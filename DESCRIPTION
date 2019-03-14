@@ -15,7 +15,7 @@ Description: Combines the features of HiSSE and MuSSE to
  Systematic Biology, in press <DOI:10.1093/sysbio/syy057>.  
 Depends: R (>= 3.5.0)
 Imports: utils,
- DDD (> 3.0),
+ DDD (> 3.7),
  ape,
  foreach,
  doParallel,
