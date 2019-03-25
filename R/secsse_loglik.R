@@ -72,7 +72,7 @@ secsse_loglik_rhs  <-  function(t,y,parameter){
 ode_FORTRAN  <-  function(
   y,
   times,
-  func,
+  func = "secsse_runmod",
   parms,
   method,
   ...
@@ -90,7 +90,7 @@ ode_FORTRAN  <-  function(
   parms  <-  as.numeric(unlist(parms))
   n_pars  <-  length(parms)
   probs  <-  deSolve::ode(y = y, parms = c(n_vars + 0.), rpar = parms, 
-                          times = times, func = "secsse_runmod", initfunc = "secsse_initmod", 
+                          times = times, func = func, initfunc = "secsse_initmod", 
                           ynames = c("SV"), dimens = n_pars, nout = 1, 
                           dllname = "secsse", method = method, ...
   )[,1:(n_vars + 1)]
@@ -243,7 +243,7 @@ calThruNodes <- function(
     
     if(use_fortran==TRUE) {
       
-      nodeMN <-  ode_FORTRAN(y = y, func = "secsse_loglik_rhs",
+      nodeMN <-  ode_FORTRAN(y = y, func = "secsse_runmod",
                              times = c(0,timeInte), parms = parameter,  rtol = reltol, atol = abstol,
                              hmax = hmax,method = methode)
       if(desIndex==1){
