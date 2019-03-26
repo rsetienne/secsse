@@ -659,6 +659,7 @@ build_initStates_time_bigtree <-
 #' @param run_parallel should the routine to run in parallel be called?
 #' @param setting_calculation argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)
 #' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
+#' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
@@ -666,6 +667,9 @@ build_initStates_time_bigtree <-
 #' library(secsse)
 #' library(DDD)
 #' library(deSolve)
+#' #library(diversitree)
+#' library(apTreeshape)
+#' library(foreach)
 #' set.seed(13)
 #' phylotree <- ape::rcoal(31, tip.label = 1:31)
 #' traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
@@ -682,7 +686,7 @@ build_initStates_time_bigtree <-
 #' drill[[3]][,]<-0.1
 #' diag(drill[[3]]) <- NA
 #' secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
-#' use_fortran,methode,cond,root_state_weight,sampling_fraction)
+#'                       use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
 #'
 #' #[1] -113.1018
 #' @export
@@ -697,7 +701,8 @@ secsse_loglik <- function(parameter,
                           sampling_fraction,
                           run_parallel = FALSE,
                           setting_calculation = NULL,
-                          setting_parallel= NULL) {
+                          setting_parallel= NULL,
+                          see_ancestral_states = FALSE) {
   
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -825,5 +830,14 @@ secsse_loglik <- function(parameter,
   
   wholeLike <- sum(atRoot)
   LL <- log(wholeLike) + loglik
-  return(LL)
+  
+  if(see_ancestral_states==TRUE){
+    num_tips<-ape::Ntip(phy)
+    ancestral_states<-states[(num_tips+1):nrow(states),]
+    ancestral_states<-ancestral_states[,-(1:(ncol(ancestral_states)/2))]
+    rownames(ancestral_states)<-ances
+    return(list(ancestral_states=ancestral_states,LL=LL))
+  } else {
+    return(LL)
+  }
 }
