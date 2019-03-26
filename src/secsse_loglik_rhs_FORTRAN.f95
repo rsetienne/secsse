@@ -208,7 +208,7 @@
 
       DO I = 1, N/2
        FF1 = (-SUM(lambdas(I,:,:)) - mus(I)) * Conc(N/2 + I) 
-       dConc(N/2 + I) = FF1 + SUM(lamDE(I,:,:))
+       dConc(N/2 + I) = FF1 + 2 * SUM(lamDE(I,:,:)) 
         DO II = 1, N/2
            FF1 = Conc(N/2 + II) - Conc(N/2 + I)
            dConc(N/2 + I) = dConc(N/2 + I) + Qs(I, II) * FF1
