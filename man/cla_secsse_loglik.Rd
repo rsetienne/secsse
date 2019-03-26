@@ -58,32 +58,32 @@ library(foreach)
 set.seed(13)
 phylotree <- ape::rcoal(12, tip.label = 1:12)
 traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
-num_concealed_states<-3
+num_concealed_states <- 3
 sampling_fraction <- c(1,1,1)
-methode<-"ode45"
-phy<-phylotree
+methode <- "ode45"
+phy <- phylotree
 # the idparlist for a ETD model (dual state inheritance model of evolution)
 # would be set like this:
-idparlist<-cla_id_paramPos(traits,num_concealed_states)
-lambd_and_modeSpe<-idparlist$lambdas
-lambd_and_modeSpe[1,]<-c(1,1,1,2,2,2,3,3,3)
-idparlist[[1]]<-lambd_and_modeSpe
-idparlist[[2]][]<- 0
-masterBlock<-matrix(4,ncol=3,nrow=3,byrow=TRUE) 
-diag(masterBlock)<-NA
-idparlist [[3]]<-q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
+idparlist <- cla_id_paramPos(traits,num_concealed_states)
+lambd_and_modeSpe <- idparlist$lambdas
+lambd_and_modeSpe[1,] <- c(1,1,1,2,2,2,3,3,3)
+idparlist[[1]] <- lambd_and_modeSpe
+idparlist[[2]][] <- 0
+masterBlock <- matrix(4,ncol=3,nrow=3,byrow=TRUE) 
+diag(masterBlock) <- NA
+idparlist [[3]] <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
 # Now, internally, clasecsse sorts the lambda matrices, so they look like:
 prepare_full_lambdas(traits,num_concealed_states,idparlist[[1]]) 
 # which is a list with 9 matrices, corresponding to the 9 states (0A,1A,2A,0B,etc)
 # if we want to calculate a single likelihood:
-parameter<-idparlist
-lambd_and_modeSpe<-parameter$lambdas
-lambd_and_modeSpe[1,]<-c(0.2,0.2,0.2,0.4,0.4,0.4,0.01,0.01,0.01)
-parameter[[1]]<-prepare_full_lambdas(traits,num_concealed_states,lambd_and_modeSpe) 
-parameter[[2]]<-rep(0,9)
-masterBlock<-matrix(0.07,ncol=3,nrow=3,byrow=TRUE) 
-diag(masterBlock)<-NA
-parameter [[3]]<-q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
+parameter <- idparlist
+lambd_and_modeSpe <- parameter$lambdas
+lambd_and_modeSpe[1,] <- c(0.2,0.2,0.2,0.4,0.4,0.4,0.01,0.01,0.01)
+parameter[[1]] <- prepare_full_lambdas(traits,num_concealed_states,lambd_and_modeSpe) 
+parameter[[2]] <- rep(0,9)
+masterBlock <- matrix(0.07,ncol=3,nrow=3,byrow=TRUE) 
+diag(masterBlock) <- NA
+parameter [[3]] <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
 cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
                  use_fortran = FALSE, methode = "ode45", cond = "maddison_cond",
                  root_state_weight = "maddison_weights", sampling_fraction,
