@@ -1,13 +1,12 @@
 
-transf_funcdefpar<-function(
-  idparsfuncdefpar=idparsfuncdefpar,
-  functions_defining_params=functions_defining_params,
-  idfactosopt=idfactosopt,
-  trparsfix=trparsfix,
-  trparsopt=trparsopt,
-  idparsfix=idparsfix,
-  idparsopt=idparsop
-  
+transf_funcdefpar <- function(
+  idparsfuncdefpar,
+  functions_defining_params,
+  idfactosopt,
+  trparsfix,
+  trparsopt,
+  idparsfix,
+  idparsopt
 ){
   trparfuncdefpar <- NULL
   ids_all <- c(idparsfix, idparsopt)

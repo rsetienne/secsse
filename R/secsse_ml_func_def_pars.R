@@ -62,13 +62,13 @@
 #'# that will be estimated to satisfy the equation. The same factor can be shared to define
 #'# several parameters.
 #'functions_defining_params<-list()
-#'functions_defining_params[[1]]<-function(){
+#'functions_defining_params[[1]] <- function(){
 #'  par_3 <- par_1 + par_2
 #'}
-#'functions_defining_params[[2]]<-function(){
+#'functions_defining_params[[2]] <- function(){
 #'  par_5 <- par_1 * factor_1
 #'}
-#'functions_defining_params[[3]]<-function(){
+#'functions_defining_params[[3]] <- function(){
 #'  par_6 <- par_3 * factor_1
 #'}
 
