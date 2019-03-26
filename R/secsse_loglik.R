@@ -243,7 +243,7 @@ calThruNodes <- function(
     
     if(use_fortran==TRUE) {
       
-      nodeMN <-  ode_FORTRAN(y = y, func = "secsse_runmod",
+      nodeMN <- ode_FORTRAN(y = y, func = "secsse_runmod",
                              times = c(0,timeInte), parms = parameter,  rtol = reltol, atol = abstol,
                              hmax = hmax,method = methode)
       if(desIndex==1){
@@ -686,7 +686,7 @@ build_initStates_time_bigtree <-
 #' drill[[3]][,]<-0.1
 #' diag(drill[[3]]) <- NA
 #' secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
-#'                       use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
+#'    use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
 #'
 #' #[1] -113.1018
 #' @export

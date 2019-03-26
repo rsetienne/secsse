@@ -105,7 +105,8 @@
 #'library(DDD)
 #'set.seed(13)
 #'# Check the vignette for a better working exercise. 
-#'# lambdas for 0A and 1A and 2A are the same but need to be estimated (CTD model, see Syst Biol paper)
+#'# lambdas for 0A and 1A and 2A are the same but need to be estimated (CTD model, see Syst Biol
+#'# paper)
 #'# mus are fixed to zero, 
 #'# the transition rates are constrained to be equal and fixed 0.01
 #'phylotree <- ape::rcoal(31, tip.label = 1:31)

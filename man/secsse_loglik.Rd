@@ -71,7 +71,7 @@ drill[[2]][]<-0
 drill[[3]][,]<-0.1
 diag(drill[[3]]) <- NA
 secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
-                      use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
+   use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
 
 #[1] -113.1018
 }
