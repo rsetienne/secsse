@@ -1,150 +1,3 @@
-secsse_transform_parameters_funcdefpar <-
-  function(trparsopt,
-           trparsfix,
-           idparsopt,
-           idparsfix,
-           idparslist,
-           idparsfuncdefpar,
-           functions_defining_params,
-           idfactosopt) {
-    trparfuncdefpar <- NULL
-    ids_all <- c(idparsfix, idparsopt)
-    
-    values_all <- c(trparsfix / (1 - trparsfix), trparsopt / (1 - trparsopt))
-    
-    for (jj in 1:length(functions_defining_params)) {
-      myfunc <- functions_defining_params[[jj]]
-      
-      calculate_param_function <-
-        function(myfunc,
-                 ids_all,
-                 values_all,
-                 idfactosopt) {
-          x <- as.list(values_all) ## To declare all the ids as variables
-          
-          if (is.null(idfactosopt)) {
-            names(x) <- paste0("par_", ids_all)
-          } else {
-            names(x) <-
-              c(paste0("par_", ids_all),
-                paste0("factor_", idfactosopt))
-          }
-          list2env(x, envir = .GlobalEnv)
-          myfunc()
-        }
-      value_func_defining_parm <-
-        calculate_param_function(myfunc, ids_all, values_all, idfactosopt)
-      
-      ## Now, declare the variable that is just calculated, so it is
-      ## available for the next calculation if needed
-      y <- as.list(value_func_defining_parm)
-      names(y) <- paste0("par_", idparsfuncdefpar[jj])
-      list2env(y, envir = .GlobalEnv)
-      
-      if (is.numeric(value_func_defining_parm) == FALSE) {
-        stop("something went with the calculation of parameters in 'functions_param_struct'")
-      }
-      trparfuncdefpar <- c(trparfuncdefpar, value_func_defining_parm)
-    }
-    trparfuncdefpar <- trparfuncdefpar / (1 + trparfuncdefpar)
-    
-    trpars1 <- idparslist
-    for (j in 1:3) {
-      trpars1[[j]][] = NA
-    }
-    if (length(idparsfix) != 0) {
-      for (i in 1:length(idparsfix)) {
-        for (j in 1:3) {
-          id <- which(idparslist[[j]] == idparsfix[i])
-          trpars1[[j]][id] <- trparsfix[i]
-          
-        }
-      }
-    }
-    for (i in 1:length(idparsopt)) {
-      for (j in 1:3)
-      {
-        id <- which(idparslist[[j]] == idparsopt[i])
-        trpars1[[j]][id] <- trparsopt[i]
-        
-      }
-    }
-    for (i in 1:length(idparsfuncdefpar)) {
-      ## structure part
-      for (j in 1:3)
-      {
-        id <- which(idparslist[[j]] == idparsfuncdefpar[i])
-        trpars1[[j]][id] <- trparfuncdefpar[i]
-        
-      }
-    }
-    pars1 <- list()
-    for (j in 1:3) {
-      pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
-    }
-    return(pars1)
-  }
-
-secsse_loglik_choosepar_funcdefpar <-
-  function(trparsopt,
-           trparsfix,
-           idparsopt,
-           idparsfix,
-           idparslist,
-           idparsfuncdefpar = idparsfuncdefpar,
-           functions_defining_params = functions_defining_params,
-           idfactosopt = idfactosopt,
-           phy = phy,
-           traits = traits,
-           num_concealed_states = num_concealed_states,
-           use_fortran = use_fortran,
-           methode,
-           cond = cond,
-           root_state_weight = root_state_weight,
-           sampling_fraction = sampling_fraction,
-           setting_calculation = setting_calculation,
-           run_parallel = run_parallel,
-           setting_parallel = setting_parallel) {
-    alltrpars <- c(trparsopt, trparsfix)
-    if (max(alltrpars) > 1 | min(alltrpars) < 0) {
-      loglik = -Inf
-    } else {
-      pars1 <-
-        secsse_transform_parameters_funcdefpar(
-          trparsopt,
-          trparsfix,
-          idparsopt,
-          idparsfix,
-          idparslist,
-          idparsfuncdefpar,
-          functions_defining_params,
-          idfactosopt
-        )
-      
-      loglik <-
-        secsse_loglik(
-          parameter = pars1,
-          phy = phy,
-          traits = traits,
-          num_concealed_states = num_concealed_states,
-          use_fortran = use_fortran,
-          methode = methode,
-          cond = cond,
-          root_state_weight = root_state_weight,
-          sampling_fraction = sampling_fraction,
-          run_parallel = run_parallel,
-          setting_calculation = setting_calculation,
-          setting_parallel = setting_parallel
-        )
-      
-      if (is.nan(loglik) || is.na(loglik)) {
-        print(trparsopt) ## new thing
-        cat("There are parameter values used which cause numerical problems.\n")
-        loglik <- -Inf
-      }
-    }
-    return(loglik)
-  }
 
 #' Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE) where some paramaters are functions of other parameters and/or factors.
 #' @title Maximum likehood estimation for (SecSSE) with parameter as complex functions.
@@ -199,15 +52,12 @@ secsse_loglik_choosepar_funcdefpar <-
 #'parsfix<-c(0,0)
 #'idfactosopt<-1
 #'initfactos<- 4
-#'# functions_defining_params is a list of functions. Each function has no arguments
-#'# and referring to parameters ids should be indicated as "par_", i.e. par_3 refers to
-#'# parameter 3. When a function is defined, all parameters involved should be either
-#'# estimated, fixed or defined by previous functions (i.e, a function that
-#'# defines parameter in 'functions_defining_params').
-#'# In this example, par_3 (i.e., parameter 3) is needed to calculate par_6. This is correct
-#'# because par_3 is defined in the first function of 'functions_defining_params'.
-#'# Note that factor_1 indicates a value that will be estimated to satisfy the equation.
-#'# The same factor can be shared to define several parameters.
+#'# functions_defining_params is a list of functions. Each function has no arguments and to refer to parameters ids should
+#'# be indicated as "par_" i.e. par_3 refers to parameter 3. When a function is defined, be sure that all the parameters involved
+#'# are either estimated, fixed or defined by previous functions (i.e, a function that defines parameter in 'functions_defining_params').
+#'# The user is responsible of this. In this example, par_3 (i.e., parameter 3) is needed to calculate par_6. This is correct
+#'# because par_3 is defined in the first function of 'functions_defining_params'. Notice that factor_1 indicates a value that will be
+#'# estimated to satisfy the equation. The same factor can be shared to define several parameters.
 #'functions_defining_params<-list()
 #'functions_defining_params[[1]]<-function(){
 #'  par_3 <- par_1 + par_2
@@ -218,6 +68,7 @@ secsse_loglik_choosepar_funcdefpar <-
 #'functions_defining_params[[3]]<-function(){
 #'  par_6 <- par_3 * factor_1
 #'}
+
 #'
 #'tol = c(1e-04, 1e-05, 1e-07)
 #'maxiter = 1000 * round((1.25)^length(idparsopt))
@@ -228,27 +79,9 @@ secsse_loglik_choosepar_funcdefpar <-
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction<-c(1,1,1)
-#'#model<-secsse_ml_func_def_pars(
-#'#phylotree, traits,
-#'#num_concealed_states,
-#'#idparslist,
-#'#idparsopt,
-#'#initparsopt,
-#'#idfactosopt,
-#'#initfactos,
-#'#idparsfix,
-#'#parsfix,
-#'#idparsfuncdefpar,
-#'#functions_defining_params,
-#'#cond,
-#'#root_state_weight,
-#'#sampling_fraction,
-#'#tol,
-#'#maxiter,
-#'#use_fortran,
-#'#methode,
-#'#optimmethod,
-#'#run_parallel)
+#'#model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt, initparsopt,idfactosopt,initfactos,
+#'#                                idparsfix, parsfix,idparsfuncdefpar,functions_defining_params, cond , root_state_weight ,sampling_fraction, tol, maxiter ,use_fortran ,
+#'#                               methode , optimmethod, run_parallel )
 #'
 #'# ML -136.5796
 #' @export
@@ -274,6 +107,17 @@ secsse_ml_func_def_pars <- function(phy,
                                     methode = "ode45",
                                     optimmethod = 'simplex',
                                     run_parallel = FALSE) {
+  
+  structure_func<-list()
+  structure_func[[1]] <- idparsfuncdefpar
+  structure_func[[2]] <- functions_defining_params
+  if(is.null(idfactosopt)){
+    structure_func[[3]]<-"noFactor"
+  } else {
+    structure_func[[3]] <- idfactosopt
+  }
+  
+  see_ancestral_states<-FALSE
   if (is.null(idfactosopt) == FALSE) {
     if (length(initfactos) != length(idfactosopt)) {
       stop("idfactosopt should have the same length than initfactos.")
@@ -369,15 +213,13 @@ secsse_ml_func_def_pars <- function(phy,
   
   
   initloglik <-
-    secsse_loglik_choosepar_funcdefpar(
+    secsse_loglik_choosepar(
       trparsopt = trparsopt,
       trparsfix = trparsfix,
       idparsopt = idparsopt,
       idparsfix = idparsfix,
       idparslist = idparslist,
-      idparsfuncdefpar = idparsfuncdefpar,
-      functions_defining_params = functions_defining_params,
-      idfactosopt = idfactosopt,
+      structure_func = structure_func,
       phy = phy,
       traits = traits,
       num_concealed_states =
@@ -390,7 +232,8 @@ secsse_ml_func_def_pars <- function(phy,
       setting_calculation =
         setting_calculation,
       run_parallel = run_parallel,
-      setting_parallel = setting_parallel
+      setting_parallel = setting_parallel,
+     see_ancestral_states=see_ancestral_states
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
@@ -408,15 +251,13 @@ secsse_ml_func_def_pars <- function(phy,
       DDD::optimizer(
         optimmethod = optimmethod,
         optimpars = optimpars,
-        fun = secsse_loglik_choosepar_funcdefpar,
+        fun = secsse_loglik_choosepar,
         trparsopt = trparsopt,
         idparsopt = idparsopt,
         trparsfix = trparsfix,
         idparsfix = idparsfix,
         idparslist = idparslist,
-        idparsfuncdefpar = idparsfuncdefpar ,
-        functions_defining_params = functions_defining_params,
-        idfactosopt = idfactosopt,
+        structure_func = structure_func,
         phy = phy,
         traits = traits,
         num_concealed_states = num_concealed_states,
@@ -427,22 +268,21 @@ secsse_ml_func_def_pars <- function(phy,
         sampling_fraction = sampling_fraction,
         setting_calculation = setting_calculation,
         run_parallel = run_parallel,
-        setting_parallel = setting_parallel
+        setting_parallel = setting_parallel,
+        see_ancestral_states=see_ancestral_states
       )
     if (out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
       MLpars1 <-
-        secsse_transform_parameters_funcdefpar(
+        secsse_transform_parameters(
           as.numeric(unlist(out$par)),
           trparsfix,
           idparsopt,
           idparsfix,
           idparslist,
-          idparsfuncdefpar,
-          functions_defining_params,
-          idfactosopt
+          structure_func
         )
       out2 <-
         list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)))
