@@ -49,13 +49,16 @@
 #'parsfix<-c(0,0)
 #'idfactosopt<-1
 #'initfactos<- 4
-#'# functions_defining_params is a list of functions. Each function has no arguments and to refer to parameters ids should
-#'# be indicated as "par_" i.e. par_3 refers to parameter 3. When a function is defined, be sure that all the parameters involved
-#'# are either estimated, fixed or defined by previous functions (i.e, a function that defines parameter in 'functions_defining_params').
-#'# The user is responsible of this. In this example, par_3 (i.e., parameter 3) is needed to calculate par_6. This is correct
-#'# because par_3 is defined in the first function of 'functions_defining_params'. Notice that factor_1 indicates a value that will be
-#'# estimated to satisfy the equation. The same factor can be shared to define several parameters.
-#'functions_defining_params<-list()
+#'# functions_defining_params is a list of functions. Each function has no arguments and to refer
+#'# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
+#'# function is defined, be sure that all the parameters involved are either estimated, fixed or
+#'# defined by previous functions (i.e, a function that defines parameter in
+#'# 'functions_defining_params'). The user is responsible for this. In this example, par_3
+#'# (i.e., parameter 3) is needed to calculate par_6. This is correct because par_3 is defined
+#'# in the first function of 'functions_defining_params'. Notice that factor_1 indicates a value
+#'# that will be estimated to satisfy the equation. The same factor can be shared to define
+#'# several parameters.
+#'functions_defining_params <- list()
 #'functions_defining_params[[1]] <- function(){
 #'  par_3 <- par_1 + par_2
 #'}
@@ -65,7 +68,6 @@
 #'functions_defining_params[[3]] <- function(){
 #'  par_6 <- par_3 * factor_1
 #'}
-
 #'
 #'tol = c(1e-04, 1e-05, 1e-07)
 #'maxiter = 1000 * round((1.25)^length(idparsopt))
@@ -76,9 +78,12 @@
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction<-c(1,1,1)
-#'#model<-cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt, initparsopt,idfactosopt,initfactos,
-#'#                                idparsfix, parsfix,idparsfuncdefpar,functions_defining_params, cond , root_state_weight ,sampling_fraction, tol, maxiter ,use_fortran ,
-#'#                               methode , optimmethod, run_parallel )
+#'#model<-cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
+#'#                                   idparsopt, initparsopt, idfactosopt, initfactos,
+#'#                                   idparsfix, parsfix, idparsfuncdefpar,
+#'#                                   functions_defining_params, cond, root_state_weight,
+#'#                                   sampling_fraction, tol, maxiter, use_fortran,
+#'#                                   methode, optimmethod, run_parallel)
 #'
 #'# ML -136.5796
 #' @export

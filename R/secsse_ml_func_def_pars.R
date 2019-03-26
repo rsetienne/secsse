@@ -82,9 +82,11 @@
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction<-c(1,1,1)
-#'#model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt, initparsopt,idfactosopt,initfactos,
-#'#                                idparsfix, parsfix,idparsfuncdefpar,functions_defining_params, cond , root_state_weight ,sampling_fraction, tol, maxiter ,use_fortran ,
-#'#                               methode , optimmethod, run_parallel )
+#'#model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt,
+#'#                               initparsopt, idfactosopt, initfactos, idparsfix, parsfix,
+#'#                               idparsfuncdefpar, functions_defining_params, cond,
+#'#                               root_state_weight, sampling_fraction, tol, maxiter, use_fortran,
+#'#                               methode, optimmethod, run_parallel)
 #'
 #'# ML -136.5796
 #' @export
