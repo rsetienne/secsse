@@ -1,4 +1,5 @@
 Package: secsse
+Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
 Version: 2.0.0
