@@ -8,7 +8,7 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
   use_fortran = TRUE, methode = "ode45", cond = "proper_cond",
   root_state_weight = "proper_weights", sampling_fraction,
   run_parallel = FALSE, setting_calculation = NULL,
-  setting_parallel = NULL)
+  setting_parallel = NULL, see_ancestral_states = FALSE)
 }
 \arguments{
 \item{parameter}{list where first vector represents lambdas, the second mus and the third transition rates.}
@@ -34,6 +34,8 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
 \item{setting_calculation}{argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)}
 
 \item{setting_parallel}{argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)}
+
+\item{see_ancestral_states}{should the ancestral states be shown? Deafault FALSE}
 }
 \value{
 The loglikelihood of the data given the parameters
@@ -50,6 +52,9 @@ rm(list=ls(all=TRUE))
 library(secsse)
 library(DDD)
 library(deSolve)
+#library(diversitree)
+library(apTreeshape)
+library(foreach)
 set.seed(13)
 phylotree <- ape::rcoal(31, tip.label = 1:31)
 traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
@@ -66,7 +71,7 @@ drill[[2]][]<-0
 drill[[3]][,]<-0.1
 diag(drill[[3]]) <- NA
 secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
-use_fortran,methode,cond,root_state_weight,sampling_fraction)
+                      use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
 
 #[1] -113.1018
 }
