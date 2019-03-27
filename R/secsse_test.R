@@ -62,7 +62,7 @@ secsse_test_geosse <- function(){
   names(pars) <- diversitree:::default.argnames.geosse()
   #set.seed(5)
   #phy <- diversitree:::tree.geosse(pars, max.t=4, x0=0)
-  phy = NULL; rm(phy);
+  phy <- NULL; rm(phy);
   utils::data('example_phy_GeoSSE', package = 'secsse');
   traits <- as.numeric(phy$tip.state)
   testit::assert(!is.null(phy))
@@ -84,13 +84,13 @@ secsse_test_geosse <- function(){
   ## Secsse part 
   lambdas<-list()
   lambdas[[1]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
-  #lambdas[[1]][1,1] <- 1
+  #lambdas[[1]][1,1] <- 1.5
   lambdas[[1]][2,1]<-1.5
   lambdas[[1]][3,1]<-0.5
   lambdas[[1]][3,2]<-1
   lambdas[[2]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
   lambdas[[2]][2,2]<-1.5
-  #lambdas[[2]][2,2] <- 1
+  #lambdas[[2]][2,2] <- 1.1
   lambdas[[3]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
   lambdas[[3]][3,3]<-0.5
   #lambdas[[3]][3,3] <- 1
@@ -123,7 +123,8 @@ secsse_test_geosse <- function(){
                                       root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1),
                                       run_parallel = FALSE, setting_calculation = NULL,
                                       setting_parallel = NULL, see_ancestral_states = FALSE)
-  
+  print(secsse_cla_LL)
+  print(secsse_cla_LL2)
   testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
 }
 

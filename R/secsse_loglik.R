@@ -72,15 +72,6 @@ ode_FORTRAN <- function(
 )
 {
   n_vars <- length(y)
-  #if(func == "cla_secsse_runmod")
-  #{
-  #  parms2 <- list()
-  #  for(i in 1:length(parms[[1]]))
-  #  {
-  #    parms2[[i]] <- t(parms[[1]][[i]])
-  #  }
-  #  parms[[1]] <- parms2
-  #}
   parms <- as.numeric(unlist(parms))
   n_pars <- length(parms)
   probs <- deSolve::ode(y = y, parms = c(n_vars + 0.), rpar = parms, 
@@ -381,7 +372,7 @@ doParalThing <- function(take_ancesSub,
   #.packages=c("foreach"),
   ii <- NULL
   rm(ii)
-  statesNEW <- foreach::foreach (ii = 1:2,
+  statesNEW <- foreach::foreach(ii = 1:2,
                                  .packages = c(
                                    "secsse",
                                    #"diversitree",
@@ -399,7 +390,6 @@ doParalThing <- function(take_ancesSub,
                                    "calThruNodes",
                                    "use_fortran")) %dopar% {
                                      ancesSub <- take_ancesSub[[ii]]
-                                     
                                      for(i in 1:length(ancesSub)){
                                        calcul <- 
                                          calThruNodes(ancesSub[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode = methode, phy = phy)
@@ -536,8 +526,8 @@ build_initStates_time_bigtree <-
       sort(ape::branching.times(phySplit), decreasing = T)
     interNodes <- as.numeric(names(split_times))
     
-    formatedtree <- apTreeshape::as.treeshape(phySplit)
-    smaller <- apTreeshape::smaller.clade.spectrum(formatedtree)
+    formattedtree <- apTreeshape::as.treeshape(phySplit)
+    smaller <- apTreeshape::smaller.clade.spectrum(formattedtree)
     smaller <- cbind(smaller, (nspp + 1):(nrow(phySplit$edge) + 1))
     
     optSplit <- NULL
