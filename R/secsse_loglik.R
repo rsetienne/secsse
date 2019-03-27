@@ -72,6 +72,15 @@ ode_FORTRAN <- function(
 )
 {
   n_vars <- length(y)
+  #if(func == "cla_secsse_runmod")
+  #{
+  #  parms2 <- list()
+  #  for(i in 1:length(parms[[1]]))
+  #  {
+  #    parms2[[i]] <- t(parms[[1]][[i]])
+  #  }
+  #  parms[[1]] <- parms2
+  #}
   parms <- as.numeric(unlist(parms))
   n_pars <- length(parms)
   probs <- deSolve::ode(y = y, parms = c(n_vars + 0.), rpar = parms, 

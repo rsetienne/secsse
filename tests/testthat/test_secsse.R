@@ -88,19 +88,17 @@ test_that("secsse gives the same result as GeoSSE", {
   ## Secsse part 
   lambdas<-list()
   lambdas[[1]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
+  #lambdas[[1]][1,1] <- 1
   lambdas[[1]][2,1]<-1.5
   lambdas[[1]][3,1]<-0.5
   lambdas[[1]][3,2]<-1
   lambdas[[2]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
   lambdas[[2]][2,2]<-1.5
+  #lambdas[[2]][2,2] <- 1
   lambdas[[3]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
   lambdas[[3]][3,3]<-0.5
-  #lambdas_in_matrices <- list()
-  #for(i in 1:3){
-  #  lambdas_in_matrices[[i]]<-matrix(0,ncol=3,nrow=3) 
-  #  lambdas_in_matrices[[i]][i,i]<-0.1 ### lambdas defines at the beggining
-  #}
-  #lambdas <- lambdas_in_matrices
+  #lambdas[[3]][3,3] <- 1
+  
   mus<-c(0,0.7,0.7)
 
   q<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
@@ -108,9 +106,7 @@ test_that("secsse gives the same result as GeoSSE", {
   q[3,1]<-1.3
   q[1,2]<-0.7
   q[1,3]<-0.7
-  #q<-matrix(0.1,ncol=3,nrow=3,byrow=TRUE)
-  #diag(q) <- 0
-  
+
   parameter<-list()
   parameter[[1]]<-lambdas
   parameter[[2]]<-mus

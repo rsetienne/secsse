@@ -244,7 +244,6 @@ cla_secsse_loglik <- function(parameter,
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
   
-  
   if (run_parallel==TRUE){ 
     
     
