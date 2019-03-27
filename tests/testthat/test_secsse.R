@@ -59,3 +59,80 @@ test_that("secsse gives the same result as hisse", {
   testthat::expect_equal(z1, z2) 
 
 })
+
+test_that("secsse gives the same result as GeoSSE", {
+  ## GeoSSE 
+  pars <- c(1.5, 0.5, 1.0, 0.7, 0.7, 2.5, 0.5)
+  names(pars) <- diversitree:::default.argnames.geosse()
+  #set.seed(5)
+  #phy <- diversitree:::tree.geosse(pars, max.t=4, x0=0)
+  phy = NULL; rm(phy);
+  utils::data('example_phy_GeoSSE', package = 'secsse');
+  traits <- as.numeric(phy$tip.state)
+  testit::assert(!is.null(phy))
+  lik.g <- diversitree:::make.geosse(phy, phy$tip.state)
+  pars.g <- c(1.5, 0.5, 1.0, 0.7, 0.7, 1.4, 1.3)
+  names(pars.g) <- diversitree:::argnames(lik.g)
+  lik.c <- diversitree:::make.classe(phy, phy$tip.state+1, 3)
+  pars.c <- 0 * diversitree:::starting.point.classe(phy, 3)
+  pars.c['lambda222'] <- pars.c['lambda112'] <- pars.g['sA']
+  pars.c['lambda333'] <- pars.c['lambda113'] <- pars.g['sB']
+  pars.c['lambda123'] <- pars.g['sAB']
+  pars.c['mu2'] <- pars.c['q13'] <- pars.g['xA']
+  pars.c['mu3'] <- pars.c['q12'] <- pars.g['xB']
+  pars.c['q21'] <- pars.g['dA']
+  pars.c['q31'] <- pars.g['dB']
+  lik.g(pars.g) # -175.7685
+  classe_diversitree_LL <- lik.c(pars.c) # -175.7685
+  
+  ## Secsse part 
+  lambdas<-list()
+  lambdas[[1]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
+  lambdas[[1]][2,1]<-1.5
+  lambdas[[1]][3,1]<-0.5
+  lambdas[[1]][3,2]<-1
+  lambdas[[2]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
+  lambdas[[2]][2,2]<-1.5
+  lambdas[[3]]<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
+  lambdas[[3]][3,3]<-0.5
+  #lambdas_in_matrices <- list()
+  #for(i in 1:3){
+  #  lambdas_in_matrices[[i]]<-matrix(0,ncol=3,nrow=3) 
+  #  lambdas_in_matrices[[i]][i,i]<-0.1 ### lambdas defines at the beggining
+  #}
+  #lambdas <- lambdas_in_matrices
+  mus<-c(0,0.7,0.7)
+
+  q<-matrix(0,ncol=3,nrow=3,byrow=TRUE)
+  q[2,1]<-1.4
+  q[3,1]<-1.3
+  q[1,2]<-0.7
+  q[1,3]<-0.7
+  #q<-matrix(0.1,ncol=3,nrow=3,byrow=TRUE)
+  #diag(q) <- 0
+  
+  parameter<-list()
+  parameter[[1]]<-lambdas
+  parameter[[2]]<-mus
+  parameter[[3]]<-q
+
+  num_concealed_states<-3.1
+  
+  secsse_cla_LL <- cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
+                                     use_fortran = FALSE, methode = "ode45", cond = "maddison_cond",
+                                     root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1),
+                                     run_parallel = FALSE, setting_calculation = NULL,
+                                     setting_parallel = NULL, see_ancestral_states = FALSE)
+  
+  testthat::expect_equal(classe_diversitree_LL,secsse_cla_LL)
+
+  parameter[[1]] <- list(t(lambdas[[1]]),t(lambdas[[2]]),t(lambdas[[3]]))
+  
+  secsse_cla_LL2 <- cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
+                                     use_fortran = TRUE, methode = "ode45", cond = "maddison_cond",
+                                     root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1),
+                                     run_parallel = FALSE, setting_calculation = NULL,
+                                     setting_parallel = NULL, see_ancestral_states = FALSE)
+  
+  testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
+})

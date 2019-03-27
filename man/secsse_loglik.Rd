@@ -41,8 +41,7 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
 The loglikelihood of the data given the parameters
 }
 \description{
-Logikelihood calculation 
-  for the SecSSE model given a set of parameters and data
+Logikelihood calculation for the SecSSE model given a set of parameters and data
 }
 \note{
 To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
@@ -52,23 +51,22 @@ rm(list=ls(all=TRUE))
 library(secsse)
 library(DDD)
 library(deSolve)
-#library(diversitree)
 library(apTreeshape)
 library(foreach)
 set.seed(13)
 phylotree <- ape::rcoal(31, tip.label = 1:31)
 traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
-num_concealed_states<-2
-use_fortran<-TRUE
-cond<-"proper_cond"
-methode<-"ode45"
+num_concealed_states <- 2
+use_fortran <- TRUE
+cond <- "proper_cond"
+methode <- "ode45"
 root_state_weight <- "proper_weights"
-sampling_fraction<-c(1,1,1)
+sampling_fraction <- c(1,1,1)
 run_parallel <- FALSE
-drill<-id_paramPos(traits,num_concealed_states)
-drill[[1]][]<-c(0.12,0.01,0.2,0.21,0.31,0.23)
-drill[[2]][]<-0
-drill[[3]][,]<-0.1
+drill <- id_paramPos(traits,num_concealed_states)
+drill[[1]][] <- c(0.12,0.01,0.2,0.21,0.31,0.23)
+drill[[2]][] <- 0
+drill[[3]][,] <- 0.1
 diag(drill[[3]]) <- NA
 secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
    use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)

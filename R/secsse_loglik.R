@@ -673,6 +673,13 @@ secsse_loglik <- function(parameter,
     ancesSub2 <- setting_calculation$ancesSub2
     ancesRest <- setting_calculation$ancesRest
     
+    if(num_concealed_states != round(num_concealed_states)){ # for testing 
+      d <- ncol(states) / 2 
+      new_states <- states[,c(1:sqrt(d),(d + 1):((d + 1) + sqrt(d) - 1))]
+      new_states <- states[,c(1,2,3,10,11,12)]
+      states <- new_states
+    }
+    
     loglik <- 0
     ly <- ncol(states)
     d <- ncol(states) / 2
@@ -681,7 +688,6 @@ secsse_loglik <- function(parameter,
     if(is.null(setting_parallel)){
       cl <- parallel::makeCluster(2)
       doParallel::registerDoParallel(cl)
-      
     }
     
     statesNEW <- doParalThing(take_ancesSub,
@@ -723,6 +729,13 @@ secsse_loglik <- function(parameter,
     states <- setting_calculation$states
     forTime <- setting_calculation$forTime
     ances <- setting_calculation$ances
+  
+    if(num_concealed_states != round(num_concealed_states)){ # for testing 
+      d <- ncol(states) / 2 
+      new_states <- states[,c(1:sqrt(d),(d + 1):((d + 1) + sqrt(d) - 1))]
+      new_states <- states[,c(1,2,3,10,11,12)]
+      states <- new_states
+    }
     
     loglik <- 0
     ly <- ncol(states)

@@ -164,15 +164,6 @@
         Initialised = .TRUE.          ! to prevent from initialising more than once
       ENDIF
 
-! dynamics
-
-!  R code
-!  all_states<-cbind(Ds,Es)
-!  a<-cbind(all_states[,2],all_states[,1])
-!  b<-t(all_states)
-!  cross_D_E <- a%*%b
-!  dE <-  -((unlist(lapply(lambdas,sum))) + mus + Q %*% (rep(1,d))) * Es + ( Q %*% Es ) + mus + unlist(lapply(lapply(lambdas,"*",Es%*%t(Es)),sum))
-
 !lambdas = P(1 ... (N**3)/8)
 !mus = P((N**3)/8 + 1 ... (N**3)/8 + N/2)
 !Qs = P((N**3)/8 + N/2 + 1 ... (N**3)/8 + N/2 + (N**2)/4)
@@ -182,7 +173,7 @@
       DO I = 1, N/2
         mus(I) = P(arraydim + I)
         DO II = 1, N/2
-           Qs(I,II) = P(arraydim + N/2 + (I - 1) * N/2 + II)
+           Qs(I,II) = P(arraydim + N/2 + (II - 1) * N/2 + I)
            DO III = 1,N/2
               lambdas(I,II,III) = P((I - 1) * matdim + (II - 1) * N/2 + III)
               FF1 = Conc(II) * Conc(III)
@@ -193,7 +184,17 @@
         ENDDO
         Qs(I,I) = 0
       ENDDO
-      
+
+
+! dynamics
+
+!  R code
+!  all_states<-cbind(Ds,Es)
+!  a<-cbind(all_states[,2],all_states[,1])
+!  b<-t(all_states)
+!  cross_D_E <- a%*%b
+!  dE <-  -((unlist(lapply(lambdas,sum))) + mus + Q %*% (rep(1,d))) * Es + ( Q %*% Es ) + mus + unlist(lapply(lapply(lambdas,"*",Es%*%t(Es)),sum))
+
       DO I = 1, N/2
         FF1 = mus(I) - (SUM(lambdas(I,:,:)) + mus(I)) * Conc(I)
         dConc(I) = FF1 + SUM(lamEE(I,:,:))
@@ -208,7 +209,7 @@
 
       DO I = 1, N/2
        FF1 = (-SUM(lambdas(I,:,:)) - mus(I)) * Conc(N/2 + I) 
-       dConc(N/2 + I) = FF1 + SUM(lamDE(I,:,:))
+       dConc(N/2 + I) = FF1 + 2 * SUM(lamDE(I,:,:))
         DO II = 1, N/2
            FF1 = Conc(N/2 + II) - Conc(N/2 + I)
            dConc(N/2 + I) = dConc(N/2 + I) + Qs(I, II) * FF1
