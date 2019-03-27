@@ -175,7 +175,7 @@
         DO II = 1, N/2
            Qs(I,II) = P(arraydim + N/2 + (II - 1) * N/2 + I)
            DO III = 1,N/2
-              lambdas(I,II,III) = P((I - 1) * matdim + (II - 1) * N/2 + III)
+              lambdas(I,II,III) = P((I - 1) * matdim + (III - 1) * N/2 + II)
               FF1 = Conc(II) * Conc(III)
               lamEE(I,II,III) = lambdas(I,II,III) * FF1
               FF1 = Conc(N/2 + II) * Conc(III)
