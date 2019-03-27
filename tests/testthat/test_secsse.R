@@ -126,8 +126,6 @@ test_that("secsse gives the same result as GeoSSE", {
   
   testthat::expect_equal(classe_diversitree_LL,secsse_cla_LL)
 
-  parameter[[1]] <- list(t(lambdas[[1]]),t(lambdas[[2]]),t(lambdas[[3]]))
-  
   secsse_cla_LL2 <- cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
                                      use_fortran = TRUE, methode = "ode45", cond = "maddison_cond",
                                      root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1),
