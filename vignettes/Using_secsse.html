@@ -12,7 +12,7 @@
 
 <meta name="author" content="Leonel Herrera-Alsina, Paul van Els &amp; Rampal S. Etienne" />
 
-<meta name="date" content="2019-02-27" />
+<meta name="date" content="2019-03-26" />
 
 <title>Using SecSSE</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Using SecSSE</h1>
 <h4 class="author"><em>Leonel Herrera-Alsina, Paul van Els &amp; Rampal S. Etienne</em></h4>
-<h4 class="date"><em>2019-02-27</em></h4>
+<h4 class="date"><em>2019-03-26</em></h4>
 
 
 
@@ -312,10 +312,8 @@ idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>,<span class="k
 <p>PARSFIX: specifies at which values the parameters identified under idparsfix should be set. Should have the same number of entries as idparsfix (same order too). In this example, the first zero means that all those entries in idparslist with ID 0 will be fixed to zero. The second zero means that all the entries in idparslist with ID 10, will be fixed to 0.0001.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parsfix &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="fl">0.0001</span>)</code></pre></div>
 <p>One can also estimate initial lambda and mu values from the tree using a simple birth-death model that does not take into account trait states. Here we do this with the bd_ML function from the DDD package. A good starting point for q is lambda/5:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DDD)</code></pre></div>
-<pre><code>## Loading required package: deSolve</code></pre>
-<pre><code>## Loading required package: ade4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">startingpoint &lt;-<span class="st"> </span><span class="kw">bd_ML</span>(<span class="dt">brts =</span> ape<span class="op">::</span><span class="kw">branching.times</span>(phylo_Vign))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DDD)
+startingpoint &lt;-<span class="st"> </span><span class="kw">bd_ML</span>(<span class="dt">brts =</span> ape<span class="op">::</span><span class="kw">branching.times</span>(phylo_Vign))</code></pre></div>
 <pre><code>## You are optimizing lambda0 mu0 
 ## You are fixing lambda1 mu1 
 ## Optimizing the likelihood - this may take a while. 

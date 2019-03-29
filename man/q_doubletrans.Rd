@@ -20,8 +20,8 @@ Q matrix that includes both examined and concealed states, it should be declared
 Sets a Q matrix where double transitions are not allowed
 }
 \examples{
-traits  <-  sample(c(0,1,2), 45,replace=TRUE) #get some traits
-masterBlock <- matrix(99,ncol=3,nrow=3,byrow=TRUE) #For a three-state trait
+traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
+masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) #For a three-state trait
 diag(masterBlock) <- NA
 masterBlock[1,2] <- 6
 masterBlock[1,3] <- 7
@@ -29,9 +29,9 @@ masterBlock[2,1] <- 8
 masterBlock[2,3] <- 9
 masterBlock[3,1] <- 10
 masterBlock[3,2] <- 11
-myQ <- q_doubletrans(traits,masterBlock,diff.conceal=FALSE)
+myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
 # now, it can replace the Q matrix from id_paramPos  
-num_concealed_states  <-  3 
+num_concealed_states <- 3 
 param_posit <- id_paramPos(traits,num_concealed_states)
-param_posit[[3]] <-  myQ
+param_posit[[3]] <- myQ
 }

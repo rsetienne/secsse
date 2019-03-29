@@ -1,6 +1,5 @@
-
-#' Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE) where some paramaters are functions of other parameters and/or factors.
-#' @title Maximum likehood estimation for (SecSSE) with parameter as complex functions.
+#' Maximum likehood estimation under cla Several examined and concealed States-dependent Speciation and Extinction (SecSSE) where some paramaters are functions of other parameters and/or factors. Offers the option of cladogenesis
+#' @title Maximum likehood estimation for (SecSSE) with parameter as complex functions. Cladogenetic version
 #' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.
 #' @param traits a vector with trait states for each tip in the phylogeny.
 #' @param num_concealed_states number of concealed states, generally equivalent to the number of examined states in the dataset.
@@ -36,10 +35,8 @@
 #'intGuessMu <- startingpoint$mu0
 #'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
 #'num_concealed_states<-3
-#'idparslist<-id_paramPos(traits, num_concealed_states)
-#'idparslist[[1]][c(1,4,7)]<-1
-#'idparslist[[1]][c(2,5,8)]<-2
-#'idparslist[[1]][c(3,6,9)]<-3
+#'idparslist<-cla_id_paramPos(traits,num_concealed_states)
+#'idparslist$lambdas[1,]<-c(1,2,3,1,2,3,1,2,3)
 #'idparslist[[2]][]<-4
 #'masterBlock<-matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
 #'diag(masterBlock)<-NA
@@ -57,11 +54,11 @@
 #'# function is defined, be sure that all the parameters involved are either estimated, fixed or
 #'# defined by previous functions (i.e, a function that defines parameter in
 #'# 'functions_defining_params'). The user is responsible for this. In this example, par_3
-#'# (i.e., parameter 3) is needed to calculate par_6. This is correct because par_3 is defined in
-#'# the first function of 'functions_defining_params'. Notice that factor_1 indicates a value
+#'# (i.e., parameter 3) is needed to calculate par_6. This is correct because par_3 is defined
+#'# in the first function of 'functions_defining_params'. Notice that factor_1 indicates a value
 #'# that will be estimated to satisfy the equation. The same factor can be shared to define
 #'# several parameters.
-#'functions_defining_params<-list()
+#'functions_defining_params <- list()
 #'functions_defining_params[[1]] <- function(){
 #'  par_3 <- par_1 + par_2
 #'}
@@ -71,7 +68,6 @@
 #'functions_defining_params[[3]] <- function(){
 #'  par_6 <- par_3 * factor_1
 #'}
-
 #'
 #'tol = c(1e-04, 1e-05, 1e-07)
 #'maxiter = 1000 * round((1.25)^length(idparsopt))
@@ -82,16 +78,17 @@
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction<-c(1,1,1)
-#'#model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt,
-#'#                               initparsopt, idfactosopt, initfactos, idparsfix, parsfix,
-#'#                               idparsfuncdefpar, functions_defining_params, cond,
-#'#                               root_state_weight, sampling_fraction, tol, maxiter, use_fortran,
-#'#                               methode, optimmethod, run_parallel)
+#'#model<-cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
+#'#                                   idparsopt, initparsopt, idfactosopt, initfactos,
+#'#                                   idparsfix, parsfix, idparsfuncdefpar,
+#'#                                   functions_defining_params, cond, root_state_weight,
+#'#                                   sampling_fraction, tol, maxiter, use_fortran,
+#'#                                   methode, optimmethod, run_parallel)
 #'
 #'# ML -136.5796
 #' @export
 
-secsse_ml_func_def_pars <- function(phy,
+cla_secsse_ml_func_def_pars <- function(phy,
                                     traits,
                                     num_concealed_states,
                                     idparslist,
@@ -116,11 +113,7 @@ secsse_ml_func_def_pars <- function(phy,
   structure_func<-list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
-  if(is.null(idfactosopt)){
-    structure_func[[3]]<-"noFactor"
-  } else {
-    structure_func[[3]] <- idfactosopt
-  }
+  structure_func[[3]] <- idfactosopt
   
   see_ancestral_states<-FALSE
   if (is.null(idfactosopt) == FALSE) {
@@ -177,6 +170,9 @@ secsse_ml_func_def_pars <- function(phy,
     cat("You set some transition states as non possible to happen", "\n")
   }
   
+  
+  idparslist[[1]]<-prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
+  see_ancestral_states <- FALSE 
   
   options(warn = -1)
   cat("Calculating the likelihood for the initial parameters.", "\n")
@@ -238,7 +234,7 @@ secsse_ml_func_def_pars <- function(phy,
         setting_calculation,
       run_parallel = run_parallel,
       setting_parallel = setting_parallel,
-     see_ancestral_states=see_ancestral_states
+      see_ancestral_states=see_ancestral_states
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
