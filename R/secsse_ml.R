@@ -12,15 +12,10 @@ transf_funcdefpar <- function(
   ids_all <- c(idparsfix, idparsopt)
   
   values_all <- c(trparsfix / (1 - trparsfix), trparsopt / (1 - trparsopt))
-  
+  a_new_envir <- new.env()
   for (jj in 1:length(functions_defining_params)) {
     myfunc <- functions_defining_params[[jj]]
-    
-    calculate_param_function <-
-      function(myfunc,
-               ids_all,
-               values_all,
-               idfactosopt) {
+    environment(myfunc) <- a_new_envir
         x <- as.list(values_all) ## To declare all the ids as variables
         
         if (is.null(idfactosopt)) {
@@ -30,17 +25,15 @@ transf_funcdefpar <- function(
             c(paste0("par_", ids_all),
               paste0("factor_", idfactosopt))
         }
-        list2env(x, envir = .GlobalEnv)
-        myfunc()
-      }
-    value_func_defining_parm <-
-      calculate_param_function(myfunc, ids_all, values_all, idfactosopt)
-    
+        list2env(x, envir = a_new_envir)
+        #   local(myfunc,envir = a_new_envir)
+        value_func_defining_parm<-local(myfunc(),envir = a_new_envir)
+
     ## Now, declare the variable that is just calculated, so it is
     ## available for the next calculation if needed
     y <- as.list(value_func_defining_parm)
     names(y) <- paste0("par_", idparsfuncdefpar[jj])
-    list2env(y, envir = .GlobalEnv)
+    list2env(y, envir = a_new_envir)
     
     if (is.numeric(value_func_defining_parm) == FALSE) {
       stop("something went with the calculation of parameters in 'functions_param_struct'")
@@ -48,7 +41,7 @@ transf_funcdefpar <- function(
     trparfuncdefpar <- c(trparfuncdefpar, value_func_defining_parm)
   }
   trparfuncdefpar <- trparfuncdefpar / (1 + trparfuncdefpar)
-  
+  rm(a_new_envir)
   return(trparfuncdefpar)
 }
 
