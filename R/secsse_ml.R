@@ -56,7 +56,7 @@ secsse_transform_parameters <-
   ) {
     if(is.null(structure_func)==FALSE){
       idparsfuncdefpar <- structure_func[[1]] 
-      functions_defining_params <-  structure_func[[2]] 
+      functions_defining_params <- structure_func[[2]] 
     #  idfactosopt <- structure_func[[3]] <- idfactosopt
       
       if(structure_func[[3]] =="noFactor"){
@@ -68,8 +68,6 @@ secsse_transform_parameters <-
       trparfuncdefpar<-transf_funcdefpar(idparsfuncdefpar=idparsfuncdefpar,functions_defining_params=functions_defining_params,
                                          idfactosopt=idfactosopt,trparsfix=trparsfix,trparsopt=trparsopt,  idparsfix=idparsfix,
                                          idparsopt=idparsopt)
-      
-      
     }
     
     if(class(idparslist[[1]])=="list"){ # when the ml function is called from cla_secsse
@@ -89,33 +87,26 @@ secsse_transform_parameters <-
         for(i in 1:length(idparsfix)){
           
           for(j in 1:nrow(trpars1[[3]])){
-            
-            
             id <- which(idparslist[[1]][[j]] == idparsfix[i])
             trpars1[[1]][[j]][id]<- trparsfix[i]
           }
           for(j in 2:3) {
             id <- which(idparslist[[j]] == idparsfix[i])
             trpars1[[j]][id] <- trparsfix[i]
-            
           }
         }
       }
       
       for(i in 1:length(idparsopt)){
         for(j in 1:nrow(trpars1[[3]])){
-          
-          
           id <- which(idparslist[[1]][[j]] == idparsopt[i])
           trpars1[[1]][[j]][id]<- trparsopt[i]
         }
         
         
         for(j in 2:3){
-          
           id <- which(idparslist[[j]] == idparsopt[i])
           trpars1[[j]][id] <- trparsopt[i]
-          
         }
       }
       
@@ -132,7 +123,6 @@ secsse_transform_parameters <-
           {
             id <- which(idparslist[[j]] == idparsfuncdefpar[i])
             trpars1[[j]][id] <- trparfuncdefpar[i]
-            
           }
         }
       }  

@@ -9,7 +9,7 @@
 #' @param initparsopt initial guess of the parameters to be estimated.
 #' @param idfactosopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
 #' @param initfactos the initial guess for a factor (it should be set to NULL when no factors).
-#' @param idparsfix id of the fixed parameters (it should be set to NULL when no factors).
+#' @param idparsfix id of the fixed parameters (it should be set to NULL when there are no factors).
 #' @param parsfix value of the fixed parameters.
 #' @param idparsfuncdefpar id of the parameters which will be a function of optimized and/or fixed parameters. The order of id should match functions_defining_params
 #' @param functions_defining_params a list of functions. Each element will be a function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example and vigenette
@@ -127,7 +127,7 @@ secsse_ml_func_def_pars <- function(phy,
   see_ancestral_states<-FALSE
   if (is.null(idfactosopt) == FALSE) {
     if (length(initfactos) != length(idfactosopt)) {
-      stop("idfactosopt should have the same length than initfactos.")
+      stop("idfactosopt should have the same length as initfactos.")
     }
   }
   
@@ -240,7 +240,7 @@ secsse_ml_func_def_pars <- function(phy,
         setting_calculation,
       run_parallel = run_parallel,
       setting_parallel = setting_parallel,
-     see_ancestral_states=see_ancestral_states
+      see_ancestral_states=see_ancestral_states
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,

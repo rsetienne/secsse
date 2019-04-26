@@ -132,7 +132,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   if (length(functions_defining_params) != length(idparsfuncdefpar)) {
     stop(
-      "the argument functions_defining_params should have the same length than idparsfuncdefpar"
+      "the argument functions_defining_params should have the same length as idparsfuncdefpar"
     )
   }
   
