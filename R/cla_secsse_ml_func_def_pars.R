@@ -20,6 +20,7 @@
 #' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
 #' @param methode method used for integration calculation. Default is "ode45".
 #' @param optimmethod method used for optimization. Default is "simplex".
+#' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
@@ -83,7 +84,7 @@
 #'#                                   idparsfix, parsfix, idparsfuncdefpar,
 #'#                                   functions_defining_params, cond, root_state_weight,
 #'#                                   sampling_fraction, tol, maxiter, use_fortran,
-#'#                                   methode, optimmethod, run_parallel)
+#'#                                   methode, optimmethod, num_cycles = 1,run_parallel)
 #'
 #'# ML -136.5796
 #' @export
@@ -108,6 +109,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     use_fortran = TRUE,
                                     methode = "ode45",
                                     optimmethod = 'simplex',
+                                    num_cycles = 1,
                                     run_parallel = FALSE) {
   
   structure_func<-list()
@@ -167,14 +169,14 @@ cla_secsse_ml_func_def_pars <- function(phy,
   if (anyDuplicated(c(unique(sort(
     as.vector(idparslist[[3]])
   )), idparsfix[which(parsfix == 0)])) != 0) {
-    cat("You set some transition states as non possible to happen", "\n")
+    cat("You set some transition states as impossible to happen", "\n")
   }
   
   
-  idparslist[[1]]<-prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
+  idparslist[[1]] <- prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
   see_ancestral_states <- FALSE 
   
-  options(warn = -1)
+  #options(warn = -1)
   cat("Calculating the likelihood for the initial parameters.", "\n")
   utils::flush.console()
   
@@ -270,7 +272,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
         setting_calculation = setting_calculation,
         run_parallel = run_parallel,
         setting_parallel = setting_parallel,
-        see_ancestral_states=see_ancestral_states
+        see_ancestral_states=see_ancestral_states,
+        num_cycles = num_cycles
       )
     if (out$conv != 0)
     {

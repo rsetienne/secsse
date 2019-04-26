@@ -174,7 +174,9 @@ secsse_test_ml <- function(){
     maxiter,
     use_fortran,
     methode,
-    optimmethod,run_parallel
+    optimmethod,
+    num_cycles = 1,
+    run_parallel
   )
   
   testthat::expect_equal(model$ML,-29.89993)
@@ -190,9 +192,8 @@ secsse_test_ml2 <- function(){
   num_concealed_states<-3
   idparslist<-id_paramPos(traits, num_concealed_states)
   idparslist[[1]][]<-1
-  
   idparslist[[2]][]<-2
-  masterBlock<-matrix(c(3,4),ncol=3,nrow=3,byrow=TRUE)
+  masterBlock<-matrix(c(3,4,3,4,3,4,3,4,3),ncol=3,nrow=3,byrow=TRUE)
   diag(masterBlock)<-NA
   diff.conceal <- FALSE
   idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
@@ -218,9 +219,9 @@ secsse_test_ml2 <- function(){
   cond<-"proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction<-c(1,1,1)
-  model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt, initparsopt,idfactosopt,initfactos,
-                                 idparsfix, parsfix,idparsfuncdefpar,functions_defining_params, cond , root_state_weight ,sampling_fraction, tol, maxiter ,use_fortran ,
-                                 methode , optimmethod, run_parallel )
+  model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt, initparsopt, idfactosopt, initfactos,
+                                 idparsfix, parsfix,idparsfuncdefpar,functions_defining_params, cond, root_state_weight, sampling_fraction, tol, maxiter, use_fortran ,
+                                 methode, optimmethod, num_cycles = 1, run_parallel)
  
   testthat::expect_equal(model$ML,-12.87974)
 }  
@@ -271,6 +272,8 @@ secsse_test_ml3 <- function(){
     maxiter,
     use_fortran,
     methode,
-    optimmethod,run_parallel)
+    optimmethod,
+    num_cycles = 1,
+    run_parallel)
   testthat::expect_equal(model$ML,-16.1342246206186)
 }  

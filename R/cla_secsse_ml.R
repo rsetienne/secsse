@@ -96,6 +96,7 @@
 #' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
 #' @param methode method used for integration calculation. Default is "ode45".
 #' @param optimmethod method used for optimization. Default is "simplex".
+#' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called?
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
@@ -152,8 +153,9 @@
 #'#  maxiter,
 #'#  use_fortran,
 #'#  methode,
-#'#  optimmethod,run_parallel)
-
+#'#  optimmethod,
+#'#  num_cycles = 1,
+#'#  run_parallel)
 #' # [1] -90.97626
 #' @export
 
@@ -174,6 +176,7 @@ cla_secsse_ml <- function(
   use_fortran = TRUE,
   methode = "ode45",
   optimmethod = 'simplex',
+  num_cycles = 1,
   run_parallel = FALSE
 ){
   
@@ -200,11 +203,11 @@ cla_secsse_ml <- function(
   }
   
   if(anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),idparsfix[which(parsfix==0)]))!=0){
-    cat("You set some transition states as non possible to happen","\n")
+    cat("You set some transition states as impossible to happen","\n")
   }
   
   
-  if(class(idparslist[[1]])=="matrix"){ ## it is a tailor case otherwise
+  if(class(idparslist[[1]]) == "matrix"){ ## it is a tailor case otherwise
   idparslist[[1]]<-prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
     
   }
@@ -212,7 +215,7 @@ cla_secsse_ml <- function(
   
    see_ancestral_states <- FALSE 
   
-  options(warn=-1)
+  #options(warn=-1)
   cat("Calculating the likelihood for the initial parameters.","\n")
   utils::flush.console()
   trparsopt <- initparsopt/(1 + initparsopt)
@@ -251,7 +254,7 @@ cla_secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
-    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states)
+    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states, num_cycles = num_cycles)
     if(out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")

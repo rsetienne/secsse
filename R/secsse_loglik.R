@@ -385,10 +385,11 @@ doParalThing <- function(take_ancesSub,
                                  .export = c(
                                    "secsse_loglik",
                                    "ode_FORTRAN",
-                                   "phy",
-                                   "methode",
-                                   "calThruNodes",
-                                   "use_fortran")) %dopar% {
+                                   #"phy",
+                                   #"methode",
+                                   "calThruNodes"
+                                   #,"use_fortran")) %dopar% {
+                                   )) %dopar% { 
                                      ancesSub <- take_ancesSub[[ii]]
                                      for(i in 1:length(ancesSub)){
                                        calcul <- 
