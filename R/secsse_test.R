@@ -59,18 +59,18 @@ secsse_test_hisse <- function(){
 secsse_test_geosse <- function(){
   #geosse
   pars <- c(1.5, 0.5, 1.0, 0.7, 0.7, 2.5, 0.5)
-  names(pars) <- diversitree:::default.argnames.geosse()
+  names(pars) <- c("sA", "sB", "sAB", "xA", "xB", "dA", "dB")
   #set.seed(5)
-  #phy <- diversitree:::tree.geosse(pars, max.t=4, x0=0)
+  #phy <- diversitree::tree.geosse(pars, max.t=4, x0=0)
   phy <- NULL; rm(phy);
   utils::data('example_phy_GeoSSE', package = 'secsse');
   traits <- as.numeric(phy$tip.state)
   testit::assert(!is.null(phy))
-  lik.g <- diversitree:::make.geosse(phy, phy$tip.state)
+  lik.g <- diversitree::make.geosse(phy, phy$tip.state)
   pars.g <- c(1.5, 0.5, 1.0, 0.7, 0.7, 1.4, 1.3)
-  names(pars.g) <- diversitree:::argnames(lik.g)
-  lik.c <- diversitree:::make.classe(phy, phy$tip.state+1, 3)
-  pars.c <- 0 * diversitree:::starting.point.classe(phy, 3)
+  names(pars.g) <- diversitree::argnames(lik.g)
+  lik.c <- diversitree::make.classe(phy, phy$tip.state+1, 3)
+  pars.c <- 0 * diversitree::starting.point.classe(phy, 3)
   pars.c['lambda222'] <- pars.c['lambda112'] <- pars.g['sA']
   pars.c['lambda333'] <- pars.c['lambda113'] <- pars.g['sB']
   pars.c['lambda123'] <- pars.g['sAB']
@@ -208,7 +208,6 @@ secsse_test_ml2 <- function(){
   functions_defining_params[[1]]<-function(){
     par_3 <- par_4 * factor_1
   }
-  
   
   tol = c(1e-04, 1e-05, 1e-07)
   maxiter = 1000 * round((1.25)^length(idparsopt))

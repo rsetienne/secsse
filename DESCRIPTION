@@ -3,7 +3,7 @@ Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
 Version: 2.0.0
-Date: 2019-03-22
+Date: 2019-04-26
 License: GPL-3
 Authors@R: c(
  person("Leonel", "Herrera Alsina", email = "leonelhalsina@gmail.com", role = "cre"),
@@ -16,7 +16,7 @@ Description: Combines the features of HiSSE and MuSSE to
  Systematic Biology, in press <DOI:10.1093/sysbio/syy057>.  
 Depends: R (>= 3.5.0)
 Imports: utils,
- DDD (> 3.7),
+ DDD (>= 4.0),
  ape,
  foreach,
  doParallel,
@@ -24,7 +24,9 @@ Imports: utils,
  phylobase,
  geiger,
  deSolve
-Suggests: testthat,
+Suggests: diversitree,
+ phytools,
+ testthat,
  testit,
  knitr,
  rmarkdown
