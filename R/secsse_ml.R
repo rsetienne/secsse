@@ -27,7 +27,7 @@ transf_funcdefpar <- function(
         }
         list2env(x, envir = a_new_envir)
         #   local(myfunc,envir = a_new_envir)
-        value_func_defining_parm<-local(myfunc(),envir = a_new_envir)
+        value_func_defining_parm <- local(myfunc(),envir = a_new_envir)
 
     ## Now, declare the variable that is just calculated, so it is
     ## available for the next calculation if needed
@@ -36,7 +36,7 @@ transf_funcdefpar <- function(
     list2env(y, envir = a_new_envir)
     
     if (is.numeric(value_func_defining_parm) == FALSE) {
-      stop("something went with the calculation of parameters in 'functions_param_struct'")
+      stop("something went wrong with the calculation of parameters in 'functions_param_struct'")
     }
     trparfuncdefpar <- c(trparfuncdefpar, value_func_defining_parm)
   }

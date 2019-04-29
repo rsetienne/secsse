@@ -30,7 +30,7 @@ secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
 
 \item{initfactos}{the initial guess for a factor (it should be set to NULL when no factors).}
 
-\item{idparsfix}{id of the fixed parameters (it should be set to NULL when no factors).}
+\item{idparsfix}{id of the fixed parameters (it should be set to NULL when there are no factors).}
 
 \item{parsfix}{value of the fixed parameters.}
 

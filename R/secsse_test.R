@@ -205,6 +205,8 @@ secsse_test_ml2 <- function(){
   idfactosopt<-1
   initfactos<- 1
   functions_defining_params<-list()
+  par_4 <- NA 
+  factor_1 <- NA
   functions_defining_params[[1]]<-function(){
     par_3 <- par_4 * factor_1
   }
