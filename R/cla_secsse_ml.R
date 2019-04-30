@@ -260,8 +260,7 @@ cla_secsse_ml <- function(
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
       MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)),trparsfix,idparsopt,idparsfix,idparslist,structure_func)
-      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)))
-      
+      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }
   return(out2)

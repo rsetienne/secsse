@@ -293,7 +293,7 @@ secsse_ml_func_def_pars <- function(phy,
           structure_func
         )
       out2 <-
-        list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)))
+        list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }
   return(out2)

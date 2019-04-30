@@ -13,21 +13,22 @@ transf_funcdefpar <- function(
   
   values_all <- c(trparsfix / (1 - trparsfix), trparsopt / (1 - trparsopt))
   a_new_envir <- new.env()
+  x <- as.list(values_all) ## To declare all the ids as variables
+  
+  if (is.null(idfactosopt)) {
+    names(x) <- paste0("par_", ids_all)
+  } else {
+    names(x) <-
+      c(paste0("par_", ids_all),
+        paste0("factor_", idfactosopt))
+  }
+  list2env(x, envir = a_new_envir)
+  
   for (jj in 1:length(functions_defining_params)) {
     myfunc <- functions_defining_params[[jj]]
     environment(myfunc) <- a_new_envir
-        x <- as.list(values_all) ## To declare all the ids as variables
-        
-        if (is.null(idfactosopt)) {
-          names(x) <- paste0("par_", ids_all)
-        } else {
-          names(x) <-
-            c(paste0("par_", ids_all),
-              paste0("factor_", idfactosopt))
-        }
-        list2env(x, envir = a_new_envir)
-        #   local(myfunc,envir = a_new_envir)
-        value_func_defining_parm <- local(myfunc(),envir = a_new_envir)
+    #   local(myfunc,envir = a_new_envir)
+    value_func_defining_parm <- local(myfunc(),envir = a_new_envir)
 
     ## Now, declare the variable that is just calculated, so it is
     ## available for the next calculation if needed
@@ -490,8 +491,7 @@ secsse_ml <- function(
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
       MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)),trparsfix,idparsopt,idparsfix,idparslist, structure_func)
-      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)))
-      
+      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }
   return(out2)
