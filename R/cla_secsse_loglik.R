@@ -98,7 +98,7 @@ cla_calThruNodes <- function(
   states[focal,] <- newstate
   loglik <- loglik + log(sumD)
   
-  return(list(states=states,loglik=loglik,mergeBranch=mergeBranch,nodeM=nodeM))
+  return(list(states = states,loglik = loglik,mergeBranch = mergeBranch,nodeM = nodeM))
 }
 
 #' @importFrom foreach foreach
