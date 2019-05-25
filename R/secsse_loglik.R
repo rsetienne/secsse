@@ -194,7 +194,7 @@ calThruNodes <- function(
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
   nb_node <- phy$Nnode
-  reltol <- 1e-10
+  reltol <- 1e-12
   abstol <- 1e-16
   ly <- ncol(states)
   d <- ncol(states)/2
@@ -229,19 +229,23 @@ calThruNodes <- function(
   ## At the node
   nodeM <- as.numeric(nodeM[2,-1])
   nodeN <- as.numeric(nodeN[2,-1])
-  
-  mergeBranch <- NULL
-  for(iii in 1:d){
-    combProb <-  nodeM[iii + d] * nodeN[iii + d] * lambdas[iii] ## multiplication of probabilities of both branches
-    mergeBranch <- c(mergeBranch,combProb)
-  }
-  sumD <- sum(mergeBranch)
-  mergeBranch <- mergeBranch/sumD
+  ff <- normalize_loglik(nodeM[(1:d) + d],loglik); nodeM[(1:d) + d] <- ff$probs; loglik <- ff$loglik
+  ff <- normalize_loglik(nodeN[(1:d) + d],loglik); nodeN[(1:d) + d] <- ff$probs; loglik <- ff$loglik
+  #mergeBranch <- NULL
+  #for(iii in 1:d){
+  #  combProb <-  nodeM[iii + d] * nodeN[iii + d] * lambdas[iii] ## multiplication of probabilities of both branches
+  #  mergeBranch <- c(mergeBranch,combProb)
+  #}
+  mergeBranch <- nodeM[(1:d) + d] * nodeN[(1:d) + d] * lambdas[(1:d)]
+
+  ff <- normalize_loglik(mergeBranch,loglik); mergeBranch <- ff$probs; loglik <- ff$loglik
+  #sumD <- sum(mergeBranch)
+  #mergeBranch <- mergeBranch/sumD
+  #loglik <- loglik + log(sumD)
   
   newstate <- nodeM[1:d] ## extinction probabilities
   newstate <- c(newstate,mergeBranch)
   states[focal,] <- newstate
-  loglik <- loglik + log(sumD)
   
   return(list(states=states,loglik=loglik,mergeBranch=mergeBranch,nodeM=nodeM))
 }
@@ -516,7 +520,7 @@ build_initStates_time_bigtree <-
           timeInterv[2] - timeInterv[1]
       }
     }
-    reltol <- 1e-10
+    reltol <- 1e-12
     abstol <- 1e-16
     
     phySplit <- phy

@@ -319,3 +319,10 @@ for(jj in 1:mat_size){
 return(full_lambdas)
 }
 
+normalize_loglik <- function(probs,loglik)
+{
+  sumabsprobs <- sum(abs(probs))
+  probs <- probs/sumabsprobs
+  loglik <- loglik + log(sumabsprobs)
+  return(list(probs = probs, loglik = loglik))
+}

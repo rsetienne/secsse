@@ -35,7 +35,7 @@ cla_calThruNodes <- function(
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
   nb_node <- phy$Nnode
-  reltol <- 1e-10
+  reltol <- 1e-12
   abstol <- 1e-16
   hmax <- NULL
   ly <- ncol(states)
@@ -75,28 +75,29 @@ cla_calThruNodes <- function(
   ## At the node
   nodeM <- as.numeric(nodeM[2,-1])
   nodeN <- as.numeric(nodeN[2,-1])
+  ff <- normalize_loglik(nodeM[(1:d) + d],loglik); nodeM[(1:d) + d] <- ff$probs; loglik <- ff$loglik
+  ff <- normalize_loglik(nodeN[(1:d) + d],loglik); nodeN[(1:d) + d] <- ff$probs; loglik <- ff$loglik
   # cat(rbind(nodeM[(d+1):length(nodeM)],nodeN[(d+1):length(nodeN)]),"\n")
   
-  all_states <- cbind(nodeM[(d+1):length(nodeM)],nodeN[(d+1):length(nodeN)])
+  all_states <- cbind(nodeM[(d + 1):length(nodeM)],nodeN[(d + 1):length(nodeN)])
   a <- cbind(all_states[,2],all_states[,1])
   b <- t(all_states)
   cross_M_N <- a%*%b
-  
   
   # mergeBranch <- NULL
   #for(iii in 1:d){
   #combProb <- 0.5*sum(lapply(lambdas,"*",cross_M_N)[[1]]) ## multiplication of probabilities of both branches
   #mergeBranch <- c(mergeBranch,combProb)
-  mergeBranch <- 0.5* (unlist(lapply(lapply(lambdas,"*",cross_M_N),sum)))
-  
+  mergeBranch <- 0.5 * (unlist(lapply(lapply(lambdas,"*",cross_M_N),sum)))
   #}
-  sumD <- sum(mergeBranch)
-  mergeBranch <- mergeBranch/sumD
+  ff <- normalize_loglik(mergeBranch,loglik); mergeBranch <- ff$probs; loglik <- ff$loglik
+  #sumD <- sum(mergeBranch)
+  #mergeBranch <- mergeBranch/sumD
+  #loglik <- loglik + log(sumD)
   #cat(mergeBranch,"\n")
   newstate <- nodeM[1:d] ## extinction probabilities
   newstate <- c(newstate,mergeBranch)
   states[focal,] <- newstate
-  loglik <- loglik + log(sumD)
   
   return(list(states = states,loglik = loglik,mergeBranch = mergeBranch,nodeM = nodeM))
 }
