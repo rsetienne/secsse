@@ -71,6 +71,7 @@ cla_calThruNodes <- function(
     if(desIndex == 2){
       nodeM <- nodeMN 
     }
+    #print(nodeMN)     ########################
   }
   ## At the node
   nodeM <- as.numeric(nodeM[2,-1])
