@@ -141,8 +141,8 @@
 
       INTEGER           :: neq, ip(*), i, ii, iii, arraydim, matdim
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*), FF1, FF2
-      DOUBLE PRECISION  :: lambdas(N/2,N/2,N/2), mus(N/2), Qs(N/2,N/2)
-      DOUBLE PRECISION  :: lamEE(N/2,N/2,N/2), lamDE(N/2,N/2,N/2)
+      REAL(16)          :: lambdas(N/2,N/2,N/2), mus(N/2), Qs(N/2,N/2)
+      REAL(16)          :: lamEE(N/2,N/2,N/2), lamDE(N/2,N/2,N/2)
 
 ! parameters - named here
       DOUBLE PRECISION rn

@@ -246,7 +246,7 @@ calThruNodes <- function(
   newstate <- nodeM[1:d] ## extinction probabilities
   newstate <- c(newstate,mergeBranch)
   states[focal,] <- newstate
-  
+  #print(parameter); print(loglik)
   return(list(states=states,loglik=loglik,mergeBranch=mergeBranch,nodeM=nodeM))
 }
 # calThruNodes <- function(ances,

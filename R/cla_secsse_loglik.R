@@ -98,7 +98,7 @@ cla_calThruNodes <- function(
   newstate <- nodeM[1:d] ## extinction probabilities
   newstate <- c(newstate,mergeBranch)
   states[focal,] <- newstate
-  
+  #print(parameter); print(loglik)
   return(list(states = states,loglik = loglik,mergeBranch = mergeBranch,nodeM = nodeM))
 }
 
@@ -397,7 +397,7 @@ cla_secsse_loglik <- function(parameter,
   
   wholeLike <- sum(atRoot)
   LL <- log(wholeLike) + loglik
-  
+  #print(unique(unlist(parameter[[1]]))); print(LL);  
   if(see_ancestral_states == TRUE){
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips+1):nrow(states),]
