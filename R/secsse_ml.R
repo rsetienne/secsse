@@ -220,7 +220,7 @@ secsse_loglik_choosepar <-
           structure_func
         )
       
-      if(class(pars1[[1]])=="list"){ # is the cla_ used?
+      if(class(pars1[[1]]) == "list"){ # is the cla_ used?
         loglik <-
           cla_secsse_loglik(
             parameter = pars1,
@@ -253,7 +253,7 @@ secsse_loglik_choosepar <-
             run_parallel = run_parallel,
             setting_calculation = setting_calculation,
             setting_parallel = setting_parallel,
-            see_ancestral_states=see_ancestral_states
+            see_ancestral_states = see_ancestral_states
           )
       }
       if (is.nan(loglik) || is.na(loglik)) {
@@ -441,7 +441,7 @@ secsse_ml <- function(
   }
   
   if(anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),idparsfix[which(parsfix==0)]))!=0){
-    cat("You set some transition states as impossible to happen","\n")
+    cat("You set some transitions as impossible to happen","\n")
   }
   
   see_ancestral_states <- FALSE 

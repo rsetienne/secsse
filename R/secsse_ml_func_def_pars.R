@@ -176,7 +176,7 @@ secsse_ml_func_def_pars <- function(phy,
   if (anyDuplicated(c(unique(sort(
     as.vector(idparslist[[3]])
   )), idparsfix[which(parsfix == 0)])) != 0) {
-    cat("You set some transition states as impossible to happen", "\n")
+    cat("You set some transitions as impossible to happen", "\n")
   }
   
   
