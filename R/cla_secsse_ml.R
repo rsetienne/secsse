@@ -98,6 +98,7 @@
 #' @param optimmethod method used for optimization. Default is "simplex".
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called?
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -177,13 +178,14 @@ cla_secsse_ml <- function(
   methode = "ode45",
   optimmethod = 'simplex',
   num_cycles = 1,
-  run_parallel = FALSE
+  run_parallel = FALSE,
+  loglik_penalty = 0
 ){
   
  ## check_input(traits,phy,sampling_fraction,root_state_weight)##################
   structure_func<-NULL
   if(is.matrix(traits)){
-    cat("you are setting a model where some species had more than one trait state \n")
+    cat("you are setting a model where some species have more than one trait state \n")
   }
   
   if(length(initparsopt)!=length(idparsopt)){
@@ -206,14 +208,11 @@ cla_secsse_ml <- function(
     cat("You set some transitions as impossible to happen","\n")
   }
   
-  
   if(class(idparslist[[1]]) == "matrix"){ ## it is a tailor case otherwise
   idparslist[[1]]<-prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
-    
   }
-  
-  
-   see_ancestral_states <- FALSE 
+
+  see_ancestral_states <- FALSE 
   
   #options(warn=-1)
   cat("Calculating the likelihood for the initial parameters.","\n")
@@ -223,8 +222,7 @@ cla_secsse_ml <- function(
   trparsfix <- parsfix/(1 + parsfix)
   trparsfix[which(parsfix == Inf)] = 1
   optimpars <- c(tol,maxiter)
-  
-  
+
   if(.Platform$OS.type=="windows" && run_parallel==TRUE){
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
@@ -239,13 +237,12 @@ cla_secsse_ml <- function(
     setting_parallel <- 1
   } 
   
-  if(run_parallel==FALSE){
+  if(run_parallel == FALSE){
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
-    setting_parallel<- NULL
+    setting_parallel <- NULL
   }
   
-  
-  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states)
+  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states,loglik_penalty = loglik_penalty)
   cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
   if(initloglik == -Inf)
   {
@@ -254,7 +251,7 @@ cla_secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
-    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states, num_cycles = num_cycles)
+    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty)
     if(out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")

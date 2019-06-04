@@ -23,6 +23,7 @@
 #' @param optimmethod method used for optimization. Default is "simplex".
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -113,18 +114,19 @@ secsse_ml_func_def_pars <- function(phy,
                                     methode = "ode45",
                                     optimmethod = 'simplex',
                                     num_cycles = 1,
-                                    run_parallel = FALSE) {
+                                    run_parallel = FALSE,
+                                    loglik_penalty = 0) {
   
-  structure_func<-list()
+  structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
   if(is.null(idfactosopt)){
-    structure_func[[3]]<-"noFactor"
+    structure_func[[3]] <- "noFactor"
   } else {
     structure_func[[3]] <- idfactosopt
   }
   
-  see_ancestral_states<-FALSE
+  see_ancestral_states <- FALSE
   if (is.null(idfactosopt) == FALSE) {
     if (length(initfactos) != length(idfactosopt)) {
       stop("idfactosopt should have the same length as initfactos.")
@@ -133,18 +135,18 @@ secsse_ml_func_def_pars <- function(phy,
   
   if (is.list(functions_defining_params) == FALSE) {
     stop(
-      "the argument functions_defining_params should be a list of functions. See example and vignette"
+      "The argument functions_defining_params should be a list of functions. See example and vignette"
     )
   }
   
   if (length(functions_defining_params) != length(idparsfuncdefpar)) {
     stop(
-      "the argument functions_defining_params should have the same length than idparsfuncdefpar"
+      "The argument functions_defining_params should have the same length than idparsfuncdefpar"
     )
   }
   
   if (is.matrix(traits)) {
-    cat("you are setting a model where some species had more than one trait state \n")
+    cat("You are setting a model where some species had more than one trait state \n")
   }
   
   if (length(initparsopt) != length(idparsopt)) {
@@ -160,7 +162,7 @@ secsse_ml_func_def_pars <- function(phy,
   }
   
   if (anyDuplicated(c(idparsopt, idparsfix, idparsfuncdefpar)) != 0) {
-    stop("at least one element was asked to be fixed, estimated or a function at the same time")
+    stop("At least one element was asked to be fixed, estimated or a function at the same time")
   }
   
   if (identical(as.numeric(sort(
@@ -240,7 +242,8 @@ secsse_ml_func_def_pars <- function(phy,
         setting_calculation,
       run_parallel = run_parallel,
       setting_parallel = setting_parallel,
-      see_ancestral_states=see_ancestral_states
+      see_ancestral_states = see_ancestral_states,
+      loglik_penalty = loglik_penalty
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
@@ -276,8 +279,9 @@ secsse_ml_func_def_pars <- function(phy,
         setting_calculation = setting_calculation,
         run_parallel = run_parallel,
         setting_parallel = setting_parallel,
-        see_ancestral_states=see_ancestral_states,
-        num_cycles = num_cycles
+        see_ancestral_states = see_ancestral_states,
+        num_cycles = num_cycles,
+        loglik_penalty = loglik_penalty
       )
     if (out$conv != 0)
     {

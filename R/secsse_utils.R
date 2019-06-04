@@ -326,3 +326,9 @@ normalize_loglik <- function(probs,loglik)
   loglik <- loglik + log(sumabsprobs)
   return(list(probs = probs, loglik = loglik))
 }
+
+penalty <- function(pars,loglik_penalty = 0)
+{
+  pars <- unlist(unlist(pars))
+  return(loglik_penalty * sum(pars^2)/(2 * length(pars)))
+}

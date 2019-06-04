@@ -107,7 +107,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     tol = c(1E-4, 1E-5, 1E-7),
                                     maxiter = 1000 * round((1.25) ^ length(idparsopt)),
                                     use_fortran = TRUE,
-                                    methode = "ode45",
+                                    methode = 'ode45',
                                     optimmethod = 'simplex',
                                     num_cycles = 1,
                                     run_parallel = FALSE) {
@@ -117,7 +117,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   structure_func[[2]] <- functions_defining_params
   structure_func[[3]] <- idfactosopt
   
-  see_ancestral_states<-FALSE
+  see_ancestral_states <- FALSE
   if (is.null(idfactosopt) == FALSE) {
     if (length(initfactos) != length(idfactosopt)) {
       stop("idfactosopt should have the same length than initfactos.")
@@ -187,11 +187,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
   trparsfix <- parsfix / (1 + parsfix)
   trparsfix[which(parsfix == Inf)] <- 1
   
-  
   optimpars <- c(tol, maxiter)
-  
-  
-  
+
   if (.Platform$OS.type == "windows" && run_parallel == TRUE) {
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
@@ -214,7 +211,6 @@ cla_secsse_ml_func_def_pars <- function(phy,
     setting_parallel <- NULL
   }
   
-  
   initloglik <-
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
@@ -225,8 +221,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
       structure_func = structure_func,
       phy = phy,
       traits = traits,
-      num_concealed_states =
-        num_concealed_states,
+      num_concealed_states = num_concealed_states,
       use_fortran = use_fortran,
       methode = methode,
       cond = cond,
@@ -236,7 +231,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
         setting_calculation,
       run_parallel = run_parallel,
       setting_parallel = setting_parallel,
-      see_ancestral_states=see_ancestral_states
+      see_ancestral_states = see_ancestral_states,
+      loglik_penalty = loglik_penalty
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
@@ -272,8 +268,9 @@ cla_secsse_ml_func_def_pars <- function(phy,
         setting_calculation = setting_calculation,
         run_parallel = run_parallel,
         setting_parallel = setting_parallel,
-        see_ancestral_states=see_ancestral_states,
-        num_cycles = num_cycles
+        see_ancestral_states = see_ancestral_states,
+        num_cycles = num_cycles,
+        loglik_penalty = loglik_penalty
       )
     if (out$conv != 0)
     {

@@ -11,7 +11,7 @@ secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
   tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 *
   round((1.25)^length(idparsopt)), use_fortran = TRUE,
   methode = "ode45", optimmethod = "simplex", num_cycles = 1,
-  run_parallel = FALSE)
+  run_parallel = FALSE, loglik_penalty = 0)
 }
 \arguments{
 \item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.}
@@ -57,6 +57,8 @@ secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
 \item{run_parallel}{should the routine to run in parallel be called? Read note below}
+
+\item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
 }
 \value{
 Parameter estimated and maximum likelihood

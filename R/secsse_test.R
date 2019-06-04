@@ -162,7 +162,8 @@ secsse_test_geosse <- function(){
                                      run_parallel = FALSE,
                                      setting_calculation = NULL,
                                      setting_parallel = NULL,
-                                     see_ancestral_states = FALSE)
+                                     see_ancestral_states = FALSE,
+                                     loglik_penalty = 0)
   
   testthat::expect_equal(classe_diversitree_LL,secsse_cla_LL)
   
@@ -178,7 +179,8 @@ secsse_test_geosse <- function(){
                                       run_parallel = FALSE,
                                       setting_calculation = NULL,
                                       setting_parallel = NULL,
-                                      see_ancestral_states = FALSE)
+                                      see_ancestral_states = FALSE,
+                                      loglik_penalty = 0)
   #print(secsse_cla_LL)
   #print(secsse_cla_LL2)
   testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
