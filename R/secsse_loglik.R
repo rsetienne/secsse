@@ -617,6 +617,7 @@ build_initStates_time_bigtree <-
 #' @param setting_calculation argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)
 #' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
@@ -658,7 +659,8 @@ secsse_loglik <- function(parameter,
                           run_parallel = FALSE,
                           setting_calculation = NULL,
                           setting_parallel= NULL,
-                          see_ancestral_states = FALSE){
+                          see_ancestral_states = FALSE,
+                          loglik_penalty = 0){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -786,7 +788,7 @@ secsse_loglik <- function(parameter,
   atRoot <- ((mergeBranch2) * (weightStates))
   
   wholeLike <- sum(atRoot)
-  LL <- log(wholeLike) + loglik
+  LL <- log(wholeLike) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
   
   if(see_ancestral_states == TRUE){
     num_tips <- ape::Ntip(phy)
