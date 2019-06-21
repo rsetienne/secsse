@@ -22,6 +22,7 @@
 #' @param optimmethod method used for optimization. Default is "simplex".
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -110,7 +111,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     methode = 'ode45',
                                     optimmethod = 'simplex',
                                     num_cycles = 1,
-                                    run_parallel = FALSE) {
+                                    run_parallel = FALSE,
+                                    loglik_penalty = 0) {
   
   structure_func<-list()
   structure_func[[1]] <- idparsfuncdefpar
