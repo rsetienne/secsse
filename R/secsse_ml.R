@@ -60,10 +60,14 @@ secsse_transform_parameters <-
       functions_defining_params <- structure_func[[2]] 
     #  idfactosopt <- structure_func[[3]] <- idfactosopt
       
-      if(structure_func[[3]] =="noFactor"){
-      idfactosopt <- NULL
-      } else {
+      if(length(structure_func[[3]])>1){
         idfactosopt <- structure_func[[3]] 
+      } else {
+        if(structure_func[[3]] =="noFactor"){
+          idfactosopt <- NULL
+        } else {
+          idfactosopt <- structure_func[[3]] 
+        }
       }
       
       trparfuncdefpar<-transf_funcdefpar(idparsfuncdefpar=idparsfuncdefpar,functions_defining_params=functions_defining_params,
