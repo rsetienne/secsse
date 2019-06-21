@@ -23,7 +23,7 @@
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
-#' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+#' @note To run in parallel the following libraries must be loaded under windows: apTreeshape, doparallel and foreach. Under unix/linux, apTreeshape, doparallel, foreach and doMC must be loaded.
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
