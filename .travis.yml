@@ -10,6 +10,10 @@ before_install:
   - sudo add-apt-repository -y ppa:opencpu/imagemagick
   - sudo apt-get update
   - sudo apt-get install -y libmagick++-dev
+  # Fix 'configure: WARNING: No fftw found - QuaSSE/fftC will not be available'
+  - sudo apt-get install -y fftw2 fftw-dev
+  # Fix 'configure: error: gsl-config not found, is GSL installed?'
+  - sudo apt-get install -y libgsl-dev
 
 after_success:
   - Rscript -e "lintr::lint_package()"
