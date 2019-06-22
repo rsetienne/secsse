@@ -50,7 +50,7 @@ Logikelihood calculation for the SecSSE model given a set of parameters and data
 To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 }
 \examples{
-rm(list=ls(all=TRUE))
+rm(list = ls(all = TRUE))
 library(secsse)
 library(DDD)
 library(deSolve)
@@ -58,7 +58,7 @@ library(apTreeshape)
 library(foreach)
 set.seed(13)
 phylotree <- ape::rcoal(31, tip.label = 1:31)
-traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
+traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace = TRUE)
 num_concealed_states <- 2
 use_fortran <- TRUE
 cond <- "proper_cond"

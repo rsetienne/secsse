@@ -67,7 +67,7 @@ Parameter estimated and maximum likelihood
 Maximum likehood estimation under cla Several examined and concealed States-dependent Speciation and Extinction (SecSSE) where some paramaters are functions of other parameters and/or factors. Offers the option of cladogenesis
 }
 \note{
-To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+To run in parallel the following libraries must be loaded under windows: apTreeshape, doparallel and foreach. Under unix/linux, apTreeshape, doparallel, foreach and doMC must be loaded.
 }
 \examples{
 # Example of how to set the arguments for a ML search.
@@ -76,25 +76,25 @@ library(secsse)
 library(DDD)
 set.seed(16)
 phylotree <- ape::rbdtree(0.07,0.001,Tmax=50)
-startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
+startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 intGuessLamba <- startingpoint$lambda0
 intGuessMu <- startingpoint$mu0
 traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
-num_concealed_states<-3
-idparslist<-cla_id_paramPos(traits,num_concealed_states)
-idparslist$lambdas[1,]<-c(1,2,3,1,2,3,1,2,3)
-idparslist[[2]][]<-4
-masterBlock<-matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
-diag(masterBlock)<-NA
+num_concealed_states <- 3
+idparslist <- cla_id_paramPos(traits,num_concealed_states)
+idparslist$lambdas[1,] <- c(1,2,3,1,2,3,1,2,3)
+idparslist[[2]][] <- 4
+masterBlock <- matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
+diag(masterBlock) <- NA
 diff.conceal <- FALSE
-idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-idparsfuncdefpar<-c(3,5,6)
-idparsopt<-c(1,2)
-idparsfix<-c(0,4)
-initparsopt<-c(rep(intGuessLamba,2))
-parsfix<-c(0,0)
-idfactosopt<-1
-initfactos<- 4
+idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+idparsfuncdefpar <- c(3,5,6)
+idparsopt <- c(1,2)
+idparsfix <- c(0,4)
+initparsopt <- c(rep(intGuessLamba,2))
+parsfix <- c(0,0)
+idfactosopt <- 1
+initfactos <- 4
 # functions_defining_params is a list of functions. Each function has no arguments and to refer
 # to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
 # function is defined, be sure that all the parameters involved are either estimated, fixed or
@@ -121,10 +121,10 @@ use_fortran = TRUE
 methode = "ode45"
 optimmethod = "simplex"
 run_parallel = FALSE
-cond<-"proper_cond"
+cond <- "proper_cond"
 root_state_weight <- "proper_weights"
-sampling_fraction<-c(1,1,1)
-#model<-cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
+sampling_fraction <- c(1,1,1)
+#model <- cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
 #                                   idparsopt, initparsopt, idfactosopt, initfactos,
 #                                   idparsfix, parsfix, idparsfuncdefpar,
 #                                   functions_defining_params, cond, root_state_weight,

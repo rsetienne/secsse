@@ -32,25 +32,25 @@
 #'library(DDD)
 #'set.seed(16)
 #'phylotree <- ape::rbdtree(0.07,0.001,Tmax=50)
-#'startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
+#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
 #'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
-#'num_concealed_states<-3
-#'idparslist<-cla_id_paramPos(traits,num_concealed_states)
-#'idparslist$lambdas[1,]<-c(1,2,3,1,2,3,1,2,3)
-#'idparslist[[2]][]<-4
-#'masterBlock<-matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
-#'diag(masterBlock)<-NA
+#'num_concealed_states <- 3
+#'idparslist <- cla_id_paramPos(traits,num_concealed_states)
+#'idparslist$lambdas[1,] <- c(1,2,3,1,2,3,1,2,3)
+#'idparslist[[2]][] <- 4
+#'masterBlock <- matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
+#'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
-#'idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-#'idparsfuncdefpar<-c(3,5,6)
-#'idparsopt<-c(1,2)
-#'idparsfix<-c(0,4)
-#'initparsopt<-c(rep(intGuessLamba,2))
-#'parsfix<-c(0,0)
-#'idfactosopt<-1
-#'initfactos<- 4
+#'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+#'idparsfuncdefpar <- c(3,5,6)
+#'idparsopt <- c(1,2)
+#'idparsfix <- c(0,4)
+#'initparsopt <- c(rep(intGuessLamba,2))
+#'parsfix <- c(0,0)
+#'idfactosopt <- 1
+#'initfactos <- 4
 #'# functions_defining_params is a list of functions. Each function has no arguments and to refer
 #'# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
 #'# function is defined, be sure that all the parameters involved are either estimated, fixed or
@@ -77,10 +77,10 @@
 #'methode = "ode45"
 #'optimmethod = "simplex"
 #'run_parallel = FALSE
-#'cond<-"proper_cond"
+#'cond <- "proper_cond"
 #'root_state_weight <- "proper_weights"
-#'sampling_fraction<-c(1,1,1)
-#'#model<-cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
+#'sampling_fraction <- c(1,1,1)
+#'#model <- cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
 #'#                                   idparsopt, initparsopt, idfactosopt, initfactos,
 #'#                                   idparsfix, parsfix, idparsfuncdefpar,
 #'#                                   functions_defining_params, cond, root_state_weight,
@@ -114,7 +114,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     run_parallel = FALSE,
                                     loglik_penalty = 0) {
   
-  structure_func<-list()
+  structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
   structure_func[[3]] <- idfactosopt
@@ -174,7 +174,6 @@ cla_secsse_ml_func_def_pars <- function(phy,
     cat("You set some transitions as impossible to happen", "\n")
   }
   
-  
   idparslist[[1]] <- prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
   see_ancestral_states <- FALSE 
   
@@ -194,7 +193,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   if (.Platform$OS.type == "windows" && run_parallel == TRUE) {
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
-    setting_calculation <-
+    setting_calculation <- 
       build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- 1
     on.exit(parallel::stopCluster(cl))
@@ -202,18 +201,18 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   if (.Platform$OS.type == "unix" && run_parallel == TRUE) {
     doMC::registerDoMC(2)
-    setting_calculation <-
+    setting_calculation <- 
       build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- 1
   }
   
   if (run_parallel == FALSE) {
-    setting_calculation <-
+    setting_calculation <- 
       build_initStates_time(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- NULL
   }
   
-  initloglik <-
+  initloglik <- 
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
       trparsfix = trparsfix,
@@ -248,7 +247,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
     cat("Optimizing the likelihood - this may take a while.", "\n")
     utils::flush.console()
     cat(setting_parallel, "\n")
-    out <-
+    out <- 
       DDD::optimizer(
         optimmethod = optimmethod,
         optimpars = optimpars,
@@ -278,7 +277,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
     {
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
-      MLpars1 <-
+      MLpars1 <- 
         secsse_transform_parameters(
           as.numeric(unlist(out$par)),
           trparsfix,
@@ -287,7 +286,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
           idparslist,
           structure_func
         )
-      out2 <-
+      out2 <- 
         list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }

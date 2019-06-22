@@ -36,24 +36,24 @@
 #'startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
-#'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
+#'traits <- sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
 #'num_concealed_states<-3
 #'idparslist<-id_paramPos(traits, num_concealed_states)
-#'idparslist[[1]][c(1,4,7)]<-1
-#'idparslist[[1]][c(2,5,8)]<-2
-#'idparslist[[1]][c(3,6,9)]<-3
+#'idparslist[[1]][c(1,4,7)] <- 1
+#'idparslist[[1]][c(2,5,8)] <- 2
+#'idparslist[[1]][c(3,6,9)] <- 3
 #'idparslist[[2]][]<-4
-#'masterBlock<-matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
-#'diag(masterBlock)<-NA
+#'masterBlock <- matrix(c(5,6),ncol = 3,nrow = 3,byrow = TRUE)
+#'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
-#'idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-#'idparsfuncdefpar<-c(3,5,6)
-#'idparsopt<-c(1,2)
-#'idparsfix<-c(0,4)
-#'initparsopt<-c(rep(intGuessLamba,2))
-#'parsfix<-c(0,0)
-#'idfactosopt<-1
-#'initfactos<- 4
+#'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+#'idparsfuncdefpar <- c(3,5,6)
+#'idparsopt <- c(1,2)
+#'idparsfix <- c(0,4)
+#'initparsopt <- c(rep(intGuessLamba,2))
+#'parsfix <- c(0,0)
+#'idfactosopt <- 1
+#'initfactos <- 4
 #'# functions_defining_params is a list of functions. Each function has no arguments and to refer
 #'# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
 #'# function is defined, be sure that all the parameters involved are either estimated, fixed or
@@ -63,7 +63,7 @@
 #'# the first function of 'functions_defining_params'. Notice that factor_1 indicates a value
 #'# that will be estimated to satisfy the equation. The same factor can be shared to define
 #'# several parameters.
-#'functions_defining_params<-list()
+#'functions_defining_params <- list()
 #'functions_defining_params[[1]] <- function(){
 #'  par_3 <- par_1 + par_2
 #'}
@@ -83,8 +83,8 @@
 #'run_parallel = FALSE
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
-#'sampling_fraction<-c(1,1,1)
-#'#model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt,
+#'sampling_fraction <- c(1,1,1)
+#'#model <- secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt,
 #'#                               initparsopt, idfactosopt, initfactos, idparsfix, parsfix,
 #'#                               idparsfuncdefpar, functions_defining_params, cond,
 #'#                               root_state_weight, sampling_fraction, tol, maxiter, use_fortran,

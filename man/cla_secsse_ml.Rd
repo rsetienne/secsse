@@ -72,31 +72,31 @@ set.seed(13)
 # the transition rates are constrained to be equal and fixed 0.01
 phylotree <- ape::rcoal(31, tip.label = 1:31)
 traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
-num_concealed_states<-3
-idparslist<-cla_id_paramPos(traits,num_concealed_states)
-idparslist$lambdas[1,]<-c(1,1,1,2,2,2,3,3,3)
-idparslist[[2]][]<-4
-masterBlock<-matrix(5,ncol=3,nrow=3,byrow=TRUE) 
-diag(masterBlock)<-NA
-diff.conceal<-FALSE
-idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
+num_concealed_states <- 3
+idparslist <- cla_id_paramPos(traits,num_concealed_states)
+idparslist$lambdas[1,] <- c(1,1,1,2,2,2,3,3,3)
+idparslist[[2]][] <- 4
+masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
+diag(masterBlock) <- NA
+diff.conceal <- FALSE
+idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 intGuessLamba <- startingpoint$lambda0
 intGuessMu <- startingpoint$mu0
-idparsopt<-c(1,2,3)
-initparsopt<-c(rep(intGuessLamba,3))
-idparsfix<-c(0,4,5)
-parsfix<-c(0,0,0.01)
-tol = c(1e-04, 1e-05, 1e-07)
-maxiter = 1000 * round((1.25)^length(idparsopt))
-use_fortran = FALSE
-methode = "ode45"
-optimmethod = "simplex"
-run_parallel = FALSE
-cond<-"proper_cond"
+idparsopt <- c(1,2,3)
+initparsopt <- c(rep(intGuessLamba,3))
+idparsfix <- c(0,4,5)
+parsfix <- c(0,0,0.01)
+tol <- c(1e-04, 1e-05, 1e-07)
+maxiter <- 1000 * round((1.25) ^ length(idparsopt))
+use_fortran <- FALSE
+methode <- "ode45"
+optimmethod <- "simplex"
+run_parallel <- FALSE
+cond <- "proper_cond"
 root_state_weight <- "proper_weights"
-sampling_fraction<-c(1,1,1)
-#model<-cla_secsse_ml(
+sampling_fraction <- c(1,1,1)
+#model <- cla_secsse_ml(
 #  phylotree,
 #  traits,
 #  num_concealed_states,
