@@ -6,8 +6,8 @@
 #' @param idparslist overview of parameters and their values.
 #' @param idparsopt id of parameters to be estimated.
 #' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idfactosopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
-#' @param initfactos the initial guess for a factor (it should be set to NULL when no factors).
+#' @param idfactorsopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
+#' @param initfactors the initial guess for a factor (it should be set to NULL when no factors).
 #' @param idparsfix id of the fixed parameters (it should be set to NULL when no factors).
 #' @param parsfix value of the fixed parameters.
 #' @param idparsfuncdefpar id of the parameters which will be a function of optimized and/or fixed parameters. The order of id should match functions_defining_params
@@ -49,8 +49,8 @@
 #'idparsfix <- c(0,4)
 #'initparsopt <- c(rep(intGuessLamba,2))
 #'parsfix <- c(0,0)
-#'idfactosopt <- 1
-#'initfactos <- 4
+#'idfactorsopt <- 1
+#'initfactors <- 4
 #'# functions_defining_params is a list of functions. Each function has no arguments and to refer
 #'# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
 #'# function is defined, be sure that all the parameters involved are either estimated, fixed or
@@ -81,7 +81,7 @@
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction <- c(1,1,1)
 #'#model <- cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
-#'#                                   idparsopt, initparsopt, idfactosopt, initfactos,
+#'#                                   idparsopt, initparsopt, idfactorsopt, initfactors,
 #'#                                   idparsfix, parsfix, idparsfuncdefpar,
 #'#                                   functions_defining_params, cond, root_state_weight,
 #'#                                   sampling_fraction, tol, maxiter, use_fortran,
@@ -96,8 +96,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     idparslist,
                                     idparsopt,
                                     initparsopt,
-                                    idfactosopt,
-                                    initfactos,
+                                    idfactorsopt,
+                                    initfactors,
                                     idparsfix,
                                     parsfix,
                                     idparsfuncdefpar,
@@ -117,12 +117,12 @@ cla_secsse_ml_func_def_pars <- function(phy,
   structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
-  structure_func[[3]] <- idfactosopt
+  structure_func[[3]] <- idfactorsopt
   
   see_ancestral_states <- FALSE
-  if (is.null(idfactosopt) == FALSE) {
-    if (length(initfactos) != length(idfactosopt)) {
-      stop("idfactosopt should have the same length than initfactos.")
+  if (is.null(idfactorsopt) == FALSE) {
+    if (length(initfactors) != length(idfactorsopt)) {
+      stop("idfactorsopt should have the same length than initfactors.")
     }
   }
   
@@ -181,7 +181,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   cat("Calculating the likelihood for the initial parameters.", "\n")
   utils::flush.console()
   
-  initparsopt2 <- c(initparsopt, initfactos)
+  initparsopt2 <- c(initparsopt, initfactors)
   
   trparsopt <- initparsopt2 / (1 + initparsopt2)
   trparsopt[which(initparsopt2 == Inf)] <- 1

@@ -260,8 +260,8 @@ secsse_test_ml2 <- function(){
   idparsfix <- c(0,2)
   initparsopt <- c(rep(intGuessLamba,1),intGuessLamba/5)
   parsfix <- c(0,5)
-  idfactosopt <- 1
-  initfactos <- 1
+  idfactorsopt <- 1
+  initfactors <- 1
   functions_defining_params <- list()
   par_4 <- NA 
   factor_1 <- NA
@@ -283,8 +283,8 @@ secsse_test_ml2 <- function(){
                                    idparslist,
                                    idparsopt,
                                    initparsopt,
-                                   idfactosopt,
-                                   initfactos,
+                                   idfactorsopt,
+                                   initfactors,
                                    idparsfix,
                                    parsfix,
                                    idparsfuncdefpar,

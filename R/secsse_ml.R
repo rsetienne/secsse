@@ -2,7 +2,7 @@
 transf_funcdefpar <- function(
   idparsfuncdefpar,
   functions_defining_params,
-  idfactosopt,
+  idfactorsopt,
   trparsfix,
   trparsopt,
   idparsfix,
@@ -15,12 +15,12 @@ transf_funcdefpar <- function(
   a_new_envir <- new.env()
   x <- as.list(values_all) ## To declare all the ids as variables
   
-  if (is.null(idfactosopt)) {
+  if (is.null(idfactorsopt)) {
     names(x) <- paste0("par_", ids_all)
   } else {
     names(x) <-
       c(paste0("par_", ids_all),
-        paste0("factor_", idfactosopt))
+        paste0("factor_", idfactorsopt))
   }
   list2env(x, envir = a_new_envir)
   
@@ -58,32 +58,36 @@ secsse_transform_parameters <-
     if(is.null(structure_func)==FALSE){
       idparsfuncdefpar <- structure_func[[1]] 
       functions_defining_params <- structure_func[[2]] 
-    #  idfactosopt <- structure_func[[3]] <- idfactosopt
+    #  idfactorsopt <- structure_func[[3]] <- idfactorsopt
       
       if(length(structure_func[[3]])>1){
-        idfactosopt <- structure_func[[3]] 
+        idfactorsopt <- structure_func[[3]] 
       } else {
         if(structure_func[[3]] =="noFactor"){
-          idfactosopt <- NULL
+          idfactorsopt <- NULL
         } else {
-          idfactosopt <- structure_func[[3]] 
+          idfactorsopt <- structure_func[[3]] 
         }
       }
       
-      trparfuncdefpar<-transf_funcdefpar(idparsfuncdefpar=idparsfuncdefpar,functions_defining_params=functions_defining_params,
-                                         idfactosopt=idfactosopt,trparsfix=trparsfix,trparsopt=trparsopt,  idparsfix=idparsfix,
-                                         idparsopt=idparsopt)
+      trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar = idparsfuncdefpar,
+                                         functions_defining_params = functions_defining_params,
+                                         idfactorsopt = idfactorsopt,
+                                         trparsfix = trparsfix,
+                                         trparsopt = trparsopt,
+                                         idparsfix=idparsfix,
+                                         idparsopt = idparsopt)
     }
     
-    if(class(idparslist[[1]])=="list"){ # when the ml function is called from cla_secsse
+    if(class(idparslist[[1]]) == "list"){ # when the ml function is called from cla_secsse
       trpars1 <- idparslist
       
       for(j in 1:nrow(trpars1[[3]])){
-        trpars1[[1]][[j]][,]<- NA
+        trpars1[[1]][[j]][,] <- NA
       }
       
       for(j in 2:3){
-        trpars1[[j]][] = NA
+        trpars1[[j]][] <- NA
       }
       
       
@@ -93,7 +97,7 @@ secsse_transform_parameters <-
           
           for(j in 1:nrow(trpars1[[3]])){
             id <- which(idparslist[[1]][[j]] == idparsfix[i])
-            trpars1[[1]][[j]][id]<- trparsfix[i]
+            trpars1[[1]][[j]][id] <- trparsfix[i]
           }
           for(j in 2:3) {
             id <- which(idparslist[[j]] == idparsfix[i])
@@ -105,7 +109,7 @@ secsse_transform_parameters <-
       for(i in 1:length(idparsopt)){
         for(j in 1:nrow(trpars1[[3]])){
           id <- which(idparslist[[1]][[j]] == idparsopt[i])
-          trpars1[[1]][[j]][id]<- trparsopt[i]
+          trpars1[[1]][[j]][id] <- trparsopt[i]
         }
         
         
@@ -117,11 +121,11 @@ secsse_transform_parameters <-
       
       ## structure_func part
       
-      if(is.null(structure_func)==FALSE){
+      if(is.null(structure_func) == FALSE){
         for (i in 1:length(idparsfuncdefpar)) {
           for(j in 1:nrow(trpars1[[3]])){
             id <- which(idparslist[[1]][[j]] == idparsfuncdefpar[i])
-            trpars1[[1]][[j]][id]<- trparfuncdefpar[i]
+            trpars1[[1]][[j]][id] <- trparfuncdefpar[i]
           }
           
           for (j in 2:3)
@@ -137,10 +141,10 @@ secsse_transform_parameters <-
       
       for(j in 1:nrow(trpars1[[3]])){
         
-        pre_pars1[[j]]<- trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,])
+        pre_pars1[[j]] <- trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,])
       }
       
-      pars1[[1]]<-pre_pars1
+      pars1[[1]] <- pre_pars1
       for(j in 2:3){
         
         pars1[[j]] <- trpars1[[j]]/(1 - trpars1[[j]])
@@ -172,7 +176,7 @@ secsse_transform_parameters <-
       
       ## if structure_func part
       
-      if(is.null(structure_func)==FALSE){
+      if(is.null(structure_func) == FALSE){
         for (i in 1:length(idparsfuncdefpar)) {
           
           for (j in 1:3)

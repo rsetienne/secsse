@@ -5,7 +5,7 @@
 \title{Maximum likehood estimation for (SecSSE) with parameter as complex functions. Cladogenetic version}
 \usage{
 cla_secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
-  idparsopt, initparsopt, idfactosopt, initfactos, idparsfix, parsfix,
+  idparsopt, initparsopt, idfactorsopt, initfactors, idparsfix, parsfix,
   idparsfuncdefpar, functions_defining_params, cond = "proper_cond",
   root_state_weight = "proper_weights", sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 *
@@ -26,9 +26,9 @@ cla_secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
 
 \item{initparsopt}{initial guess of the parameters to be estimated.}
 
-\item{idfactosopt}{id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.}
+\item{idfactorsopt}{id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.}
 
-\item{initfactos}{the initial guess for a factor (it should be set to NULL when no factors).}
+\item{initfactors}{the initial guess for a factor (it should be set to NULL when no factors).}
 
 \item{idparsfix}{id of the fixed parameters (it should be set to NULL when no factors).}
 
@@ -93,8 +93,8 @@ idparsopt <- c(1,2)
 idparsfix <- c(0,4)
 initparsopt <- c(rep(intGuessLamba,2))
 parsfix <- c(0,0)
-idfactosopt <- 1
-initfactos <- 4
+idfactorsopt <- 1
+initfactors <- 4
 # functions_defining_params is a list of functions. Each function has no arguments and to refer
 # to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
 # function is defined, be sure that all the parameters involved are either estimated, fixed or
@@ -125,7 +125,7 @@ cond <- "proper_cond"
 root_state_weight <- "proper_weights"
 sampling_fraction <- c(1,1,1)
 #model <- cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
-#                                   idparsopt, initparsopt, idfactosopt, initfactos,
+#                                   idparsopt, initparsopt, idfactorsopt, initfactors,
 #                                   idparsfix, parsfix, idparsfuncdefpar,
 #                                   functions_defining_params, cond, root_state_weight,
 #                                   sampling_fraction, tol, maxiter, use_fortran,
