@@ -214,7 +214,8 @@ secsse_loglik_choosepar <-
            run_parallel = run_parallel,
            setting_parallel = setting_parallel,
            see_ancestral_states = see_ancestral_states,
-           loglik_penalty = loglik_penalty
+           loglik_penalty = loglik_penalty,
+           optimmethod1 = optimmethod1
            ) {
     alltrpars <- c(trparsopt, trparsfix)
     if (max(alltrpars) > 1 | min(alltrpars) < 0) {
@@ -272,6 +273,9 @@ secsse_loglik_choosepar <-
         cat("There are parameter values used which cause numerical problems.\n")
         loglik <- -Inf
       }
+    }
+    if(optimmethod1=="subplex"){
+      cat(c(trparsopt / (1 - trparsopt),loglik),"\n")
     }
     return(loglik)
   }
@@ -487,8 +491,8 @@ secsse_ml <- function(
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
     setting_parallel <- NULL
   }
-  
-  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel = setting_parallel,see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty)
+  optimmethod1 <- optimmethod
+  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel = setting_parallel,see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty,optimmethod1 = optimmethod1)
   cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
   if(initloglik == -Inf)
   {
@@ -497,7 +501,7 @@ secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
-    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty)
+    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty,optimmethod1 = optimmethod1)
     if(out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")

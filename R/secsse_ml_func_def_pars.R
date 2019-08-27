@@ -220,7 +220,7 @@ secsse_ml_func_def_pars <- function(phy,
     setting_parallel <- NULL
   }
   
-  
+  optimmethod1 <- optimmethod
   initloglik <-
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
@@ -243,7 +243,8 @@ secsse_ml_func_def_pars <- function(phy,
       run_parallel = run_parallel,
       setting_parallel = setting_parallel,
       see_ancestral_states = see_ancestral_states,
-      loglik_penalty = loglik_penalty
+      loglik_penalty = loglik_penalty,
+      optimmethod1 = optimmethod1
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
@@ -281,7 +282,8 @@ secsse_ml_func_def_pars <- function(phy,
         setting_parallel = setting_parallel,
         see_ancestral_states = see_ancestral_states,
         num_cycles = num_cycles,
-        loglik_penalty = loglik_penalty
+        loglik_penalty = loglik_penalty,
+        optimmethod1 = optimmethod1
       )
     if (out$conv != 0)
     {
