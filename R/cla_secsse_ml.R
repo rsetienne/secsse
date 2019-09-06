@@ -239,8 +239,8 @@ cla_secsse_ml <- function(
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
     setting_parallel <- NULL
   }
-  optimmethod1 <- optimmethod
-  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states,loglik_penalty = loglik_penalty,    optimmethod1 = optimmethod1)
+  if(optimmethod == 'subplex') {verbose = TRUE} else {verbose = FALSE}
+  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states,loglik_penalty = loglik_penalty,verbose = verbose)
   cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
   if(initloglik == -Inf)
   {
@@ -249,7 +249,7 @@ cla_secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
-    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty,    optimmethod1 = optimmethod1)
+    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty, verbose = verbose)
     if(out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")

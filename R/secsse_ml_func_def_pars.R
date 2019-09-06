@@ -220,7 +220,7 @@ secsse_ml_func_def_pars <- function(phy,
     setting_parallel <- NULL
   }
   
-  optimmethod1 <- optimmethod
+  if(optimmethod == 'subplex') {verbose = TRUE} else {verbose = FALSE}
   initloglik <-
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
@@ -244,7 +244,7 @@ secsse_ml_func_def_pars <- function(phy,
       setting_parallel = setting_parallel,
       see_ancestral_states = see_ancestral_states,
       loglik_penalty = loglik_penalty,
-      optimmethod1 = optimmethod1
+      verbose = verbose
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
@@ -283,7 +283,7 @@ secsse_ml_func_def_pars <- function(phy,
         see_ancestral_states = see_ancestral_states,
         num_cycles = num_cycles,
         loglik_penalty = loglik_penalty,
-        optimmethod1 = optimmethod1
+        verbose = verbose
       )
     if (out$conv != 0)
     {
