@@ -211,7 +211,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
       build_initStates_time(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- NULL
   }
-  if(optimmethod == 'subplex') {verbose = TRUE} else {verbose = FALSE}
+  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
   initloglik <- 
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
