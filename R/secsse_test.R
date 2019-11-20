@@ -53,7 +53,7 @@ secsse_test_hisse <- function(){
                                       cond = cond,
                                       root_state_weight = root_state_weight,
                                       sampling_fraction = sampling_fraction)
-                         ),4)
+  ),4)
   
   ## Now with different  sampling_fraction 
   
@@ -68,7 +68,7 @@ secsse_test_hisse <- function(){
                                        cond = cond,
                                        root_state_weight = root_state_weight,
                                        sampling_fraction = sampling_fraction)
-                         ),4)
+  ),4)
   
   # Test to compare different solvers: Fortran vs Rsolver
   z1 <- round(as.numeric(secsse_loglik(parameter = toCheck,
