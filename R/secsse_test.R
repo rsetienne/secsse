@@ -123,8 +123,8 @@ secsse_test_geosse <- function(){
                                       root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1),
                                       run_parallel = FALSE, setting_calculation = NULL,
                                       setting_parallel = NULL, see_ancestral_states = FALSE)
-  print(secsse_cla_LL)
-  print(secsse_cla_LL2)
+  #print(secsse_cla_LL)
+  #print(secsse_cla_LL2)
   testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
 }
 
