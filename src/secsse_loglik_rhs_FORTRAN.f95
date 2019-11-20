@@ -132,7 +132,60 @@
       END SUBROUTINE secsse_runmod
       
 !==========================================================================
-       
+
+      SUBROUTINE secsse_runmod2 (neq, t, Conc, dConc, yout, ip)
+      USE secsse_dimmod
+      IMPLICIT NONE
+
+!......................... declaration section.............................
+      INTEGER           :: neq, ip(*), i, ii, d
+      DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
+      DOUBLE PRECISION  :: mus(N/2), las(N/2), Q(N/2,N/2), ones(N/2) 
+      DOUBLE PRECISION  :: Ds(N/2), Es(N/2), Q1(N/2), QE(N/2), QD(N/2)
+
+! parameters - named here
+      DOUBLE PRECISION rn
+      COMMON /XCBPar/rn
+
+
+! local variables
+      CHARACTER(len=80) msg
+
+!............................ statements ..................................
+
+      IF (.NOT. Initialised) THEN
+        ! check memory allocated to output variables
+        IF (ip(1) < 1) CALL rexit("nout not large enough") 
+
+        ! save parameter values in yout
+        ii = ip(1)   ! Start of parameter values
+        CALL secsse_fill1d(P, (N**2) / 4 + N, yout, ii) ! ii is updated in Fill1D
+        Initialised = .TRUE.      ! to prevent from initialising more than once
+      ENDIF
+
+! dynamics
+
+!  R code
+!  dE<- mus-(lambdas + mus + Q %*% (rep(1,d))) * Es + lambdas * Es * Es + ( Q %*% Es )
+!  dD<- -(lambdas + mus + Q %*% (rep(1,d))) * Ds + 2 * lambdas * Es * Ds + ( Q %*% Ds )
+
+      d = N/2
+      ones = 1.d0
+      las = P(1:d)
+      mus = P((d + 1):N)
+      Es = Conc(1:d)
+      Ds = Conc((d + 1):N)
+      Q = RESHAPE(P((N + 1):(N + d ** 2)),(/d,d/), order = (/1,2/))
+      Q1 = MATMUL(Q,ones)
+      QE = MATMUL(Q,Es)
+      QD = MATMUL(Q,Ds)
+      dConc(1:d) = mus - (las + mus + Q1) * Es + las * Es * Es + QE
+      dConc((d + 1):N) = -(las + mus + Q1) * Ds + 2 * las * Es * Ds + QD
+
+      END SUBROUTINE secsse_runmod2
+      
+!==========================================================================
+
       SUBROUTINE cla_secsse_runmod (neq, t, Conc, dConc, yout, ip)
       USE secsse_dimmod
       IMPLICIT NONE
@@ -141,8 +194,8 @@
 
       INTEGER           :: neq, ip(*), i, ii, iii, arraydim, matdim
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*), FF1, FF2
-      REAL(16)          :: lambdas(N/2,N/2,N/2), mus(N/2), Qs(N/2,N/2)
-      REAL(16)          :: lamEE(N/2,N/2,N/2), lamDE(N/2,N/2,N/2)
+      DOUBLE PRECISION  :: lambdas(N/2,N/2,N/2), mus(N/2), Qs(N/2,N/2)
+      DOUBLE PRECISION  :: lamEE(N/2,N/2,N/2), lamDE(N/2,N/2,N/2)
 
 ! parameters - named here
       DOUBLE PRECISION rn
@@ -210,7 +263,7 @@
 
       DO I = 1, N/2
        FF1 = (-SUM(lambdas(I,:,:)) - mus(I)) * Conc(N/2 + I) 
-       dConc(N/2 + I) = FF1 + SUM(lamDE(I,:,:))
+       dConc(N/2 + I) = FF1 + 2 * SUM(lamDE(I,:,:)) 
         DO II = 1, N/2
            FF1 = Conc(N/2 + II) - Conc(N/2 + I)
            dConc(N/2 + I) = dConc(N/2 + I) + Qs(I, II) * FF1

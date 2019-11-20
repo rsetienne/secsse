@@ -29,7 +29,7 @@ secsse_test_hisse <- function(){
   toCheck[[3]][,]<-userTransRate
   diag(toCheck[[3]]) <- NA
   root_state_weight <- "maddison_weights"
-  use_fortran<-TRUE
+  use_fortran <- TRUE
   methode<-"ode45"
   cond<-"noCondit"
   
@@ -122,7 +122,7 @@ secsse_test_geosse <- function(){
   classe_diversitree_LL <- lik.c(pars.c) # -175.7685
   
   ## Secsse part 
-  lambdas<-list()
+  lambdas <- list()
   lambdas[[1]] <- matrix(0,ncol = 3,nrow = 3,byrow = TRUE)
   #lambdas[[1]][1,1] <- 1.5
   lambdas[[1]][2,1] <- 1.5
