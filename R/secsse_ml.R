@@ -2,7 +2,7 @@
 transf_funcdefpar <- function(
   idparsfuncdefpar,
   functions_defining_params,
-  idfactosopt,
+  idfactorsopt,
   trparsfix,
   trparsopt,
   idparsfix,
@@ -12,43 +12,37 @@ transf_funcdefpar <- function(
   ids_all <- c(idparsfix, idparsopt)
   
   values_all <- c(trparsfix / (1 - trparsfix), trparsopt / (1 - trparsopt))
+  a_new_envir <- new.env()
+  x <- as.list(values_all) ## To declare all the ids as variables
+  
+  if (is.null(idfactorsopt)) {
+    names(x) <- paste0("par_", ids_all)
+  } else {
+    names(x) <-
+      c(paste0("par_", ids_all),
+        paste0("factor_", idfactorsopt))
+  }
+  list2env(x, envir = a_new_envir)
   
   for (jj in 1:length(functions_defining_params)) {
     myfunc <- functions_defining_params[[jj]]
-    
-    calculate_param_function <-
-      function(myfunc,
-               ids_all,
-               values_all,
-               idfactosopt) {
-        x <- as.list(values_all) ## To declare all the ids as variables
-        
-        if (is.null(idfactosopt)) {
-          names(x) <- paste0("par_", ids_all)
-        } else {
-          names(x) <-
-            c(paste0("par_", ids_all),
-              paste0("factor_", idfactosopt))
-        }
-        list2env(x, envir = .GlobalEnv)
-        myfunc()
-      }
-    value_func_defining_parm <-
-      calculate_param_function(myfunc, ids_all, values_all, idfactosopt)
-    
+    environment(myfunc) <- a_new_envir
+    #   local(myfunc,envir = a_new_envir)
+    value_func_defining_parm <- local(myfunc(),envir = a_new_envir)
+
     ## Now, declare the variable that is just calculated, so it is
     ## available for the next calculation if needed
     y <- as.list(value_func_defining_parm)
     names(y) <- paste0("par_", idparsfuncdefpar[jj])
-    list2env(y, envir = .GlobalEnv)
+    list2env(y, envir = a_new_envir)
     
     if (is.numeric(value_func_defining_parm) == FALSE) {
-      stop("something went with the calculation of parameters in 'functions_param_struct'")
+      stop("something went wrong with the calculation of parameters in 'functions_param_struct'")
     }
     trparfuncdefpar <- c(trparfuncdefpar, value_func_defining_parm)
   }
   trparfuncdefpar <- trparfuncdefpar / (1 + trparfuncdefpar)
-  
+  rm(a_new_envir)
   return(trparfuncdefpar)
 }
 
@@ -63,31 +57,37 @@ secsse_transform_parameters <-
   ) {
     if(is.null(structure_func)==FALSE){
       idparsfuncdefpar <- structure_func[[1]] 
-      functions_defining_params <-  structure_func[[2]] 
-    #  idfactosopt <- structure_func[[3]] <- idfactosopt
+      functions_defining_params <- structure_func[[2]] 
+    #  idfactorsopt <- structure_func[[3]] <- idfactorsopt
       
-      if(structure_func[[3]] =="noFactor"){
-      idfactosopt <- NULL
+      if(length(structure_func[[3]])>1){
+        idfactorsopt <- structure_func[[3]] 
       } else {
-        idfactosopt <- structure_func[[3]] 
+        if(structure_func[[3]] =="noFactor"){
+          idfactorsopt <- NULL
+        } else {
+          idfactorsopt <- structure_func[[3]] 
+        }
       }
       
-      trparfuncdefpar<-transf_funcdefpar(idparsfuncdefpar=idparsfuncdefpar,functions_defining_params=functions_defining_params,
-                                         idfactosopt=idfactosopt,trparsfix=trparsfix,trparsopt=trparsopt,  idparsfix=idparsfix,
-                                         idparsopt=idparsopt)
-      
-      
+      trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar = idparsfuncdefpar,
+                                         functions_defining_params = functions_defining_params,
+                                         idfactorsopt = idfactorsopt,
+                                         trparsfix = trparsfix,
+                                         trparsopt = trparsopt,
+                                         idparsfix=idparsfix,
+                                         idparsopt = idparsopt)
     }
     
-    if(class(idparslist[[1]])=="list"){ # when the ml function is called from cla_secsse
+    if(class(idparslist[[1]]) == "list"){ # when the ml function is called from cla_secsse
       trpars1 <- idparslist
       
       for(j in 1:nrow(trpars1[[3]])){
-        trpars1[[1]][[j]][,]<- NA
+        trpars1[[1]][[j]][,] <- NA
       }
       
       for(j in 2:3){
-        trpars1[[j]][] = NA
+        trpars1[[j]][] <- NA
       }
       
       
@@ -96,50 +96,42 @@ secsse_transform_parameters <-
         for(i in 1:length(idparsfix)){
           
           for(j in 1:nrow(trpars1[[3]])){
-            
-            
             id <- which(idparslist[[1]][[j]] == idparsfix[i])
-            trpars1[[1]][[j]][id]<- trparsfix[i]
+            trpars1[[1]][[j]][id] <- trparsfix[i]
           }
           for(j in 2:3) {
             id <- which(idparslist[[j]] == idparsfix[i])
             trpars1[[j]][id] <- trparsfix[i]
-            
           }
         }
       }
       
       for(i in 1:length(idparsopt)){
         for(j in 1:nrow(trpars1[[3]])){
-          
-          
           id <- which(idparslist[[1]][[j]] == idparsopt[i])
-          trpars1[[1]][[j]][id]<- trparsopt[i]
+          trpars1[[1]][[j]][id] <- trparsopt[i]
         }
         
         
         for(j in 2:3){
-          
           id <- which(idparslist[[j]] == idparsopt[i])
           trpars1[[j]][id] <- trparsopt[i]
-          
         }
       }
       
       ## structure_func part
       
-      if(is.null(structure_func)==FALSE){
+      if(is.null(structure_func) == FALSE){
         for (i in 1:length(idparsfuncdefpar)) {
           for(j in 1:nrow(trpars1[[3]])){
             id <- which(idparslist[[1]][[j]] == idparsfuncdefpar[i])
-            trpars1[[1]][[j]][id]<- trparfuncdefpar[i]
+            trpars1[[1]][[j]][id] <- trparfuncdefpar[i]
           }
           
           for (j in 2:3)
           {
             id <- which(idparslist[[j]] == idparsfuncdefpar[i])
             trpars1[[j]][id] <- trparfuncdefpar[i]
-            
           }
         }
       }  
@@ -149,10 +141,10 @@ secsse_transform_parameters <-
       
       for(j in 1:nrow(trpars1[[3]])){
         
-        pre_pars1[[j]]<- trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,])
+        pre_pars1[[j]] <- trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,])
       }
       
-      pars1[[1]]<-pre_pars1
+      pars1[[1]] <- pre_pars1
       for(j in 2:3){
         
         pars1[[j]] <- trpars1[[j]]/(1 - trpars1[[j]])
@@ -184,7 +176,7 @@ secsse_transform_parameters <-
       
       ## if structure_func part
       
-      if(is.null(structure_func)==FALSE){
+      if(is.null(structure_func) == FALSE){
         for (i in 1:length(idparsfuncdefpar)) {
           
           for (j in 1:3)
@@ -221,7 +213,10 @@ secsse_loglik_choosepar <-
            setting_calculation = setting_calculation,
            run_parallel = run_parallel,
            setting_parallel = setting_parallel,
-           see_ancestral_states=see_ancestral_states) {
+           see_ancestral_states = see_ancestral_states,
+           loglik_penalty = loglik_penalty,
+           verbose = verbose
+           ) {
     alltrpars <- c(trparsopt, trparsfix)
     if (max(alltrpars) > 1 | min(alltrpars) < 0) {
       loglik = -Inf
@@ -236,7 +231,7 @@ secsse_loglik_choosepar <-
           structure_func
         )
       
-      if(class(pars1[[1]])=="list"){ # is the cla_ used?
+      if(class(pars1[[1]]) == "list"){ # is the cla_ used?
         loglik <-
           cla_secsse_loglik(
             parameter = pars1,
@@ -251,9 +246,9 @@ secsse_loglik_choosepar <-
             run_parallel = run_parallel,
             setting_calculation = setting_calculation,
             setting_parallel = setting_parallel,
-            see_ancestral_states=see_ancestral_states
+            see_ancestral_states = see_ancestral_states,
+            loglik_penalty = loglik_penalty
           )
-        
       } else {
         loglik <-
           secsse_loglik(
@@ -269,14 +264,18 @@ secsse_loglik_choosepar <-
             run_parallel = run_parallel,
             setting_calculation = setting_calculation,
             setting_parallel = setting_parallel,
-            see_ancestral_states=see_ancestral_states
+            see_ancestral_states = see_ancestral_states,
+            loglik_penalty = loglik_penalty
           )
       }
       if (is.nan(loglik) || is.na(loglik)) {
-        print(trparsopt) ## new thing
+        #print(trparsopt) ## new thing
         cat("There are parameter values used which cause numerical problems.\n")
         loglik <- -Inf
       }
+    }
+    if(verbose){
+      cat(c(trparsopt / (1 - trparsopt),loglik),"\n")
     }
     return(loglik)
   }
@@ -348,7 +347,9 @@ secsse_loglik_choosepar <-
 #' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
 #' @param methode method used for integration calculation. Default is "ode45".
 #' @param optimmethod method used for optimization. Default is "simplex".
+#' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called?
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -404,7 +405,9 @@ secsse_loglik_choosepar <-
 #'#maxiter,
 #'#use_fortran,
 #'#methode,
-#'#optimmethod,run_parallel
+#'#optimmethod,
+#'#num_cycles = 1,
+#'#run_parallel
 #'#)
 #'# $ML
 #'# [1] -16.43162
@@ -427,7 +430,9 @@ secsse_ml <- function(
   use_fortran = TRUE,
   methode = "ode45",
   optimmethod = 'simplex',
-  run_parallel = FALSE
+  num_cycles = 1,
+  run_parallel = FALSE,
+  loglik_penalty = 0
 ){
   structure_func<-NULL
   check_input(traits,phy,sampling_fraction,root_state_weight)
@@ -453,12 +458,12 @@ secsse_ml <- function(
   }
   
   if(anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),idparsfix[which(parsfix==0)]))!=0){
-    cat("You set some transition states as non possible to happen","\n")
+    cat("You set some transitions as impossible to happen","\n")
   }
   
   see_ancestral_states <- FALSE 
   
-  options(warn=-1)
+  #options(warn=-1)
   cat("Calculating the likelihood for the initial parameters.","\n")
   utils::flush.console()
   trparsopt <- initparsopt/(1 + initparsopt)
@@ -482,13 +487,12 @@ secsse_ml <- function(
     setting_parallel <- 1
   } 
   
-  if(run_parallel==FALSE){
+  if(run_parallel == FALSE){
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
-    setting_parallel<- NULL
+    setting_parallel <- NULL
   }
-  
-  
-  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states)
+  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
+  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel = setting_parallel,see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty,verbose = verbose)
   cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
   if(initloglik == -Inf)
   {
@@ -496,15 +500,14 @@ secsse_ml <- function(
   } else {
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
-   cat(setting_parallel,"\n")
-    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states)
+    cat(setting_parallel,"\n")
+    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty,verbose = verbose)
     if(out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
       MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)),trparsfix,idparsopt,idparsfix,idparslist, structure_func)
-      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)))
-      
+      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }
   return(out2)

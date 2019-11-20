@@ -8,7 +8,8 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
   use_fortran = TRUE, methode = "ode45", cond = "proper_cond",
   root_state_weight = "proper_weights", sampling_fraction,
   run_parallel = FALSE, setting_calculation = NULL,
-  setting_parallel = NULL, see_ancestral_states = FALSE)
+  setting_parallel = NULL, see_ancestral_states = FALSE,
+  loglik_penalty = 0)
 }
 \arguments{
 \item{parameter}{list where first vector represents lambdas, the second mus and the third transition rates.}
@@ -36,6 +37,8 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
 \item{setting_parallel}{argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)}
 
 \item{see_ancestral_states}{should the ancestral states be shown? Deafault FALSE}
+
+\item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
 }
 \value{
 The loglikelihood of the data given the parameters
@@ -47,7 +50,7 @@ Logikelihood calculation for the SecSSE model given a set of parameters and data
 To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 }
 \examples{
-rm(list=ls(all=TRUE))
+rm(list = ls(all = TRUE))
 library(secsse)
 library(DDD)
 library(deSolve)
@@ -55,7 +58,7 @@ library(apTreeshape)
 library(foreach)
 set.seed(13)
 phylotree <- ape::rcoal(31, tip.label = 1:31)
-traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
+traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace = TRUE)
 num_concealed_states <- 2
 use_fortran <- TRUE
 cond <- "proper_cond"

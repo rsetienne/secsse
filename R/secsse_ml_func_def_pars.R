@@ -7,9 +7,9 @@
 #' @param idparslist overview of parameters and their values.
 #' @param idparsopt id of parameters to be estimated.
 #' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idfactosopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
-#' @param initfactos the initial guess for a factor (it should be set to NULL when no factors).
-#' @param idparsfix id of the fixed parameters (it should be set to NULL when no factors).
+#' @param idfactorsopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
+#' @param initfactors the initial guess for a factor (it should be set to NULL when no factors).
+#' @param idparsfix id of the fixed parameters (it should be set to NULL when there are no factors).
 #' @param parsfix value of the fixed parameters.
 #' @param idparsfuncdefpar id of the parameters which will be a function of optimized and/or fixed parameters. The order of id should match functions_defining_params
 #' @param functions_defining_params a list of functions. Each element will be a function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example and vigenette
@@ -21,7 +21,9 @@
 #' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
 #' @param methode method used for integration calculation. Default is "ode45".
 #' @param optimmethod method used for optimization. Default is "simplex".
+#' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -34,24 +36,24 @@
 #'startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
-#'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
+#'traits <- sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
 #'num_concealed_states<-3
 #'idparslist<-id_paramPos(traits, num_concealed_states)
-#'idparslist[[1]][c(1,4,7)]<-1
-#'idparslist[[1]][c(2,5,8)]<-2
-#'idparslist[[1]][c(3,6,9)]<-3
+#'idparslist[[1]][c(1,4,7)] <- 1
+#'idparslist[[1]][c(2,5,8)] <- 2
+#'idparslist[[1]][c(3,6,9)] <- 3
 #'idparslist[[2]][]<-4
-#'masterBlock<-matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
-#'diag(masterBlock)<-NA
+#'masterBlock <- matrix(c(5,6),ncol = 3,nrow = 3,byrow = TRUE)
+#'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
-#'idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-#'idparsfuncdefpar<-c(3,5,6)
-#'idparsopt<-c(1,2)
-#'idparsfix<-c(0,4)
-#'initparsopt<-c(rep(intGuessLamba,2))
-#'parsfix<-c(0,0)
-#'idfactosopt<-1
-#'initfactos<- 4
+#'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+#'idparsfuncdefpar <- c(3,5,6)
+#'idparsopt <- c(1,2)
+#'idparsfix <- c(0,4)
+#'initparsopt <- c(rep(intGuessLamba,2))
+#'parsfix <- c(0,0)
+#'idfactorsopt <- 1
+#'initfactors <- 4
 #'# functions_defining_params is a list of functions. Each function has no arguments and to refer
 #'# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
 #'# function is defined, be sure that all the parameters involved are either estimated, fixed or
@@ -61,7 +63,7 @@
 #'# the first function of 'functions_defining_params'. Notice that factor_1 indicates a value
 #'# that will be estimated to satisfy the equation. The same factor can be shared to define
 #'# several parameters.
-#'functions_defining_params<-list()
+#'functions_defining_params <- list()
 #'functions_defining_params[[1]] <- function(){
 #'  par_3 <- par_1 + par_2
 #'}
@@ -81,12 +83,12 @@
 #'run_parallel = FALSE
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
-#'sampling_fraction<-c(1,1,1)
-#'#model<-secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt,
-#'#                               initparsopt, idfactosopt, initfactos, idparsfix, parsfix,
+#'sampling_fraction <- c(1,1,1)
+#'#model <- secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt,
+#'#                               initparsopt, idfactorsopt, initfactors, idparsfix, parsfix,
 #'#                               idparsfuncdefpar, functions_defining_params, cond,
 #'#                               root_state_weight, sampling_fraction, tol, maxiter, use_fortran,
-#'#                               methode, optimmethod, run_parallel)
+#'#                               methode, optimmethod, num_cycles = 1,run_parallel)
 #'
 #'# ML -136.5796
 #' @export
@@ -97,8 +99,8 @@ secsse_ml_func_def_pars <- function(phy,
                                     idparslist,
                                     idparsopt,
                                     initparsopt,
-                                    idfactosopt,
-                                    initfactos,
+                                    idfactorsopt,
+                                    initfactors,
                                     idparsfix,
                                     parsfix,
                                     idparsfuncdefpar,
@@ -111,38 +113,40 @@ secsse_ml_func_def_pars <- function(phy,
                                     use_fortran = TRUE,
                                     methode = "ode45",
                                     optimmethod = 'simplex',
-                                    run_parallel = FALSE) {
+                                    num_cycles = 1,
+                                    run_parallel = FALSE,
+                                    loglik_penalty = 0) {
   
-  structure_func<-list()
+  structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
-  if(is.null(idfactosopt)){
-    structure_func[[3]]<-"noFactor"
+  if(is.null(idfactorsopt)){
+    structure_func[[3]] <- "noFactor"
   } else {
-    structure_func[[3]] <- idfactosopt
+    structure_func[[3]] <- idfactorsopt
   }
   
-  see_ancestral_states<-FALSE
-  if (is.null(idfactosopt) == FALSE) {
-    if (length(initfactos) != length(idfactosopt)) {
-      stop("idfactosopt should have the same length than initfactos.")
+  see_ancestral_states <- FALSE
+  if (is.null(idfactorsopt) == FALSE) {
+    if (length(initfactors) != length(idfactorsopt)) {
+      stop("idfactorsopt should have the same length as initfactors.")
     }
   }
   
   if (is.list(functions_defining_params) == FALSE) {
     stop(
-      "the argument functions_defining_params should be a list of functions. See example and vignette"
+      "The argument functions_defining_params should be a list of functions. See example and vignette"
     )
   }
   
   if (length(functions_defining_params) != length(idparsfuncdefpar)) {
     stop(
-      "the argument functions_defining_params should have the same length than idparsfuncdefpar"
+      "The argument functions_defining_params should have the same length than idparsfuncdefpar"
     )
   }
   
   if (is.matrix(traits)) {
-    cat("you are setting a model where some species had more than one trait state \n")
+    cat("You are setting a model where some species had more than one trait state \n")
   }
   
   if (length(initparsopt) != length(idparsopt)) {
@@ -158,7 +162,7 @@ secsse_ml_func_def_pars <- function(phy,
   }
   
   if (anyDuplicated(c(idparsopt, idparsfix, idparsfuncdefpar)) != 0) {
-    stop("at least one element was asked to be fixed, estimated or a function at the same time")
+    stop("At least one element was asked to be fixed, estimated or a function at the same time")
   }
   
   if (identical(as.numeric(sort(
@@ -174,15 +178,15 @@ secsse_ml_func_def_pars <- function(phy,
   if (anyDuplicated(c(unique(sort(
     as.vector(idparslist[[3]])
   )), idparsfix[which(parsfix == 0)])) != 0) {
-    cat("You set some transition states as non possible to happen", "\n")
+    cat("You set some transitions as impossible to happen", "\n")
   }
   
   
-  options(warn = -1)
+  #options(warn = -1)
   cat("Calculating the likelihood for the initial parameters.", "\n")
   utils::flush.console()
   
-  initparsopt2 <- c(initparsopt, initfactos)
+  initparsopt2 <- c(initparsopt, initfactors)
   
   trparsopt <- initparsopt2 / (1 + initparsopt2)
   trparsopt[which(initparsopt2 == Inf)] <- 1
@@ -216,7 +220,7 @@ secsse_ml_func_def_pars <- function(phy,
     setting_parallel <- NULL
   }
   
-  
+  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
   initloglik <-
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
@@ -238,7 +242,9 @@ secsse_ml_func_def_pars <- function(phy,
         setting_calculation,
       run_parallel = run_parallel,
       setting_parallel = setting_parallel,
-     see_ancestral_states=see_ancestral_states
+      see_ancestral_states = see_ancestral_states,
+      loglik_penalty = loglik_penalty,
+      verbose = verbose
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
@@ -274,7 +280,10 @@ secsse_ml_func_def_pars <- function(phy,
         setting_calculation = setting_calculation,
         run_parallel = run_parallel,
         setting_parallel = setting_parallel,
-        see_ancestral_states=see_ancestral_states
+        see_ancestral_states = see_ancestral_states,
+        num_cycles = num_cycles,
+        loglik_penalty = loglik_penalty,
+        verbose = verbose
       )
     if (out$conv != 0)
     {
@@ -290,7 +299,7 @@ secsse_ml_func_def_pars <- function(phy,
           structure_func
         )
       out2 <-
-        list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)))
+        list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }
   return(out2)

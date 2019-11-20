@@ -1,9 +1,9 @@
 check_input <- function(traits,phy,sampling_fraction,root_state_weight){
   if(class(root_state_weight) == "numeric"){
-    if(length(root_state_weight)!=length(sort(unique(traits)))){
+    if(length(root_state_weight) != length(sort(unique(traits)))){
       stop("you need to have as many elements in root_state_weight as traits")
     }
-    if(length(which(root_state_weight == 1))!=1){
+    if(length(which(root_state_weight == 1)) != 1){
       stop("your root_state_weight needs only one 1")
     }
   } else {
@@ -91,9 +91,9 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
   
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
-  states <- matrix(ncol=(length(traitStates) * 2 *num_concealed_states),nrow=(nb_tip+nb_node))
+  states <- matrix(ncol = (length(traitStates) * 2 * num_concealed_states),nrow=(nb_tip+nb_node))
   ly <- ncol(states)
-  d <- ncol(states)/2
+  d <- ncol(states) / 2
   ## In a example of 3 states, the names of the colums would be like:
   ##
   ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
@@ -105,13 +105,13 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
       if(anyNA(usetraits)){
         nas <- which( is.na(traits))
         for(iii in 1:length(nas) ){
-          states[nas[iii],] <- c(1-rep(sampling_fraction,num_concealed_states),
+          states[nas[iii],] <- c(1 - rep(sampling_fraction,num_concealed_states),
                                  rep(sampling_fraction,num_concealed_states))
         }
       }
       
       for(iii in 1:length(traitStates)){ # Initial state probabilities
-        StatesPresents <- d+iii
+        StatesPresents <- d + iii
         toPlaceOnes <- NULL
         for(jj in 1:(num_concealed_states-1)){
           toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates)* jj))
@@ -122,22 +122,22 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
       }
       
       for(iii in 1:nb_tip){
-        states[iii,1:d] <- rep(1-sampling_fraction,num_concealed_states)
+        states[iii,1:d] <- rep(1 - sampling_fraction,num_concealed_states)
       }
     }
   } else {
     if(anyNA(traits)){
       nas <- which( is.na(traits))
       for(iii in 1:length(nas) ){
-        states[nas[iii],] <- c(1-rep(sampling_fraction,num_concealed_states),
+        states[nas[iii],] <- c(1 - rep(sampling_fraction,num_concealed_states),
                                rep(sampling_fraction,num_concealed_states))
       }
     }
     
     for(iii in 1:length(traitStates)){ # Initial state probabilities
-      StatesPresents <- d+iii
+      StatesPresents <- d + iii
       toPlaceOnes <- NULL
-      for(jj in 1:(num_concealed_states-1)){
+      for(jj in 1:(num_concealed_states - 1)){
         toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates)* jj))
       }
       toPlaceOnes <- c(StatesPresents,toPlaceOnes)
@@ -146,14 +146,14 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
     }
     
     for(iii in 1:nb_tip){
-      states[iii,1:d] <- rep(1-sampling_fraction,num_concealed_states)
+      states[iii,1:d] <- rep(1 - sampling_fraction,num_concealed_states)
     }
   }
   
   phy$node.label <- NULL
   split_times <- sort(ape::branching.times(phy), decreasing = F)
   ances <- as.numeric(names(split_times))
-  forTime <- matrix(NA,ncol=3,nrow=nrow(phy$edge))
+  forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
   forTime[,1:2] <- phy$edge
   
   for(ab in 1:length(ances)){
@@ -173,9 +173,9 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
     }
   }
   return(list(
-    states=states,
-    ances=ances,
-    forTime=forTime
+    states = states,
+    ances = ances,
+    forTime = forTime
   ))
 }
 
@@ -194,10 +194,10 @@ calThruNodes <- function(
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
   nb_node <- phy$Nnode
-  reltol <- 1e-10
+  reltol <- 1e-12
   abstol <- 1e-16
   ly <- ncol(states)
-  d <- ncol(states)/2
+  d <- ncol(states) / 2
   focal <- ances
   desRows <- which(phy$edge[, 1] == focal)
   desNodes <- phy$edge[desRows, 2]
@@ -229,21 +229,25 @@ calThruNodes <- function(
   ## At the node
   nodeM <- as.numeric(nodeM[2,-1])
   nodeN <- as.numeric(nodeN[2,-1])
-  
-  mergeBranch <- NULL
-  for(iii in 1:d){
-    combProb <-  nodeM[iii + d] * nodeN[iii + d] * lambdas[iii] ## multiplication of probabilities of both branches
-    mergeBranch <- c(mergeBranch,combProb)
-  }
-  sumD <- sum(mergeBranch)
-  mergeBranch <- mergeBranch/sumD
+  ff <- normalize_loglik(nodeM[(1:d) + d],loglik); nodeM[(1:d) + d] <- ff$probs; loglik <- ff$loglik
+  ff <- normalize_loglik(nodeN[(1:d) + d],loglik); nodeN[(1:d) + d] <- ff$probs; loglik <- ff$loglik
+  #mergeBranch <- NULL
+  #for(iii in 1:d){
+  #  combProb <-  nodeM[iii + d] * nodeN[iii + d] * lambdas[iii] ## multiplication of probabilities of both branches
+  #  mergeBranch <- c(mergeBranch,combProb)
+  #}
+  mergeBranch <- nodeM[(1:d) + d] * nodeN[(1:d) + d] * lambdas[(1:d)]
+
+  ff <- normalize_loglik(mergeBranch,loglik); mergeBranch <- ff$probs; loglik <- ff$loglik
+  #sumD <- sum(mergeBranch)
+  #mergeBranch <- mergeBranch/sumD
+  #loglik <- loglik + log(sumD)
   
   newstate <- nodeM[1:d] ## extinction probabilities
   newstate <- c(newstate,mergeBranch)
   states[focal,] <- newstate
-  loglik <- loglik + log(sumD)
-  
-  return(list(states=states,loglik=loglik,mergeBranch=mergeBranch,nodeM=nodeM))
+  #print(parameter); print(loglik)
+  return(list(states = states,loglik = loglik,mergeBranch = mergeBranch,nodeM = nodeM))
 }
 # calThruNodes <- function(ances,
 #                          states,
@@ -385,10 +389,11 @@ doParalThing <- function(take_ancesSub,
                                  .export = c(
                                    "secsse_loglik",
                                    "ode_FORTRAN",
-                                   "phy",
-                                   "methode",
-                                   "calThruNodes",
-                                   "use_fortran")) %dopar% {
+                                   #"phy",
+                                   #"methode",
+                                   "calThruNodes"
+                                   #,"use_fortran")) %dopar% {
+                                   )) %dopar% { 
                                      ancesSub <- take_ancesSub[[ii]]
                                      for(i in 1:length(ancesSub)){
                                        calcul <- 
@@ -515,7 +520,7 @@ build_initStates_time_bigtree <-
           timeInterv[2] - timeInterv[1]
       }
     }
-    reltol <- 1e-10
+    reltol <- 1e-12
     abstol <- 1e-16
     
     phySplit <- phy
@@ -612,10 +617,11 @@ build_initStates_time_bigtree <-
 #' @param setting_calculation argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)
 #' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
-#' rm(list=ls(all=TRUE))
+#' rm(list = ls(all = TRUE))
 #' library(secsse)
 #' library(DDD)
 #' library(deSolve)
@@ -623,7 +629,7 @@ build_initStates_time_bigtree <-
 #' library(foreach)
 #' set.seed(13)
 #' phylotree <- ape::rcoal(31, tip.label = 1:31)
-#' traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
+#' traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace = TRUE)
 #' num_concealed_states <- 2
 #' use_fortran <- TRUE
 #' cond <- "proper_cond"
@@ -653,7 +659,8 @@ secsse_loglik <- function(parameter,
                           run_parallel = FALSE,
                           setting_calculation = NULL,
                           setting_parallel= NULL,
-                          see_ancestral_states = FALSE){
+                          see_ancestral_states = FALSE,
+                          loglik_penalty = 0){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -738,7 +745,7 @@ secsse_loglik <- function(parameter,
     
     loglik <- 0
     ly <- ncol(states)
-    d <- ncol(states)/2
+    d <- ncol(states) / 2
     
     for(i in 1:length(ances)){
       calcul <- calThruNodes(ances[i],states,loglik,forTime,parameter,use_fortran = use_fortran,methode=methode, phy=phy)
@@ -761,7 +768,7 @@ secsse_loglik <- function(parameter,
     }
     
     if(root_state_weight == "proper_weights"){
-      weightStates <- (mergeBranch2/(lambdas * (1 -nodeM[1:d]) ^2))/sum((mergeBranch2/(lambdas * (1 -nodeM[1:d]) ^2)))
+      weightStates <- (mergeBranch2/(lambdas * (1 - nodeM[1:d]) ^ 2))/sum((mergeBranch2/(lambdas * (1 - nodeM[1:d]) ^ 2)))
     }
     
     if(root_state_weight == "equal_weights"){  
@@ -771,7 +778,7 @@ secsse_loglik <- function(parameter,
   
   if(cond == "maddison_cond"){
     mergeBranch2 <- 
-      mergeBranch2 / sum(weightStates * lambdas *  (1 - nodeM[1:d]) ^ 2)
+      mergeBranch2 / sum(weightStates * lambdas * (1 - nodeM[1:d]) ^ 2)
   }
   
   if(cond == "proper_cond"){
@@ -781,14 +788,14 @@ secsse_loglik <- function(parameter,
   atRoot <- ((mergeBranch2) * (weightStates))
   
   wholeLike <- sum(atRoot)
-  LL <- log(wholeLike) + loglik
+  LL <- log(wholeLike) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
   
   if(see_ancestral_states == TRUE){
     num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips+1):nrow(states),]
+    ancestral_states <- states[(num_tips + 1):nrow(states),]
     ancestral_states <- ancestral_states[,-(1:(ncol(ancestral_states)/2))]
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states=ancestral_states,LL=LL))
+    return(list(ancestral_states = ancestral_states,LL = LL))
   } else {
     return(LL)
   }

@@ -2,13 +2,12 @@
 #   trpars1 <- idparslist
 #   
 #   for(j in 1:nrow(trpars1[[3]])){
-#     trpars1[[1]][[j]][,]<- NA
+#     trpars1[[1]][[j]][,] <- NA
 #   }
 #   
-#     for(j in 2:3){
-#     trpars1[[j]][] = NA
+#   for(j in 2:3){
+#     trpars1[[j]][] <- NA
 #   }
-#   
 #   
 #   if(length(idparsfix) != 0){
 #     
@@ -16,9 +15,8 @@
 #       
 #       for(j in 1:nrow(trpars1[[3]])){
 #         
-#         
 #         id <- which(idparslist[[1]][[j]] == idparsfix[i])
-#         trpars1[[1]][[j]][id]<- trparsfix[i]
+#         trpars1[[1]][[j]][id] <- trparsfix[i]
 #       }
 #       for(j in 2:3) {
 #         id <- which(idparslist[[j]] == idparsfix[i])
@@ -33,7 +31,7 @@
 #       
 #       
 #       id <- which(idparslist[[1]][[j]] == idparsopt[i])
-#       trpars1[[1]][[j]][id]<- trparsopt[i]
+#       trpars1[[1]][[j]][id] <- trparsopt[i]
 #     }
 #     
 #     
@@ -44,12 +42,12 @@
 #       
 #     }
 #   }
-#   pre_pars1<-list()
+#   pre_pars1 <- list()
 #   pars1 <- list()
 #   
 #   for(j in 1:nrow(trpars1[[3]])){
 #   
-#     pre_pars1[[j]]<- trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,])
+#     pre_pars1[[j]] <- trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,])
 #   }
 #   
 #   pars1[[1]]<-pre_pars1
@@ -96,7 +94,9 @@
 #' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
 #' @param methode method used for integration calculation. Default is "ode45".
 #' @param optimmethod method used for optimization. Default is "simplex".
+#' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called?
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -111,32 +111,32 @@
 #'# the transition rates are constrained to be equal and fixed 0.01
 #'phylotree <- ape::rcoal(31, tip.label = 1:31)
 #'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
-#'num_concealed_states<-3
-#'idparslist<-cla_id_paramPos(traits,num_concealed_states)
-#'idparslist$lambdas[1,]<-c(1,1,1,2,2,2,3,3,3)
-#'idparslist[[2]][]<-4
-#'masterBlock<-matrix(5,ncol=3,nrow=3,byrow=TRUE) 
-#'diag(masterBlock)<-NA
-#'diff.conceal<-FALSE
-#'idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-#'startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
+#'num_concealed_states <- 3
+#'idparslist <- cla_id_paramPos(traits,num_concealed_states)
+#'idparslist$lambdas[1,] <- c(1,1,1,2,2,2,3,3,3)
+#'idparslist[[2]][] <- 4
+#'masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
+#'diag(masterBlock) <- NA
+#'diff.conceal <- FALSE
+#'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
-#'idparsopt<-c(1,2,3)
-#'initparsopt<-c(rep(intGuessLamba,3))
-#'idparsfix<-c(0,4,5)
-#'parsfix<-c(0,0,0.01)
-#'tol = c(1e-04, 1e-05, 1e-07)
-#'maxiter = 1000 * round((1.25)^length(idparsopt))
-#'use_fortran = FALSE
-#'methode = "ode45"
-#'optimmethod = "simplex"
-#'run_parallel = FALSE
-#'cond<-"proper_cond"
+#'idparsopt <- c(1,2,3)
+#'initparsopt <- c(rep(intGuessLamba,3))
+#'idparsfix <- c(0,4,5)
+#'parsfix <- c(0,0,0.01)
+#'tol <- c(1e-04, 1e-05, 1e-07)
+#'maxiter <- 1000 * round((1.25) ^ length(idparsopt))
+#'use_fortran <- FALSE
+#'methode <- "ode45"
+#'optimmethod <- "simplex"
+#'run_parallel <- FALSE
+#'cond <- "proper_cond"
 #'root_state_weight <- "proper_weights"
-#'sampling_fraction<-c(1,1,1)
+#'sampling_fraction <- c(1,1,1)
 
-#'#model<-cla_secsse_ml(
+#'#model <- cla_secsse_ml(
 #'#  phylotree,
 #'#  traits,
 #'#  num_concealed_states,
@@ -152,8 +152,9 @@
 #'#  maxiter,
 #'#  use_fortran,
 #'#  methode,
-#'#  optimmethod,run_parallel)
-
+#'#  optimmethod,
+#'#  num_cycles = 1,
+#'#  run_parallel)
 #' # [1] -90.97626
 #' @export
 
@@ -170,28 +171,30 @@ cla_secsse_ml <- function(
   root_state_weight = "proper_weights",
   sampling_fraction,
   tol = c(1E-4, 1E-5, 1E-7),
-  maxiter = 1000 * round((1.25)^length(idparsopt)),
+  maxiter = 1000 * round((1.25) ^ length(idparsopt)),
   use_fortran = TRUE,
   methode = "ode45",
   optimmethod = 'simplex',
-  run_parallel = FALSE
+  num_cycles = 1,
+  run_parallel = FALSE,
+  loglik_penalty = 0
 ){
   
  ## check_input(traits,phy,sampling_fraction,root_state_weight)##################
-  structure_func<-NULL
+  structure_func <- NULL
   if(is.matrix(traits)){
-    cat("you are setting a model where some species had more than one trait state \n")
+    cat("you are setting a model where some species have more than one trait state \n")
   }
   
-  if(length(initparsopt)!=length(idparsopt)){
+  if(length(initparsopt) != length(idparsopt)){
     stop("initparsopt must be the same length as idparsopt. Number of parameters to optimize does not match the number of initial values for the search")
   }
   
-  if(length(idparsfix)!=length(parsfix)){
+  if(length(idparsfix) != length(parsfix)){
     stop("idparsfix and parsfix must be the same length.Number of fixed elements does not match the fixed figures")
   }
   
-  if(anyDuplicated(c(idparsopt,idparsfix))!=0){
+  if(anyDuplicated(c(idparsopt,idparsfix)) != 0){
     stop("at least one element was asked to be both fixed and estimated ")
   }
   
@@ -200,49 +203,44 @@ cla_secsse_ml <- function(
   }
   
   if(anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),idparsfix[which(parsfix==0)]))!=0){
-    cat("You set some transition states as non possible to happen","\n")
+    cat("You set some transitions as impossible to happen","\n")
   }
   
-  
-  if(class(idparslist[[1]])=="matrix"){ ## it is a tailor case otherwise
-  idparslist[[1]]<-prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
-    
+  if(class(idparslist[[1]]) == "matrix"){ ## it is a tailor case otherwise
+  idparslist[[1]] <- prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
   }
+
+  see_ancestral_states <- FALSE 
   
-  
-   see_ancestral_states <- FALSE 
-  
-  options(warn=-1)
+  #options(warn=-1)
   cat("Calculating the likelihood for the initial parameters.","\n")
   utils::flush.console()
   trparsopt <- initparsopt/(1 + initparsopt)
-  trparsopt[which(initparsopt == Inf)] = 1
+  trparsopt[which(initparsopt == Inf)] <- 1
   trparsfix <- parsfix/(1 + parsfix)
-  trparsfix[which(parsfix == Inf)] = 1
+  trparsfix[which(parsfix == Inf)] <- 1
   optimpars <- c(tol,maxiter)
-  
-  
-  if(.Platform$OS.type=="windows" && run_parallel==TRUE){
+
+  if(.Platform$OS.type == "windows" && run_parallel == TRUE){
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
     setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
-    setting_parallel<-1
+    setting_parallel <- 1
     on.exit(parallel::stopCluster(cl))
   }
   
-  if(.Platform$OS.type=="unix" && run_parallel==TRUE){
+  if(.Platform$OS.type == "unix" && run_parallel == TRUE){
     doMC::registerDoMC(2)
     setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- 1
   } 
   
-  if(run_parallel==FALSE){
+  if(run_parallel == FALSE){
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
-    setting_parallel<- NULL
+    setting_parallel <- NULL
   }
-  
-  
-  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states)
+  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
+  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states,loglik_penalty = loglik_penalty,verbose = verbose)
   cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
   if(initloglik == -Inf)
   {
@@ -251,14 +249,13 @@ cla_secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
-    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states)
+    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist,structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states = see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty, verbose = verbose)
     if(out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
       MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)),trparsfix,idparsopt,idparsfix,idparslist,structure_func)
-      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)))
-      
+      out2 <- list(MLpars = MLpars1,ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }
   return(out2)

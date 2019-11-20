@@ -12,7 +12,7 @@
 
 <meta name="author" content="Leonel Herrera-Alsina, Paul van Els &amp; Rampal S. Etienne" />
 
-<meta name="date" content="2019-03-26" />
+<meta name="date" content="2019-04-26" />
 
 <title>Using SecSSE</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Using SecSSE</h1>
 <h4 class="author"><em>Leonel Herrera-Alsina, Paul van Els &amp; Rampal S. Etienne</em></h4>
-<h4 class="date"><em>2019-03-26</em></h4>
+<h4 class="date"><em>2019-04-26</em></h4>
 
 
 
@@ -317,10 +317,10 @@ startingpoint &lt;-<span class="st"> </span><span class="kw">bd_ML</span>(<span 
 <pre><code>## You are optimizing lambda0 mu0 
 ## You are fixing lambda1 mu1 
 ## Optimizing the likelihood - this may take a while. 
-## The loglikelihood for the inital parameter values is -657.6517 
+## The loglikelihood for the initial parameter values is -657.65168907669.
 ## 
-##  Maximum likelihood parameter estimates: lambda0: 0.066492, mu0: 0.000115, lambda1: 0.000000, mu1: 0.000000:  
-##  Maximum loglikelihood: -645.684269</code></pre>
+## Maximum likelihood parameter estimates: lambda0: 0.066492, mu0: 0.000115, lambda1: 0.000000, mu1: 0.000000: 
+## Maximum loglikelihood: -645.684269</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">intGuessLamba &lt;-<span class="st"> </span>startingpoint<span class="op">$</span>lambda0
 intGuessMu &lt;-<span class="st"> </span>startingpoint<span class="op">$</span>mu0
 <span class="co">#Make sure that the dimensions of initparsopt agree with those of idparslist and idparsopt, especially in the case of the initial guesses for rates supplied to the Q matrix. Rules of thumb are that if n=number of examined states, both intGuessLamba and intGuessMu should be replicated 2n times, and (intGuessLamba/5) should be replicated (2n)2/2 times:</span>
@@ -336,9 +336,9 @@ initparsopt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class=
 <div id="running-the-likelihood-function" class="section level2">
 <h2>Running the likelihood function</h2>
 <p>After we have defined all of the necessary parameters for running secsse_ml, we can start running our analysis:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond=&quot;maddison_cond&quot;,root_state_weight = &quot;maddison_weights&quot;, tol = c(1e-04, 1e-05, 1e-07), sampling_fraction=c(1,1,1), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode=&quot;ode45&quot;, optimmethod = &quot;simplex&quot;, run_parallel=FALSE)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond=&quot;maddison_cond&quot;,root_state_weight = &quot;maddison_weights&quot;, tol = c(1e-04, 1e-05, 1e-07), sampling_fraction=c(1,1,1), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode=&quot;ode45&quot;, optimmethod = &quot;simplex&quot;, num_cycles = 1, run_parallel=FALSE)</span></code></pre></div>
 <p>We can save output to an R data file, for example, here called output.RDS:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#out&lt;-secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond=&quot;maddison_cond&quot;,root_state_weight = &quot;maddison_weights&quot;, sampling_fraction=c(1,1,1), tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode=&quot;ode45&quot;, optimmethod = &quot;simplex&quot;, run_parallel=FALSE)</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#out&lt;-secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond=&quot;maddison_cond&quot;,root_state_weight = &quot;maddison_weights&quot;, sampling_fraction=c(1,1,1), tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode=&quot;ode45&quot;, optimmethod = &quot;simplex&quot;, num_cycles = 1, run_parallel=FALSE)</span>
 <span class="co">#saveRDS(out, file=&quot;output.RDS&quot;)</span></code></pre></div>
 <p>Later on, we can retrieve the data in this file, simply by entering:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#readRDS(&quot;output.RDS&quot;)</span></code></pre></div>

@@ -6,8 +6,8 @@
 #' @param idparslist overview of parameters and their values.
 #' @param idparsopt id of parameters to be estimated.
 #' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idfactosopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
-#' @param initfactos the initial guess for a factor (it should be set to NULL when no factors).
+#' @param idfactorsopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
+#' @param initfactors the initial guess for a factor (it should be set to NULL when no factors).
 #' @param idparsfix id of the fixed parameters (it should be set to NULL when no factors).
 #' @param parsfix value of the fixed parameters.
 #' @param idparsfuncdefpar id of the parameters which will be a function of optimized and/or fixed parameters. The order of id should match functions_defining_params
@@ -20,8 +20,10 @@
 #' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
 #' @param methode method used for integration calculation. Default is "ode45".
 #' @param optimmethod method used for optimization. Default is "simplex".
+#' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
-#' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @note To run in parallel the following libraries must be loaded under windows: apTreeshape, doparallel and foreach. Under unix/linux, apTreeshape, doparallel, foreach and doMC must be loaded.
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -30,25 +32,25 @@
 #'library(DDD)
 #'set.seed(16)
 #'phylotree <- ape::rbdtree(0.07,0.001,Tmax=50)
-#'startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
+#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
 #'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
-#'num_concealed_states<-3
-#'idparslist<-cla_id_paramPos(traits,num_concealed_states)
-#'idparslist$lambdas[1,]<-c(1,2,3,1,2,3,1,2,3)
-#'idparslist[[2]][]<-4
-#'masterBlock<-matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
-#'diag(masterBlock)<-NA
+#'num_concealed_states <- 3
+#'idparslist <- cla_id_paramPos(traits,num_concealed_states)
+#'idparslist$lambdas[1,] <- c(1,2,3,1,2,3,1,2,3)
+#'idparslist[[2]][] <- 4
+#'masterBlock <- matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
+#'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
-#'idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-#'idparsfuncdefpar<-c(3,5,6)
-#'idparsopt<-c(1,2)
-#'idparsfix<-c(0,4)
-#'initparsopt<-c(rep(intGuessLamba,2))
-#'parsfix<-c(0,0)
-#'idfactosopt<-1
-#'initfactos<- 4
+#'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+#'idparsfuncdefpar <- c(3,5,6)
+#'idparsopt <- c(1,2)
+#'idparsfix <- c(0,4)
+#'initparsopt <- c(rep(intGuessLamba,2))
+#'parsfix <- c(0,0)
+#'idfactorsopt <- 1
+#'initfactors <- 4
 #'# functions_defining_params is a list of functions. Each function has no arguments and to refer
 #'# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
 #'# function is defined, be sure that all the parameters involved are either estimated, fixed or
@@ -75,15 +77,15 @@
 #'methode = "ode45"
 #'optimmethod = "simplex"
 #'run_parallel = FALSE
-#'cond<-"proper_cond"
+#'cond <- "proper_cond"
 #'root_state_weight <- "proper_weights"
-#'sampling_fraction<-c(1,1,1)
-#'#model<-cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
-#'#                                   idparsopt, initparsopt, idfactosopt, initfactos,
+#'sampling_fraction <- c(1,1,1)
+#'#model <- cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
+#'#                                   idparsopt, initparsopt, idfactorsopt, initfactors,
 #'#                                   idparsfix, parsfix, idparsfuncdefpar,
 #'#                                   functions_defining_params, cond, root_state_weight,
 #'#                                   sampling_fraction, tol, maxiter, use_fortran,
-#'#                                   methode, optimmethod, run_parallel)
+#'#                                   methode, optimmethod, num_cycles = 1,run_parallel)
 #'
 #'# ML -136.5796
 #' @export
@@ -94,8 +96,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     idparslist,
                                     idparsopt,
                                     initparsopt,
-                                    idfactosopt,
-                                    initfactos,
+                                    idfactorsopt,
+                                    initfactors,
                                     idparsfix,
                                     parsfix,
                                     idparsfuncdefpar,
@@ -106,19 +108,21 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     tol = c(1E-4, 1E-5, 1E-7),
                                     maxiter = 1000 * round((1.25) ^ length(idparsopt)),
                                     use_fortran = TRUE,
-                                    methode = "ode45",
+                                    methode = 'ode45',
                                     optimmethod = 'simplex',
-                                    run_parallel = FALSE) {
+                                    num_cycles = 1,
+                                    run_parallel = FALSE,
+                                    loglik_penalty = 0) {
   
-  structure_func<-list()
+  structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
-  structure_func[[3]] <- idfactosopt
+  structure_func[[3]] <- idfactorsopt
   
-  see_ancestral_states<-FALSE
-  if (is.null(idfactosopt) == FALSE) {
-    if (length(initfactos) != length(idfactosopt)) {
-      stop("idfactosopt should have the same length than initfactos.")
+  see_ancestral_states <- FALSE
+  if (is.null(idfactorsopt) == FALSE) {
+    if (length(initfactors) != length(idfactorsopt)) {
+      stop("idfactorsopt should have the same length than initfactors.")
     }
   }
   
@@ -130,7 +134,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   if (length(functions_defining_params) != length(idparsfuncdefpar)) {
     stop(
-      "the argument functions_defining_params should have the same length than idparsfuncdefpar"
+      "the argument functions_defining_params should have the same length as idparsfuncdefpar"
     )
   }
   
@@ -167,33 +171,29 @@ cla_secsse_ml_func_def_pars <- function(phy,
   if (anyDuplicated(c(unique(sort(
     as.vector(idparslist[[3]])
   )), idparsfix[which(parsfix == 0)])) != 0) {
-    cat("You set some transition states as non possible to happen", "\n")
+    cat("You set some transitions as impossible to happen", "\n")
   }
   
-  
-  idparslist[[1]]<-prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
+  idparslist[[1]] <- prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
   see_ancestral_states <- FALSE 
   
-  options(warn = -1)
+  #options(warn = -1)
   cat("Calculating the likelihood for the initial parameters.", "\n")
   utils::flush.console()
   
-  initparsopt2 <- c(initparsopt, initfactos)
+  initparsopt2 <- c(initparsopt, initfactors)
   
   trparsopt <- initparsopt2 / (1 + initparsopt2)
   trparsopt[which(initparsopt2 == Inf)] <- 1
   trparsfix <- parsfix / (1 + parsfix)
   trparsfix[which(parsfix == Inf)] <- 1
   
-  
   optimpars <- c(tol, maxiter)
-  
-  
-  
+
   if (.Platform$OS.type == "windows" && run_parallel == TRUE) {
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
-    setting_calculation <-
+    setting_calculation <- 
       build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- 1
     on.exit(parallel::stopCluster(cl))
@@ -201,19 +201,18 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   if (.Platform$OS.type == "unix" && run_parallel == TRUE) {
     doMC::registerDoMC(2)
-    setting_calculation <-
+    setting_calculation <- 
       build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- 1
   }
   
   if (run_parallel == FALSE) {
-    setting_calculation <-
+    setting_calculation <- 
       build_initStates_time(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- NULL
   }
-  
-  
-  initloglik <-
+  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
+  initloglik <- 
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
       trparsfix = trparsfix,
@@ -223,8 +222,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
       structure_func = structure_func,
       phy = phy,
       traits = traits,
-      num_concealed_states =
-        num_concealed_states,
+      num_concealed_states = num_concealed_states,
       use_fortran = use_fortran,
       methode = methode,
       cond = cond,
@@ -234,7 +232,9 @@ cla_secsse_ml_func_def_pars <- function(phy,
         setting_calculation,
       run_parallel = run_parallel,
       setting_parallel = setting_parallel,
-      see_ancestral_states=see_ancestral_states
+      see_ancestral_states = see_ancestral_states,
+      loglik_penalty = loglik_penalty,
+      verbose = verbose
     )
   cat("The loglikelihood for the initial parameter values is",
       initloglik,
@@ -248,7 +248,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
     cat("Optimizing the likelihood - this may take a while.", "\n")
     utils::flush.console()
     cat(setting_parallel, "\n")
-    out <-
+    out <- 
       DDD::optimizer(
         optimmethod = optimmethod,
         optimpars = optimpars,
@@ -270,13 +270,16 @@ cla_secsse_ml_func_def_pars <- function(phy,
         setting_calculation = setting_calculation,
         run_parallel = run_parallel,
         setting_parallel = setting_parallel,
-        see_ancestral_states=see_ancestral_states
+        see_ancestral_states = see_ancestral_states,
+        num_cycles = num_cycles,
+        loglik_penalty = loglik_penalty,
+        verbose = verbose
       )
     if (out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
-      MLpars1 <-
+      MLpars1 <- 
         secsse_transform_parameters(
           as.numeric(unlist(out$par)),
           trparsfix,
@@ -285,8 +288,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
           idparslist,
           structure_func
         )
-      out2 <-
-        list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)))
+      out2 <- 
+        list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
     }
   }
   return(out2)

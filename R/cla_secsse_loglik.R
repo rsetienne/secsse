@@ -35,7 +35,7 @@ cla_calThruNodes <- function(
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
   nb_node <- phy$Nnode
-  reltol <- 1e-10
+  reltol <- 1e-12
   abstol <- 1e-16
   hmax <- NULL
   ly <- ncol(states)
@@ -71,34 +71,36 @@ cla_calThruNodes <- function(
     if(desIndex == 2){
       nodeM <- nodeMN 
     }
+   # print(nodeMN)
   }
   ## At the node
   nodeM <- as.numeric(nodeM[2,-1])
   nodeN <- as.numeric(nodeN[2,-1])
+  ff <- normalize_loglik(nodeM[(1:d) + d],loglik); nodeM[(1:d) + d] <- ff$probs; loglik <- ff$loglik
+  ff <- normalize_loglik(nodeN[(1:d) + d],loglik); nodeN[(1:d) + d] <- ff$probs; loglik <- ff$loglik
   # cat(rbind(nodeM[(d+1):length(nodeM)],nodeN[(d+1):length(nodeN)]),"\n")
   
-  all_states <- cbind(nodeM[(d+1):length(nodeM)],nodeN[(d+1):length(nodeN)])
+  all_states <- cbind(nodeM[(d + 1):length(nodeM)],nodeN[(d + 1):length(nodeN)])
   a <- cbind(all_states[,2],all_states[,1])
   b <- t(all_states)
   cross_M_N <- a%*%b
-  
   
   # mergeBranch <- NULL
   #for(iii in 1:d){
   #combProb <- 0.5*sum(lapply(lambdas,"*",cross_M_N)[[1]]) ## multiplication of probabilities of both branches
   #mergeBranch <- c(mergeBranch,combProb)
-  mergeBranch <- 0.5* (unlist(lapply(lapply(lambdas,"*",cross_M_N),sum)))
-  
+  mergeBranch <- 0.5 * (unlist(lapply(lapply(lambdas,"*",cross_M_N),sum)))
   #}
-  sumD <- sum(mergeBranch)
-  mergeBranch <- mergeBranch/sumD
+  ff <- normalize_loglik(mergeBranch,loglik); mergeBranch <- ff$probs; loglik <- ff$loglik
+  #sumD <- sum(mergeBranch)
+  #mergeBranch <- mergeBranch/sumD
+  #loglik <- loglik + log(sumD)
   #cat(mergeBranch,"\n")
   newstate <- nodeM[1:d] ## extinction probabilities
   newstate <- c(newstate,mergeBranch)
   states[focal,] <- newstate
-  loglik <- loglik + log(sumD)
-  
-  return(list(states=states,loglik=loglik,mergeBranch=mergeBranch,nodeM=nodeM))
+  #print(parameter); print(loglik)
+  return(list(states = states,loglik = loglik,mergeBranch = mergeBranch,nodeM = nodeM))
 }
 
 #' @importFrom foreach foreach
@@ -136,10 +138,11 @@ cla_doParalThing <- function(take_ancesSub,
                                  .export = c(
                                    "cla_secsse_loglik",
                                    "ode_FORTRAN",
-                                   "phy",
-                                   "methode",
-                                   "cla_calThruNodes",
-                                   "use_fortran")) %dopar% {
+                                   #"phy",
+                                   #"methode",
+                                   "cla_calThruNodes"
+                                   #,"use_fortran")) %dopar% {
+                                   )) %dopar% { 
                                      ancesSub <- take_ancesSub[[ii]]
                                      for(i in 1:length(ancesSub)){
                                        calcul <- 
@@ -175,6 +178,7 @@ cla_doParalThing <- function(take_ancesSub,
 #' @param setting_calculation argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)
 #' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
+#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
@@ -219,7 +223,8 @@ cla_doParalThing <- function(take_ancesSub,
 #'                  use_fortran = FALSE, methode = "ode45", cond = "maddison_cond",
 #'                  root_state_weight = "maddison_weights", sampling_fraction,
 #'                  run_parallel = FALSE, setting_calculation = NULL,
-#'                  setting_parallel = NULL, see_ancestral_states = FALSE)
+#'                  setting_parallel = NULL, see_ancestral_states = FALSE,
+#'                  loglik_penalty = 0)
 #'# LL = -37.8741
 #' @export
 cla_secsse_loglik <- function(parameter,
@@ -234,7 +239,8 @@ cla_secsse_loglik <- function(parameter,
                               run_parallel = FALSE,
                               setting_calculation = NULL,
                               setting_parallel= NULL,
-                              see_ancestral_states = FALSE){
+                              see_ancestral_states = FALSE,
+                              loglik_penalty = 0){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -294,7 +300,7 @@ cla_secsse_loglik <- function(parameter,
     
     for(i in 1:length(ancesRest)){
       calcul <- 
-        cla_calThruNodes(ancesRest[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode=methode, phy= phy)
+        cla_calThruNodes(ancesRest[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode = methode, phy = phy)
       states <- calcul$states
       loglik <- calcul$loglik
       
@@ -321,7 +327,7 @@ cla_secsse_loglik <- function(parameter,
     d <- ncol(states)/2
     
     for(i in 1:length(ances)){
-      calcul <- cla_calThruNodes(ances[i],states,loglik,forTime,parameter,use_fortran = use_fortran,methode=methode, phy=phy)
+      calcul <- cla_calThruNodes(ances[i],states,loglik,forTime,parameter,use_fortran = use_fortran,methode = methode,phy = phy)
       states <- calcul$states
       loglik <- calcul$loglik
       nodeN <- calcul$nodeN
@@ -394,8 +400,8 @@ cla_secsse_loglik <- function(parameter,
   atRoot <- ((mergeBranch2) * (weightStates))
   
   wholeLike <- sum(atRoot)
-  LL <- log(wholeLike) + loglik
-  
+  LL <- log(wholeLike) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
+  #print(unique(unlist(parameter[[1]]))); print(LL);  
   if(see_ancestral_states == TRUE){
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips+1):nrow(states),]
