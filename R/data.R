@@ -16,4 +16,4 @@ NULL
 #' @title A phylogeny with traits at the tips
 #' @description An example phylogeny for testing purposes
 #' @format A phylogeny as created by GeoSSE (diversitree)
-NULL
+"phy"
