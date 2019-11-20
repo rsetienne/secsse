@@ -277,29 +277,28 @@ secsse_test_ml2 <- function(){
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)
-  model <- secsse_ml_func_def_pars(phylotree,
-                                   traits,
-                                   num_concealed_states,
-                                   idparslist,
-                                   idparsopt,
-                                   initparsopt,
-                                   idfactorsopt,
-                                   initfactors,
-                                   idparsfix,
-                                   parsfix,
-                                   idparsfuncdefpar,
-                                   functions_defining_params,
-                                   cond,
-                                   root_state_weight,
-                                   sampling_fraction,
-                                   tol,
-                                   maxiter,
-                                   use_fortran,
-                                   methode,
-                                   optimmethod,
+  model <- secsse_ml_func_def_pars(phy = phylotree,
+                                   traits = traits,
+                                   num_concealed_states = num_concealed_states,
+                                   idparslist = idparslist,
+                                   idparsopt = idparsopt,
+                                   initparsopt = initparsopt,
+                                   idfactorsopt = idfactorsopt,
+                                   initfactors = initfactors,
+                                   idparsfix = idparsfix,
+                                   parsfix = parsfix,
+                                   idparsfuncdefpar = idparsfuncdefpar,
+                                   functions_defining_params = functions_defining_params,
+                                   cond = cond,
+                                   root_state_weight = root_state_weight,
+                                   sampling_fraction = sampling_fraction,
+                                   tol = tol,
+                                   maxiter = maxiter,
+                                   use_fortran = use_fortran,
+                                   methode = methode,
+                                   optimmethod = optimmethod,
                                    num_cycles = 1,
-                                   run_parallel)
- 
+                                   run_parallel = run_parallel)
   testthat::expect_equal(model$ML,-12.87974)
 }  
 
