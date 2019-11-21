@@ -82,10 +82,13 @@ ode_FORTRAN <- function(
   return(probs)
 }
 
-build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fraction){ 
+build_initStates_time <- function(phy,
+                                  traits,
+                                  num_concealed_states,
+                                  sampling_fraction){ 
   if(is.matrix(traits)){ ## trait might be a matrix when a species has more than one state
     traitStates <- sort(unique(traits[,1]))
-  }else{
+  } else {
     traitStates <- sort(unique(traits))
   }
   
@@ -99,35 +102,14 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
   ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
   ##                   "D0A","D1A","D2B","D0B","D1B","D2B")
   states[1:nb_tip,] <- 0
-  if(is.matrix(traits)){ ## I repeat the process of state assignation as many times as columns I have
-    for(iv in 1:ncol(traits)){
-      usetraits <- traits[,iv]
-      if(anyNA(usetraits)){
-        nas <- which( is.na(traits))
-        for(iii in 1:length(nas) ){
-          states[nas[iii],] <- c(1 - rep(sampling_fraction,num_concealed_states),
-                                 rep(sampling_fraction,num_concealed_states))
-        }
-      }
-      
-      for(iii in 1:length(traitStates)){ # Initial state probabilities
-        StatesPresents <- d + iii
-        toPlaceOnes <- NULL
-        for(jj in 1:(num_concealed_states-1)){
-          toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates)* jj))
-        }
-        toPlaceOnes <- c(StatesPresents,toPlaceOnes)
-        tipSampling <- 1 * sampling_fraction
-        states[which(usetraits == traitStates[iii]),toPlaceOnes] <- tipSampling[iii]
-      }
-      
-      for(iii in 1:nb_tip){
-        states[iii,1:d] <- rep(1 - sampling_fraction,num_concealed_states)
-      }
-    }
-  } else {
-    if(anyNA(traits)){
-      nas <- which( is.na(traits))
+  if(!is.matrix(traits)){
+    traits <- matrix(traits,nrow = length(traits),ncol = 1,byrow = FALSE)
+  }
+  #if(is.matrix(traits)){ ## I repeat the process of state assignation as many times as columns I have
+  for(iv in 1:ncol(traits)){
+    usetraits <- traits[,iv]
+    if(anyNA(usetraits)){
+      nas <- which(is.na(traits))
       for(iii in 1:length(nas) ){
         states[nas[iii],] <- c(1 - rep(sampling_fraction,num_concealed_states),
                                rep(sampling_fraction,num_concealed_states))
@@ -138,20 +120,44 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
       StatesPresents <- d + iii
       toPlaceOnes <- NULL
       for(jj in 1:(num_concealed_states - 1)){
-        toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates)* jj))
+        toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
       }
       toPlaceOnes <- c(StatesPresents,toPlaceOnes)
       tipSampling <- 1 * sampling_fraction
-      states[which(traits == traitStates[iii]),toPlaceOnes] <- tipSampling[iii]
+      states[which(usetraits == traitStates[iii]),toPlaceOnes] <- tipSampling[iii]
     }
     
     for(iii in 1:nb_tip){
       states[iii,1:d] <- rep(1 - sampling_fraction,num_concealed_states)
     }
   }
+  #} else {
+  #  if(anyNA(traits)){
+  #    nas <- which( is.na(traits))
+  #    for(iii in 1:length(nas) ){
+  #      states[nas[iii],] <- c(1 - rep(sampling_fraction,num_concealed_states),
+  #                             rep(sampling_fraction,num_concealed_states))
+  #    }
+  #  }
+  #  
+  #  for(iii in 1:length(traitStates)){ # Initial state probabilities
+  #    StatesPresents <- d + iii
+  #    toPlaceOnes <- NULL
+  #    for(jj in 1:(num_concealed_states - 1)){
+  #      toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates)* jj))
+  #    }
+  #    toPlaceOnes <- c(StatesPresents,toPlaceOnes)
+  #    tipSampling <- 1 * sampling_fraction
+  #    states[which(traits == traitStates[iii]),toPlaceOnes] <- tipSampling[iii]
+  #  }
+  #  
+  #  for(iii in 1:nb_tip){
+  #    states[iii,1:d] <- rep(1 - sampling_fraction,num_concealed_states)
+  #  }
+  #}
   
   phy$node.label <- NULL
-  split_times <- sort(event.times(phy), decreasing = F)
+  split_times <- sort(event_times(phy), decreasing = F)
   ances <- as.numeric(names(split_times))
   forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
   forTime[,1:2] <- phy$edge
@@ -169,7 +175,7 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
       } else {
         timeInterv <- c(0, rootward_age)
       }  
-      forTime[ which(forTime[,2] == desNodes[desIndex]),3] <- timeInterv[2]-timeInterv[1]
+      forTime[which(forTime[,2] == desNodes[desIndex]),3] <- timeInterv[2] - timeInterv[1]
     }
   }
   return(list(
@@ -565,7 +571,7 @@ secsse_loglik <- function(parameter,
                           sampling_fraction,
                           run_parallel = FALSE,
                           setting_calculation = NULL,
-                          setting_parallel= NULL,
+                          setting_parallel = NULL,
                           see_ancestral_states = FALSE,
                           loglik_penalty = 0,
                           func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")

@@ -186,6 +186,56 @@
       
 !==========================================================================
 
+      SUBROUTINE secsse_runmod_ct (neq, t, Conc, dConc, yout, ip)
+      USE secsse_dimmod
+      IMPLICIT NONE
+
+!......................... declaration section.............................
+      INTEGER           :: neq, ip(*), i, ii, d
+      DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
+      DOUBLE PRECISION  :: mus(N/2), las(N/2), Q(N/2,N/2), ones(N/2)
+      DOUBLE PRECISION  :: Ds(N/2), QD(N/2), Q1(N/2)
+
+! parameters - named here
+      DOUBLE PRECISION rn
+      COMMON /XCBPar/rn
+
+
+! local variables
+      CHARACTER(len=80) msg
+
+!............................ statements ..................................
+
+      IF (.NOT. Initialised) THEN
+        ! check memory allocated to output variables
+        IF (ip(1) < 1) CALL rexit("nout not large enough") 
+
+        ! save parameter values in yout
+        ii = ip(1)   ! Start of parameter values
+        CALL secsse_fill1d(P, (N**2) / 4 + N, yout, ii) ! ii is updated in Fill1D
+        Initialised = .TRUE.      ! to prevent from initialising more than once
+      ENDIF
+
+! dynamics
+
+!  R code
+!  dD<- -(lambdas + mus + Q %*% (rep(1,d))) * Ds + ( Q %*% Ds )
+
+      d = N/2
+      ones = 1.d0
+      las = P(1:d)
+      mus = P((d + 1):N)
+      Ds = Conc((d + 1):N)
+      Q = RESHAPE(P((N + 1):(N + d ** 2)),(/d,d/), order = (/1,2/))
+      CALL dgemm('n','n',d,1,d,1.d0,Q,d,Ds,d,0.d0,QD,d)
+      CALL dgemm('n','n',d,1,d,1.d0,Q,d,ones,d,0.d0,Q1,d)
+      dConc(1:d) = 0
+      dConc((d + 1):N) = -(las + mus + Q1) * Ds + QD
+
+      END SUBROUTINE secsse_runmod_ct
+      
+!==========================================================================
+
       SUBROUTINE cla_secsse_runmod (neq, t, Conc, dConc, yout, ip)
       USE secsse_dimmod
       IMPLICIT NONE
