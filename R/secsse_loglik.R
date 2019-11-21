@@ -151,7 +151,7 @@ build_initStates_time <- function(phy,traits,num_concealed_states,sampling_fract
   }
   
   phy$node.label <- NULL
-  split_times <- sort(ape::branching.times(phy), decreasing = F)
+  split_times <- sort(event.times(phy), decreasing = F)
   ances <- as.numeric(names(split_times))
   forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
   forTime[,1:2] <- phy$edge
@@ -187,7 +187,8 @@ calThruNodes <- function(
   parameter,
   use_fortran,
   methode,
-  phy
+  phy,
+  func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
 ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -208,16 +209,24 @@ calThruNodes <- function(
   for(desIndex in 1:2){
     y <- states[desNodes[desIndex],]
     timeInte <- forTime[which(forTime[,2] == desNodes[desIndex]),3]
-    ##  To make the calculation in both lineages
+    ##  To do the calculation in both lineages
     
     if(use_fortran == FALSE){
-      nodeMN <- deSolve::ode(y = y, func = secsse_loglik_rhs,
-                             times = c(0,timeInte), parms = parameter,  rtol = reltol, atol = abstol,
+      nodeMN <- deSolve::ode(y = y,
+                             func = func,
+                             times = c(0,timeInte),
+                             parms = parameter,
+                             rtol = reltol,
+                             atol = abstol,
                              method = methode)
     } else {
-      nodeMN <- ode_FORTRAN(y = y, func = "secsse_runmod",
-                             times = c(0,timeInte), parms = parameter,  rtol = reltol, atol = abstol,
-                             method = methode)
+      nodeMN <- ode_FORTRAN(y = y,
+                            func = func,
+                            times = c(0,timeInte),
+                            parms = parameter,
+                            rtol = reltol,
+                            atol = abstol,
+                            method = methode)
     }
     if(desIndex == 1){
       nodeN <- nodeMN
@@ -246,117 +255,9 @@ calThruNodes <- function(
   newstate <- nodeM[1:d] ## extinction probabilities
   newstate <- c(newstate,mergeBranch)
   states[focal,] <- newstate
-  #print(parameter); print(loglik)
   return(list(states = states,loglik = loglik,mergeBranch = mergeBranch,nodeM = nodeM))
 }
-# calThruNodes <- function(ances,
-#                          states,
-#                          loglik,
-#                          forTime,
-#                          parameter,
-#                          use_fortran,
-#                          methode,
-#                          phy){
-#   
-#   
-#   lambdas <- parameter[[1]]
-#   mus <- parameter[[2]]
-#   
-#   parameter[[3]][is.na(parameter[[3]])] <- 0
-#   Q <- parameter[[3]]
-#   
-#   nb_node <- phy$Nnode
-#   reltol <- 1e-10
-#   abstol <- 1e-16
-#   hmax <- NULL
-#   ly <- ncol(states)
-#   d <- ncol(states) / 2
-#   
-#   focal <- ances
-#   desRows <- which(phy$edge[, 1] == focal)
-#   desNodes <- phy$edge[desRows, 2]
-#   
-#   nodeM <- numeric()
-#   nodeN <- numeric()
-#   
-#   for(desIndex in 1:2){
-#     y <- states[desNodes[desIndex], ]
-#     timeInte <- forTime[which(forTime[, 2] == desNodes[desIndex]), 3]
-#     ##  To make the calculation in both lineages
-#     
-#     if(use_fortran == "Rsolver"){
-#       nodeMN <- deSolve::ode(
-#         y = y,
-#         func = secsse_loglik_rhs,
-#         times = c(0, timeInte),
-#         parms = parameter,
-#         rtol = reltol,
-#         atol = abstol,
-#         hmax = hmax,
-#         method = methode
-#       )
-#       if(desIndex == 1){
-#         nodeN <- nodeMN
-#         
-#       }
-#       
-#       if(desIndex == 2){
-#         nodeM <- nodeMN
-#       }
-#       
-#     }
-#     
-#     
-#     if(use_fortran == "Fortran"){
-#       nodeMN <- ode_FORTRAN(
-#         y = y,
-#         func = "secsse_loglik_rhs",
-#         times = c(0, timeInte),
-#         parms = parameter,
-#         rtol = reltol,
-#         atol = abstol,
-#         hmax = hmax,
-#         method = methode
-#       )
-#       if(desIndex == 1){
-#         nodeN <- nodeMN
-#         
-#       }
-#       
-#       if(desIndex == 2){
-#         nodeM <- nodeMN
-#       }
-#       
-#     }
-#     
-#   }
-#   ## At the node
-#   
-#   nodeM <- as.numeric(nodeM[2, -1])
-#   nodeN <- as.numeric(nodeN[2, -1])
-#   mergeBranch <- NULL
-#   
-#   for(iii in 1:d){
-#     combProb <- 
-#       nodeM[iii + d] * nodeN[iii + d] * lambdas[iii] ## multiplication of probabilities of both branches
-#     mergeBranch <- c(mergeBranch, combProb)
-#   }
-#   
-#   sumD <- sum(mergeBranch)
-#   mergeBranch <- mergeBranch / sumD
-#   
-#   newstate <- nodeM[1:d] ## extinction probabilities
-#   newstate <- c(newstate, mergeBranch)
-#   
-#   states[focal, ] <- newstate
-#   loglik <- loglik + log(sumD)
-#   return(list(
-#     states = states,
-#     loglik = loglik,
-#     mergeBranch = mergeBranch,
-#     nodeM = nodeM
-#   ))
-# }
+
 #' @importFrom foreach foreach
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach %dopar%
@@ -368,7 +269,8 @@ doParalThing <- function(take_ancesSub,
                          parameter,
                          use_fortran,
                          methode,
-                         phy
+                         phy,
+                         func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
 ){
   #cl <- makeCluster(2)
   #registerDoParallel(cl)
@@ -389,15 +291,20 @@ doParalThing <- function(take_ancesSub,
                                  .export = c(
                                    "secsse_loglik",
                                    "ode_FORTRAN",
-                                   #"phy",
-                                   #"methode",
                                    "calThruNodes"
-                                   #,"use_fortran")) %dopar% {
                                    )) %dopar% { 
                                      ancesSub <- take_ancesSub[[ii]]
                                      for(i in 1:length(ancesSub)){
                                        calcul <- 
-                                         calThruNodes(ancesSub[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode = methode, phy = phy)
+                                         calThruNodes(ancesSub[i],
+                                                      states,
+                                                      loglik,
+                                                      forTime,
+                                                      parameter,
+                                                      use_fortran = use_fortran,
+                                                      methode = methode,
+                                                      phy = phy,
+                                                      func = func)
                                        loglik <- calcul$loglik
                                        states <- calcul$states
                                      }
@@ -492,7 +399,7 @@ build_initStates_time_bigtree <-
     }
     
     phy$node.label <- NULL
-    split_times <- sort(ape::branching.times(phy), decreasing = F)
+    split_times <- sort(event_times(phy), decreasing = F)
     ances <- as.numeric(names(split_times))
     
     forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
@@ -528,7 +435,7 @@ build_initStates_time_bigtree <-
     nspp <- length(phySplit$tip.label)
     
     split_times <- 
-      sort(ape::branching.times(phySplit), decreasing = T)
+      sort(event_times(phySplit), decreasing = T)
     interNodes <- as.numeric(names(split_times))
     
     formattedtree <- apTreeshape::as.treeshape(phySplit)
@@ -642,7 +549,7 @@ build_initStates_time_bigtree <-
 #' drill[[2]][] <- 0
 #' drill[[3]][,] <- 0.1
 #' diag(drill[[3]]) <- NA
-#' secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
+#' secsse_loglik(parameter = drill,phylotree,traits,num_concealed_states,
 #'    use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
 #'
 #' #[1] -113.1018
@@ -660,7 +567,9 @@ secsse_loglik <- function(parameter,
                           setting_calculation = NULL,
                           setting_parallel= NULL,
                           see_ancestral_states = FALSE,
-                          loglik_penalty = 0){
+                          loglik_penalty = 0,
+                          func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
+){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -703,9 +612,8 @@ secsse_loglik <- function(parameter,
                               parameter,
                               use_fortran,
                               methode,
-                              phy
-    )
-    
+                              phy,
+                              func)
     comingfromSub1 <- statesNEW[[1]][[1]]
     comingfromSub2 <- statesNEW[[2]] [[1]]
     loglik <- statesNEW[[1]][[2]] + statesNEW[[2]][[2]]
@@ -720,13 +628,19 @@ secsse_loglik <- function(parameter,
     
     for(i in 1:length(ancesRest)){
       calcul <- 
-        calThruNodes(ancesRest[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode=methode, phy= phy)
+        calThruNodes(ancesRest[i],
+                     states,
+                     loglik,
+                     forTime,
+                     parameter,
+                     use_fortran = use_fortran,
+                     methode = methode, 
+                     phy= phy,
+                     func = func)
       states <- calcul$states
       loglik <- calcul$loglik
-      
     }
   } else {
-    
     if(is.null(setting_calculation)){
       check_input(traits,phy,sampling_fraction,root_state_weight)
       setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
@@ -748,7 +662,15 @@ secsse_loglik <- function(parameter,
     d <- ncol(states) / 2
     
     for(i in 1:length(ances)){
-      calcul <- calThruNodes(ances[i],states,loglik,forTime,parameter,use_fortran = use_fortran,methode=methode, phy=phy)
+      calcul <- calThruNodes(ances[i],
+                             states,
+                             loglik,
+                             forTime,
+                             parameter,
+                             use_fortran = use_fortran,
+                             methode = methode,
+                             phy = phy,
+                             func = func)
       states <- calcul$states
       loglik <- calcul$loglik
       nodeN <- calcul$nodeN

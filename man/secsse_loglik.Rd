@@ -9,7 +9,8 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
   root_state_weight = "proper_weights", sampling_fraction,
   run_parallel = FALSE, setting_calculation = NULL,
   setting_parallel = NULL, see_ancestral_states = FALSE,
-  loglik_penalty = 0)
+  loglik_penalty = 0, func = ifelse(use_fortran == FALSE,
+  secsse_loglik_rhs, "secsse_runmod2"))
 }
 \arguments{
 \item{parameter}{list where first vector represents lambdas, the second mus and the third transition rates.}
@@ -71,7 +72,7 @@ drill[[1]][] <- c(0.12,0.01,0.2,0.21,0.31,0.23)
 drill[[2]][] <- 0
 drill[[3]][,] <- 0.1
 diag(drill[[3]]) <- NA
-secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
+secsse_loglik(parameter = drill,phylotree,traits,num_concealed_states,
    use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
 
 #[1] -113.1018

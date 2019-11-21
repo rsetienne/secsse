@@ -11,7 +11,8 @@ secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
   tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 *
   round((1.25)^length(idparsopt)), use_fortran = TRUE,
   methode = "ode45", optimmethod = "simplex", num_cycles = 1,
-  run_parallel = FALSE, loglik_penalty = 0)
+  run_parallel = FALSE, loglik_penalty = 0, func = ifelse(use_fortran
+  == FALSE, secsse_loglik_rhs, "secsse_runmod2"))
 }
 \arguments{
 \item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.}
@@ -59,6 +60,8 @@ secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
 \item{run_parallel}{should the routine to run in parallel be called? Read note below}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+
+\item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
 }
 \value{
 Parameter estimated and maximum likelihood
@@ -130,7 +133,7 @@ sampling_fraction <- c(1,1,1)
 #                               initparsopt, idfactorsopt, initfactors, idparsfix, parsfix,
 #                               idparsfuncdefpar, functions_defining_params, cond,
 #                               root_state_weight, sampling_fraction, tol, maxiter, use_fortran,
-#                               methode, optimmethod, num_cycles = 1,run_parallel)
+#                               methode, optimmethod, num_cycles = 1, run_parallel)
 
 # ML -136.5796
 }

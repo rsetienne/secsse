@@ -47,14 +47,12 @@ transf_funcdefpar <- function(
 }
 
 
-secsse_transform_parameters <-
-  function(trparsopt,
-           trparsfix,
-           idparsopt,
-           idparsfix,
-           idparslist,
-           structure_func
-  ) {
+secsse_transform_parameters <- function(trparsopt,
+                                        trparsfix,
+                                        idparsopt,
+                                        idparsfix,
+                                        idparslist,
+                                        structure_func) {
     if(is.null(structure_func)==FALSE){
       idparsfuncdefpar <- structure_func[[1]] 
       functions_defining_params <- structure_func[[2]] 
@@ -195,28 +193,27 @@ secsse_transform_parameters <-
     return(pars1)
   }
 
-secsse_loglik_choosepar <-
-  function(trparsopt,
-           trparsfix,
-           idparsopt,
-           idparsfix,
-           idparslist,
-           structure_func = structure_func,
-           phy = phy,
-           traits = traits,
-           num_concealed_states = num_concealed_states,
-           use_fortran = use_fortran,
-           methode,
-           cond = cond,
-           root_state_weight = root_state_weight,
-           sampling_fraction = sampling_fraction,
-           setting_calculation = setting_calculation,
-           run_parallel = run_parallel,
-           setting_parallel = setting_parallel,
-           see_ancestral_states = see_ancestral_states,
-           loglik_penalty = loglik_penalty,
-           verbose = verbose
-           ) {
+secsse_loglik_choosepar <- function(trparsopt,
+                                    trparsfix,
+                                    idparsopt,
+                                    idparsfix,
+                                    idparslist,
+                                    structure_func = structure_func,
+                                    phy = phy,
+                                    traits = traits,
+                                    num_concealed_states = num_concealed_states,
+                                    use_fortran = use_fortran,
+                                    methode,
+                                    cond = cond,
+                                    root_state_weight = root_state_weight,
+                                    sampling_fraction = sampling_fraction,
+                                    setting_calculation = setting_calculation,
+                                    run_parallel = run_parallel,
+                                    setting_parallel = setting_parallel,
+                                    see_ancestral_states = see_ancestral_states,
+                                    loglik_penalty = loglik_penalty,
+                                    func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2"),
+                                    verbose = verbose) {
     alltrpars <- c(trparsopt, trparsfix)
     if (max(alltrpars) > 1 | min(alltrpars) < 0) {
       loglik = -Inf
@@ -269,7 +266,6 @@ secsse_loglik_choosepar <-
           )
       }
       if (is.nan(loglik) || is.na(loglik)) {
-        #print(trparsopt) ## new thing
         cat("There are parameter values used which cause numerical problems.\n")
         loglik <- -Inf
       }
@@ -279,55 +275,6 @@ secsse_loglik_choosepar <-
     }
     return(loglik)
   }
-# secsse_transform_parameters <- function(trparsopt,trparsfix,idparsopt,idparsfix,idparslist){
-#   trpars1 <- idparslist
-#   for(j in 1:3){
-#     trpars1[[j]][] = NA
-#   }
-#   if(length(idparsfix) != 0){
-#     
-#     for(i in 1:length(idparsfix)){
-#       for(j in 1:3) {
-#         id <- which(idparslist[[j]] == idparsfix[i])
-#         trpars1[[j]][id] <- trparsfix[i]
-#         
-#       }
-#     }
-#   }
-#   for(i in 1:length(idparsopt))
-#   {
-#     for(j in 1:3)
-#     {
-#       id <- which(idparslist[[j]] == idparsopt[i])
-#       trpars1[[j]][id] <- trparsopt[i]
-#       
-#     }
-#   }
-#   pars1 <- list()
-#   for(j in 1:3)
-#   {
-#     pars1[[j]] <- trpars1[[j]]/(1 - trpars1[[j]])
-#   }
-#   return(pars1)
-# }
-# 
-# secsse_loglik_choosepar <- function(trparsopt,trparsfix,idparsopt,idparsfix,idparslist,phy=phy,traits=traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states){
-#   alltrpars <- c(trparsopt,trparsfix)
-#   if(max(alltrpars) > 1 | min(alltrpars) < 0) {
-#     loglik = -Inf
-#   } else {
-#     pars1 <- secsse_transform_parameters(trparsopt,trparsfix,idparsopt,idparsfix,idparslist)
-#      
-#       loglik <- secsse_loglik(parameter=pars1,phy=phy,traits=traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,run_parallel=run_parallel,setting_calculation=setting_calculation,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states)
-#           
-#     if(is.nan(loglik) || is.na(loglik)){
-#       print(trparsopt) ## new thing
-#       cat("There are parameter values used which cause numerical problems.\n")
-#       loglik <- -Inf
-#     }
-#   }
-#   return(loglik)
-# }
 
 #' Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE)
 #' @title Maximum likehood estimation for (SecSSE)
@@ -350,6 +297,7 @@ secsse_loglik_choosepar <-
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called?
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @param func function to be used in solving the ODE system. Currently only for testing purposes.
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -412,7 +360,6 @@ secsse_loglik_choosepar <-
 #'# $ML
 #'# [1] -16.43162
 #' @export
-
 secsse_ml <- function(
   phy,
   traits,
@@ -432,9 +379,10 @@ secsse_ml <- function(
   optimmethod = 'simplex',
   num_cycles = 1,
   run_parallel = FALSE,
-  loglik_penalty = 0
+  loglik_penalty = 0,
+  func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
 ){
-  structure_func<-NULL
+  structure_func <- NULL
   check_input(traits,phy,sampling_fraction,root_state_weight)
   
   if(is.matrix(traits)){
@@ -472,7 +420,6 @@ secsse_ml <- function(
   trparsfix[which(parsfix == Inf)] = 1
   optimpars <- c(tol,maxiter)
   
-  
   if(.Platform$OS.type=="windows" && run_parallel==TRUE){
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
@@ -492,7 +439,27 @@ secsse_ml <- function(
     setting_parallel <- NULL
   }
   if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
-  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel = setting_parallel,see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty,verbose = verbose)
+  initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
+                                        trparsfix = trparsfix,
+                                        idparsopt = idparsopt,
+                                        idparsfix = idparsfix,
+                                        idparslist = idparslist,
+                                        structure_func = structure_func,
+                                        phy = phy,
+                                        traits = traits,
+                                        num_concealed_states = num_concealed_states,
+                                        use_fortran = use_fortran,
+                                        methode = methode,
+                                        cond = cond,
+                                        root_state_weight = root_state_weight,
+                                        sampling_fraction = sampling_fraction,
+                                        setting_calculation = setting_calculation,
+                                        run_parallel = run_parallel,
+                                        setting_parallel = setting_parallel,
+                                        see_ancestral_states = see_ancestral_states,
+                                        loglik_penalty = loglik_penalty,
+                                        func = func,
+                                        verbose = verbose)
   cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
   if(initloglik == -Inf)
   {
@@ -501,7 +468,31 @@ secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
-    out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = secsse_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparslist = idparslist, structure_func = structure_func,phy = phy, traits = traits,num_concealed_states=num_concealed_states,use_fortran=use_fortran,methode = methode,cond=cond,root_state_weight=root_state_weight,sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,run_parallel=run_parallel,setting_parallel=setting_parallel,see_ancestral_states=see_ancestral_states, num_cycles = num_cycles, loglik_penalty = loglik_penalty,verbose = verbose)
+    out <- DDD::optimizer(optimmethod = optimmethod,
+                          optimpars = optimpars,
+                          fun = secsse_loglik_choosepar,
+                          trparsopt = trparsopt,
+                          idparsopt = idparsopt,
+                          trparsfix = trparsfix,
+                          idparsfix = idparsfix,
+                          idparslist = idparslist,
+                          structure_func = structure_func,
+                          phy = phy,
+                          traits = traits,
+                          num_concealed_states = num_concealed_states,
+                          use_fortran = use_fortran,
+                          methode = methode,
+                          cond = cond,
+                          root_state_weight = root_state_weight,
+                          sampling_fraction = sampling_fraction,
+                          setting_calculation = setting_calculation,
+                          run_parallel = run_parallel,
+                          setting_parallel = setting_parallel,
+                          see_ancestral_states = see_ancestral_states,
+                          num_cycles = num_cycles,
+                          loglik_penalty = loglik_penalty,
+                          func = func,
+                          verbose = verbose)
     if(out$conv != 0)
     {
       stop("Optimization has not converged. Try again with different initial values.\n")

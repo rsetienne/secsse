@@ -24,6 +24,7 @@
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @param func function to be used in solving the ODE system. Currently only for testing purposes.
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -88,7 +89,7 @@
 #'#                               initparsopt, idfactorsopt, initfactors, idparsfix, parsfix,
 #'#                               idparsfuncdefpar, functions_defining_params, cond,
 #'#                               root_state_weight, sampling_fraction, tol, maxiter, use_fortran,
-#'#                               methode, optimmethod, num_cycles = 1,run_parallel)
+#'#                               methode, optimmethod, num_cycles = 1, run_parallel)
 #'
 #'# ML -136.5796
 #' @export
@@ -115,7 +116,9 @@ secsse_ml_func_def_pars <- function(phy,
                                     optimmethod = 'simplex',
                                     num_cycles = 1,
                                     run_parallel = FALSE,
-                                    loglik_penalty = 0) {
+                                    loglik_penalty = 0,
+                                    func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
+) {
   
   structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
@@ -244,6 +247,7 @@ secsse_ml_func_def_pars <- function(phy,
       setting_parallel = setting_parallel,
       see_ancestral_states = see_ancestral_states,
       loglik_penalty = loglik_penalty,
+      func = func,
       verbose = verbose
     )
   cat("The loglikelihood for the initial parameter values is",
@@ -283,6 +287,7 @@ secsse_ml_func_def_pars <- function(phy,
         see_ancestral_states = see_ancestral_states,
         num_cycles = num_cycles,
         loglik_penalty = loglik_penalty,
+        func = func,
         verbose = verbose
       )
     if (out$conv != 0)

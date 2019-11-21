@@ -176,9 +176,9 @@
       Es = Conc(1:d)
       Ds = Conc((d + 1):N)
       Q = RESHAPE(P((N + 1):(N + d ** 2)),(/d,d/), order = (/1,2/))
-      Q1 = MATMUL(Q,ones)
-      QE = MATMUL(Q,Es)
-      QD = MATMUL(Q,Ds)
+      CALL dgemm('n','n',d,1,d,1.d0,Q,d,ones,d,0.d0,Q1,d)
+      CALL dgemm('n','n',d,1,d,1.d0,Q,d,Es,d,0.d0,QE,d)
+      CALL dgemm('n','n',d,1,d,1.d0,Q,d,Ds,d,0.d0,QD,d)
       dConc(1:d) = mus - (las + mus + Q1) * Es + las * Es * Es + QE
       dConc((d + 1):N) = -(las + mus + Q1) * Ds + 2 * las * Es * Ds + QD
 
@@ -239,7 +239,14 @@
         Qs(I,I) = 0
       ENDDO
 
-
+      !d = N/2
+      !d3 = d ** 3
+      !d2 = d ** 2
+      !mus = P((d3 + 1):(d3 + d))
+      !Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
+      !las = RESHAPE(P(1:d3),(/d,d,d/), order = (/1,2,3/))
+      !dE = mus + QE - (las + mus + Q1) * Es + MATMUL(Es,TRANSPOSE(Es)) 
+      
 ! dynamics
 
 !  R code
@@ -263,7 +270,7 @@
 
       DO I = 1, N/2
        FF1 = (-SUM(lambdas(I,:,:)) - mus(I)) * Conc(N/2 + I) 
-       dConc(N/2 + I) = FF1 + 2 * SUM(lamDE(I,:,:)) 
+       dConc(N/2 + I) = FF1 + SUM(lamDE(I,:,:)) 
         DO II = 1, N/2
            FF1 = Conc(N/2 + II) - Conc(N/2 + I)
            dConc(N/2 + I) = dConc(N/2 + I) + Qs(I, II) * FF1
