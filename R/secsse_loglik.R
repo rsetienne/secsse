@@ -94,25 +94,25 @@ build_initStates_time <- function(phy,
   
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
-  states <- matrix(ncol = (length(traitStates) * 2 * num_concealed_states),nrow=(nb_tip+nb_node))
-  ly <- ncol(states)
-  d <- ncol(states) / 2
+  ly <- length(traitStates) * 2 * num_concealed_states
+  states <- matrix(ncol = ly, nrow = nb_tip + nb_node)
+  d <- ly / 2
   ## In a example of 3 states, the names of the colums would be like:
   ##
   ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
   ##                   "D0A","D1A","D2B","D0B","D1B","D2B")
   states[1:nb_tip,] <- 0
   if(!is.matrix(traits)){
-    traits <- matrix(traits,nrow = length(traits),ncol = 1,byrow = FALSE)
+    traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
   }
   #if(is.matrix(traits)){ ## I repeat the process of state assignation as many times as columns I have
   for(iv in 1:ncol(traits)){
     usetraits <- traits[,iv]
     if(anyNA(usetraits)){
       nas <- which(is.na(traits))
-      for(iii in 1:length(nas) ){
-        states[nas[iii],] <- c(1 - rep(sampling_fraction,num_concealed_states),
-                               rep(sampling_fraction,num_concealed_states))
+      for(iii in 1:length(nas)){
+        states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
+                               rep(sampling_fraction, num_concealed_states))
       }
     }
     
@@ -122,7 +122,7 @@ build_initStates_time <- function(phy,
       for(jj in 1:(num_concealed_states - 1)){
         toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
       }
-      toPlaceOnes <- c(StatesPresents,toPlaceOnes)
+      toPlaceOnes <- c(StatesPresents, toPlaceOnes)
       tipSampling <- 1 * sampling_fraction
       states[which(usetraits == traitStates[iii]),toPlaceOnes] <- tipSampling[iii]
     }
