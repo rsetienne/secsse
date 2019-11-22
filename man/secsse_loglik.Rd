@@ -9,8 +9,9 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
   root_state_weight = "proper_weights", sampling_fraction,
   run_parallel = FALSE, setting_calculation = NULL,
   setting_parallel = NULL, see_ancestral_states = FALSE,
-  loglik_penalty = 0, func = ifelse(use_fortran == FALSE,
-  secsse_loglik_rhs, "secsse_runmod2"))
+  loglik_penalty = 0, is_complete_tree = FALSE,
+  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran
+  == FALSE, secsse_loglik_rhs, "secsse_runmod2")))
 }
 \arguments{
 \item{parameter}{list where first vector represents lambdas, the second mus and the third transition rates.}
@@ -40,6 +41,10 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
 \item{see_ancestral_states}{should the ancestral states be shown? Deafault FALSE}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+
+\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
+
+\item{func}{function to be used in solving the ODE system Currently only for testing purposes.}
 }
 \value{
 The loglikelihood of the data given the parameters

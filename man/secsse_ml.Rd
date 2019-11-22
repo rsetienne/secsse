@@ -10,8 +10,9 @@ secsse_ml(phy, traits, num_concealed_states, idparslist, idparsopt,
   tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 *
   round((1.25)^length(idparsopt)), use_fortran = TRUE,
   methode = "ode45", optimmethod = "simplex", num_cycles = 1,
-  run_parallel = FALSE, loglik_penalty = 0, func = ifelse(use_fortran
-  == FALSE, secsse_loglik_rhs, "secsse_runmod2"))
+  run_parallel = FALSE, loglik_penalty = 0, is_complete_tree = FALSE,
+  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran
+  == FALSE, secsse_loglik_rhs, "secsse_runmod2")))
 }
 \arguments{
 \item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.}
@@ -51,6 +52,8 @@ secsse_ml(phy, traits, num_concealed_states, idparslist, idparsopt,
 \item{run_parallel}{should the routine to run in parallel be called?}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+
+\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
 
 \item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
 }

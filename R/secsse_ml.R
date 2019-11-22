@@ -1,4 +1,3 @@
-
 transf_funcdefpar <- function(
   idparsfuncdefpar,
   functions_defining_params,
@@ -45,7 +44,6 @@ transf_funcdefpar <- function(
   rm(a_new_envir)
   return(trparfuncdefpar)
 }
-
 
 secsse_transform_parameters <- function(trparsopt,
                                         trparsfix,
@@ -212,7 +210,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     setting_parallel = setting_parallel,
                                     see_ancestral_states = see_ancestral_states,
                                     loglik_penalty = loglik_penalty,
-                                    func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2"),
+                                    is_complete_tree = is_complete_tree,
+                                    func = func,
                                     verbose = verbose) {
     alltrpars <- c(trparsopt, trparsfix)
     if (max(alltrpars) > 1 | min(alltrpars) < 0) {
@@ -244,7 +243,9 @@ secsse_loglik_choosepar <- function(trparsopt,
             setting_calculation = setting_calculation,
             setting_parallel = setting_parallel,
             see_ancestral_states = see_ancestral_states,
-            loglik_penalty = loglik_penalty
+            loglik_penalty = loglik_penalty,
+            is_complete_tree = is_complete_tree,
+            func = func
           )
       } else {
         loglik <-
@@ -262,7 +263,9 @@ secsse_loglik_choosepar <- function(trparsopt,
             setting_calculation = setting_calculation,
             setting_parallel = setting_parallel,
             see_ancestral_states = see_ancestral_states,
-            loglik_penalty = loglik_penalty
+            loglik_penalty = loglik_penalty,
+            is_complete_tree = is_complete_tree,
+            func = func
           )
       }
       if (is.nan(loglik) || is.na(loglik)) {
@@ -297,6 +300,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called?
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param func function to be used in solving the ODE system. Currently only for testing purposes.
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
@@ -380,7 +384,13 @@ secsse_ml <- function(
   num_cycles = 1,
   run_parallel = FALSE,
   loglik_penalty = 0,
-  func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
+  is_complete_tree = FALSE,
+  func = ifelse(is_complete_tree,
+                "secsse_runmod_ct",
+                ifelse(use_fortran == FALSE,
+                       secsse_loglik_rhs,
+                       "secsse_runmod2")
+  )
 ){
   structure_func <- NULL
   check_input(traits,phy,sampling_fraction,root_state_weight)
@@ -397,7 +407,7 @@ secsse_ml <- function(
     stop("idparsfix and parsfix must be the same length.Number of fixed elements does not match the fixed figures")
   }
   
-  if(anyDuplicated(c(idparsopt,idparsfix))!=0){
+  if(anyDuplicated(c(idparsopt,idparsfix)) != 0){
     stop("at least one element was asked to be both fixed and estimated ")
   }
   
@@ -420,7 +430,7 @@ secsse_ml <- function(
   trparsfix[which(parsfix == Inf)] = 1
   optimpars <- c(tol,maxiter)
   
-  if(.Platform$OS.type=="windows" && run_parallel==TRUE){
+  if(.Platform$OS.type == "windows" && run_parallel == TRUE){
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
     setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
@@ -428,7 +438,7 @@ secsse_ml <- function(
     on.exit(parallel::stopCluster(cl))
     }
   
-  if(.Platform$OS.type=="unix" && run_parallel==TRUE){
+  if(.Platform$OS.type == "unix" && run_parallel == TRUE){
     doMC::registerDoMC(2)
     setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     setting_parallel <- 1
@@ -458,6 +468,7 @@ secsse_ml <- function(
                                         setting_parallel = setting_parallel,
                                         see_ancestral_states = see_ancestral_states,
                                         loglik_penalty = loglik_penalty,
+                                        is_complete_tree = is_complete_tree,
                                         func = func,
                                         verbose = verbose)
   cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
@@ -491,6 +502,7 @@ secsse_ml <- function(
                           see_ancestral_states = see_ancestral_states,
                           num_cycles = num_cycles,
                           loglik_penalty = loglik_penalty,
+                          is_complete_tree = is_complete_tree,
                           func = func,
                           verbose = verbose)
     if(out$conv != 0)

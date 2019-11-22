@@ -15,3 +15,6 @@ times at which speciation or extinction happens.
 \description{
 Times at which speciation or extinction occurs
 }
+\note{
+This script has been modified from BAMMtools' internal function NU.branching.times
+}

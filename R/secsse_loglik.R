@@ -85,13 +85,17 @@ ode_FORTRAN <- function(
 build_initStates_time <- function(phy,
                                   traits,
                                   num_concealed_states,
-                                  sampling_fraction){ 
-  if(is.matrix(traits)){ ## trait might be a matrix when a species has more than one state
-    traitStates <- sort(unique(traits[,1]))
-  } else {
-    traitStates <- sort(unique(traits))
+                                  sampling_fraction,
+                                  is_complete_tree = FALSE,
+                                  mus = NULL){ 
+  if(!is.matrix(traits)){
+    traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
   }
-  
+  if(length(phy$tip.label)!= nrow(traits)){
+    stop("Number of species in the tree must be the same as in the trait file")
+  }
+  traitStates <- sort(unique(traits[,1]))
+
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
   ly <- length(traitStates) * 2 * num_concealed_states
@@ -102,10 +106,7 @@ build_initStates_time <- function(phy,
   ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
   ##                   "D0A","D1A","D2B","D0B","D1B","D2B")
   states[1:nb_tip,] <- 0
-  if(!is.matrix(traits)){
-    traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
-  }
-  #if(is.matrix(traits)){ ## I repeat the process of state assignation as many times as columns I have
+  #if(is.matrix(traits)){ ## I repeat the process of state assignment as many times as columns I have
   for(iv in 1:ncol(traits)){
     usetraits <- traits[,iv]
     if(anyNA(usetraits)){
@@ -118,17 +119,31 @@ build_initStates_time <- function(phy,
     
     for(iii in 1:length(traitStates)){ # Initial state probabilities
       StatesPresents <- d + iii
-      toPlaceOnes <- NULL
-      for(jj in 1:(num_concealed_states - 1)){
-        toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
-      }
-      toPlaceOnes <- c(StatesPresents, toPlaceOnes)
+      #toPlaceOnes <- NULL
+      #for(jj in 1:(num_concealed_states - 1)){
+      #  toPlaceOnes <- c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
+      #}
+      #toPlaceOnes <- c(StatesPresents, toPlaceOnes)
+      toPlaceOnes <- StatesPresents + length(traitStates) * (0:(num_concealed_states - 1))
       tipSampling <- 1 * sampling_fraction
       states[which(usetraits == traitStates[iii]),toPlaceOnes] <- tipSampling[iii]
     }
-    
-    for(iii in 1:nb_tip){
-      states[iii,1:d] <- rep(1 - sampling_fraction,num_concealed_states)
+
+    if(is_complete_tree){
+      extinct_species <- geiger::is.extinct(phy)
+      if(!is.null(extinct_species))
+      {
+        for(i in 1:length(extinct_species)){
+          states[which(phy$tip.label == extinct_species[i]),(d + 1):ly] <- mus
+        }
+      }
+      for(iii in 1:nb_tip){
+        states[iii,1:d] <- 0
+      }
+    } else {
+      for(iii in 1:nb_tip){
+        states[iii,1:d] <- rep(1 - sampling_fraction,num_concealed_states)
+      }
     }
   }
   #} else {
@@ -194,7 +209,7 @@ calThruNodes <- function(
   use_fortran,
   methode,
   phy,
-  func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
+  func
 ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -276,7 +291,7 @@ doParalThing <- function(take_ancesSub,
                          use_fortran,
                          methode,
                          phy,
-                         func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
+                         func
 ){
   #cl <- makeCluster(2)
   #registerDoParallel(cl)
@@ -531,6 +546,8 @@ build_initStates_time_bigtree <-
 #' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species is provided
+#' @param func function to be used in solving the ODE system Currently only for testing purposes.
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
@@ -574,7 +591,13 @@ secsse_loglik <- function(parameter,
                           setting_parallel = NULL,
                           see_ancestral_states = FALSE,
                           loglik_penalty = 0,
-                          func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
+                          is_complete_tree = FALSE,
+                          func = ifelse(is_complete_tree,
+                                        "secsse_runmod_ct",
+                                        ifelse(use_fortran == FALSE,
+                                               secsse_loglik_rhs,
+                                               "secsse_runmod2")
+                                        )
 ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -641,7 +664,7 @@ secsse_loglik <- function(parameter,
                      parameter,
                      use_fortran = use_fortran,
                      methode = methode, 
-                     phy= phy,
+                     phy = phy,
                      func = func)
       states <- calcul$states
       loglik <- calcul$loglik
@@ -649,7 +672,7 @@ secsse_loglik <- function(parameter,
   } else {
     if(is.null(setting_calculation)){
       check_input(traits,phy,sampling_fraction,root_state_weight)
-      setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
+      setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
     } 
     
     states <- setting_calculation$states

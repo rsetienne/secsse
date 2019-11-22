@@ -1,4 +1,3 @@
-
 #' Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE) where some paramaters are functions of other parameters and/or factors.
 #' @title Maximum likehood estimation for (SecSSE) with parameter as complex functions.
 #' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.
@@ -24,6 +23,7 @@
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param func function to be used in solving the ODE system. Currently only for testing purposes.
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
@@ -117,7 +117,13 @@ secsse_ml_func_def_pars <- function(phy,
                                     num_cycles = 1,
                                     run_parallel = FALSE,
                                     loglik_penalty = 0,
-                                    func = ifelse(use_fortran == FALSE,secsse_loglik_rhs,"secsse_runmod2")
+                                    is_complete_tree = FALSE,
+                                    func = ifelse(is_complete_tree,
+                                                  "secsse_runmod_ct",
+                                                  ifelse(use_fortran == FALSE,
+                                                         secsse_loglik_rhs,
+                                                         "secsse_runmod2")
+                                    )
 ) {
   
   structure_func <- list()

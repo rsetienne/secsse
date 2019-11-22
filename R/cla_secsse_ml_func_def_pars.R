@@ -23,6 +23,8 @@
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called? Read note below
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species is provided
+#' @param func function to be used in solving the ODE system. Currently only for testing purposes.
 #' @note To run in parallel the following libraries must be loaded under windows: apTreeshape, doparallel and foreach. Under unix/linux, apTreeshape, doparallel, foreach and doMC must be loaded.
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -112,8 +114,9 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     optimmethod = 'simplex',
                                     num_cycles = 1,
                                     run_parallel = FALSE,
-                                    loglik_penalty = 0) {
-  
+                                    loglik_penalty = 0,
+                                    is_complete_tree = FALSE,
+                                    func = 'cla_secsse_runmod') {
   structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
@@ -234,6 +237,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
       setting_parallel = setting_parallel,
       see_ancestral_states = see_ancestral_states,
       loglik_penalty = loglik_penalty,
+      is_complete_tree = is_complete_tree,
+      func = func,
       verbose = verbose
     )
   cat("The loglikelihood for the initial parameter values is",
@@ -273,6 +278,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
         see_ancestral_states = see_ancestral_states,
         num_cycles = num_cycles,
         loglik_penalty = loglik_penalty,
+        is_complete_tree = is_complete_tree,
+        func = func,
         verbose = verbose
       )
     if (out$conv != 0)

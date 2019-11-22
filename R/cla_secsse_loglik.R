@@ -28,7 +28,8 @@ cla_calThruNodes <- function(
   parameter,
   use_fortran,
   methode,
-  phy
+  phy,
+  func
 ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -61,7 +62,7 @@ cla_calThruNodes <- function(
                            times = c(0,timeInte), parms = parameter,rtol = reltol, atol = abstol,
                            hmax = NULL,method = methode)
     } else {
-       nodeMN <- ode_FORTRAN(y = y, func = "cla_secsse_runmod",
+       nodeMN <- ode_FORTRAN(y = y, func = func,
                               times = c(0,timeInte), parms = parameter, rtol = reltol, atol = abstol,
                               method = methode)
     }
@@ -114,8 +115,8 @@ cla_doParalThing <- function(take_ancesSub,
                          parameter,
                          use_fortran,
                          methode,
-                         phy
-                         
+                         phy,
+                         func
 ){
   #cl <- makeCluster(2)
   #registerDoParallel(cl)
@@ -150,7 +151,8 @@ cla_doParalThing <- function(take_ancesSub,
                                                           parameter,
                                                           use_fortran = use_fortran,
                                                           methode = methode,
-                                                          phy = phy)
+                                                          phy = phy,
+                                                          func = func)
                                        loglik <- calcul$loglik
                                        states <- calcul$states
                                      }
@@ -159,8 +161,7 @@ cla_doParalThing <- function(take_ancesSub,
   return(statesNEW)
 }
 
-#' Logikelihood calculation 
-#'   for the cla_SecSSE model given a set of parameters and data
+#' Logikelihood calculation for the cla_SecSSE model given a set of parameters and data
 #' @title Likelihood for SecSSE model
 #' @param parameter list where the first is a table where lambdas across different modes of speciation are shown, the second mus and the third transition rates.
 #' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved, rooted and with branch lengths.
@@ -176,6 +177,8 @@ cla_doParalThing <- function(take_ancesSub,
 #' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species is provided
+#' @param func function to be used in solving the ODE system. Currently only for testing purposes.
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
@@ -237,7 +240,9 @@ cla_secsse_loglik <- function(parameter,
                               setting_calculation = NULL,
                               setting_parallel= NULL,
                               see_ancestral_states = FALSE,
-                              loglik_penalty = 0){
+                              loglik_penalty = 0,
+                              is_complete_tree = FALSE,
+                              func = 'cla_secsse_runmod'){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -280,7 +285,8 @@ cla_secsse_loglik <- function(parameter,
                               parameter,
                               use_fortran,
                               methode,
-                              phy
+                              phy,
+                              func
     )
     
     comingfromSub1 <- statesNEW[[1]][[1]]
@@ -297,7 +303,7 @@ cla_secsse_loglik <- function(parameter,
     
     for(i in 1:length(ancesRest)){
       calcul <- 
-        cla_calThruNodes(ancesRest[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode = methode, phy = phy)
+        cla_calThruNodes(ancesRest[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode = methode, phy = phy, func = func)
       states <- calcul$states
       loglik <- calcul$loglik
       
@@ -324,7 +330,15 @@ cla_secsse_loglik <- function(parameter,
     d <- ncol(states)/2
     
     for(i in 1:length(ances)){
-      calcul <- cla_calThruNodes(ances[i],states,loglik,forTime,parameter,use_fortran = use_fortran,methode = methode,phy = phy)
+      calcul <- cla_calThruNodes(ances[i],
+                                 states,
+                                 loglik,
+                                 forTime,
+                                 parameter,
+                                 use_fortran = use_fortran,
+                                 methode = methode,
+                                 phy = phy,
+                                 func = func)
       states <- calcul$states
       loglik <- calcul$loglik
       nodeN <- calcul$nodeN

@@ -9,7 +9,8 @@ cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
   root_state_weight = "proper_weights", sampling_fraction,
   run_parallel = FALSE, setting_calculation = NULL,
   setting_parallel = NULL, see_ancestral_states = FALSE,
-  loglik_penalty = 0)
+  loglik_penalty = 0, is_complete_tree = FALSE,
+  func = "cla_secsse_runmod")
 }
 \arguments{
 \item{parameter}{list where the first is a table where lambdas across different modes of speciation are shown, the second mus and the third transition rates.}
@@ -39,13 +40,16 @@ cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
 \item{see_ancestral_states}{should the ancestral states be shown? Deafault FALSE}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+
+\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
+
+\item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
 }
 \value{
 The loglikelihood of the data given the parameters
 }
 \description{
-Logikelihood calculation 
-  for the cla_SecSSE model given a set of parameters and data
+Logikelihood calculation for the cla_SecSSE model given a set of parameters and data
 }
 \note{
 To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
