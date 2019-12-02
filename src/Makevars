@@ -1,4 +1,4 @@
-PKG_LIBS = $(BLAS_LIBS)
+PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
 
 all : clean
 
