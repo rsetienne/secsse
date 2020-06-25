@@ -1,5 +1,5 @@
 check_input <- function(traits,phy,sampling_fraction,root_state_weight){
-  if(class(root_state_weight) == "numeric"){
+  if(is.numeric(root_state_weight)){
     if(length(root_state_weight) != length(sort(unique(traits)))){
       stop("you need to have as many elements in root_state_weight as traits")
     }
@@ -710,7 +710,7 @@ secsse_loglik <- function(parameter,
   nodeM <- calcul$nodeM
   ## At the root
   mergeBranch2 <- (mergeBranch)
-  if(class(root_state_weight) == "numeric"){
+  if(is.numeric(root_state_weight)){
     giveWeights <- root_state_weight/num_concealed_states
     weightStates <- rep(giveWeights,num_concealed_states)
   } else {
