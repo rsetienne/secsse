@@ -4,13 +4,24 @@
 \alias{cla_secsse_loglik}
 \title{Likelihood for SecSSE model}
 \usage{
-cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
-  use_fortran = TRUE, methode = "ode45", cond = "proper_cond",
-  root_state_weight = "proper_weights", sampling_fraction,
-  run_parallel = FALSE, setting_calculation = NULL,
-  setting_parallel = NULL, see_ancestral_states = FALSE,
-  loglik_penalty = 0, is_complete_tree = FALSE,
-  func = "cla_secsse_runmod")
+cla_secsse_loglik(
+  parameter,
+  phy,
+  traits,
+  num_concealed_states,
+  use_fortran = TRUE,
+  methode = "ode45",
+  cond = "proper_cond",
+  root_state_weight = "proper_weights",
+  sampling_fraction,
+  run_parallel = FALSE,
+  setting_calculation = NULL,
+  setting_parallel = NULL,
+  see_ancestral_states = FALSE,
+  loglik_penalty = 0,
+  is_complete_tree = FALSE,
+  func = "cla_secsse_runmod"
+)
 }
 \arguments{
 \item{parameter}{list where the first is a table where lambdas across different modes of speciation are shown, the second mus and the third transition rates.}

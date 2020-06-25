@@ -4,15 +4,33 @@
 \alias{cla_secsse_ml_func_def_pars}
 \title{Maximum likehood estimation for (SecSSE) with parameter as complex functions. Cladogenetic version}
 \usage{
-cla_secsse_ml_func_def_pars(phy, traits, num_concealed_states, idparslist,
-  idparsopt, initparsopt, idfactorsopt, initfactors, idparsfix, parsfix,
-  idparsfuncdefpar, functions_defining_params, cond = "proper_cond",
-  root_state_weight = "proper_weights", sampling_fraction,
-  tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 *
-  round((1.25)^length(idparsopt)), use_fortran = TRUE,
-  methode = "ode45", optimmethod = "simplex", num_cycles = 1,
-  run_parallel = FALSE, loglik_penalty = 0, is_complete_tree = FALSE,
-  func = "cla_secsse_runmod")
+cla_secsse_ml_func_def_pars(
+  phy,
+  traits,
+  num_concealed_states,
+  idparslist,
+  idparsopt,
+  initparsopt,
+  idfactorsopt,
+  initfactors,
+  idparsfix,
+  parsfix,
+  idparsfuncdefpar,
+  functions_defining_params,
+  cond = "proper_cond",
+  root_state_weight = "proper_weights",
+  sampling_fraction,
+  tol = c(1e-04, 1e-05, 1e-07),
+  maxiter = 1000 * round((1.25)^length(idparsopt)),
+  use_fortran = TRUE,
+  methode = "ode45",
+  optimmethod = "simplex",
+  num_cycles = 1,
+  run_parallel = FALSE,
+  loglik_penalty = 0,
+  is_complete_tree = FALSE,
+  func = "cla_secsse_runmod"
+)
 }
 \arguments{
 \item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.}

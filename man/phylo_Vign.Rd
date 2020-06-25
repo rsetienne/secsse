@@ -3,7 +3,9 @@
 \name{phylo_Vign}
 \alias{phylo_Vign}
 \title{A phylogenetic reconstuction to run the vignette}
-\format{Phylogenetic tree in format nexus, rooted, including branch lengths}
+\format{
+Phylogenetic tree in format nexus, rooted, including branch lengths
+}
 \description{
 An example phylogeny in the right format for secsse
 }

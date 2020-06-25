@@ -4,14 +4,25 @@
 \alias{secsse_loglik}
 \title{Likelihood for SecSSE model}
 \usage{
-secsse_loglik(parameter, phy, traits, num_concealed_states,
-  use_fortran = TRUE, methode = "ode45", cond = "proper_cond",
-  root_state_weight = "proper_weights", sampling_fraction,
-  run_parallel = FALSE, setting_calculation = NULL,
-  setting_parallel = NULL, see_ancestral_states = FALSE,
-  loglik_penalty = 0, is_complete_tree = FALSE,
-  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran
-  == FALSE, secsse_loglik_rhs, "secsse_runmod2")))
+secsse_loglik(
+  parameter,
+  phy,
+  traits,
+  num_concealed_states,
+  use_fortran = TRUE,
+  methode = "ode45",
+  cond = "proper_cond",
+  root_state_weight = "proper_weights",
+  sampling_fraction,
+  run_parallel = FALSE,
+  setting_calculation = NULL,
+  setting_parallel = NULL,
+  see_ancestral_states = FALSE,
+  loglik_penalty = 0,
+  is_complete_tree = FALSE,
+  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE,
+    secsse_loglik_rhs, "secsse_runmod2"))
+)
 }
 \arguments{
 \item{parameter}{list where first vector represents lambdas, the second mus and the third transition rates.}
