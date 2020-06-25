@@ -75,7 +75,7 @@ secsse_transform_parameters <- function(trparsopt,
                                          idparsopt = idparsopt)
     }
     
-    if(class(idparslist[[1]]) == "list"){ # when the ml function is called from cla_secsse
+    if(is.list(idparslist[[1]])){ # when the ml function is called from cla_secsse
       trpars1 <- idparslist
       
       for(j in 1:nrow(trpars1[[3]])){
@@ -227,7 +227,7 @@ secsse_loglik_choosepar <- function(trparsopt,
           structure_func
         )
       
-      if(class(pars1[[1]]) == "list"){ # is the cla_ used?
+      if(is.list(pars1[[1]])){ # is the cla_ used?
         loglik <-
           cla_secsse_loglik(
             parameter = pars1,
