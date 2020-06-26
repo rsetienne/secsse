@@ -5,9 +5,9 @@
 #' @param num_concealed_states number of concealed states, generally equivalent to number of examined states.
 #' @return A list that includes the ids of the parameters for ML analysis. 
 #' @examples
-#'traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-#'num_concealed_states <- 3 
-#'param_posit <- id_paramPos(traits,num_concealed_states)
+#' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
+#' num_concealed_states <- 3 
+#' param_posit <- id_paramPos(traits,num_concealed_states)
 #' @export
 
 id_paramPos <- function(traits,num_concealed_states){

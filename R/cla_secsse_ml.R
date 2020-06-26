@@ -210,7 +210,7 @@ cla_secsse_ml <- function(
     cat("You set some transitions as impossible to happen","\n")
   }
   
-  if(class(idparslist[[1]]) == "matrix"){ ## it is a tailor case otherwise
+  if(is.matrix(idparslist[[1]])){ ## it is a tailor case otherwise
   idparslist[[1]] <- prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
   }
 

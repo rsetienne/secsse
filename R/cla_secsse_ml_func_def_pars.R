@@ -42,7 +42,7 @@
 #'idparslist <- cla_id_paramPos(traits,num_concealed_states)
 #'idparslist$lambdas[1,] <- c(1,2,3,1,2,3,1,2,3)
 #'idparslist[[2]][] <- 4
-#'masterBlock <- matrix(c(5,6),ncol=3,nrow=3,byrow=TRUE)
+#'masterBlock <- matrix(c(5,6,5,6,5,6,5,6,5),ncol=3,nrow=3,byrow=TRUE)
 #'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
 #'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)

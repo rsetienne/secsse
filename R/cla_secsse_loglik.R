@@ -351,7 +351,7 @@ cla_secsse_loglik <- function(parameter,
   ## At the root
   
   mergeBranch2 <- (mergeBranch)
-  if(class(root_state_weight) == "numeric"){
+  if(is.numeric(root_state_weight)){
     giveWeights <- root_state_weight/num_concealed_states
     weightStates <- rep(giveWeights,num_concealed_states)
     
