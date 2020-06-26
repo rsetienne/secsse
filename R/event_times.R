@@ -9,7 +9,7 @@ event_times <- function(phy)
   if(ape::is.ultrametric(phy)) {
     return(ape::branching.times(phy))
   } else {
-    if (!ape::is.binary.tree(phy)) {
+    if (ape::is.binary.tree(phy) == FALSE) {
       stop("error. Need fully bifurcating (resolved) tree\n")
     }
     phy$begin <- rep(0, nrow(phy$edge))
