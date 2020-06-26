@@ -250,7 +250,7 @@ cla_secsse_loglik <- function(parameter,
   
   if(run_parallel == TRUE){ 
     if(is.null(setting_calculation)){
-      check_input(traits,phy,sampling_fraction,root_state_weight)
+      check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- 
         build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     }
@@ -310,7 +310,7 @@ cla_secsse_loglik <- function(parameter,
     }
   } else {
     if(is.null(setting_calculation)){
-      check_input(traits,phy,sampling_fraction,root_state_weight)
+      check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
     } 
     

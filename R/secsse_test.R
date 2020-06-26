@@ -365,35 +365,83 @@ secsse_test_ml3 <- function(){
   testthat::expect_equal(model$ML,-16.1342246206186)
 }  
 
-#secsse_test_complete_tree <- function()
-#  text <- "((Leptocyon_delicatus:10.37,((Leptocyon_douglassi:7,Leptocyon_mollis:5)Node4:2.82751116764679,(Leptocyon_gregorii:4.4,((Leptocyon_vulpinus:4.46,Leptocyon_leidyi:6.83)Node7:2.199999,(Leptocyon_vafer:3.7,(Leptocyon_tejonensis:3.3,Leptocyon_matthewi:3.5)Node9:0.4)Node8:8.599998)Node6:2.2)Node5:3)Node3:3)Node2:9.200001,(((((((((((((((((((Canis_lupus:2.6,Canis_anthus:2.6)Node28:0.99,(((Canis_armbrusteri:1.5,(Canis_cedazoensis:0.4,Canis_feneus:0.4)Node32:0.9)Node31:0.613333,(Canis_nehringi:0.6,Canis_dirus:0.6)Node33:1.613333)Node30:0.613333,((Canis_antonii:0.3,Canis_falconeri:0.2)Node35:0.563333,(Canis_arnensis:0.3,Canis_etruscus:0.3)Node36:0.563333)Node34:0.563333)Node29:0.563333)Node27:0.505,((Canis_chihliensis:0.9,Canis_teilhardi:1.3)Node38:0.7475,(Canis_longdanensis:1.3,Canis_brevicephalus:1.3)Node39:0.5475)Node37:0.5475)Node26:0.505,((Canis_aureus:3.4,Canis_thöoides:2)Node41:0.3,Canis_simensis:3.7)Node40:0.9)Node25:1.28,(Canis_rufus:3.3,Canis_latrans:3.3)Node42:2.58)Node24:0.38,Canis_edwardii:6)Node23:0.38,(Canis_palmidens:0.7,(Canis_variabilis:0.7,Canis_mosbachensis:0.7)Node44:0.7)Node43:4.14)Node22:0.38,Canis_lepophagus:6.4)Node21:0.38,(Cuon_javanicus:7,Cuon_alpinus:7.1)Node45:0.1)Node20:0.1,Cynotherium_sardous:3)Node19:0.1,((Lycaon_pictus:6,Lycaon_sekowei:4)Node47:0.8,Lycaon_magnus:6)Node46:0.8)Node18:0.1,(((Xenocyon_lycaonoides:2.8,Xenocyon_texanus:3)Node50:2.5,Xenocyon_africanus:5)Node49:1,Xenocyon_dubius:5)Node48:0.7)Node17:0.1,(Canis_adustus:3.6,Canis_mesomelas:3.6)Node51:4.2)Node16:0.1,Canis_ferox:6)Node15:0.1,Canis_cipio:5)Node14:2,Nurocyon_chonokhariensis:6)Node13:1.5,((((((Eucyon_odessanus:1.6,Eucyon_davisi:1.7)Node57:0.3,Eucyon_minor:2)Node56:0.2,Eucyon_zhoui:1.7)Node55:0.2,Eucyon_intrepidus:2.6)Node54:4.3,Eucyon_adoxus:6.7)Node53:0.9,Eucyon_monticinensis:6)Node52:0.3)Node12:0.3,((((((Lycalopex_vetulus:3,Lycalopex_sechurae:3)Node63:2.88,(Lycalopex_gymnocercus:4.88,((Lycalopex_culpaeus:3,Lycalopex_fulvipes:3)Node66:0.93,Lycalopex_griseus:3.93)Node65:0.95)Node64:1)Node62:1.02,((Cerdocyon_avius:1.2,Cerdocyon_texanus:2)Node68:1.1,Cerdocyon_thous:3.6)Node67:3.3)Node61:1.1,Atelocynus_microtis:8)Node60:1.2,((Dusicyon_avus:5.1,Dusicyon_australis:5.4)Node70:1.85,(Theriodictis_floridanus:1.6,(Theriodictis_tarijensis:1.05,Theriodictis_platensis:1.05)Node72:0.6)Node71:5.55)Node69:1.85)Node59:1.3,((Chrysocyon_nearcticus:2.6,(Chrysocyon_brachyurus:2.67,(Protocyon_scagliorum:0.6,Protocyon_troglodytes:0.6)Node76:1.87)Node75:1.03)Node74:2.8,((Speothos_pacivorus:1.8,Speothos_venaticus:2)Node78:0.5,Canis_gezi:2.2)Node77:4)Node73:4)Node58:1.3)Node11:0.8,(((((((((((((Vulpes_rueppellii:1.38,Vulpes_vulpes:1.38)Node91:1.39,(Vulpes_ferrilata:1.7,Vulpes_corsac:1.7)Node92:1.07)Node90:0.53,(((((Vulpes_velox:1.17,Vulpes_macrotis:1.17)Node97:1.13,Vulpes_lagopus:2.3)Node96:0.2,Vulpes_praeglacialis:2.3)Node95:0.29,(Vulpes_angustidens:2.08,Vulpes_alopecoides:2.46)Node98:0.21)Node94:0.21,Vulpes_galaticus:2.6)Node93:0.3)Node89:0.3,((Vulpes_chama:1.8,Vulpes_bengalensis:1.8)Node100:1.7,Vulpes_pallida:3.5)Node99:0.1)Node88:0.1,(Vulpes_riffautae:2,(Vulpes_zerda:3.5,Vulpes_cana:3.5)Node101:0.1):0.1)Node87:0.1,Vulpes_praecorsac:3.02)Node86:0.2,Vulpes_chikushanensis:3.6)Node85:0.7,Vulpes_beihaiensis:3.7)Node84:3.6,Vulpes_kernensis_:8)Node83:0.099999,Vulpes_stenognathus:8)Node82:0.1,(((Nyctereutes_donnezani:2.6,((Nyctereutes_megamastoides:2.6,(Nyctereutes_sinensis:2.82,Nyctereutes_abdeslami:1.02)Node107:2.2)Node106:0.2,Nyctereutes_procyonoides:6)Node105:1.9)Node104:0.2,Nyctereutes_terblanchei:7.3)Node103:0.099999,Nyctereutes_tingi:5.1)Node102:0.3)Node81:1.55,(Otocyon_megalotis:9.3,(Prototocyon_recki:2.38,Prototocyon_curvipalatus:2.28)Node109:6.72)Node108:0.75)Node80:0.75,(((((Urocyon_littoralis:0.9,Urocyon_cinereoargenteus:0.9)Node114:2.2,(Urocyon_citrinus:1.02,Urocyon_progressus:1)Node115:1.3)Node113:1.3,(Urocyon_galushai_:1.2,Urocyon_minicephalus:2.7)Node116:1.4)Node112:1.4,Urocyon_webbi:4.3)Node111:4.8,((Metalopex_bakeri:5.4,Metalopex_merriami:4.97)Node118:0.099999,Metalopex_macconnelli_:4.97)Node117:0.200001)Node110:0.2)Node79:1.8)Node10:27.4)Node1:0.0;"
-#  #phy <- phytools::read.newick(text = text)
-#  phy <- ape::rcoal(10)
-#  traits <- sample(c(0,1),ape::Ntip(phy),replace = T)
-#  b <- c(0.04,0.04)  # lambda
-#  d <- rep(0,2)
-#  userTransRate <- 0.2 # transition rate among trait states
-#  num_concealed_states <- 2
-#  sampling_fraction <- c(1,1)
-#  toCheck <- secsse::id_paramPos(traits,num_concealed_states)
-#  toCheck[[1]][] <- b
-#  toCheck[[2]][] <- d
-#  toCheck[[3]][,] <- userTransRate
-#  diag(toCheck[[3]]) <- NA
-#  root_state_weight <- "maddison_weights"
-#  use_fortran <- TRUE
-#  methode <- "ode45"
-#  cond <- "noCondit"
-#  
-#  loglik <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
-#                                 phy = phy,
-#                                 traits = traits,
-#                                 num_concealed_states = num_concealed_states,
-#                                 use_fortran = TRUE,
-#                                 methode = "ode45",
-#                                 cond = cond,
-#                                 root_state_weight = root_state_weight,
-#                                 sampling_fraction = sampling_fraction,
-#                                 func = "secsse_runmod_ct")
-#  )
+secsse_test_complete_tree <- function() {
+  set.seed(42)
+  out <- DDD::dd_sim(pars = c(0.4,0.1,40), age = 15)
+  phy <- out$tes
+  traits <- sample(c(0,1),ape::Ntip(phy),replace = T)
+  b <- c(0.04,0.04)  # lambda
+  d <- rep(0,2)
+  userTransRate <- 0.2 # transition rate among trait states
+  num_concealed_states <- 2
+  sampling_fraction <- c(1,1)
+  toCheck <- secsse::id_paramPos(traits,num_concealed_states)
+  toCheck[[1]][] <- b
+  toCheck[[2]][] <- d
+  toCheck[[3]][,] <- userTransRate
+  diag(toCheck[[3]]) <- NA
+  root_state_weight <- "maddison_weights"
+  use_fortran <- TRUE
+  methode <- "ode45"
+  cond <- "noCondit"
   
+  loglik1 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states = num_concealed_states,
+                                              use_fortran = TRUE,
+                                              methode = "ode45",
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = TRUE,
+                                              func = "secsse_runmod_ct")
+                        )
+  loglik2 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states = num_concealed_states,
+                                              use_fortran = TRUE,
+                                              methode = "ode45",
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction)
+                        )
+  toCheck[[2]][] <- 0.05
+  testthat::expect_equal(loglik1,loglik2)
+  loglik3 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states = num_concealed_states,
+                                              use_fortran = TRUE,
+                                              methode = "ode45",
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = TRUE,
+                                              func = "secsse_runmod_ct")
+  )
+  loglik4 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states = num_concealed_states,
+                                              use_fortran = TRUE,
+                                              methode = "ode45",
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction)
+  )
+  testthat::expect_gt(loglik4, loglik3)
+  loglik5 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = out$tas,
+                                              traits = sample(c(0,1),ape::Ntip(out$tas),replace = T),
+                                              num_concealed_states = num_concealed_states,
+                                              use_fortran = TRUE,
+                                              methode = "ode45",
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = TRUE,
+                                              func = "secsse_runmod_ct")
+  )
+}

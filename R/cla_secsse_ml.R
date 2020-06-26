@@ -184,7 +184,7 @@ cla_secsse_ml <- function(
   func = 'cla_secsse_runmod'
 ){
   
- ## check_input(traits,phy,sampling_fraction,root_state_weight)##################
+ ## check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)##################
   structure_func <- NULL
   if(is.matrix(traits)){
     cat("you are setting a model where some species have more than one trait state \n")

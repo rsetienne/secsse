@@ -1,4 +1,4 @@
-check_input <- function(traits,phy,sampling_fraction,root_state_weight){
+check_input <- function(traits,phy,sampling_fraction,root_state_weight,is_complete_tree){
   if(is.numeric(root_state_weight)){
     if(length(root_state_weight) != length(sort(unique(traits)))){
       stop("you need to have as many elements in root_state_weight as traits")
@@ -20,7 +20,7 @@ check_input <- function(traits,phy,sampling_fraction,root_state_weight){
   if(ape::is.binary(phy) == FALSE){
     stop("the tree needs to be fully resolved")
   }
-  if(ape::is.ultrametric(phy) == FALSE){
+  if(ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE){
     stop("the tree needs to be ultrametric")
   }
   
@@ -606,7 +606,7 @@ secsse_loglik <- function(parameter,
 
   if(run_parallel == TRUE){ 
     if(is.null(setting_calculation)){
-      check_input(traits,phy,sampling_fraction,root_state_weight)
+      check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- 
         build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
     }
@@ -671,7 +671,7 @@ secsse_loglik <- function(parameter,
     }
   } else {
     if(is.null(setting_calculation)){
-      check_input(traits,phy,sampling_fraction,root_state_weight)
+      check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
     } 
     
