@@ -316,31 +316,31 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'phylotree <- ape::rcoal(31, tip.label = 1:31)
 #'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
 #'num_concealed_states<-3
-#'idparslist<-id_paramPos(traits, num_concealed_states)
-#'idparslist[[1]][c(1,4,7)]<-1
-#'idparslist[[1]][c(2,5,8)]<-2
-#'idparslist[[1]][c(3,6,9)]<-3
+#'idparslist <- id_paramPos(traits, num_concealed_states)
+#'idparslist[[1]][c(1,4,7)] <- 1
+#'idparslist[[1]][c(2,5,8)] <- 2
+#'idparslist[[1]][c(3,6,9)] <- 3
 #'idparslist[[2]][]<-4
-#'masterBlock<-matrix(5,ncol=3,nrow=3,byrow=TRUE) 
-#'diag(masterBlock)<-NA
-#'diff.conceal<-FALSE
-#'idparslist[[3]]<-q_doubletrans(traits,masterBlock,diff.conceal)
-#'startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
+#'masterBlock < -matrix(5,ncol=3,nrow=3,byrow=TRUE) 
+#'diag(masterBlock) <- NA
+#'diff.conceal <- FALSE
+#'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
-#'idparsopt<-c(1,2,3,5)
-#'initparsopt<-c(rep(intGuessLamba,3),rep((intGuessLamba/5),1))
-#'idparsfix<-c(0,4)
-#'parsfix<-c(0,0)
-#'tol = c(1e-04, 1e-05, 1e-07)
-#'maxiter = 1000 * round((1.25)^length(idparsopt))
-#'use_fortran = TRUE
-#'methode = "ode45"
-#'optimmethod = "simplex"
-#'run_parallel = FALSE
-#'cond<-"proper_cond"
+#'idparsopt <- c(1,2,3,5)
+#'initparsopt <- c(rep(intGuessLamba,3),rep((intGuessLamba/5),1))
+#'idparsfix <- c(0,4)
+#'parsfix <- c(0,0)
+#'tol <- c(1e-04, 1e-05, 1e-07)
+#'maxiter <- 1000 * round((1.25)^length(idparsopt))
+#'use_fortran <- TRUE
+#'methode <- "ode45"
+#'optimmethod <- "simplex"
+#'run_parallel <- FALSE
+#'cond <- "proper_cond"
 #'root_state_weight <- "proper_weights"
-#'sampling_fraction<-c(1,1,1)
+#'sampling_fraction <- c(1,1,1)
 #'#model<-secsse_ml(
 #'#phylotree,
 #'#traits,

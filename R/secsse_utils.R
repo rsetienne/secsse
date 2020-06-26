@@ -9,7 +9,6 @@
 #' num_concealed_states <- 3 
 #' param_posit <- id_paramPos(traits,num_concealed_states)
 #' @export
-
 id_paramPos <- function(traits,num_concealed_states){
   idparslist <- list()
   if(is.matrix(traits)){
