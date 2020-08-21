@@ -406,9 +406,11 @@ secsse_test_complete_tree <- function() {
                                               cond = cond,
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction)
-                        )
-  toCheck[[2]][] <- 0.05
+                                             )
+  # check that the likelihood for a specifically complete tree without extinct lineages with 0 extinction
+  # is equal to the likelihood for a tree with extant species only and 0 extinction rate
   testthat::expect_equal(loglik1,loglik2)
+  toCheck[[2]][] <- 0.05
   loglik3 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                               phy = phy,
                                               traits = traits,
@@ -420,7 +422,7 @@ secsse_test_complete_tree <- function() {
                                               sampling_fraction = sampling_fraction,
                                               is_complete_tree = TRUE,
                                               func = "secsse_runmod_ct")
-  )
+                                             )
   loglik4 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                               phy = phy,
                                               traits = traits,
@@ -430,11 +432,14 @@ secsse_test_complete_tree <- function() {
                                               cond = cond,
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction)
-  )
+                                             )
+  # check that when the extinction rate is not zero, the likelihood of treating the tree as
+  # extant-species only is larger than treating it as a complete tree
   testthat::expect_gt(loglik4, loglik3)
+  traits <- sample(c(0,1),ape::Ntip(out$tas),replace = T)
   loglik5 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                               phy = out$tas,
-                                              traits = sample(c(0,1),ape::Ntip(out$tas),replace = T),
+                                              traits = traits,
                                               num_concealed_states = num_concealed_states,
                                               use_fortran = TRUE,
                                               methode = "ode45",
@@ -444,4 +449,5 @@ secsse_test_complete_tree <- function() {
                                               is_complete_tree = TRUE,
                                               func = "secsse_runmod_ct")
   )
+  testthat::expect_equal(loglik5,-298.6936,tolerance = 1E-4)
 }

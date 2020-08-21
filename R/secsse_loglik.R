@@ -128,7 +128,6 @@ build_initStates_time <- function(phy,
       tipSampling <- 1 * sampling_fraction
       states[which(usetraits == traitStates[iii]),toPlaceOnes] <- tipSampling[iii]
     }
-
     if(is_complete_tree){
       extinct_species <- geiger::is.extinct(phy)
       if(!is.null(extinct_species))
@@ -146,6 +145,7 @@ build_initStates_time <- function(phy,
       }
     }
   }
+
   #} else {
   #  if(anyNA(traits)){
   #    nas <- which( is.na(traits))
@@ -335,121 +335,125 @@ doParalThing <- function(take_ancesSub,
 }
 
 build_initStates_time_bigtree <- 
-  function(phy, traits, num_concealed_states, sampling_fraction){
-    if(is.matrix(traits)){
-      ## trait might be a matrix when a species has more than one state
-      traitStates <- sort(unique(traits[, 1]))
-    } else{
-      traitStates <- sort(unique(traits))
-    }
+  function(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree = FALSE, mus = NULL) {
+    initStates_list <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus) 
+    states <- initStates_list$states
+    ances <- initStates_list$ances
+    forTime <- initStates_list$forTime
     
-    nb_tip <- ape::Ntip(phy)
-    nb_node <- phy$Nnode
-    states <- 
-      matrix(ncol = (length(traitStates) * 2 * num_concealed_states),
-             nrow = (nb_tip + nb_node))
-    
-    
-    ####
-    ly <- ncol(states)
-    d <- ncol(states) / 2
-    ## In a example of 3 states, the names of the colums would be like:
-    ##
-    ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
-    ##                   "D0A","D1A","D2B","D0B","D1B","D2B")
-    
-    states[1:nb_tip,] <- 0
-    
-    if(is.matrix(traits)){
-      ## I repeat the process of state assignation as many times as columns I have
-      for(iv in 1:ncol(traits)){
-        usetraits <- traits[, iv]
-        if(anyNA(usetraits)){
-          nas <- which(is.na(traits))
-          for(iii in 1:length(nas)){
-            states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
-                                   rep(sampling_fraction, num_concealed_states))
-          }
-        }
-        
-        for(iii in 1:length(traitStates)){
-          # Initial state probabilities
-          StatesPresents <- d + iii
-          toPlaceOnes <- NULL
-          for(jj in 1:(num_concealed_states - 1)){
-            toPlaceOnes <- 
-              c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
-          }
-          toPlaceOnes <- c(StatesPresents, toPlaceOnes)
-          tipSampling <- 1 * sampling_fraction
-          states[which(usetraits == traitStates[iii]), toPlaceOnes] <- 
-            tipSampling[iii]
-        }
-        
-        for(iii in 1:nb_tip){
-          states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
-        }
-        
-      }
-    } else {
-      if(anyNA(traits)){
-        nas <- which(is.na(traits))
-        for(iii in 1:length(nas)){
-          states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
-                                 rep(sampling_fraction, num_concealed_states))
-        }
-      }
-      
-      for(iii in 1:length(traitStates)){
-        # Initial state probabilities
-        StatesPresents <- d + iii
-        toPlaceOnes <- NULL
-        for(jj in 1:(num_concealed_states - 1)){
-          toPlaceOnes <- 
-            c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
-        }
-        toPlaceOnes <- c(StatesPresents, toPlaceOnes)
-        tipSampling <- 1 * sampling_fraction
-        states[which(traits == traitStates[iii]), toPlaceOnes] <- 
-          tipSampling[iii]
-      }
-
-      for(iii in 1:nb_tip){
-        states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
-      }
-    }
-    
-    phy$node.label <- NULL
-    split_times <- sort(event_times(phy), decreasing = F)
-    ances <- as.numeric(names(split_times))
-    
-    forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
-    forTime[, 1:2] <- phy$edge
-    
-    for(ab in 1:length(ances)){
-      focalTime <- ances[ab]
-      desRows <- which(phy$edge[, 1] == focalTime)
-      desNodes <- phy$edge[desRows, 2]
-      
-      rootward_age <- 
-        split_times[which(names(split_times) == focalTime)]
-      
-      for(desIndex in 1:2){
-        ## to Find the time which the integration will be done in
-        if(any(desNodes[desIndex] == names(split_times))){
-          tipward_age <- 
-            split_times[which(names(split_times) == desNodes[desIndex])]
-          timeInterv <- c(tipward_age, rootward_age)
-        } else {
-          timeInterv <- c(0, rootward_age)
-        }
-        
-        forTime [which(forTime[, 2] == desNodes[desIndex]), 3] <- 
-          timeInterv[2] - timeInterv[1]
-      }
-    }
-    reltol <- 1e-12
-    abstol <- 1e-16
+    #if(is.matrix(traits)){
+    #  traitStates <- sort(unique(traits[, 1]))
+    #} else {
+    #  traitStates <- sort(unique(traits))
+    #}
+    #
+    #nb_tip <- ape::Ntip(phy)
+    #nb_node <- phy$Nnode
+    #states <- 
+    #  matrix(ncol = (length(traitStates) * 2 * num_concealed_states),
+    #         nrow = (nb_tip + nb_node))
+    #  
+    #
+    #####
+    #ly <- ncol(states)
+    #d <- ncol(states) / 2
+    ### In a example of 3 states, the names of the colums would be like:
+    ###
+    ### colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
+    ###                   "D0A","D1A","D2B","D0B","D1B","D2B")
+    #  
+    #states[1:nb_tip,] <- 0
+    #  
+    #if(is.matrix(traits)){
+    #  ## I repeat the process of state assignation as many times as columns I have
+    #  for(iv in 1:ncol(traits)){
+    #    usetraits <- traits[, iv]
+    #    if(anyNA(usetraits)){
+    #      nas <- which(is.na(traits))
+    #      for(iii in 1:length(nas)){
+    #        states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
+    #                               rep(sampling_fraction, num_concealed_states))
+    #      }
+    #    }
+    #    
+    #    for(iii in 1:length(traitStates)){
+    #      # Initial state probabilities
+    #      StatesPresents <- d + iii
+    #      toPlaceOnes <- NULL
+    #      for(jj in 1:(num_concealed_states - 1)){
+    #        toPlaceOnes <- 
+    #          c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
+    #      }
+    #      toPlaceOnes <- c(StatesPresents, toPlaceOnes)
+    #      tipSampling <- 1 * sampling_fraction
+    #      states[which(usetraits == traitStates[iii]), toPlaceOnes] <- 
+    #        tipSampling[iii]
+    #    }
+    #    
+    #    for(iii in 1:nb_tip){
+    #      states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+    #    }
+    #    
+    #  }
+    #} else {
+    #  if(anyNA(traits)){
+    #    nas <- which(is.na(traits))
+    #    for(iii in 1:length(nas)){
+    #      states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
+    #                             rep(sampling_fraction, num_concealed_states))
+    #    }
+    #  }
+    #  
+    #  for(iii in 1:length(traitStates)){
+    #    # Initial state probabilities
+    #    StatesPresents <- d + iii
+    #    toPlaceOnes <- NULL
+    #    for(jj in 1:(num_concealed_states - 1)){
+    #      toPlaceOnes <- 
+    #        c(toPlaceOnes, StatesPresents + (length(traitStates) * jj))
+    #    }
+    #    toPlaceOnes <- c(StatesPresents, toPlaceOnes)
+    #    tipSampling <- 1 * sampling_fraction
+    #    states[which(traits == traitStates[iii]), toPlaceOnes] <- 
+    #      tipSampling[iii]
+    #  }
+    #
+    #  for(iii in 1:nb_tip){
+    #    states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+    #  }
+    #}
+    #  
+    #phy$node.label <- NULL
+    #split_times <- sort(event_times(phy), decreasing = F)
+    #ances <- as.numeric(names(split_times))
+    #
+    #forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
+    #forTime[, 1:2] <- phy$edge
+    #  
+    #for(ab in 1:length(ances)){
+    #  focalTime <- ances[ab]
+    #  desRows <- which(phy$edge[, 1] == focalTime)
+    #  desNodes <- phy$edge[desRows, 2]
+    #  
+    #  rootward_age <- 
+    #    split_times[which(names(split_times) == focalTime)]
+    #  
+    #  for(desIndex in 1:2){
+    #    ## to Find the time which the integration will be done in
+    #    if(any(desNodes[desIndex] == names(split_times))){
+    #      tipward_age <- 
+    #        split_times[which(names(split_times) == desNodes[desIndex])]
+    #      timeInterv <- c(tipward_age, rootward_age)
+    #    } else {
+    #      timeInterv <- c(0, rootward_age)
+    #    }
+    #    
+    #    forTime [which(forTime[, 2] == desNodes[desIndex]), 3] <- 
+    #      timeInterv[2] - timeInterv[1]
+    #  }
+    #}
+    #reltol <- 1e-12
+    #abstol <- 1e-16
     
     phySplit <- phy
     phySplit$node.label <- NULL
@@ -479,7 +483,7 @@ build_initStates_time_bigtree <-
     sub2 <- as.numeric(phylobase::children(phy2,NodeOptimSplit)[2])
     jointSubs <- NodeOptimSplit
     
-    cat("The best split is a subtree which has branches of size:",
+    cat("The best split is into two subtrees with ",
         length(geiger::tips(phy, sub1)),"and",length(geiger::tips(phy, sub2)),"tips \n")    
     
     descenSub1 <- sort(phylobase::descendants(phy2, sub1, type = "all"))
@@ -542,7 +546,7 @@ build_initStates_time_bigtree <-
 #' @param root_state_weight the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per trait state. It must have as many elements as trait states.
 #' @param run_parallel should the routine to run in parallel be called?
-#' @param setting_calculation argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)
+#' @param setting_calculation argument used internally to speed up calculation. It should be left blank (default : setting_calculation = NULL)
 #' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)

@@ -190,6 +190,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
   trparsopt[which(initparsopt2 == Inf)] <- 1
   trparsfix <- parsfix / (1 + parsfix)
   trparsfix[which(parsfix == Inf)] <- 1
+
+  mus <- calc_mus(is_complete_tree, idparslist, idparsfix, parsfix, idparsopt, initparsopt)
   
   optimpars <- c(tol, maxiter)
 
@@ -197,7 +199,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
     setting_calculation <- 
-      build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
+      build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     setting_parallel <- 1
     on.exit(parallel::stopCluster(cl))
   }
@@ -205,7 +207,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   if (.Platform$OS.type == "unix" && run_parallel == TRUE) {
     doMC::registerDoMC(2)
     setting_calculation <- 
-      build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
+      build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     setting_parallel <- 1
   }
   

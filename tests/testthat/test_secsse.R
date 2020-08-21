@@ -8,7 +8,7 @@ test_that("secsse gives the same result as GeoSSE", {
   secsse_test_geosse()  
 })
 
-test_that("trying a short ML search: secsse_ml & Parallel procedure", {
+test_that("trying a short ML search: secsse_ml & parallel procedure", {
  secsse_test_ml()
 })  
 

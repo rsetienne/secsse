@@ -252,7 +252,7 @@ cla_secsse_loglik <- function(parameter,
     if(is.null(setting_calculation)){
       check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- 
-        build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
+        build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     }
     
     states <- setting_calculation$states

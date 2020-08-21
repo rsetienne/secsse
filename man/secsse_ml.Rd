@@ -98,7 +98,7 @@ idparslist[[1]][c(1,4,7)] <- 1
 idparslist[[1]][c(2,5,8)] <- 2
 idparslist[[1]][c(3,6,9)] <- 3
 idparslist[[2]][]<-4
-masterBlock <- matrix(5,ncol=3,nrow=3,byrow=TRUE) 
+masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
 diag(masterBlock) <- NA
 diff.conceal <- FALSE
 idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)

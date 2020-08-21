@@ -331,3 +331,14 @@ penalty <- function(pars,loglik_penalty = 0)
   pars <- unlist(unlist(pars))
   return(loglik_penalty * sum(pars^2)/(2 * length(pars)))
 }
+
+calc_mus <- function(is_complete_tree, idparslist, idparsfix, parsfix, idparsopt, initparsopt) {
+  mus <- NULL
+  if(is_complete_tree) {
+    mus <- rep(NA,length(idparslist[[2]]))
+    for(i in 1:length(idparslist[[2]])) {
+      mus[i] <- c(parsfix[which(idparsfix == idparslist[[2]][i])],initparsopt[which(idparsopt == idparslist[[2]][i])])
+    }
+  }
+  return(mus)
+}

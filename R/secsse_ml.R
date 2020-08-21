@@ -321,7 +321,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'idparslist[[1]][c(2,5,8)] <- 2
 #'idparslist[[1]][c(3,6,9)] <- 3
 #'idparslist[[2]][]<-4
-#'masterBlock <- matrix(5,ncol=3,nrow=3,byrow=TRUE) 
+#'masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
 #'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
 #'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
@@ -404,7 +404,7 @@ secsse_ml <- function(
   }
   
   if(length(idparsfix)!=length(parsfix)){
-    stop("idparsfix and parsfix must be the same length.Number of fixed elements does not match the fixed figures")
+    stop("idparsfix and parsfix must be the same length. Number of fixed elements does not match the fixed figures")
   }
   
   if(anyDuplicated(c(idparsopt,idparsfix)) != 0){
@@ -428,24 +428,25 @@ secsse_ml <- function(
   trparsopt[which(initparsopt == Inf)] = 1
   trparsfix <- parsfix/(1 + parsfix)
   trparsfix[which(parsfix == Inf)] = 1
+  mus <- calc_mus(is_complete_tree, idparslist, idparsfix, parsfix, idparsopt, initparsopt)
   optimpars <- c(tol,maxiter)
   
   if(.Platform$OS.type == "windows" && run_parallel == TRUE){
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
-    setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
+    setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     setting_parallel<-1
     on.exit(parallel::stopCluster(cl))
     }
   
   if(.Platform$OS.type == "unix" && run_parallel == TRUE){
     doMC::registerDoMC(2)
-    setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
+    setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     setting_parallel <- 1
   } 
   
   if(run_parallel == FALSE){
-    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
+    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
     setting_parallel <- NULL
   }
   if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}

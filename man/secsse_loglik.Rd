@@ -45,7 +45,7 @@ secsse_loglik(
 
 \item{run_parallel}{should the routine to run in parallel be called?}
 
-\item{setting_calculation}{argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)}
+\item{setting_calculation}{argument used internally to speed up calculation. It should be left blank (default : setting_calculation = NULL)}
 
 \item{setting_parallel}{argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)}
 
