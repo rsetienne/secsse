@@ -2,8 +2,8 @@ Package: secsse
 Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
-Version: 2.0.1
-Date: 2019-08-21
+Version: 2.0.2
+Date: 2019-08-24
 License: GPL-3
 Authors@R: c(
  person("Leonel", "Herrera Alsina", email = "leonelhalsina@gmail.com", role = "cre"),
