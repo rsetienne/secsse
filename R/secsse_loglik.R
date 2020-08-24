@@ -56,8 +56,8 @@ secsse_loglik_rhs <- function(t,y,parameter){
   mus <- parameter[[2]]
   Q <- parameter[[3]]
   diag(Q) <- 0
-  dE <- mus-(lambdas + mus + Q %*% (rep(1,d))) * Es + lambdas * Es * Es + ( Q %*% Es )
-  dD <- -(lambdas + mus + Q %*% (rep(1,d)))  * Ds + 2 * lambdas * Es * Ds +( Q %*% Ds )
+  dE <- mus - (lambdas + mus + Q %*% (rep(1,d))) * Es + lambdas * Es * Es + ( Q %*% Es )
+  dD <- -(lambdas + mus + Q %*% (rep(1,d))) * Ds + 2 * lambdas * Es * Ds + ( Q %*% Ds )
   return(list(c(dE,dD)))
 }
 

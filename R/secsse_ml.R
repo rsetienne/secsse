@@ -480,6 +480,9 @@ secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
+    if (is_complete_tree == TRUE) {
+      setting_calculation <- NULL
+    }
     out <- DDD::optimizer(optimmethod = optimmethod,
                           optimpars = optimpars,
                           fun = secsse_loglik_choosepar,
