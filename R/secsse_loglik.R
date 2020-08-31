@@ -24,7 +24,7 @@ check_input <- function(traits,phy,sampling_fraction,root_state_weight,is_comple
   if(ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE){
     stop("The tree needs to be ultrametric.")
   }
-  if(ape::any(coalescent.intervals(phy)$interval.length == 0)){
+  if(any(phy$edge.length == 0)){
     stop('The tree must have internode distancs that are all larger than 0.')
   }
   
