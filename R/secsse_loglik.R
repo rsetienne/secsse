@@ -1,49 +1,53 @@
 check_input <- function(traits,phy,sampling_fraction,root_state_weight,is_complete_tree){
   if(is.numeric(root_state_weight)){
     if(length(root_state_weight) != length(sort(unique(traits)))){
-      stop("you need to have as many elements in root_state_weight as traits")
+      stop("There need to be as many elements in root_state_weight as there are traits.")
     }
     if(length(which(root_state_weight == 1)) != 1){
-      stop("your root_state_weight needs only one 1")
+      stop("The root_state_weight needs only one 1.")
     }
   } else {
-    if(any(root_state_weight == "maddison_weights" | root_state_weight == "equal_weights"|
+    if(any(root_state_weight == "maddison_weights" |
+           root_state_weight == "equal_weights" |
            root_state_weight == "proper_weights") == FALSE){
-      stop("check root_state_weight for a typo or so")
+      stop("The root_state_weight must be any of maddison_weights, equal_weights, or proper_weights.")
     }
   }
   
   if(ape::is.rooted(phy) == FALSE){
-    stop("the tree needs to be rooted")
+    stop("The tree needs to be rooted.")
   }
   
   if(ape::is.binary(phy) == FALSE){
-    stop("the tree needs to be fully resolved")
+    stop("The tree needs to be fully resolved.")
   }
   if(ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE){
-    stop("the tree needs to be ultrametric")
+    stop("The tree needs to be ultrametric.")
+  }
+  if(ape::any(coalescent.intervals(phy)$interval.length == 0)){
+    stop('The tree must have internode distancs that are all larger than 0.')
   }
   
   if(is.matrix(traits)){
     if(length(sampling_fraction) != length(sort(unique(traits[, 1])))){
-      stop("sampling_fraction must have as many elements as traits you have")
+      stop("Sampling_fraction must have as many elements as the number of traits.")
     }
     
     if(all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) == 
         FALSE){
       stop(
-        "Check your trait argument, if you have more than one column, make sure all your states are included in the first column"
+        "Check your trait argument; if you have more than one column, make sure all your states are included in the first column."
       )
     }
   } else{
     if(length(sampling_fraction) != length(sort(unique(traits)))){
-      stop("sampling_fraction must have as many elements as traits you have")
+      stop("Sampling_fraction must have as many elements as the number of traits.")
     }
   }
   
   if(length(sort(unique(as.vector(traits)))) < 2)
   {
-    stop("the trait has only one state")
+    stop("The trait has only one state.")
   }
 }
 
@@ -223,12 +227,12 @@ calThruNodes <- function(
   focal <- ances
   desRows <- which(phy$edge[, 1] == focal)
   desNodes <- phy$edge[desRows, 2]
-  
   nodeM <- numeric()
   nodeN <- numeric()
   
   for(desIndex in 1:2){
     y <- states[desNodes[desIndex],]
+    #
     timeInte <- forTime[which(forTime[,2] == desNodes[desIndex]),3]
     ##  To do the calculation in both lineages
     
@@ -706,6 +710,8 @@ secsse_loglik <- function(parameter,
                              func = func)
       states <- calcul$states
       loglik <- calcul$loglik
+      if(is.na(loglik)) {stop('NA encountered in loglik')}
+      
       nodeN <- calcul$nodeN
     }
   }
