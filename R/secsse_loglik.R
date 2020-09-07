@@ -83,6 +83,7 @@ ode_FORTRAN <- function(
                           ynames = c("SV"), dimens = n_pars, nout = 1, 
                           dllname = "secsse", method = method, ...
   )[,1:(n_vars + 1)]
+  #print(as.numeric(c(probs[1,1],probs[2,c(1,6:9)])));
   return(probs)
 }
 
@@ -616,7 +617,7 @@ secsse_loglik <- function(parameter,
     if(is.null(setting_calculation)){
       check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- 
-        build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction)
+        build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     }
     
     states <- setting_calculation$states

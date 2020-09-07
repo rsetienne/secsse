@@ -224,7 +224,7 @@ secsse_ml_func_def_pars <- function(phy,
   
   if (run_parallel == FALSE) {
     setting_calculation <-
-      build_initStates_time(phy, traits, num_concealed_states, sampling_fraction)
+      build_initStates_time(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     setting_parallel <- NULL
   }
   

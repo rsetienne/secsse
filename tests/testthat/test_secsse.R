@@ -19,3 +19,15 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
 test_that("trying a short ML search: cla_secsse", {
   secsse_test_ml3()
 })
+
+test_that("trying a short ML search: cla_secsse", {
+  secsse_test_ml4()
+})
+
+test_that("the loglik for the complete tree", {
+  secsse_test_complete_tree()
+})
+
+test_that("the loglik for the complete tree under cla_secsse", {
+  secsse_test_cla_complete_tree()
+})

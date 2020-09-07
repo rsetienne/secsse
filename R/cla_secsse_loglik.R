@@ -58,13 +58,22 @@ cla_calThruNodes <- function(
     ##  To make the calculation in both lineages
     
     if(use_fortran == FALSE){
-       nodeMN <- deSolve::ode(y = y, func = cla_secsse_loglik_rhs,
-                           times = c(0,timeInte), parms = parameter,rtol = reltol, atol = abstol,
-                           hmax = NULL,method = methode)
-    } else {
-       nodeMN <- ode_FORTRAN(y = y, func = func,
-                              times = c(0,timeInte), parms = parameter, rtol = reltol, atol = abstol,
+       nodeMN <- deSolve::ode(y = y,
+                              func = cla_secsse_loglik_rhs,
+                              times = c(0,timeInte),
+                              parms = parameter,
+                              rtol = reltol,
+                              atol = abstol,
+                              hmax = NULL,
                               method = methode)
+    } else {
+       nodeMN <- ode_FORTRAN(y = y,
+                             func = func,
+                             times = c(0,timeInte),
+                             parms = parameter,
+                             rtol = reltol,
+                             atol = abstol,
+                             method = methode)
     }
     if(desIndex == 1){
       nodeN <- nodeMN
@@ -242,7 +251,13 @@ cla_secsse_loglik <- function(parameter,
                               see_ancestral_states = FALSE,
                               loglik_penalty = 0,
                               is_complete_tree = FALSE,
-                              func = 'cla_secsse_runmod'){
+                              func = ifelse(is_complete_tree,
+                                            "cla_secsse_runmod_ct",
+                                            ifelse(use_fortran == FALSE,
+                                                   cla_secsse_loglik_rhs,
+                                                   "cla_secsse_runmod")
+                                            )
+                              ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -311,7 +326,7 @@ cla_secsse_loglik <- function(parameter,
   } else {
     if(is.null(setting_calculation)){
       check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
-      setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
+      setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
     } 
     
     states <- setting_calculation$states

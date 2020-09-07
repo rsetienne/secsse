@@ -329,3 +329,71 @@
 
       END SUBROUTINE cla_secsse_runmod
       
+!==========================================================================
+
+      SUBROUTINE cla_secsse_runmod_ct (neq, t, Conc, dConc, yout, ip)
+      USE secsse_dimmod
+      IMPLICIT NONE
+
+!......................... declaration section.............................
+
+      INTEGER           :: neq, ip(*), i, ii, iii
+      INTEGER           :: arraydim, matdim, d
+      DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*), ones(N/2)
+      DOUBLE PRECISION  :: lambdas(N/2,N/2,N/2), mus(N/2), las(N/2)
+      DOUBLE PRECISION  :: Q(N/2,N/2), Ds(N/2), Q1(N/2), QD(N/2)
+
+! parameters - named here
+      DOUBLE PRECISION rn
+      COMMON /XCBPar/rn
+
+
+! local variables
+      CHARACTER(len=80) msg
+
+!............................ statements ..................................
+
+      IF (.NOT. Initialised) THEN
+        ! check memory allocated to output variables
+        IF (ip(1) < 1) CALL rexit("nout not large enough") 
+
+        ! save parameter values in yout
+        ii = ip(1)   ! Start of parameter values
+        CALL secsse_fill1d(P, (N**3)/8 + N/2 + (N**2)/4, yout, ii)   ! ii is updated in Fill1D
+        Initialised = .TRUE.          ! to prevent from initialising more than once
+      ENDIF
+
+!lambdas = P(1 ... (N**3)/8)
+!mus = P((N**3)/8 + 1 ... (N**3)/8 + N/2)
+!Q = P((N**3)/8 + N/2 + 1 ... (N**3)/8 + N/2 + (N**2)/4)
+!Q = RESHAPE(P(((N**3)/8 + N/2 + 1):((N ** 3)/8 + N/2 + (N**2)/4)),(/d,d/), order = (/1,2/))
+
+      arraydim = (N**3)/8
+      matdim = (N**2)/4
+      DO I = 1, N/2
+        mus(I) = P(arraydim + I)
+        DO II = 1, N/2
+           Q(I,II) = P(arraydim + N/2 + (II - 1) * N/2 + I)
+           DO III = 1,N/2
+              lambdas(I,II,III) = P((I - 1) * matdim + (III - 1) * N/2 + II)
+           ENDDO
+        ENDDO
+        Q(I,I) = 0
+        las(I) = SUM(lambdas(I,:,:))
+      ENDDO
+
+! dynamics
+
+!  R code
+!  dD <- -("sum(lambdas)" + mus + Q %*% (rep(1,d))) * Ds + ( Q %*% Ds )
+
+      d = N/2
+      ones = 1.d0
+      Ds = Conc((d + 1):N)
+      CALL dgemm('n','n',d,1,d,1.d0,Q,d,Ds,d,0.d0,QD,d)
+      CALL dgemm('n','n',d,1,d,1.d0,Q,d,ones,d,0.d0,Q1,d)
+      dConc(1:d) = 0
+      dConc((d + 1):N) = -(las + mus + Q1) * Ds + QD
+
+      END SUBROUTINE cla_secsse_runmod_ct
+      

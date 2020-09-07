@@ -1,4 +1,4 @@
-secsse_test_hisse <- function(){
+secsse_test_hisse <- function() {
   ## Test to check that our approach reaches the same likelihood than HiSSE.
   # to calculate likelihood of a trait with 2 states using Hisse
   #####pars <- c(0.1, 0.2, 0.03, 0.03, 0.01, 0.01)
@@ -108,7 +108,7 @@ secsse_test_hisse <- function(){
   testthat::expect_equal(z2, z3) 
 }
 
-secsse_test_geosse <- function(){
+secsse_test_geosse <- function() {
   #geosse
   pars <- c(1.5, 0.5, 1.0, 0.7, 0.7, 2.5, 0.5)
   names(pars) <- c("sA", "sB", "sAB", "xA", "xB", "dA", "dB")
@@ -140,16 +140,16 @@ secsse_test_geosse <- function(){
   lambdas[[1]][2,1] <- 1.5
   lambdas[[1]][3,1] <- 0.5
   lambdas[[1]][3,2] <- 1
-  lambdas[[2]]<-matrix(0,ncol = 3,nrow = 3,byrow = TRUE)
+  lambdas[[2]] <- matrix(0,ncol = 3,nrow = 3,byrow = TRUE)
   lambdas[[2]][2,2] <- 1.5
   #lambdas[[2]][2,2] <- 1.1
   lambdas[[3]] <- matrix(0,ncol=3,nrow=3,byrow=TRUE)
   lambdas[[3]][3,3] <- 0.5
   #lambdas[[3]][3,3] <- 1
   
-  mus<-c(0,0.7,0.7)
+  mus <- c(0,0.7,0.7)
   
-  q<-matrix(0,ncol = 3,nrow = 3,byrow = TRUE)
+  q <- matrix(0,ncol = 3,nrow = 3,byrow = TRUE)
   q[2,1] <- 1.4
   q[3,1] <- 1.3
   q[1,2] <- 0.7
@@ -176,7 +176,6 @@ secsse_test_geosse <- function(){
                                      setting_parallel = NULL,
                                      see_ancestral_states = FALSE,
                                      loglik_penalty = 0)
-  
   testthat::expect_equal(classe_diversitree_LL,secsse_cla_LL)
   
   secsse_cla_LL2 <- cla_secsse_loglik(parameter,
@@ -193,8 +192,6 @@ secsse_test_geosse <- function(){
                                       setting_parallel = NULL,
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0)
-  #print(secsse_cla_LL)
-  #print(secsse_cla_LL2)
   testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
 }
 
@@ -314,7 +311,7 @@ secsse_test_ml2 <- function(){
   testthat::expect_equal(model$ML,-12.87974)
 }  
 
-secsse_test_ml3 <- function(){
+secsse_test_ml3 <- function() {
   parenthesis <- "(((6:0.2547423371,(1:0.0496153503,4:0.0496153503):0.2051269868):0.1306304758,(9:0.2124135406,5:0.2124135406):0.1729592723):1.151205247,(((7:0.009347664296,3:0.009347664296):0.2101416075,10:0.2194892718):0.1035186448,(2:0.2575886319,8:0.2575886319):0.06541928469):1.213570144);"
   phylotree <- ape::read.tree(file = "",parenthesis)
   traits <- c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
@@ -343,7 +340,7 @@ secsse_test_ml3 <- function(){
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)
   
-  model<-cla_secsse_ml(
+  model_R <- cla_secsse_ml(
     phylotree,
     traits,
     num_concealed_states,
@@ -362,6 +359,66 @@ secsse_test_ml3 <- function(){
     optimmethod,
     num_cycles = 1,
     run_parallel)
+  testthat::expect_equal(model_R$ML,-16.1342246206186)
+  
+  model_FORTRAN <- cla_secsse_ml(
+    phylotree,
+    traits,
+    num_concealed_states,
+    idparslist,
+    idparsopt,
+    initparsopt,
+    idparsfix,
+    parsfix,
+    cond,
+    root_state_weight,
+    sampling_fraction,
+    tol,
+    maxiter,
+    use_fortran = TRUE,
+    methode,
+    optimmethod,
+    num_cycles = 1,
+    run_parallel)
+  testthat::expect_equal(model_R$ML,model_FORTRAN$ML)
+}  
+
+secsse_test_ml4 <- function() {
+  parenthesis <- "(((6:0.2547423371,(1:0.0496153503,4:0.0496153503):0.2051269868):0.1306304758,(9:0.2124135406,5:0.2124135406):0.1729592723):1.151205247,(((7:0.009347664296,3:0.009347664296):0.2101416075,10:0.2194892718):0.1035186448,(2:0.2575886319,8:0.2575886319):0.06541928469):1.213570144);"
+  phylotree <- ape::read.tree(file = "",parenthesis)
+  traits <- c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
+  num_concealed_states <- 3
+  idparslist <- cla_id_paramPos(traits,num_concealed_states)
+  idparslist$lambdas[2,] <- rep(1,9)
+  idparslist[[2]][] <- 4
+  masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
+  diag(masterBlock) <- NA
+  diff.conceal <- FALSE
+  idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+  startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
+  intGuessLamba <- startingpoint$lambda0
+
+  model <- cla_secsse_ml(
+    phy = phylotree,
+    traits = traits,
+    num_concealed_states = num_concealed_states,
+    idparslist = idparslist,
+    idparsopt = c(1),
+    initparsopt = intGuessLamba,
+    idparsfix = c(0,4,5),
+    parsfix = c(0,0,0.01),
+    cond = "proper_cond",
+    root_state_weight = "proper_weights",
+    sampling_fraction = c(1,1,1),
+    tol = c(1e-04, 1e-05, 1e-07),
+    maxiter = 1000 * round((1.25)),
+    use_fortran = TRUE,
+    methode = "ode45",
+    optimmethod = "simplex",
+    num_cycles = 1,
+    run_parallel = FALSE,
+    is_complete_tree = FALSE
+  )
   testthat::expect_equal(model$ML,-16.1342246206186)
 }  
 
@@ -436,9 +493,17 @@ secsse_test_complete_tree <- function() {
   # check that when the extinction rate is not zero, the likelihood of treating the tree as
   # extant-species only is larger than treating it as a complete tree
   testthat::expect_gt(loglik4, loglik3)
-  traits <- sample(c(0,1),ape::Ntip(out$tas),replace = T)
+  
+  parenthesis <- "((t1:13.27595158,(((t7:3.890382947,t44:3.890382947):1.853160984,((t28:1.711947644,t52:0.4956923013):1.025240512,t49:2.737188156):3.006355775):8.137718231,t8:0.505931684):0.03852050838):1.080217329,(((((((t2:1.223724296,t54:1.223724296):2.937627297,(t43:1.877801583,t51:1.477270763):2.283550009):0.3267835885,t39:4.488135181):3.978299002,(t20:5.332776925,t33:1.090685514):3.133657257):0.6198399825,(t17:2.592728197,t21:8.418528959):0.6677452056):0.5788113411,((t13:9.543568307,t15:4.657699849):0.03128867016,(((t14:0.2753485556,((t27:1.893882667,t34:4.969412207):0.4876873725,t31:5.45709958):0.2968375929):2.956689195,((t18:3.089806926,t47:3.089806926):3.812406896,(t23:4.616705952,t37:3.696779257):2.28550787):1.808412546):0.6634713591,t16:4.343870947):0.2007592503):0.09022852898):5.130443554,((t3:3.025694309,(((t5:0.6527575809,((t10:8.190240586,t22:4.624901141):1.973824751,((t12:4.230710001,(t42:0.2233137827,t55:0.2233137827):4.007396218):4.263802978,((((t19:4.431551413,t40:4.431551413):1.104239624,t30:0.1129381496):1.083744321,t26:1.989902921):0.2782431807,t24:0.2097131009):1.596734441):1.669552358):1.61638294):1.700092275,((t9:1.444919643,t53:1.444919643):5.416788797,(((t25:4.956186112,(t35:0.07136896428,((t41:2.961601359,(t48:0.04657504123,t56:0.04657504123):2.915026317):0.6168912293,t45:3.578492588):0.7569031841):0.6207903395):0.4454730422,(t32:3.460649902,t46:3.460649902):1.941009252):0.3114551734,t29:4.364985142):1.148594113):6.618832112):0.9318119344,((((t6:2.605426467,t50:0.4317387896):2.002392571,t38:4.607819038):0.207438208,t36:4.815257246):6.619291453,t11:11.4345487):2.977803786):0.1895024879):0.1670130749,t4:0.903839228):0.026661011):0.20447094):0;"
+  phy <- ape::read.tree(file = "",parenthesis)
+  traits <- c(0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,1,1,1,0,0,0,0,1,1,0,1,1,1,1,0,0)
+  # produced locally by
+  # set.seed(42)
+  # out <- DDD::dd_sim(pars = c(0.4,0.1,40), age = 15)
+  # phy <- out$tas
+  # traits <- sample(c(0,1),ape::Ntip(phy),replace = T)
   loglik5 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                              phy = out$tas,
+                                              phy = phy,
                                               traits = traits,
                                               num_concealed_states = num_concealed_states,
                                               use_fortran = TRUE,
@@ -447,7 +512,88 @@ secsse_test_complete_tree <- function() {
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction,
                                               is_complete_tree = TRUE,
-                                              func = "secsse_runmod_ct")
-  )
-  testthat::expect_equal(loglik5,-298.6936,tolerance = 1E-4)
+                                              func = "secsse_runmod_ct"))
+  testthat::expect_equal(loglik5,-298.3583,tolerance = 1E-4)
+ 
+  lambdas <- list()
+  for(i in 1:4) {
+    lambdas[[i]] <- matrix(0,ncol = 4,nrow = 4,byrow = TRUE)
+    lambdas[[i]][i,i] <- toCheck$lambdas[i]
+  }
+
+  parameter <- toCheck
+  parameter[[1]] <- lambdas
+
+  loglik6 <- secsse::cla_secsse_loglik(parameter = parameter,
+                                       phy = phy,
+                                       traits = traits,
+                                       num_concealed_states = num_concealed_states,
+                                       use_fortran = TRUE,
+                                       methode = "ode45",
+                                       cond = cond,
+                                       root_state_weight = root_state_weight,
+                                       sampling_fraction = sampling_fraction,
+                                       run_parallel = FALSE,
+                                       setting_calculation = NULL,
+                                       setting_parallel = NULL,
+                                       see_ancestral_states = FALSE,
+                                       loglik_penalty = 0,
+                                       is_complete_tree = TRUE)
+  testthat::expect_equal(loglik6,loglik5)
+}
+
+secsse_test_cla_complete_tree <- function(){  
+  phy <- NULL; rm(phy);
+  utils::data('example_phy_GeoSSE', package = 'secsse');
+  traits <- as.numeric(phy$tip.state)
+  lambdas <- list()
+  lambdas[[1]] <- matrix(0,ncol = 9,nrow = 9,byrow = TRUE)
+  lambdas[[1]][2,1] <- 1.5
+  lambdas[[1]][3,1] <- 0.5
+  lambdas[[1]][3,2] <- 1
+  for(i in 2:9) {
+    lambdas[[i]] <- lambdas[[1]]
+  }
+  mus <- rep(0,9)
+  Q <- matrix(runif(81),ncol = 9,nrow = 9,byrow = TRUE)
+  Q[diag(Q)] <- NA
+  parameter <- list()
+  parameter[[1]] <- lambdas
+  parameter[[2]] <- mus
+  parameter[[3]] <- Q
+  
+  num_concealed_states <- 3
+  
+  secsse_cla_LL3 <- cla_secsse_loglik(parameter = parameter,
+                                      phy = phy,
+                                      traits = traits,
+                                      num_concealed_states = num_concealed_states,
+                                      use_fortran = TRUE,
+                                      methode = "ode45",
+                                      cond = "maddison_cond",
+                                      root_state_weight = "maddison_weights",
+                                      sampling_fraction = c(1,1,1),
+                                      run_parallel = FALSE,
+                                      setting_calculation = NULL,
+                                      setting_parallel = NULL,
+                                      see_ancestral_states = FALSE,
+                                      loglik_penalty = 0,
+                                      is_complete_tree = FALSE)
+  
+  secsse_cla_LL4 <- cla_secsse_loglik(parameter = parameter,
+                                      phy = phy,
+                                      traits = traits,
+                                      num_concealed_states = num_concealed_states,
+                                      use_fortran = TRUE,
+                                      methode = "ode45",
+                                      cond = "maddison_cond",
+                                      root_state_weight = "maddison_weights",
+                                      sampling_fraction = c(1,1,1),
+                                      run_parallel = FALSE,
+                                      setting_calculation = NULL,
+                                      setting_parallel = NULL,
+                                      see_ancestral_states = FALSE,
+                                      loglik_penalty = 0,
+                                      is_complete_tree = TRUE)
+  testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL4)
 }

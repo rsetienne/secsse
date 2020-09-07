@@ -20,7 +20,8 @@ cla_secsse_loglik(
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = "cla_secsse_runmod"
+  func = ifelse(is_complete_tree, "cla_secsse_runmod_ct", ifelse(use_fortran == FALSE,
+    cla_secsse_loglik_rhs, "cla_secsse_runmod"))
 )
 }
 \arguments{
