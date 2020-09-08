@@ -338,7 +338,7 @@
 !......................... declaration section.............................
 
       INTEGER           :: neq, ip(*), i, ii, iii
-      INTEGER           :: arraydim, matdim, d
+      INTEGER           :: arraydim, matdim, d, d2, d3
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*), ones(N/2)
       DOUBLE PRECISION  :: lambdas(N/2,N/2,N/2), mus(N/2), las(N/2)
       DOUBLE PRECISION  :: Q(N/2,N/2), Ds(N/2), Q1(N/2), QD(N/2)
@@ -366,21 +366,20 @@
 !lambdas = P(1 ... (N**3)/8)
 !mus = P((N**3)/8 + 1 ... (N**3)/8 + N/2)
 !Q = P((N**3)/8 + N/2 + 1 ... (N**3)/8 + N/2 + (N**2)/4)
-!Q = RESHAPE(P(((N**3)/8 + N/2 + 1):((N ** 3)/8 + N/2 + (N**2)/4)),(/d,d/), order = (/1,2/))
 
-      arraydim = (N**3)/8
-      matdim = (N**2)/4
-      DO I = 1, N/2
-        mus(I) = P(arraydim + I)
-        DO II = 1, N/2
-           Q(I,II) = P(arraydim + N/2 + (II - 1) * N/2 + I)
-           DO III = 1,N/2
-              lambdas(I,II,III) = P((I - 1) * matdim + (III - 1) * N/2 + II)
-           ENDDO
-        ENDDO
-        Q(I,I) = 0
-        las(I) = SUM(lambdas(I,:,:))
-      ENDDO
+      !arraydim = (N**3)/8
+      !matdim = (N**2)/4
+      !DO I = 1, N/2
+      !  mus(I) = P(arraydim + I)
+      !  DO II = 1, N/2
+      !     Q(I,II) = P(arraydim + N/2 + (II - 1) * N/2 + I)
+      !     DO III = 1,N/2
+      !        lambdas(I,II,III) = P((I - 1) * matdim + (III - 1) * N/2 + II)
+      !     ENDDO
+      !  ENDDO
+      !  Q(I,I) = 0
+      !  las(I) = SUM(lambdas(I,:,:))
+      !ENDDO
 
 ! dynamics
 
@@ -388,6 +387,14 @@
 !  dD <- -("sum(lambdas)" + mus + Q %*% (rep(1,d))) * Ds + ( Q %*% Ds )
 
       d = N/2
+      d3 = d ** 3
+      d2 = d ** 2
+      mus = P((d3 + 1):(d3 + d))
+      Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
+      lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
+      DO I = 1,d
+         las(I) = SUM(lambdas(I,:,:))
+      ENDDO
       ones = 1.d0
       Ds = Conc((d + 1):N)
       CALL dgemm('n','n',d,1,d,1.d0,Q,d,Ds,d,0.d0,QD,d)
