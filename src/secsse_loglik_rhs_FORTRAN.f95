@@ -294,7 +294,10 @@
       !d2 = d ** 2
       !mus = P((d3 + 1):(d3 + d))
       !Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
-      !las = RESHAPE(P(1:d3),(/d,d,d/), order = (/1,2,3/))
+      !lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
+      !DO I = 1,d
+      !   las(I) = SUM(lambdas(I,:,:))
+      !ENDDO
       !dE = mus + QE - (las + mus + Q1) * Es + MATMUL(Es,TRANSPOSE(Es)) 
       
 ! dynamics
@@ -366,20 +369,6 @@
 !lambdas = P(1 ... (N**3)/8)
 !mus = P((N**3)/8 + 1 ... (N**3)/8 + N/2)
 !Q = P((N**3)/8 + N/2 + 1 ... (N**3)/8 + N/2 + (N**2)/4)
-
-      !arraydim = (N**3)/8
-      !matdim = (N**2)/4
-      !DO I = 1, N/2
-      !  mus(I) = P(arraydim + I)
-      !  DO II = 1, N/2
-      !     Q(I,II) = P(arraydim + N/2 + (II - 1) * N/2 + I)
-      !     DO III = 1,N/2
-      !        lambdas(I,II,III) = P((I - 1) * matdim + (III - 1) * N/2 + II)
-      !     ENDDO
-      !  ENDDO
-      !  Q(I,I) = 0
-      !  las(I) = SUM(lambdas(I,:,:))
-      !ENDDO
 
 ! dynamics
 
