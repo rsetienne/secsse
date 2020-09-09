@@ -340,8 +340,8 @@
 
 !......................... declaration section.............................
 
-      INTEGER           :: neq, ip(*), i, ii, iii
-      INTEGER           :: arraydim, matdim, d, d2, d3
+      INTEGER           :: neq, ip(*), i, ii
+      INTEGER           :: d, d2, d3
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*), ones(N/2)
       DOUBLE PRECISION  :: lambdas(N/2,N/2,N/2), mus(N/2), las(N/2)
       DOUBLE PRECISION  :: Q(N/2,N/2), Ds(N/2), Q1(N/2), QD(N/2)
