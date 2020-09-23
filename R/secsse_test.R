@@ -70,42 +70,51 @@ secsse_test_hisse <- function() {
   ),4)
   
   # Test to compare different solvers: Fortran vs Rsolver
-  z1 <- round(as.numeric(secsse_loglik(parameter = toCheck,
-                                       phy = phy,
-                                       traits = traits,
-                                       num_concealed_states = num_concealed_states,
-                                       use_fortran = FALSE,
-                                       methode = "ode45",
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       sampling_fraction = sampling_fraction)
-                         ),4)
-  z2 <- round(as.numeric(secsse_loglik(parameter = toCheck,
-                                       phy = phy,
-                                       traits = traits,
-                                       num_concealed_states = num_concealed_states,
-                                       use_fortran = TRUE,
-                                       methode = "ode45",
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       sampling_fraction = sampling_fraction)
-                         ),4)
-  z3 <- round(as.numeric(secsse_loglik(parameter = toCheck,
-                                       phy = phy,
-                                       traits = traits,
-                                       num_concealed_states = num_concealed_states,
-                                       use_fortran = TRUE,
-                                       methode = "ode45",
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       sampling_fraction = sampling_fraction,
-                                       func = "secsse_runmod")
-  ),4)
+  z1 <- as.numeric(secsse_loglik(parameter = toCheck,
+                                 phy = phy,
+                                 traits = traits,
+                                 num_concealed_states = num_concealed_states,
+                                 use_fortran = FALSE,
+                                 methode = "ode45",
+                                 cond = cond,
+                                 root_state_weight = root_state_weight,
+                                 sampling_fraction = sampling_fraction))
+  z2 <- as.numeric(secsse_loglik(parameter = toCheck,
+                                 phy = phy,
+                                 traits = traits,
+                                 num_concealed_states = num_concealed_states,
+                                 use_fortran = TRUE,
+                                 methode = "ode45",
+                                 cond = cond,
+                                 root_state_weight = root_state_weight,
+                                 sampling_fraction = sampling_fraction))
+  z3 <- as.numeric(secsse_loglik(parameter = toCheck,
+                                 phy = phy,
+                                 traits = traits,
+                                 num_concealed_states = num_concealed_states,
+                                 use_fortran = TRUE,
+                                 methode = "ode45",
+                                 cond = cond,
+                                 root_state_weight = root_state_weight,
+                                 sampling_fraction = sampling_fraction,
+                                 func = "secsse_runmod"))
+  z4 <- as.numeric(secsse_loglik(parameter = toCheck,
+                                 phy = phy,
+                                 traits = traits,
+                                 num_concealed_states = num_concealed_states,
+                                 use_fortran = TRUE,
+                                 methode = "ode45",
+                                 cond = cond,
+                                 root_state_weight = root_state_weight,
+                                 sampling_fraction = sampling_fraction,
+                                 func = "secsse_runmod",
+                                 run_parallel = TRUE))
   
   testthat::expect_equal(-237.8611,y1)##-237.8611 is the right one, 
   testthat::expect_equal(-243.8611,y2)
   testthat::expect_equal(z1, z2) 
   testthat::expect_equal(z2, z3) 
+  testthat::expect_equal(z3, z4) 
 }
 
 secsse_test_geosse <- function() {
@@ -193,6 +202,22 @@ secsse_test_geosse <- function() {
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0)
   testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
+  
+  secsse_cla_LL3 <- cla_secsse_loglik(parameter,
+                                      phy,
+                                      traits,
+                                      num_concealed_states,
+                                      use_fortran = TRUE,
+                                      methode = "ode45",
+                                      cond = "maddison_cond",
+                                      root_state_weight = "maddison_weights",
+                                      sampling_fraction = c(1,1,1),
+                                      run_parallel = TRUE,
+                                      setting_calculation = NULL,
+                                      setting_parallel = NULL,
+                                      see_ancestral_states = FALSE,
+                                      loglik_penalty = 0)
+  testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL2)
 }
 
 secsse_test_ml <- function(){
@@ -514,7 +539,21 @@ secsse_test_complete_tree <- function() {
                                               is_complete_tree = TRUE,
                                               func = "secsse_runmod_ct"))
   testthat::expect_equal(loglik5,-298.3583,tolerance = 1E-4)
- 
+
+  loglik6 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states = num_concealed_states,
+                                              use_fortran = TRUE,
+                                              run_parallel = TRUE,
+                                              methode = "ode45",
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = TRUE,
+                                              func = "secsse_runmod_ct"))
+  testthat::expect_equal(loglik6,loglik5,tolerance = 1E-4)
+  
   lambdas <- list()
   for(i in 1:4) {
     lambdas[[i]] <- matrix(0,ncol = 4,nrow = 4,byrow = TRUE)
@@ -524,7 +563,7 @@ secsse_test_complete_tree <- function() {
   parameter <- toCheck
   parameter[[1]] <- lambdas
 
-  loglik6 <- secsse::cla_secsse_loglik(parameter = parameter,
+  loglik7 <- secsse::cla_secsse_loglik(parameter = parameter,
                                        phy = phy,
                                        traits = traits,
                                        num_concealed_states = num_concealed_states,
@@ -539,7 +578,24 @@ secsse_test_complete_tree <- function() {
                                        see_ancestral_states = FALSE,
                                        loglik_penalty = 0,
                                        is_complete_tree = TRUE)
-  testthat::expect_equal(loglik6,loglik5)
+  testthat::expect_equal(loglik7,loglik5)
+  
+  loglik8 <- secsse::cla_secsse_loglik(parameter = parameter,
+                                       phy = phy,
+                                       traits = traits,
+                                       num_concealed_states = num_concealed_states,
+                                       use_fortran = TRUE,
+                                       methode = "ode45",
+                                       cond = cond,
+                                       root_state_weight = root_state_weight,
+                                       sampling_fraction = sampling_fraction,
+                                       run_parallel = TRUE,
+                                       setting_calculation = NULL,
+                                       setting_parallel = NULL,
+                                       see_ancestral_states = FALSE,
+                                       loglik_penalty = 0,
+                                       is_complete_tree = TRUE)
+  testthat::expect_equal(loglik8,loglik7)
 }
 
 secsse_test_cla_complete_tree <- function(){  
@@ -596,4 +652,21 @@ secsse_test_cla_complete_tree <- function(){
                                       loglik_penalty = 0,
                                       is_complete_tree = TRUE)
   testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL4)
+  
+  secsse_cla_LL5 <- cla_secsse_loglik(parameter = parameter,
+                                      phy = phy,
+                                      traits = traits,
+                                      num_concealed_states = num_concealed_states,
+                                      use_fortran = TRUE,
+                                      methode = "ode45",
+                                      cond = "maddison_cond",
+                                      root_state_weight = "maddison_weights",
+                                      sampling_fraction = c(1,1,1),
+                                      run_parallel = TRUE,
+                                      setting_calculation = NULL,
+                                      setting_parallel = NULL,
+                                      see_ancestral_states = FALSE,
+                                      loglik_penalty = 0,
+                                      is_complete_tree = TRUE)
+  testthat::expect_equal(secsse_cla_LL5,secsse_cla_LL4)
 }
