@@ -36,7 +36,7 @@ transf_funcdefpar <- function(
     list2env(y, envir = a_new_envir)
     
     if (is.numeric(value_func_defining_parm) == FALSE) {
-      stop("something went wrong with the calculation of parameters in 'functions_param_struct'")
+      stop("Something went wrong with the calculation of parameters in 'functions_param_struct'")
     }
     trparfuncdefpar <- c(trparfuncdefpar, value_func_defining_parm)
   }
@@ -51,7 +51,7 @@ secsse_transform_parameters <- function(trparsopt,
                                         idparsfix,
                                         idparslist,
                                         structure_func) {
-    if(is.null(structure_func)==FALSE){
+    if(is.null(structure_func) == FALSE){
       idparsfuncdefpar <- structure_func[[1]] 
       functions_defining_params <- structure_func[[2]] 
     #  idfactorsopt <- structure_func[[3]] <- idfactorsopt
@@ -59,7 +59,7 @@ secsse_transform_parameters <- function(trparsopt,
       if(length(structure_func[[3]])>1){
         idfactorsopt <- structure_func[[3]] 
       } else {
-        if(structure_func[[3]] =="noFactor"){
+        if(structure_func[[3]] == "noFactor"){
           idfactorsopt <- NULL
         } else {
           idfactorsopt <- structure_func[[3]] 
@@ -71,7 +71,7 @@ secsse_transform_parameters <- function(trparsopt,
                                          idfactorsopt = idfactorsopt,
                                          trparsfix = trparsfix,
                                          trparsopt = trparsopt,
-                                         idparsfix=idparsfix,
+                                         idparsfix = idparsfix,
                                          idparsopt = idparsopt)
     }
     
@@ -132,25 +132,23 @@ secsse_transform_parameters <- function(trparsopt,
         }
       }  
       
-      pre_pars1<-list()
+      pre_pars1 <- list()
       pars1 <- list()
       
       for(j in 1:nrow(trpars1[[3]])){
-        
-        pre_pars1[[j]] <- trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,])
+        pre_pars1[[j]] <- trpars1[[1]][[j]][,] / (1 - trpars1[[1]][[j]][,])
       }
       
       pars1[[1]] <- pre_pars1
       for(j in 2:3){
-        
-        pars1[[j]] <- trpars1[[j]]/(1 - trpars1[[j]])
+        pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
       }
       
     } else { #### when non-cla option is called
       
       trpars1 <- idparslist
       for (j in 1:3) {
-        trpars1[[j]][] = NA
+        trpars1[[j]][] <- NA
       }
       if (length(idparsfix) != 0) {
         for (i in 1:length(idparsfix)) {
@@ -396,10 +394,10 @@ secsse_ml <- function(
   check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
   
   if(is.matrix(traits)){
-    cat("you are setting a model where some species had more than one trait state \n")
+    cat("You are setting a model where some species had more than one trait state \n")
   }
   
-  if(length(initparsopt)!=length(idparsopt)){
+  if(length(initparsopt) != length(idparsopt)){
     stop("initparsopt must be the same length as idparsopt. Number of parameters to optimize does not match the number of initial values for the search")
   }
   
@@ -408,7 +406,7 @@ secsse_ml <- function(
   }
   
   if(anyDuplicated(c(idparsopt,idparsfix)) != 0){
-    stop("at least one element was asked to be both fixed and estimated ")
+    stop("At least one element was asked to be both fixed and estimated ")
   }
   
   if(identical(as.numeric(sort(c(idparsopt,idparsfix))),as.numeric(sort(unique(unlist(idparslist)))))==FALSE){
@@ -424,9 +422,9 @@ secsse_ml <- function(
   #options(warn=-1)
   cat("Calculating the likelihood for the initial parameters.","\n")
   utils::flush.console()
-  trparsopt <- initparsopt/(1 + initparsopt)
+  trparsopt <- initparsopt / (1 + initparsopt)
   trparsopt[which(initparsopt == Inf)] = 1
-  trparsfix <- parsfix/(1 + parsfix)
+  trparsfix <- parsfix / (1 + parsfix)
   trparsfix[which(parsfix == Inf)] = 1
   mus <- calc_mus(is_complete_tree, idparslist, idparsfix, parsfix, idparsopt, initparsopt)
   optimpars <- c(tol,maxiter)
@@ -435,9 +433,9 @@ secsse_ml <- function(
     cl <- parallel::makeCluster(2)
     doParallel::registerDoParallel(cl)
     setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
-    setting_parallel<-1
+    setting_parallel <- 1
     on.exit(parallel::stopCluster(cl))
-    }
+  }
   
   if(.Platform$OS.type == "unix" && run_parallel == TRUE){
     doMC::registerDoMC(2)

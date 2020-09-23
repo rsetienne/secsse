@@ -488,7 +488,7 @@ build_initStates_time_bigtree <-
     sub2 <- as.numeric(phylobase::children(phy2,NodeOptimSplit)[2])
     jointSubs <- NodeOptimSplit
     
-    cat("The best split is into two subtrees with ",
+    cat("The best split is into two subtrees with",
         length(geiger::tips(phy, sub1)),"and",length(geiger::tips(phy, sub2)),"tips \n")    
     
     descenSub1 <- sort(phylobase::descendants(phy2, sub1, type = "all"))
