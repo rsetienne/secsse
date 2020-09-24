@@ -612,13 +612,14 @@ secsse_test_cla_complete_tree <- function(){
   }
   mus <- rep(0,9)
   Q <- matrix(runif(81),ncol = 9,nrow = 9,byrow = TRUE)
-  Q[diag(Q)] <- NA
+  #diag(Q) <- NA
   parameter <- list()
   parameter[[1]] <- lambdas
   parameter[[2]] <- mus
   parameter[[3]] <- Q
   
   num_concealed_states <- 3
+  sampling_fraction <- c(1,1,1)
   
   secsse_cla_LL3 <- cla_secsse_loglik(parameter = parameter,
                                       phy = phy,
@@ -628,7 +629,7 @@ secsse_test_cla_complete_tree <- function(){
                                       methode = "ode45",
                                       cond = "maddison_cond",
                                       root_state_weight = "maddison_weights",
-                                      sampling_fraction = c(1,1,1),
+                                      sampling_fraction = sampling_fraction,
                                       run_parallel = FALSE,
                                       setting_calculation = NULL,
                                       setting_parallel = NULL,
@@ -644,7 +645,7 @@ secsse_test_cla_complete_tree <- function(){
                                       methode = "ode45",
                                       cond = "maddison_cond",
                                       root_state_weight = "maddison_weights",
-                                      sampling_fraction = c(1,1,1),
+                                      sampling_fraction = sampling_fraction,
                                       run_parallel = FALSE,
                                       setting_calculation = NULL,
                                       setting_parallel = NULL,
@@ -661,7 +662,7 @@ secsse_test_cla_complete_tree <- function(){
                                       methode = "ode45",
                                       cond = "maddison_cond",
                                       root_state_weight = "maddison_weights",
-                                      sampling_fraction = c(1,1,1),
+                                      sampling_fraction = sampling_fraction,
                                       run_parallel = TRUE,
                                       setting_calculation = NULL,
                                       setting_parallel = NULL,
@@ -669,4 +670,41 @@ secsse_test_cla_complete_tree <- function(){
                                       loglik_penalty = 0,
                                       is_complete_tree = TRUE)
   testthat::expect_equal(secsse_cla_LL5,secsse_cla_LL4)
+
+  parameter[[2]] <- rep(0.04,9)  
+  setting_calculation <- 
+    secsse:::build_initStates_time(phy, traits, num_concealed_states, sampling_fraction = sampling_fraction, is_complete_tree = TRUE, mus = parameter[[2]])
+  secsse_cla_LL4a <- cla_secsse_loglik(parameter = parameter,
+                                       phy = phy,
+                                       traits = traits,
+                                       num_concealed_states = num_concealed_states,
+                                       use_fortran = TRUE,
+                                       methode = "ode45",
+                                       cond = "maddison_cond",
+                                       root_state_weight = "maddison_weights",
+                                       sampling_fraction = sampling_fraction,
+                                       run_parallel = FALSE,
+                                       setting_calculation = setting_calculation,
+                                       setting_parallel = NULL,
+                                       see_ancestral_states = FALSE,
+                                       loglik_penalty = 0,
+                                       is_complete_tree = TRUE)
+  setting_calculation <- 
+    secsse:::build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree = TRUE, mus = parameter[[2]])
+  secsse_cla_LL5a <- cla_secsse_loglik(parameter = parameter,
+                                      phy = phy,
+                                      traits = traits,
+                                      num_concealed_states = num_concealed_states,
+                                      use_fortran = TRUE,
+                                      methode = "ode45",
+                                      cond = "maddison_cond",
+                                      root_state_weight = "maddison_weights",
+                                      sampling_fraction = sampling_fraction,
+                                      run_parallel = TRUE,
+                                      setting_calculation = setting_calculation,
+                                      setting_parallel = NULL,
+                                      see_ancestral_states = FALSE,
+                                      loglik_penalty = 0,
+                                      is_complete_tree = TRUE)
+  testthat::expect_equal(secsse_cla_LL5a,secsse_cla_LL4a)
 }

@@ -25,6 +25,7 @@
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param func function to be used in solving the ODE system. Currently only for testing purposes.
+#' @param verbose sets verbose output; default is verbose when optimmethod is 'subplex'
 #' @note To run in parallel the following libraries must be loaded under windows: apTreeshape, doparallel and foreach. Under unix/linux, apTreeshape, doparallel, foreach and doMC must be loaded.
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -116,7 +117,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                     run_parallel = FALSE,
                                     loglik_penalty = 0,
                                     is_complete_tree = FALSE,
-                                    func = 'cla_secsse_runmod') {
+                                    func = 'cla_secsse_runmod',
+                                    verbose = (optimmethod == 'subplex')) {
   structure_func <- list()
   structure_func[[1]] <- idparsfuncdefpar
   structure_func[[2]] <- functions_defining_params
@@ -131,7 +133,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   if (is.list(functions_defining_params) == FALSE) {
     stop(
-      "the argument functions_defining_params should be a list of functions. See example and vignette"
+      "The argument functions_defining_params should be a list of functions. See example and vignette"
     )
   }
   
@@ -142,7 +144,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   }
   
   if (is.matrix(traits)) {
-    cat("you are setting a model where some species had more than one trait state \n")
+    cat("You are setting a model where some species had more than one trait state \n")
   }
   
   if (length(initparsopt) != length(idparsopt)) {
@@ -158,7 +160,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   }
   
   if (anyDuplicated(c(idparsopt, idparsfix, idparsfuncdefpar)) != 0) {
-    stop("at least one element was asked to be fixed, estimated or a function at the same time")
+    stop("At least one element was asked to be fixed, estimated or a function at the same time")
   }
   
   if (identical(as.numeric(sort(
@@ -174,7 +176,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   if (anyDuplicated(c(unique(sort(
     as.vector(idparslist[[3]])
   )), idparsfix[which(parsfix == 0)])) != 0) {
-    cat("You set some transitions as impossible to happen", "\n")
+    cat("Note: you set some transitions as impossible to happen.","\n")
   }
   
   idparslist[[1]] <- prepare_full_lambdas(traits,num_concealed_states,idparslist[[1]])
@@ -216,7 +218,6 @@ cla_secsse_ml_func_def_pars <- function(phy,
       build_initStates_time(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     setting_parallel <- NULL
   }
-  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
   initloglik <- 
     secsse_loglik_choosepar(
       trparsopt = trparsopt,

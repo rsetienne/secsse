@@ -300,6 +300,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param func function to be used in solving the ODE system. Currently only for testing purposes.
+#' @param verbose sets verbose output; default is verbose when optimmethod is 'subplex'
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -388,7 +389,8 @@ secsse_ml <- function(
                 ifelse(use_fortran == FALSE,
                        secsse_loglik_rhs,
                        "secsse_runmod2")
-  )
+  ),
+  verbose = (optimmethod == 'subplex')
 ){
   structure_func <- NULL
   check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
@@ -414,7 +416,7 @@ secsse_ml <- function(
   }
   
   if(anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),idparsfix[which(parsfix==0)]))!=0){
-    cat("You set some transitions as impossible to happen","\n")
+    cat("Note: you set some transitions as impossible to happen.","\n")
   }
   
   see_ancestral_states <- FALSE 
@@ -447,7 +449,6 @@ secsse_ml <- function(
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
     setting_parallel <- NULL
   }
-  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,
                                         idparsopt = idparsopt,

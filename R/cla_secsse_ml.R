@@ -99,6 +99,7 @@
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param func function to be used in solving the ODE system. Currently only for testing purposes.
+#' @param verbose sets verbose output; default is verbose when optimmethod is 'submplex'
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
 #' @examples
@@ -181,7 +182,8 @@ cla_secsse_ml <- function(
   run_parallel = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = 'cla_secsse_runmod'
+  func = 'cla_secsse_runmod',
+  verbose = (optimmethod == 'subplex')
 ){
   
  ## check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)##################
@@ -207,7 +209,7 @@ cla_secsse_ml <- function(
   }
   
   if(anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),idparsfix[which(parsfix==0)]))!=0){
-    cat("You set some transitions as impossible to happen","\n")
+    cat("Note: you set some transitions as impossible to happen.","\n")
   }
   
   if(is.matrix(idparslist[[1]])){ ## it is a tailor case otherwise
@@ -217,7 +219,7 @@ cla_secsse_ml <- function(
   see_ancestral_states <- FALSE 
   
   #options(warn=-1)
-  cat("Calculating the likelihood for the initial parameters.","\n")
+  cat("Calculating the likelihood for the initial parameters ...","\n")
   utils::flush.console()
   trparsopt <- initparsopt/(1 + initparsopt)
   trparsopt[which(initparsopt == Inf)] <- 1
@@ -241,10 +243,9 @@ cla_secsse_ml <- function(
   } 
   
   if(run_parallel == FALSE){
-    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction)
+    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction, is_complete_tree, mus)
     setting_parallel <- NULL
   }
-  if(optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,
                                         idparsopt = idparsopt,
@@ -275,6 +276,9 @@ cla_secsse_ml <- function(
     cat("Optimizing the likelihood - this may take a while.","\n")
     utils::flush.console()
     cat(setting_parallel,"\n")
+    if (is_complete_tree == TRUE) {
+      setting_calculation <- NULL
+    }
     out <- DDD::optimizer(optimmethod = optimmethod,
                           optimpars = optimpars,
                           fun = secsse_loglik_choosepar,
