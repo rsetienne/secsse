@@ -197,27 +197,22 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   optimpars <- c(tol, maxiter)
 
-  if (.Platform$OS.type == "windows" && run_parallel == TRUE) {
-    cl <- parallel::makeCluster(2)
-    doParallel::registerDoParallel(cl)
-    setting_calculation <- 
-      build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
-    setting_parallel <- 1
-    on.exit(parallel::stopCluster(cl))
-  }
-  
-  if (.Platform$OS.type == "unix" && run_parallel == TRUE) {
-    doMC::registerDoMC(2)
-    setting_calculation <- 
-      build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
-    setting_parallel <- 1
-  }
-  
-  if (run_parallel == FALSE) {
-    setting_calculation <- 
-      build_initStates_time(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
+  if(run_parallel == FALSE){
+    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction, is_complete_tree, mus)
     setting_parallel <- NULL
+  } else {
+    setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
+    setting_parallel <- 1
+    if(.Platform$OS.type == "windows"){
+      cl <- parallel::makeCluster(2)
+      doParallel::registerDoParallel(cl)
+      on.exit(parallel::stopCluster(cl))
+    }
+    if(.Platform$OS.type == "unix"){
+      doMC::registerDoMC(2)
+    } 
   }
+
   initloglik <- 
     secsse_loglik_choosepar(
       trparsopt = trparsopt,
@@ -255,7 +250,6 @@ cla_secsse_ml_func_def_pars <- function(phy,
   } else {
     cat("Optimizing the likelihood - this may take a while.", "\n")
     utils::flush.console()
-    cat(setting_parallel, "\n")
     out <- 
       DDD::optimizer(
         optimmethod = optimmethod,
