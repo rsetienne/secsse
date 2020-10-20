@@ -26,7 +26,8 @@ secsse_ml(
   loglik_penalty = 0,
   is_complete_tree = FALSE,
   func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE,
-    secsse_loglik_rhs, "secsse_runmod2"))
+    secsse_loglik_rhs, "secsse_runmod2")),
+  verbose = (optimmethod == "subplex")
 )
 }
 \arguments{
@@ -71,6 +72,8 @@ secsse_ml(
 \item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
 
 \item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
+
+\item{verbose}{sets verbose output; default is verbose when optimmethod is 'subplex'}
 }
 \value{
 Parameter estimated and maximum likelihood

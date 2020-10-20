@@ -7,10 +7,11 @@
       INTEGER DIMP, II, I
       DOUBLE PRECISION vec(DIMP), parms(*)
      
-        DO I = 1, DIMP
-          II = II + 1
-          vec(I) = parms(II)
-        ENDDO
+        !DO I = 1, DIMP
+        !  II = II + 1
+        !  vec(I) = parms(II)
+        !ENDDO
+        vec(1:DIMP) = parms((II + 1):(II + DIMP))
         
       END SUBROUTINE secsse_fill1d
 
