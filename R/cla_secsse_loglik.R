@@ -289,10 +289,15 @@ cla_secsse_loglik <- function(parameter,
     take_ancesSub <- list(ancesSub1, ancesSub2)
     
     if(is.null(setting_parallel)){
-      cl <- parallel::makeCluster(2)
-      doParallel::registerDoParallel(cl)
+      if(.Platform$OS.type == "windows"){
+        cl <- parallel::makeCluster(2)
+        doParallel::registerDoParallel(cl)
+        on.exit(parallel::stopCluster(cl))
+      }
+      if(.Platform$OS.type == "unix"){
+        doMC::registerDoMC(2)
+      } 
     }
-    
     statesNEW <- cla_doParalThing(take_ancesSub,
                               states,
                               loglik,

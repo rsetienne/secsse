@@ -197,10 +197,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   optimpars <- c(tol, maxiter)
 
-  if(run_parallel == FALSE){
-    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction, is_complete_tree, mus)
-    setting_parallel <- NULL
-  } else {
+  if(run_parallel == TRUE){
     setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     setting_parallel <- 1
     if(.Platform$OS.type == "windows"){
@@ -211,6 +208,9 @@ cla_secsse_ml_func_def_pars <- function(phy,
     if(.Platform$OS.type == "unix"){
       doMC::registerDoMC(2)
     } 
+  } else {
+    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction, is_complete_tree, mus)
+    setting_parallel <- NULL
   }
 
   initloglik <- 
