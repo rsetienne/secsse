@@ -271,7 +271,6 @@ calThruNodes <- function(
 #' @importFrom foreach foreach
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach %dopar%
-#' @importFrom doMC registerDoMC
 
 doParalThing <- function(take_ancesSub,
                          states,
@@ -521,6 +520,7 @@ secsse_loglik <- function(parameter,
       }
       if(.Platform$OS.type == "unix"){
         doMC::registerDoMC(2)
+        foreach::foreach() %do% .libPaths()
       } 
     }
     statesNEW <- doParalThing(take_ancesSub,
