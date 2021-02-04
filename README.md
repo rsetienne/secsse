@@ -1,5 +1,5 @@
 
-# secsse: Several Examined and Concealed States-Dependent Speciation and Extinction
+# SecSSE: Several Examined and Concealed States-Dependent Speciation and Extinction
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/secsse)](https://CRAN.R-project.org/package=secsse)
