@@ -4,8 +4,8 @@
 Sys.unsetenv("R_TESTS")
 library(testthat)
 library(Rcpp)
-if (.Platform$OS.type == "unix") library(doMC)
-if (.Platform$OS.type == "windows") library(parallel)
+# if (.Platform$OS.type == "unix") library(doMC)
+# if (.Platform$OS.type == "windows") library(parallel)
 library(secsse)
 
 test_check("secsse")
