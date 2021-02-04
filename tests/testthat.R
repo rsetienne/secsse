@@ -3,8 +3,6 @@
 # We should remove it when the issue is resolved.
 Sys.unsetenv("R_TESTS")
 library(testthat)
-# if (.Platform$OS.type == "unix") library(doMC)
-# if (.Platform$OS.type == "windows") library(parallel)
 library(secsse)
 
 test_check("secsse")
