@@ -14,7 +14,7 @@ prepare_full_lambdas(traits, num_concealed_states, lambd_and_modeSpe)
 \item{lambd_and_modeSpe}{a matrix with the 4 models of speciation possible.}
 }
 \value{
-A list of lambdas, its lenght would be the same than the number of trait states * num_concealed_states..
+A list of lambdas, its length would be the same than the number of trait states * num_concealed_states..
 }
 \description{
 It provides the set of matrices containing all the speciation rates
