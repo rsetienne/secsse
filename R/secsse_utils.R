@@ -270,7 +270,7 @@ cla_id_paramPos <- function(traits,num_concealed_states){
 #' @param traits vector with trait states, order of states must be the same as tree tips, for help, see vignette.
 #' @param num_concealed_states number of concealed states, generally equivalent to number of examined states.
 #' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
-#' @return A list of lambdas, its lenght would be the same than the number of trait states * num_concealed_states.. 
+#' @return A list of lambdas, its length would be the same than the number of trait states * num_concealed_states.. 
 #' @export
 
 prepare_full_lambdas <- function(traits,
