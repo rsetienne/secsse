@@ -271,6 +271,7 @@ calThruNodes <- function(
 #' @importFrom foreach foreach
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach %dopar%
+#' @importFrom doMC registerDoMC
 
 doParalThing <- function(take_ancesSub,
                          states,

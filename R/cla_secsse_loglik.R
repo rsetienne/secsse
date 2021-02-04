@@ -116,6 +116,7 @@ cla_calThruNodes <- function(
 #' @importFrom foreach foreach
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach %dopar%
+#' @importFrom doMC registerDoMC
 
 cla_doParalThing <- function(take_ancesSub,
                          states,
