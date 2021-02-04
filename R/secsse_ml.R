@@ -445,7 +445,6 @@ secsse_ml <- function(
     }
     if(.Platform$OS.type == "unix"){
       doMC::registerDoMC(2)
-      foreach::foreach() %do% .libPaths()
     } 
   } else {  
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)

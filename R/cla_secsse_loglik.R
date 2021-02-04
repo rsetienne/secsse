@@ -300,7 +300,6 @@ cla_secsse_loglik <- function(parameter,
       }
       if(.Platform$OS.type == "unix"){
         doMC::registerDoMC(2)
-        foreach::foreach() %do% .libPaths()
       } 
     }
     statesNEW <- cla_doParalThing(take_ancesSub,
