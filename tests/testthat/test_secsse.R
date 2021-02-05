@@ -211,26 +211,29 @@ test_that("secsse gives the same result as GeoSSE", {
                                       loglik_penalty = 0)
   testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
   
-  secsse_cla_LL3 <- cla_secsse_loglik(parameter,
-                                      phy,
-                                      traits,
-                                      num_concealed_states,
-                                      use_fortran = TRUE,
-                                      methode = "ode45",
-                                      cond = "maddison_cond",
-                                      root_state_weight = "maddison_weights",
-                                      sampling_fraction = c(1,1,1),
-                                      run_parallel = TRUE,
-                                      setting_calculation = NULL,
-                                      setting_parallel = NULL,
-                                      see_ancestral_states = FALSE,
-                                      loglik_penalty = 0)
-  testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL2)
+  # Parallel code doesn't work on CI unless running on windows
+  if (!isTRUE(as.logical(Sys.getenv("CI"))) || .Platform$OS.type == "windows") {
+    secsse_cla_LL3 <- cla_secsse_loglik(parameter,
+                                        phy,
+                                        traits,
+                                        num_concealed_states,
+                                        use_fortran = TRUE,
+                                        methode = "ode45",
+                                        cond = "maddison_cond",
+                                        root_state_weight = "maddison_weights",
+                                        sampling_fraction = c(1,1,1),
+                                        run_parallel = TRUE,
+                                        setting_calculation = NULL,
+                                        setting_parallel = NULL,
+                                        see_ancestral_states = FALSE,
+                                        loglik_penalty = 0)
+    testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL2)
+  }
 })
 
 test_that("trying a short ML search: secsse_ml & parallel procedure", {
   skip_if(
-    !isTRUE(as.logical(Sys.getenv("CI"))) || .Platform$OS.type == "windows",
+    isTRUE(as.logical(Sys.getenv("CI"))) && !.Platform$OS.type == "windows",
     message = "Parallel code doesn't work on CI unless running on windows"
   )
   
