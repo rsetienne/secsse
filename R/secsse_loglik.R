@@ -520,9 +520,6 @@ secsse_loglik <- function(parameter,
       }
       if(.Platform$OS.type == "unix"){
         doMC::registerDoMC(2)
-        foreach::foreach(i=1:2) %dopar% {
-          .libPaths(.libPaths())
-        }
       } 
     }
     statesNEW <- doParalThing(take_ancesSub,

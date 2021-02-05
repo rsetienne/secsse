@@ -221,9 +221,6 @@ secsse_ml_func_def_pars <- function(phy,
     }
     if (.Platform$OS.type == "unix") {
       doMC::registerDoMC(2)
-      foreach::foreach(i=1:2) %dopar% {
-        .libPaths(.libPaths())
-      }
     }
   } else {
     setting_calculation <-
