@@ -211,7 +211,9 @@ cla_secsse_ml_func_def_pars <- function(phy,
     }
     if(.Platform$OS.type == "unix"){
       doMC::registerDoMC(2)
-      parallel::setDoPar(fun = function(x) .libPaths(x), .libPaths(), data = NULL)
+      foreach::foreach(i=1:2) %dopar% {
+        .libPaths(.libPaths())
+      }
     } 
   } else {
     setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction, is_complete_tree, mus)

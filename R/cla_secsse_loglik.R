@@ -300,7 +300,9 @@ cla_secsse_loglik <- function(parameter,
       }
       if(.Platform$OS.type == "unix"){
         doMC::registerDoMC(2)
-        parallel::setDoPar(fun = function(x) .libPaths(x), .libPaths(), data = NULL)
+        foreach::foreach(i=1:2) %dopar% {
+          .libPaths(.libPaths())
+        }
       } 
     }
     statesNEW <- cla_doParalThing(take_ancesSub,
