@@ -213,6 +213,10 @@ secsse_ml_func_def_pars <- function(phy,
     if (.Platform$OS.type == "windows") {
       cl <- parallel::makeCluster(2)
       doParallel::registerDoParallel(cl)
+      # pass libPath to workers
+      # see https://stackoverflow.com/questions/6412459/how-to-specify-the-location-of-r-packages-in-foreach-packages-pkg-do
+      # https://gitlab.com/CarlBrunius/MUVR/-/issues/11
+      parallel::clusterCall(cl, function(x) .libPaths(x), .libPaths())
       on.exit(parallel::stopCluster(cl))
     }
     if (.Platform$OS.type == "unix") {
