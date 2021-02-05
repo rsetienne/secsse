@@ -91,10 +91,10 @@ jobs:
         shell: bash
 
       - name: Install covr and test coverage
-        if: runner.os == 'Windows'
+        if: matrix.config.r == 'devel'
         run: |
           remotes::install_cran("covr", dependencies = TRUE, upgrade = "always")
-          covr::codecov(quiet = FALSE)
+          covr::codecov()
         shell: Rscript {0}
 
       - name: Upload check results
