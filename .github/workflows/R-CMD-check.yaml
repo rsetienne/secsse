@@ -94,7 +94,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           remotes::install_cran("covr", dependencies = TRUE, upgrade = "always")
-          covr::codecov()
+          covr::codecov(quiet = FALSE)
         shell: Rscript {0}
 
       - name: Upload check results
