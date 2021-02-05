@@ -520,6 +520,7 @@ secsse_loglik <- function(parameter,
       }
       if(.Platform$OS.type == "unix"){
         doMC::registerDoMC(2)
+        parallel::setDoPar(fun = function(x) .libPaths(x), .libPaths(), data = NULL)
       } 
     }
     statesNEW <- doParalThing(take_ancesSub,
