@@ -66,11 +66,11 @@ Remotes:
 ## Cite
 If you use `secsse` in your publications, please cite:
 
-* Herrera-Alsina, Leonel et al. “Detecting the Dependence of Diversification on Multiple Traits from Phylogenetic Trees and Trait Data.” Systematic biology vol. 68,2 (2019): 317-328. doi:10.1093/sysbio/syy057
+* Herrera-Alsina, Leonel et al. “Detecting the Dependence of Diversification on Multiple Traits from Phylogenetic Trees and Trait Data.” Systematic biology vol. 68,2 (2019): 317-328. https://doi.org/10.1093/sysbio/syy057
 
 ## References
-* Beaulieu, Jeremy M et al. “Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms.” Systematic biology vol. 62,5 (2013): 725-37. doi:10.1093/sysbio/syt034
+* Beaulieu, Jeremy M et al. “Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms.” Systematic biology vol. 62,5 (2013): 725-37. https://doi.org/.1093/sysbio/syt034
 
-* Beaulieu, Jeremy M, and Brian C O'Meara. “Detecting Hidden Diversification Shifts in Models of Trait-Dependent Speciation and Extinction.” Systematic biology vol. 65,4 (2016): 583-601. doi:10.1093/sysbio/syw022
+* Beaulieu, Jeremy M, and Brian C O'Meara. “Detecting Hidden Diversification Shifts in Models of Trait-Dependent Speciation and Extinction.” Systematic biology vol. 65,4 (2016): 583-601. https://doi.org/10.1093/sysbio/syw022
 
-* Rabosky, Daniel L., and Emma E. Goldberg. "Model inadequacy and mistaken inferences of trait-dependent speciation." Systematic biology 64.2 (2015): 340-355. doi:10.1093/sysbio/syu131
+* Rabosky, Daniel L., and Emma E. Goldberg. "Model inadequacy and mistaken inferences of trait-dependent speciation." Systematic biology 64.2 (2015): 340-355. https://doi.org/10.1093/sysbio/syu131
