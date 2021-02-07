@@ -194,13 +194,13 @@
 !......................... declaration section.............................
       INTEGER           :: neq, ip(*), i, ii, d
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
-      DOUBLE PRECISION  :: mus(N/2), las(N/2), Q(N/2,N/2), ones(N/2)
-      DOUBLE PRECISION  :: Ds(N/2), QD(N/2), Q1(N/2)
+      DOUBLE PRECISION  :: mus(N/2), las(N/2), Q(N/2,N/2)
+      DOUBLE PRECISION  :: Ds(N/2), Es(N/2)
+      !DOUBLE PRECISION  :: QD(N/2), Q1(N/2), ones(N/2)
 
 ! parameters - named here
       DOUBLE PRECISION rn
       COMMON /XCBPar/rn
-
 
 ! local variables
       CHARACTER(len=80) msg
@@ -217,21 +217,31 @@
         Initialised = .TRUE.      ! to prevent from initialising more than once
       ENDIF
 
-! dynamics
-
-!  R code
-!  dD<- -(lambdas + mus + Q %*% (rep(1,d))) * Ds + ( Q %*% Ds )
-
       d = N/2
-      ones = 1.d0
+      !ones = 1.d0
       las = P(1:d)
       mus = P((d + 1):N)
+      Es = Conc(1:d)
       Ds = Conc((d + 1):N)
       Q = RESHAPE(P((N + 1):(N + d ** 2)),(/d,d/), order = (/1,2/))
-      CALL dgemm('n','n',d,1,d,1.d0,Q,d,Ds,d,0.d0,QD,d)
-      CALL dgemm('n','n',d,1,d,1.d0,Q,d,ones,d,0.d0,Q1,d)
-      dConc(1:d) = 0
-      dConc((d + 1):N) = -(las + mus + Q1) * Ds + QD
+
+! dynamics
+
+!  dE<- mus-(lambdas + mus + Q %*% (rep(1,d))) * Es + lambdas * Es * Es + ( Q %*% Es )
+!  dD<- -(lambdas + mus + Q %*% (rep(1,d))) * Ds + ( Q %*% Ds )
+
+      dConc(1:d) = (mus - (las * Es)) * (1 - Es)
+      dConc((d + 1):N) = -(las + mus) * Ds
+      DO I = 1, d
+        DO II = 1, d
+           dConc(I) = dConc(I) + Q(I, II) * (Es(II) - Es(I))
+           dConc(d + I) = dConc(d + I) + Q(I, II) * (Ds(II) - Ds(I))
+        ENDDO
+      ENDDO
+
+      !CALL dgemm('n','n',d,1,d,1.d0,Q,d,Ds,d,0.d0,QD,d)
+      !CALL dgemm('n','n',d,1,d,1.d0,Q,d,ones,d,0.d0,Q1,d)
+      !dConc((d + 1):N) = -(las + mus + Q1) * Ds + QD
 
       END SUBROUTINE secsse_runmod_ct
       
@@ -345,11 +355,11 @@
 
 !......................... declaration section.............................
 
-      INTEGER           :: neq, ip(*), i, ii
+      INTEGER           :: neq, ip(*), i, ii, iii
       INTEGER           :: d, d2, d3
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
-      REAL(c_intptr_t * 2)  :: dD(N), lambdas(N/2,N/2,N/2)
-      DOUBLE PRECISION  :: mus(N/2), Q(N/2,N/2)
+      REAL(c_intptr_t * 2)  :: dC(N), lambdas(N/2,N/2,N/2)
+      DOUBLE PRECISION  :: mus(N/2), Q(N/2,N/2), Ds(N/2), Es(N/2)
 
 ! parameters - named here
       DOUBLE PRECISION rn
@@ -383,17 +393,23 @@
       d = N/2
       d3 = d ** 3
       d2 = d ** 2
+      Es = Conc(1:d)
+      Ds = Conc((d + 1):N)
       mus = P((d3 + 1):(d3 + d))
       Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
       lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
       DO I = 1,d
-        dConc(I) = 0
-        dD(d + I) = -(SUM(lambdas(I,:,:)) + mus(I)) * Conc(d + I)
+        dC(I) = mus(I) * (1 - Es(I))
+        dC(d + I) = -(SUM(lambdas(I,:,:)) + mus(I)) * Ds(I)
         DO II = 1,d
-           dD(d + I) = dD(d + I) + Q(I, II) * (Conc(d + II) - Conc(d + I))
+           dC(I) = dC(I) + Q(I, II) * (Es(II) - Es(I))
+           DO III = 1,d
+              dC(I) = dC(I) + lambdas(I, II, II) * (Es(II) * Es(III) - Es(I))
+           ENDDO
+           dC(d + I) = dC(d + I) + Q(I, II) * (Ds(II) - Ds(I))
         ENDDO
-        dConc(d + I) = dD(d + I) 
       ENDDO
+      dConc = dC
 
       END SUBROUTINE cla_secsse_runmod_ct
       
