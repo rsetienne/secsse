@@ -286,13 +286,13 @@ RUN_PARALLEL: this specifies whether or not to use the SecSSE tree-breaking func
 After we have defined all of the necessary parameters for running secsse_ml, we can start running our analysis:
 
 ```{r}
-#secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", tol = c(1e-04, 1e-05, 1e-07), sampling_fraction=c(1,1,1), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", run_parallel=FALSE)
+#secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", tol = c(1e-04, 1e-05, 1e-07), sampling_fraction=c(1,1,1), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", num_cycles = 1, run_parallel=FALSE)
 ```
 
 We can save output to an R data file, for example, here called output.RDS:
 
 ```{r}
-#out<-secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1), tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", run_parallel=FALSE)
+#out<-secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1), tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", num_cycles = 1, run_parallel=FALSE)
 #saveRDS(out, file="output.RDS")
 ```
 

@@ -3,7 +3,9 @@
 \name{traitinfo}
 \alias{traitinfo}
 \title{A table with trait info to run the vignette}
-\format{A data frame where each species has a trait state associated}
+\format{
+A data frame where each species has a trait state associated
+}
 \description{
 An example of trait information in the right format for secsse
 }

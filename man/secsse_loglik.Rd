@@ -4,11 +4,25 @@
 \alias{secsse_loglik}
 \title{Likelihood for SecSSE model}
 \usage{
-secsse_loglik(parameter, phy, traits, num_concealed_states,
-  use_fortran = TRUE, methode = "ode45", cond = "proper_cond",
-  root_state_weight = "proper_weights", sampling_fraction,
-  run_parallel = FALSE, setting_calculation = NULL,
-  setting_parallel = NULL)
+secsse_loglik(
+  parameter,
+  phy,
+  traits,
+  num_concealed_states,
+  use_fortran = TRUE,
+  methode = "ode45",
+  cond = "proper_cond",
+  root_state_weight = "proper_weights",
+  sampling_fraction,
+  run_parallel = FALSE,
+  setting_calculation = NULL,
+  setting_parallel = NULL,
+  see_ancestral_states = FALSE,
+  loglik_penalty = 0,
+  is_complete_tree = FALSE,
+  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE,
+    secsse_loglik_rhs, "secsse_runmod2"))
+)
 }
 \arguments{
 \item{parameter}{list where first vector represents lambdas, the second mus and the third transition rates.}
@@ -31,42 +45,51 @@ secsse_loglik(parameter, phy, traits, num_concealed_states,
 
 \item{run_parallel}{should the routine to run in parallel be called?}
 
-\item{setting_calculation}{argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)}
+\item{setting_calculation}{argument used internally to speed up calculation. It should be left blank (default : setting_calculation = NULL)}
 
 \item{setting_parallel}{argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)}
+
+\item{see_ancestral_states}{should the ancestral states be shown? Deafault FALSE}
+
+\item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+
+\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
+
+\item{func}{function to be used in solving the ODE system Currently only for testing purposes.}
 }
 \value{
 The loglikelihood of the data given the parameters
 }
 \description{
-Logikelihood calculation 
-  for the SecSSE model given a set of parameters and data
+Logikelihood calculation for the SecSSE model given a set of parameters and data
 }
 \note{
 To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 }
 \examples{
-rm(list=ls(all=TRUE))
+rm(list = ls(all = TRUE))
 library(secsse)
 library(DDD)
 library(deSolve)
+library(apTreeshape)
+library(foreach)
 set.seed(13)
 phylotree <- ape::rcoal(31, tip.label = 1:31)
-traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
-num_concealed_states<-2
-use_fortran<-TRUE
-cond<-"proper_cond"
-methode<-"ode45"
+traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace = TRUE)
+num_concealed_states <- 2
+use_fortran <- TRUE
+cond <- "proper_cond"
+methode <- "ode45"
 root_state_weight <- "proper_weights"
-sampling_fraction<-c(1,1,1)
+sampling_fraction <- c(1,1,1)
 run_parallel <- FALSE
-drill<-id_paramPos(traits,num_concealed_states)
-drill[[1]][]<-c(0.12,0.01,0.2,0.21,0.31,0.23)
-drill[[2]][]<-0
-drill[[3]][,]<-0.1
+drill <- id_paramPos(traits,num_concealed_states)
+drill[[1]][] <- c(0.12,0.01,0.2,0.21,0.31,0.23)
+drill[[2]][] <- 0
+drill[[3]][,] <- 0.1
 diag(drill[[3]]) <- NA
-secsse_loglik(parameter=drill,phylotree,traits,num_concealed_states,
-use_fortran,methode,cond,root_state_weight,sampling_fraction)
+secsse_loglik(parameter = drill,phylotree,traits,num_concealed_states,
+   use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
 
 #[1] -113.1018
 }

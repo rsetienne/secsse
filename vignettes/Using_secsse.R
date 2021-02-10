@@ -160,10 +160,10 @@ intGuessMu <- startingpoint$mu0
 initparsopt <- c(rep(intGuessLamba,9), rep((intGuessLamba/5),1))
 
 ## ------------------------------------------------------------------------
-#secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", tol = c(1e-04, 1e-05, 1e-07), sampling_fraction=c(1,1,1), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", run_parallel=FALSE)
+#secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", tol = c(1e-04, 1e-05, 1e-07), sampling_fraction=c(1,1,1), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", num_cycles = 1, run_parallel=FALSE)
 
 ## ------------------------------------------------------------------------
-#out<-secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1), tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", run_parallel=FALSE)
+#out<-secsse_ml(phylo_Vign,traits, num_concealed_states=3, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond="maddison_cond",root_state_weight = "maddison_weights", sampling_fraction=c(1,1,1), tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran=TRUE,methode="ode45", optimmethod = "simplex", num_cycles = 1, run_parallel=FALSE)
 #saveRDS(out, file="output.RDS")
 
 ## ------------------------------------------------------------------------
