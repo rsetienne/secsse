@@ -20,6 +20,6 @@ ids. Needed for ML calculation (secsse_ml)
 }
 \examples{
 traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-num_concealed_states <- 3 
+num_concealed_states <- 3
 param_posit <- id_paramPos(traits,num_concealed_states)
 }

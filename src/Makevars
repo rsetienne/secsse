@@ -1,7 +1,1 @@
-PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
-
-all : clean
-
-clean :
-	@rm -rf *.mod *.o
-	
+CXX_STD = CXX14

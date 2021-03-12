@@ -47,21 +47,21 @@ secsse_ml(
 
 \item{parsfix}{value of the fixed parameters.}
 
-\item{cond}{condition on the existence of a node root: "maddison_cond","proper_cond"(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.}
 
-\item{tol}{maximum tolerance. Default is "c(1e-04, 1e-05, 1e-05)".}
+\item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
-\item{maxiter}{max number of iterations. Default is "1000 *round((1.25)^length(idparsopt))".}
+\item{maxiter}{max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.}
 
 \item{use_fortran}{Should the Fortran code for numerical integration be called? Default is TRUE.}
 
-\item{methode}{method used for integration calculation. Default is "ode45".}
+\item{methode}{method used for integration calculation. Default is 'ode45'.}
 
-\item{optimmethod}{method used for optimization. Default is "simplex".}
+\item{optimmethod}{method used for optimization. Default is 'simplex'.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
@@ -89,9 +89,9 @@ To run in parallel it is needed to load the following libraries when windows: ap
 library(secsse)
 library(DDD)
 set.seed(13)
-# Check the vignette for a better working exercise. 
+# Check the vignette for a better working exercise.
 # lambdas for 0A and 1A and 2A are the same but need to be estimated
-# mus are fixed to 
+# mus are fixed to
 # the transition rates are constrained to be equal and fixed 0.01
 phylotree <- ape::rcoal(31, tip.label = 1:31)
 traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
@@ -101,7 +101,7 @@ idparslist[[1]][c(1,4,7)] <- 1
 idparslist[[1]][c(2,5,8)] <- 2
 idparslist[[1]][c(3,6,9)] <- 3
 idparslist[[2]][]<-4
-masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
+masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE)
 diag(masterBlock) <- NA
 diff.conceal <- FALSE
 idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
@@ -115,11 +115,11 @@ parsfix <- c(0,0)
 tol <- c(1e-04, 1e-05, 1e-07)
 maxiter <- 1000 * round((1.25)^length(idparsopt))
 use_fortran <- TRUE
-methode <- "ode45"
-optimmethod <- "simplex"
+methode <- 'ode45'
+optimmethod <- 'simplex'
 run_parallel <- FALSE
-cond <- "proper_cond"
-root_state_weight <- "proper_weights"
+cond <- 'proper_cond'
+root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
 #model<-secsse_ml(
 #phylotree,

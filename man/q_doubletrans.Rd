@@ -30,8 +30,8 @@ masterBlock[2,3] <- 9
 masterBlock[3,1] <- 10
 masterBlock[3,2] <- 11
 myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
-# now, it can replace the Q matrix from id_paramPos  
-num_concealed_states <- 3 
+# now, it can replace the Q matrix from id_paramPos
+num_concealed_states <- 3
 param_posit <- id_paramPos(traits,num_concealed_states)
 param_posit[[3]] <- myQ
 }

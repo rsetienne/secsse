@@ -46,21 +46,21 @@ cla_secsse_ml(
 
 \item{parsfix}{value of the fixed parameters.}
 
-\item{cond}{condition on the existence of a node root: "maddison_cond","proper_cond"(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.}
 
-\item{tol}{maximum tolerance. Default is "c(1e-04, 1e-05, 1e-05)".}
+\item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
-\item{maxiter}{max number of iterations. Default is "1000 *round((1.25)^length(idparsopt))".}
+\item{maxiter}{max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.}
 
 \item{use_fortran}{Should the Fortran code for numerical integration be called? Default is TRUE.}
 
-\item{methode}{method used for integration calculation. Default is "ode45".}
+\item{methode}{method used for integration calculation. Default is 'ode45'.}
 
-\item{optimmethod}{method used for optimization. Default is "simplex".}
+\item{optimmethod}{method used for optimization. Default is 'simplex'.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
@@ -113,11 +113,11 @@ parsfix <- c(0,0,0.01)
 tol <- c(1e-04, 1e-05, 1e-07)
 maxiter <- 1000 * round((1.25) ^ length(idparsopt))
 use_fortran <- FALSE
-methode <- "ode45"
-optimmethod <- "simplex"
+methode <- 'ode45'
+optimmethod <- 'simplex'
 run_parallel <- FALSE
-cond <- "proper_cond"
-root_state_weight <- "proper_weights"
+cond <- 'proper_cond'
+root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
 #model <- cla_secsse_ml(
 #  phylotree,

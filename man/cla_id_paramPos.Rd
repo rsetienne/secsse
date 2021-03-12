@@ -20,6 +20,6 @@ ids. Needed for ML calculation with cladogenetic options (cla_secsse_ml)
 }
 \examples{
 traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-num_concealed_states <- 3 
+num_concealed_states <- 3
 param_posit <- cla_id_paramPos(traits,num_concealed_states)
 }

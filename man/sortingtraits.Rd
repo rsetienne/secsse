@@ -20,6 +20,6 @@ In preparation for likelihood calculation, it orders trait data according the tr
 \examples{
 # Some data we have prepared
 data(traitinfo)
-data("phylo_Vign")
+data('phylo_Vign')
 traits <- sortingtraits(traitinfo,phylo_Vign)
 }

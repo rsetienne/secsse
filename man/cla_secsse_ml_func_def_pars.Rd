@@ -22,7 +22,7 @@ cla_secsse_ml_func_def_pars(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  use_fortran = TRUE,
+  use_fortran = FALSE,
   methode = "ode45",
   optimmethod = "simplex",
   num_cycles = 1,
@@ -58,21 +58,21 @@ cla_secsse_ml_func_def_pars(
 
 \item{functions_defining_params}{a list of functions. Each element will be a function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example and vigenette}
 
-\item{cond}{condition on the existence of a node root: "maddison_cond","proper_cond"(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.}
 
-\item{tol}{maximum tolerance. Default is "c(1e-04, 1e-05, 1e-05)".}
+\item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
-\item{maxiter}{max number of iterations. Default is "1000 *round((1.25)^length(idparsopt))".}
+\item{maxiter}{max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.}
 
 \item{use_fortran}{Should the Fortran code for numerical integration be called? Default is TRUE.}
 
-\item{methode}{method used for integration calculation. Default is "ode45".}
+\item{methode}{method used for integration calculation. Default is 'ode45'.}
 
-\item{optimmethod}{method used for optimization. Default is "simplex".}
+\item{optimmethod}{method used for optimization. Default is 'simplex'.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
@@ -122,7 +122,7 @@ parsfix <- c(0,0)
 idfactorsopt <- 1
 initfactors <- 4
 # functions_defining_params is a list of functions. Each function has no arguments and to refer
-# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter 3. When a
+# to parameters ids should be indicated as 'par_' i.e. par_3 refers to parameter 3. When a
 # function is defined, be sure that all the parameters involved are either estimated, fixed or
 # defined by previous functions (i.e, a function that defines parameter in
 # 'functions_defining_params'). The user is responsible for this. In this example, par_3
@@ -144,11 +144,11 @@ functions_defining_params[[3]] <- function(){
 tol = c(1e-04, 1e-05, 1e-07)
 maxiter = 1000 * round((1.25)^length(idparsopt))
 use_fortran = TRUE
-methode = "ode45"
-optimmethod = "simplex"
+methode = 'ode45'
+optimmethod = 'simplex'
 run_parallel = FALSE
-cond <- "proper_cond"
-root_state_weight <- "proper_weights"
+cond <- 'proper_cond'
+root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
 #model <- cla_secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist,
 #                                   idparsopt, initparsopt, idfactorsopt, initfactors,

@@ -1,4 +1,4 @@
-Package: secsse
+Package: secsseCPP
 Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
@@ -24,15 +24,18 @@ Description: Simultaneously infers state-dependent diversification across
  role of a possible concealed trait. See Herrera-Alsina et al. 2019
  Systematic Biology 68: 317-328 <DOI:10.1093/sysbio/syy057>.  
 Depends: R (>= 3.5.0)
-Imports: utils,
- DDD (>= 4.0),
- ape,
- foreach,
- doParallel,
- apTreeshape,
- phylobase,
- geiger,
- deSolve
+Imports: 
+    utils,
+    DDD (>= 4.0),
+    ape,
+    foreach,
+    doParallel,
+    apTreeshape,
+    phylobase,
+    geiger,
+    deSolve,
+    Rcpp,
+    BH
 Suggests: diversitree,
  phytools,
  testthat,
@@ -45,3 +48,6 @@ Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
+LinkingTo: 
+    Rcpp,
+    RcppParallel

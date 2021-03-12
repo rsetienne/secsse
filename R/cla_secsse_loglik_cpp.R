@@ -1,116 +1,5 @@
-cla_secsse_loglik_rhs <- function(t, y, parameter) {
-  ly <- length(y)
-  d <- ly/2
-  Es <- y[1:d]
-  Ds <- y[(d + 1):ly]
-  lambdas <- parameter[[1]]
-  mus <- parameter[[2]]
-  Q <- parameter[[3]]
-  diag(Q) <- 0
-
-  all_states <- cbind(Ds, Es)
-  a <- cbind(all_states[, 2], all_states[, 1])
-  b <- t(all_states)
-  cross_D_E <- a %*% b
-
-  dD <- -((unlist(lapply(lambdas, sum))) +
-            mus + Q %*% (rep(1, d))) *
-    Ds + (Q %*% Ds) + unlist(lapply(lapply(lambdas, "*", cross_D_E), sum))
-  dE <- -((unlist(lapply(lambdas, sum))) + mus + Q %*% (rep(1, d))) *
-    Es +
-    (Q %*% Es) +
-    mus +
-    unlist(lapply(lapply(lambdas, "*", Es %*% t(Es)), sum))
-
-  return(list(c(dE, dD)))
-}
-
-
-cla_calThruNodes <- function(ances,
-                             states,
-                             loglik,
-                             forTime,
-                             parameter,
-                             use_fortran,
-                             methode,
-                             phy,
-                             func) {
-  lambdas <- parameter[[1]]
-  mus <- parameter[[2]]
-  parameter[[3]][is.na(parameter[[3]])] <- 0
-  Q <- parameter[[3]]
-  nb_node <- phy$Nnode
-  reltol <- 1e-12
-  abstol <- 1e-16
-  hmax <- NULL
-  ly <- ncol(states)
-  d <- ncol(states)/2
-
-  focal <- ances
-  desRows <- which(phy$edge[, 1] == focal)
-  desNodes <- phy$edge[desRows, 2]
-
-  nodeM <- numeric()
-  nodeN <- numeric()
-
-  for (desIndex in 1:2) {
-    y <- states[desNodes[desIndex], ]
-    timeInte <- forTime[which(forTime[, 2] == desNodes[ desIndex]), 3]
-    ## To make the calculation in both lineages
-
-    if (use_fortran == FALSE) {
-      nodeMN <- deSolve::ode(y = y,
-                             func = cla_secsse_loglik_rhs,
-                             times = c(0, timeInte),
-                             parms = parameter,
-                             rtol = reltol,
-                             atol = abstol,
-                             hmax = NULL,
-                             method = methode)
-    } else {
-      stop("FORTRAN was removed from this version")
-    }
-    if (desIndex == 1) {
-      nodeN <- nodeMN
-    }
-    if (desIndex == 2) {
-      nodeM <- nodeMN
-    }
-  }
-  ## At the node
-  nodeM <- as.numeric(nodeM[2, -1])
-  nodeN <- as.numeric(nodeN[2, -1])
-  ff <- normalize_loglik(nodeM[(1:d) + d], loglik)
-  nodeM[(1:d) + d] <- ff$probs
-  loglik <- ff$loglik
-  ff <- normalize_loglik(nodeN[(1:d) + d], loglik)
-  nodeN[(1:d) + d] <- ff$probs
-  loglik <- ff$loglik
-
-  all_states <- cbind(nodeM[(d + 1):length(nodeM)],
-                      nodeN[(d + 1):length(nodeN)])
-  a <- cbind(all_states[, 2], all_states[, 1])
-  b <- t(all_states)
-  cross_M_N <- a %*% b
-
-  # probabilities of both branches mergeBranch <- c(mergeBranch,combProb)
-  mergeBranch <- 0.5 * (unlist(lapply(lapply(lambdas, "*", cross_M_N), sum)))
-  # }
-  ff <- normalize_loglik(mergeBranch, loglik)
-  mergeBranch <- ff$probs
-  loglik <- ff$loglik
-  newstate <- nodeM[1:d]  ## extinction probabilities
-  newstate <- c(newstate, mergeBranch)
-  states[focal, ] <- newstate
-  # print(parameter); print(loglik)
-  return(list(states = states,
-              loglik = loglik,
-              mergeBranch = mergeBranch,
-              nodeM = nodeM))
-}
-
-#' Logikelihood calculation for the cla_SecSSE model given a set of parameters and data
-#' @title Likelihood for SecSSE model
+#' Logikelihood calculation for the cla_SecSSE model given a set of parameters and data using Rcpp
+#' @title Likelihood for SecSSE model, using Rcpp
 #' @param parameter list where the first is a table where lambdas across different modes of speciation are shown, the second mus and the third transition rates.
 #' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved, rooted and with branch lengths.
 #' @param traits vector with trait states, order of states must be the same as tree tips, for help, see vignette.
@@ -167,7 +56,7 @@ cla_calThruNodes <- function(ances,
 #'masterBlock <- matrix(0.07,ncol=3,nrow=3,byrow=TRUE)
 #'diag(masterBlock) <- NA
 #'parameter [[3]] <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
-#'cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
+#'cla_secsse_loglik_cpp(parameter, phy, traits, num_concealed_states,
 #'                  use_fortran = FALSE, methode = 'ode45', cond = 'maddison_cond',
 #'                  root_state_weight = 'maddison_weights', sampling_fraction,
 #'                  run_parallel = FALSE, setting_calculation = NULL,
@@ -175,7 +64,7 @@ cla_calThruNodes <- function(ances,
 #'                  loglik_penalty = 0)
 #'# LL = -37.8741
 #' @export
-cla_secsse_loglik <- function(parameter,
+cla_secsse_loglik_cpp <- function(parameter,
                               phy,
                               traits,
                               num_concealed_states,
@@ -215,42 +104,35 @@ cla_secsse_loglik <- function(parameter,
                                                  mus)
   }
 
-  states <- setting_calculation$states
-  forTime <- setting_calculation$forTime
-  ances <- setting_calculation$ances
 
-  if (num_concealed_states != round(num_concealed_states)) {
-    # for testing
+    states <- setting_calculation$states
+    forTime <- setting_calculation$forTime
+    ances <- setting_calculation$ances
+
+    if (num_concealed_states != round(num_concealed_states)) {
+      # for testing
+      d <- ncol(states)/2
+      new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
+      new_states <- states[, c(1, 2, 3, 10, 11, 12)]
+      states <- new_states
+    }
+
+    loglik <- 0
+    ly <- ncol(states)
     d <- ncol(states)/2
-    new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
-    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
-    states <- new_states
-  }
 
-  loglik <- 0
-  ly <- ncol(states)
-  d <- ncol(states)/2
-
-  for (i in 1:length(ances)) {
-    calcul <- cla_calThruNodes(ances[i],
-                               states,
-                               loglik,
-                               forTime,
-                               parameter,
-                               use_fortran = use_fortran,
-                               methode = methode,
-                               phy = phy,
-                               func = func)
-    states <- calcul$states
-    loglik <- calcul$loglik
-    nodeN <- calcul$nodeN
-  }
+    calcul <- cla_calThruNodes_cpp(ances,
+                                   states,
+                                   forTime,
+                                   lambdas,
+                                   mus,
+                                   Q)
 
   mergeBranch <- calcul$mergeBranch
   nodeM <- calcul$nodeM
+  loglik <- calcul$loglik
 
   ## At the root
-
   mergeBranch2 <- (mergeBranch)
   if (is.numeric(root_state_weight)) {
     giveWeights <- root_state_weight/num_concealed_states
