@@ -27,6 +27,8 @@ void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
                    std::vector<int>& desNodes,
                    std::vector<double>& timeInte) {
+  desNodes.clear();
+  timeInte.clear();
   std::vector<int> output;
   for(int i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {

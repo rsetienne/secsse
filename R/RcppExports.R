@@ -5,7 +5,7 @@ calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_th
     .Call(`_secsseCPP_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads)
 }
 
-cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q) {
-    .Call(`_secsseCPP_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q)
+cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method) {
+    .Call(`_secsseCPP_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method)
 }
 

@@ -12,7 +12,8 @@ double calc_ll_cla(const Rcpp::List& ll,
                    const std::vector< std::vector< double >>& for_time,
                    std::vector<std::vector<double>>& states,
                    Rcpp::NumericVector& merge_branch_out,
-                   Rcpp::NumericVector& nodeM_out) {
+                   Rcpp::NumericVector& nodeM_out,
+                   const std::string& method) {
 
   std::vector< std::vector< std::vector< double > >> ll_;
   for (int i = 0; i < ll.size(); ++i) {
@@ -22,11 +23,9 @@ double calc_ll_cla(const Rcpp::List& ll,
     ll_.push_back(entry);
   }
 
-
-  MyOde_cla od(ll, mm, Q);
+ MyOde_cla od(ll, mm, Q);
 
   size_t d = ll.size();
-
 
   std::vector<double> mergeBranch(d);
   std::vector<double> nodeN;
@@ -39,17 +38,19 @@ double calc_ll_cla(const Rcpp::List& ll,
   }
 
   std::vector< double > logliks(ances.size());
+  std::vector<double> y;
+ 
+  int focal_node;
+  std::vector<int> desNodes;
+  std::vector<double> timeInte;
+  
   for (int a = 0; a < ances.size(); ++a) {
-
     double loglik = 0.0;
-
+    
     int focal = ances[a];
-    std::vector<int> desNodes;
-    std::vector<double> timeInte;
-    find_desNodes(for_time, focal, desNodes, timeInte);
 
-    std::vector<double> y;
-    int focal_node;
+    find_desNodes(for_time, focal, desNodes, timeInte);
+    
     for (int i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
 
@@ -62,8 +63,16 @@ double calc_ll_cla(const Rcpp::List& ll,
         Rcpp::stop("focal_node - 1 > states.size()");
       }
       y = states[focal_node - 1];
-
-      bno::integrate(od, y, 0.0, timeInte[i], 0.1 * timeInte[i]);
+     
+      std::unique_ptr<MyOde_cla> od_ptr = std::make_unique<MyOde_cla>(od);
+     
+      odeintcpp::integrate(method, std::move(od_ptr), // ode class object
+                          y,// state vector
+                          0.0,// t0
+                          timeInte[i]); // dt
+      
+      
+    //  bno::integrate(stepper, od, y, 0.0, timeInte[i], 0.1 * timeInte[i]);   
 
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
@@ -117,7 +126,8 @@ Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& forTime_R,
                                 const Rcpp::List& lambdas,
                                 const Rcpp::NumericVector& mus,
-                                const Rcpp::NumericMatrix& Q) {
+                                const Rcpp::NumericMatrix& Q,
+                                const std::string method) {
 
 try {
   std::vector< std::vector< double >> states, forTime;
@@ -136,7 +146,8 @@ try {
                      forTime,
                      states,
                      mergeBranch,
-                     nodeM);
+                     nodeM,
+                     method);
 
   NumericMatrix states_out;
   vector_to_numericmatrix(states, states_out);

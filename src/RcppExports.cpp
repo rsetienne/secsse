@@ -23,8 +23,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // cla_calThruNodes_cpp
-Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q);
-RcppExport SEXP _secsseCPP_cla_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP) {
+Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string method);
+RcppExport SEXP _secsseCPP_cla_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -34,14 +34,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::List& >::type lambdas(lambdasSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mus(musSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
-    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_cpp(ances, states_R, forTime_R, lambdas, mus, Q));
+    Rcpp::traits::input_parameter< const std::string >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_cpp(ances, states_R, forTime_R, lambdas, mus, Q, method));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_secsseCPP_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_calThruNodes_cpp, 7},
-    {"_secsseCPP_cla_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_cla_calThruNodes_cpp, 6},
+    {"_secsseCPP_cla_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_cla_calThruNodes_cpp, 7},
     {NULL, NULL, 0}
 };
 

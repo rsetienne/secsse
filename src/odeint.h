@@ -137,5 +137,85 @@ private:
 
 namespace bno = boost::numeric::odeint;
 
+namespace odeintcpp {
+
+namespace bno = boost::numeric::odeint;
+
+constexpr char default_stepper_name[] = "odeint::runge_kutta_fehlberg78";
+constexpr double default_atol = 1E-8;
+constexpr double default_rtol = 1E-8;
+constexpr double default_init_steps = 10;
+
+template <
+  typename STEPPER,
+  typename STATE,
+  typename ODE
+>
+void integrate(STEPPER stepper, ODE ode, STATE& y, double t0, double t1, double dt)
+{
+  bno::integrate_adaptive(stepper, ode, y, t0, t1, dt);
+}
+
+
+template <
+  typename STATE,
+  typename ODE
+>
+void integrate(const std::string& stepper_name, std::unique_ptr<ODE> ode, STATE& y, double t0, double t1, double dt, double atol, double rtol)
+{
+  if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol),
+              std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::runge_kutta_dopri5" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::bulirsch_stoer" == stepper_name) {
+    integrate(bno::bulirsch_stoer<STATE>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::runge_kutta4" == stepper_name) {
+    integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
+  }
+ /* else if ("odeint::adams_bashforth_moulton" == stepper_name) {
+    integrate(bno::adams_bashforth_moulton< 2, STATE>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+ }*/
+  else {
+    throw std::runtime_error("odeintcpp::integrate: unknown stepper");
+  }
+}
+
+
+template <
+  typename STATE,
+  typename ODE
+>
+void integrate(const std::string& stepper_name, std::unique_ptr<ODE> ode, STATE& y, double t0, double t1)
+{
+  integrate(stepper_name, std::move(ode), y, t0, t1, (t1 - t0) / default_init_steps, default_atol, default_rtol);
+}
+
+
+template <
+  typename STATE,
+  typename ODE
+>
+void integrate(std::unique_ptr<ODE> ode, STATE& y, double t0, double t1, double dt, double atol, double rtol)
+{
+  integrate(default_stepper_name, std::move(ode), y, t0, t1, dt, atol, rtol);
+}
+
+
+template <
+  typename STATE,
+  typename ODE
+>
+void integrate(std::unique_ptr<ODE> ode, STATE& y, double t0, double t1)
+{
+  integrate(default_stepper_name, std::move(ode), y, t0, t1);
+}
+}
 
 #endif /* odeint_h */
