@@ -5,6 +5,23 @@
 
 using namespace Rcpp;
 
+// calc_ll_threaded
+double calc_ll_threaded(const Rcpp::NumericVector& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& for_time, const Rcpp::NumericMatrix& states, int num_threads);
+RcppExport SEXP _secsseCPP_calc_ll_threaded(SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP ancesSEXP, SEXP for_timeSEXP, SEXP statesSEXP, SEXP num_threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ll(llSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mm(mmSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ances(ancesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type for_time(for_timeSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_ll_threaded(ll, mm, Q, ances, for_time, states, num_threads));
+    return rcpp_result_gen;
+END_RCPP
+}
 // calThruNodes_cpp
 Rcpp::List calThruNodes_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas, const NumericVector& mus, const NumericMatrix& Q, int num_threads);
 RcppExport SEXP _secsseCPP_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP) {
@@ -41,6 +58,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_secsseCPP_calc_ll_threaded", (DL_FUNC) &_secsseCPP_calc_ll_threaded, 7},
     {"_secsseCPP_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_calThruNodes_cpp, 7},
     {"_secsseCPP_cla_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_cla_calThruNodes_cpp, 7},
     {NULL, NULL, 0}

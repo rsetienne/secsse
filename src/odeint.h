@@ -63,6 +63,10 @@ class MyOde{
     return;
   }
 
+  double get_l(int index) {
+    return l_[index];
+  } 
+   
 private:
   std::vector< double > l_;
   std::vector< double > m_;

@@ -9,6 +9,12 @@ void force_output();
 std::vector<int> find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                                int focal);
 
+std::vector<int> find_connections(const std::vector< std::vector<double>>& phy_edge,
+                                  int focal);
+
+double get_dt(const std::vector< std::vector<double>>& phy_edge,
+              int focal);
+
 void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
                    std::vector<int>& desNodes,

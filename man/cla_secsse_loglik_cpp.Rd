@@ -10,7 +10,7 @@ cla_secsse_loglik_cpp(
   traits,
   num_concealed_states,
   use_fortran = FALSE,
-  methode = "ode45",
+  methode = "odeint::runge_kutta_dopri5",
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   sampling_fraction,

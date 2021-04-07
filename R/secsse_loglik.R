@@ -454,9 +454,9 @@ secsse_loglik <- function(parameter,
   d <- ncol(states) / 2
 
   logliks <- c()
-
+  loglik <- 0
   for (i in 1:length(ances)) {
-    loglik <- 0
+
     calcul <- calThruNodes(ances[i],
                            states,
                            loglik,

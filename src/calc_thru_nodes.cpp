@@ -6,19 +6,6 @@ using namespace Rcpp;
 #include "odeint.h"
 #include "util.h"
 
-/*
-#include <RcppParallel.h>
-
-double calc_ll_threaded(const Rcpp::NumericVector& ll,
-                        const Rcpp::NumericVector& mm,
-                        const Rcpp::NumericMatrix& Q,
-                        const std::vector<int>& ances,
-                        const std::vector< std::vector< double >>& for_time,
-                        std::vector<std::vector<double>>& states,
-                        Rcpp::NumericVector& merge_branch_out,
-                        Rcpp::NumericVector& nodeM_out,
-                        int num_threads);*/
-
 double calc_ll(const Rcpp::NumericVector& ll,
                const Rcpp::NumericVector& mm,
                const Rcpp::NumericMatrix& Q,

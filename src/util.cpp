@@ -5,7 +5,7 @@
 
 void force_output() {
   //  std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-  std::this_thread::sleep_for(std::chrono::milliseconds(30));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   R_FlushConsole();
   R_ProcessEvents();
   R_CheckUserInterrupt();
@@ -23,6 +23,16 @@ std::vector<int> find_desNodes(const std::vector< std::vector<double>>& phy_edge
   return(output);
 }
 
+double get_dt(const std::vector< std::vector<double>>& phy_edge,
+              int focal) {
+  for(int i = 0; i < phy_edge.size(); ++i) {
+    if (phy_edge[i][1] == focal) {
+      return phy_edge[i][2];  
+    }
+  }
+  return 0.0;
+}
+
 void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
                    std::vector<int>& desNodes,
@@ -37,6 +47,24 @@ void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
     }
   }
 }
+
+std::vector<int> find_connections(const std::vector< std::vector<double>>& phy_edge,
+                                  int focal) {
+  std::vector<int> output(2);
+  int cnt = 0;
+  for(int i = 0; i < phy_edge.size(); ++i) {
+    if (phy_edge[i][0] == focal) {
+     output[cnt] = phy_edge[i][1];
+     cnt++;
+    }
+    if (cnt >= 2) break;
+  }
+  return output;
+  
+}
+
+
+
 
 double get_time_inte(const std::vector< std::vector<double>>& forTime,
                      int focal_node) {
