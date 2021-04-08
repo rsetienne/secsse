@@ -4,19 +4,14 @@
 #' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved, rooted and with branch lengths.
 #' @param traits vector with trait states, order of states must be the same as tree tips, for help, see vignette.
 #' @param num_concealed_states number of concealed states, generally equivalent to number of examined states.
-#' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
-#' @param methode Solver for the set of equations, default is 'ode45'.
 #' @param cond condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per trait state. It must have as many elements as trait states.
-#' @param run_parallel should the routine to run in parallel be called?
 #' @param setting_calculation argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)
-#' @param setting_parallel argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
-#' @param func function to be used in solving the ODE system. Currently only for testing purposes.
-#' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+#' @param num_threads number of threads to be used, default is 1. Set to -1 to use all available threads.
 #' @return The loglikelihood of the data given the parameters
 #' @examples
 #'rm(list=ls(all=TRUE))
@@ -68,22 +63,14 @@ cla_secsse_loglik_cpp <- function(parameter,
                               phy,
                               traits,
                               num_concealed_states,
-                              use_fortran = FALSE,
-                              methode = "odeint::runge_kutta_dopri5",
                               cond = "proper_cond",
                               root_state_weight = "proper_weights",
                               sampling_fraction,
-                              run_parallel = FALSE,
                               setting_calculation = NULL,
-                              setting_parallel = NULL,
                               see_ancestral_states = FALSE,
                               loglik_penalty = 0,
                               is_complete_tree = FALSE,
-                              func =
-                                ifelse(is_complete_tree, "cla_secsse_runmod_ct",
-                                       ifelse(use_fortran == FALSE,
-                                              cla_secsse_loglik_rhs,
-                                              "cla_secsse_runmod"))) {
+                              num_threads = 1) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -121,13 +108,24 @@ cla_secsse_loglik_cpp <- function(parameter,
     ly <- ncol(states)
     d <- ncol(states)/2
 
-    calcul <- cla_calThruNodes_cpp(ances,
-                                   states,
-                                   forTime,
-                                   lambdas,
-                                   mus,
-                                   Q,
-                                   methode)
+    calcul <- c()
+    if (num_threads == 1) {
+    
+      calcul <- cla_calThruNodes_cpp(ances,
+                                     states,
+                                     forTime,
+                                     lambdas,
+                                     mus,
+                                     Q)
+    } else {
+      calcul <- calc_cla_ll_threaded(ances,
+                                     states,
+                                     forTime,
+                                     lambdas,
+                                     mus,
+                                     Q,
+                                     num_threads)
+    }
 
   mergeBranch <- calcul$mergeBranch
   nodeM <- calcul$nodeM

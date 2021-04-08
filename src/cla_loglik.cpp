@@ -126,8 +126,7 @@ Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& forTime_R,
                                 const Rcpp::List& lambdas,
                                 const Rcpp::NumericVector& mus,
-                                const Rcpp::NumericMatrix& Q,
-                                const std::string method) {
+                                const Rcpp::NumericMatrix& Q) {
 
 try {
   std::vector< std::vector< double >> states, forTime;
@@ -147,7 +146,7 @@ try {
                      states,
                      mergeBranch,
                      nodeM,
-                     method);
+                     "odeint::runge_kutta_fehlberg78");
 
   NumericMatrix states_out;
   vector_to_numericmatrix(states, states_out);

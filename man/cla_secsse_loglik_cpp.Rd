@@ -9,19 +9,14 @@ cla_secsse_loglik_cpp(
   phy,
   traits,
   num_concealed_states,
-  use_fortran = FALSE,
-  methode = "odeint::runge_kutta_dopri5",
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   sampling_fraction,
-  run_parallel = FALSE,
   setting_calculation = NULL,
-  setting_parallel = NULL,
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = ifelse(is_complete_tree, "cla_secsse_runmod_ct", ifelse(use_fortran == FALSE,
-    cla_secsse_loglik_rhs, "cla_secsse_runmod"))
+  num_threads = 1
 )
 }
 \arguments{
@@ -33,21 +28,13 @@ cla_secsse_loglik_cpp(
 
 \item{num_concealed_states}{number of concealed states, generally equivalent to number of examined states.}
 
-\item{use_fortran}{Should the Fortran code for numerical integration be called? Default is TRUE.}
-
-\item{methode}{Solver for the set of equations, default is 'ode45'.}
-
 \item{cond}{condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.}
 
 \item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as trait states.}
 
-\item{run_parallel}{should the routine to run in parallel be called?}
-
 \item{setting_calculation}{argument used internally to speed up calculation. It should be leave blank (default : setting_calculation = NULL)}
-
-\item{setting_parallel}{argument used internally to set a parallel calculation. It should be left blank (default : setting_parallel = NULL)}
 
 \item{see_ancestral_states}{should the ancestral states be shown? Deafault FALSE}
 
@@ -55,16 +42,13 @@ cla_secsse_loglik_cpp(
 
 \item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
 
-\item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
+\item{num_threads}{number of threads to be used, default is 1. Set to -1 to use all available threads.}
 }
 \value{
 The loglikelihood of the data given the parameters
 }
 \description{
 Logikelihood calculation for the cla_SecSSE model given a set of parameters and data using Rcpp
-}
-\note{
-To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 }
 \examples{
 rm(list=ls(all=TRUE))

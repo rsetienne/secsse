@@ -80,13 +80,36 @@ secsse_loglik_cpp <- function(parameter,
   ancescpp <- ances - 1
   forTimecpp <- forTime
   forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
-  calcul <- calc_ll_threaded(lambdas,
-                             mus,
-                             Q,
-                             ancescpp,
-                             forTimecpp,
-                             states,
-                             num_threads)
+  
+  calcul <- c()
+  
+  if (num_threads == 1) {
+    calcul <- calThruNodes_cpp(ances,
+                               states,
+                               forTime,
+                               lambdas,
+                               mus,
+                               Q,
+                               1)
+  } else {
+    if (num_threads == -2) {
+      calcul <- calc_ll_threaded(lambdas,
+                                 mus,
+                                 Q,
+                                 ancescpp,
+                                 forTimecpp,
+                                 states,
+                                 1)
+    } else {
+    calcul <- calc_ll_threaded(lambdas,
+                               mus,
+                               Q,
+                               ancescpp,
+                               forTimecpp,
+                               states,
+                               num_threads)
+    }
+  }
   
   loglik <- calcul$loglik
   nodeM <- calcul$nodeM

@@ -20,7 +20,7 @@ using state_vec = std::vector<double>;
 struct update_state {
   
   update_state(double dt, int id,
-               const MyOde& od, 
+               const MyOde_cla& od, 
                int d) : dt_(dt), id_(id), od_(od), d_(d) {}
   
   
@@ -31,21 +31,19 @@ struct update_state {
     bno::integrate(od_, current_state, 0.0, dt_, 0.1 * dt_);
     normalize_loglik_node(current_state, loglik, d_);
     current_state.push_back(loglik);
-    
-    //std::cerr << "state_node: " << id_ << "\n";
-    
+  
     return current_state;
   }
   
   double dt_;
   int id_;
-  MyOde od_;
+  MyOde_cla od_;
   int d_;
 };
 
 struct combine_states {
   
-  combine_states(int d, const MyOde& od) : d_(d), od_(od) {}
+  combine_states(int d, const MyOde_cla& od) : d_(d), od_(od) {}
   
   state_vec operator()(const std::tuple< state_vec, state_vec >& input_states) {
     state_vec vec1 =  std::get<0>(input_states);
@@ -54,9 +52,18 @@ struct combine_states {
     double ll1 = vec1.back(); vec1.pop_back();
     double ll2 = vec2.back(); vec2.pop_back();
     
-    state_vec mergeBranch(d_);
-    for (int i = 0; i < d_; ++i) {
-      mergeBranch[i] = vec2[i + d_] * vec1[i + d_] * od_.get_l(i);
+    state_vec mergeBranch(d_, 0.0);
+    
+    int ll_size = od_.get_ll_size();
+    
+    for (int i = 0; i < ll_size; ++i) {
+      for (int j = 0; j < d_; ++j) {
+        for (int k = 0; k < d_; ++k) {
+          mergeBranch[i] += od_.get_l(i, j, k) * (vec1[j + d_] * vec2[k + d_] +
+            vec2[j + d_] * vec1[k + d_]); // cross_M_N[j][k];
+        }
+      }
+      mergeBranch[i] *= 0.5;
     }
     
     double loglik = ll1 + ll2;
@@ -69,15 +76,11 @@ struct combine_states {
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
     newstate.push_back(loglik);
     
-    /* for (auto i : newstate) {
-     std::cerr << i << " ";
-    } std::cerr << "\n";*/
-    
     return newstate;
   }
   
   size_t d_;
-  MyOde od_;
+  MyOde_cla od_;
 };
 
 class collect_ll {
@@ -85,25 +88,31 @@ class collect_ll {
 public:
   collect_ll( state_vec &ll ) : my_ll(ll) {}
   state_vec operator()( const state_vec& v ) {
-    // my_sum += get<0>(v) + get<1>(v);
     my_ll = v;
     return my_ll;
   }
 };
 
-Rcpp::List calc_ll_threaded_cpp2(const Rcpp::NumericVector& ll,
-                                 const Rcpp::NumericVector& mm,
-                                 const Rcpp::NumericMatrix& Q,
-                                 const std::vector<int>& ances,
-                                 const std::vector< std::vector< double >>& for_time,
-                                 std::vector<std::vector<double>>& states,
-                                 int num_threads) {
+Rcpp::List calc_ll_cla_threaded_cpp( const Rcpp::List& ll,
+                                     const Rcpp::NumericVector& mm,
+                                     const Rcpp::NumericMatrix& Q,
+                                     const std::vector<int>& ances,
+                                     const std::vector< std::vector< double >>& for_time,
+                                     std::vector<std::vector<double>>& states,
+                                     int num_threads) {
   
   // https://xinhuang.github.io/posts/2015-07-27-use-tbb-to-generate-dynamic-dependency-graph-for-computation.html
   // nodes have to be created as pointers...
+  std::vector< std::vector< std::vector< double > >> ll_;
+  for (int i = 0; i < ll.size(); ++i) {
+    Rcpp::NumericMatrix tt = ll[i];
+    std::vector< std::vector< double >> entry;
+    numericmatrix_to_vector(tt, entry);
+    ll_.push_back(entry);
+  }
   
-  MyOde od(ll, mm, Q);
-  size_t d = ll.size();
+  MyOde_cla od(ll, mm, Q);
+  size_t d = Q.size();
   
   tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
   
@@ -123,16 +132,12 @@ Rcpp::List calc_ll_threaded_cpp2(const Rcpp::NumericVector& ll,
   std::vector< merge_node* > merge_nodes;
   std::vector< join_node*  > join_nodes;
   
-  //  Rcout << "starting loading state_nodes\n"; force_output();
-  
+ 
   for (int i = 0; i < states.size() + 1; ++i) {
     double dt = get_dt(for_time, i); // TODO: find dt!
     auto new_node = new state_node(g, tbb::flow::unlimited, update_state(dt, i, od, d));
     state_nodes.push_back(new_node);
-    //  Rcout << i << " " << dt << "\n"; force_output();
   }
-  
-  //p  Rcout << "starting going through ances\n"; force_output();
   
   for (int i = 0; i < ances.size(); ++i) {
     std::vector<int> connections = find_connections(for_time, ances[i]);
@@ -162,9 +167,6 @@ Rcpp::List calc_ll_threaded_cpp2(const Rcpp::NumericVector& ll,
   
   nodeM.pop_back();
   
-  
-  //  Rcout << "done creating flowgraph\n"; force_output();
-  
   for (int i = 0; i < num_tips; ++i) {
     tbb::flow::broadcast_node< state_vec > input(g);
     
@@ -172,60 +174,44 @@ Rcpp::List calc_ll_threaded_cpp2(const Rcpp::NumericVector& ll,
     
     std::vector<double> startvec = states[i];
     startvec.push_back(0.0);
-    /* for (auto j : startvec) {
-     std::cerr << j << " ";
-    } std::cerr << "\n";*/
     
     input.try_put(startvec);
   }  
   
   g.wait_for_all();
-  //   std::cerr << loglik << "\n";
-  //   
-  double loglikelihood = output.back();
 
+  double loglikelihood = output.back();
+  
   NumericVector mergeBranch;
   for (int i = d; i < (d + d); ++i) {
     mergeBranch.push_back(output[d]);
   }
-
+  
   return Rcpp::List::create(Rcpp::Named("mergeBranch") = mergeBranch,
                             Rcpp::Named("nodeM") = nodeM,
                             Rcpp::Named("loglik") = loglikelihood);
 }
 
 
-//' ll threaded
-//' @param ll lambdas
-//' @param mm mus
-//' @param Q qs
-//' @param ances vector of ances
-//' @param for_time fortime
-//' @param states states matrix
-//' @param merge_branch_out
-//' @param node_M out
-//' @param num_threads
-//' @return log likelihood
-//' @export
+
 // [[Rcpp::export]]
-Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
-                            const Rcpp::NumericVector& mm,
-                            const Rcpp::NumericMatrix& Q,
-                            const Rcpp::NumericVector& ances,
-                            const Rcpp::NumericMatrix& for_time,
-                            const Rcpp::NumericMatrix& states,
-                            int num_threads) {
+Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
+                                const Rcpp::NumericMatrix& states_R,
+                                const Rcpp::NumericMatrix& forTime_R,
+                                const Rcpp::List& lambdas,
+                                const Rcpp::NumericVector& mus,
+                                const Rcpp::NumericMatrix& Q,
+                                int num_threads) {
   try {
+    
+    std::vector< std::vector< double >> states_cpp, for_time_cpp;
+    numericmatrix_to_vector(states_R, states_cpp);
+    numericmatrix_to_vector(forTime_R, for_time_cpp);
+    
     std::vector< int > ances_cpp(ances.begin(), ances.end());
     
-    std::vector< std::vector< double >> for_time_cpp;
-    numericmatrix_to_vector(for_time, for_time_cpp);
-    
-    std::vector< std::vector< double >> states_cpp;
-    numericmatrix_to_vector(states, states_cpp);
-    
-    return calc_ll_threaded_cpp2(ll, mm, Q, ances_cpp, 
-                                 for_time_cpp, states_cpp, num_threads);
+    return calc_ll_cla_threaded_cpp(lambdas, mus, Q, ances_cpp, 
+                                    for_time_cpp, states_cpp, num_threads);
     
   } catch(std::exception &ex) {
     forward_exception_to_r(ex);

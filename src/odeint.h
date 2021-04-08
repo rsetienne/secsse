@@ -132,6 +132,14 @@ public:
     return;
   }
 
+  double get_l(int i, int j, int k) const {
+    return l_[i][j][k];
+  } 
+  
+  size_t get_ll_size() const {
+    return l_.size();
+  }
+  
 private:
    std::vector< std::vector< std::vector< double > > > l_;
    std::vector< double > m_;
