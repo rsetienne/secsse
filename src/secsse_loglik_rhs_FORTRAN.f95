@@ -413,3 +413,130 @@
 
       END SUBROUTINE cla_secsse_runmod_ct
       
+!==========================================================================
+
+      SUBROUTINE cla_secsse_runmod_ct_E (neq, t, Conc, dConc, yout, ip)
+      USE secsse_dimmod
+      USE iso_c_binding
+      IMPLICIT NONE
+
+!......................... declaration section.............................
+
+      INTEGER           :: neq, ip(*), i, ii, iii
+      INTEGER           :: d, d2, d3
+      DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
+      REAL(c_intptr_t * 2)  :: dC(N), lambdas(N/2,N/2,N/2)
+      DOUBLE PRECISION  :: mus(N/2), Q(N/2,N/2), Es(N/2)
+
+! parameters - named here
+      DOUBLE PRECISION rn
+      COMMON /XCBPar/rn
+
+
+! local variables
+      CHARACTER(len=80) msg
+
+!............................ statements ..................................
+
+      IF (.NOT. Initialised) THEN
+        ! check memory allocated to output variables
+        IF (ip(1) < 1) CALL rexit("nout not large enough") 
+
+        ! save parameter values in yout
+        ii = ip(1)   ! Start of parameter values
+        CALL secsse_fill1d(P, (N**3)/8 + N/2 + (N**2)/4, yout, ii)   ! ii is updated in Fill1D
+        Initialised = .TRUE.          ! to prevent from initialising more than once
+      ENDIF
+
+!lambdas = P(1 ... (N**3)/8)
+!mus = P((N**3)/8 + 1 ... (N**3)/8 + N/2)
+!Q = P((N**3)/8 + N/2 + 1 ... (N**3)/8 + N/2 + (N**2)/4)
+
+! dynamics
+
+!  R code
+!  dD <- -("sum(lambdas)" + mus + Q %*% (rep(1,d))) * Ds + ( Q %*% Ds )
+
+      d = N/2
+      d3 = d ** 3
+      d2 = d ** 2
+      Es = Conc(1:d)
+      dC = 0
+      mus = P((d3 + 1):(d3 + d))
+      Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
+      lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
+      DO I = 1,d
+        dC(I) = mus(I) * (1 - Es(I))
+        DO II = 1,d
+           dC(I) = dC(I) + Q(I, II) * (Es(II) - Es(I))
+           DO III = 1,d
+              dC(I) = dC(I) + lambdas(I, II, II) * (Es(II) * Es(III) - Es(I))
+           ENDDO
+        ENDDO
+      ENDDO
+      dConc = dC
+
+      END SUBROUTINE cla_secsse_runmod_ct_E
+      
+!==========================================================================
+
+      SUBROUTINE cla_secsse_runmod_ct_D (neq, t, Conc, dConc, yout, ip)
+      USE secsse_dimmod
+      USE iso_c_binding
+      IMPLICIT NONE
+
+!......................... declaration section.............................
+
+      INTEGER           :: neq, ip(*), i, ii, iii
+      INTEGER           :: d, d2, d3
+      DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
+      REAL(c_intptr_t * 2)  :: dC(N), lambdas(N/2,N/2,N/2)
+      DOUBLE PRECISION  :: mus(N/2), Q(N/2,N/2), Ds(N/2)
+
+! parameters - named here
+      DOUBLE PRECISION rn
+      COMMON /XCBPar/rn
+
+
+! local variables
+      CHARACTER(len=80) msg
+
+!............................ statements ..................................
+
+      IF (.NOT. Initialised) THEN
+        ! check memory allocated to output variables
+        IF (ip(1) < 1) CALL rexit("nout not large enough") 
+
+        ! save parameter values in yout
+        ii = ip(1)   ! Start of parameter values
+        CALL secsse_fill1d(P, (N**3)/8 + N/2 + (N**2)/4, yout, ii)   ! ii is updated in Fill1D
+        Initialised = .TRUE.          ! to prevent from initialising more than once
+      ENDIF
+
+!lambdas = P(1 ... (N**3)/8)
+!mus = P((N**3)/8 + 1 ... (N**3)/8 + N/2)
+!Q = P((N**3)/8 + N/2 + 1 ... (N**3)/8 + N/2 + (N**2)/4)
+
+! dynamics
+
+!  R code
+!  dD <- -("sum(lambdas)" + mus + Q %*% (rep(1,d))) * Ds + ( Q %*% Ds )
+
+      d = N/2
+      d3 = d ** 3
+      d2 = d ** 2
+      Ds = Conc((d + 1):N)
+      dC = 0
+      mus = P((d3 + 1):(d3 + d))
+      Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
+      lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
+      DO I = 1,d
+        dC(d + I) = -(SUM(lambdas(I,:,:)) + mus(I)) * Ds(I)
+        DO II = 1,d
+           dC(d + I) = dC(d + I) + Q(I, II) * (Ds(II) - Ds(I))
+        ENDDO
+      ENDDO
+      dConc = dC
+
+      END SUBROUTINE cla_secsse_runmod_ct_D
+      
