@@ -11,6 +11,7 @@ extern void F77_NAME(secsse_runmod2)(int *neq, double *t, double *Conc, double *
 extern void F77_NAME(secsse_runmod_ct)(int *neq, double *t, double *Conc, double *dConc, double *yout, int *ip);
 extern void F77_NAME(cla_secsse_runmod)(int *neq, double *t, double *Conc, double *dConc, double *yout, int *ip);
 extern void F77_NAME(cla_secsse_runmod_ct)(int *neq, double *t, double *Conc, double *dConc, double *yout, int *ip);
+extern void F77_NAME(cla_secsse_runmod_ct_E)(int *neq, double *t, double *Conc, double *dConc, double *yout, int *ip);
 
 static const R_FortranMethodDef FortranEntries[] = {
   {"secsse_fill1d", (DL_FUNC) &F77_NAME(secsse_fill1d), 4},
@@ -20,6 +21,7 @@ static const R_FortranMethodDef FortranEntries[] = {
   {"secsse_runmod_ct", (DL_FUNC) &F77_NAME(secsse_runmod_ct), 6},
   {"cla_secsse_runmod", (DL_FUNC) &F77_NAME(cla_secsse_runmod), 6},
   {"cla_secsse_runmod_ct", (DL_FUNC) &F77_NAME(cla_secsse_runmod_ct), 6},
+  {"cla_secsse_runmod_ct_E", (DL_FUNC) &F77_NAME(cla_secsse_runmod_ct_E), 6},
   {NULL, NULL, 0}
 };
 
