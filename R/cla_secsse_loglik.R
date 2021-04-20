@@ -250,7 +250,7 @@ cla_secsse_loglik <- function(parameter,
                               loglik_penalty = 0,
                               is_complete_tree = FALSE,
                               func = ifelse(is_complete_tree,
-                                            "cla_secsse_runmod_ct",
+                                            "cla_secsse_runmod_ct_d",
                                             ifelse(use_fortran == FALSE,
                                                    cla_secsse_loglik_rhs,
                                                    "cla_secsse_runmod")
@@ -429,7 +429,7 @@ cla_secsse_loglik <- function(parameter,
     timeInte <- max(abs(branching.times(phy)))
     y <- rep(0,2 * lmb)
     nodeMN <- ode_FORTRAN(y = y,
-                          func = 'cla_secsse_runmod_ct',
+                          func = 'cla_secsse_runmod_ct_e',
                           times = c(0,timeInte),
                           parms = parameter,
                           rtol = reltol,
