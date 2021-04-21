@@ -415,7 +415,7 @@
       
 !==========================================================================
 
-      SUBROUTINE cla_secsse_runmod_ct_E (neq, t, Conc, dConc, yout, ip)
+      SUBROUTINE cla_secsse_runmod_ct_e (neq, t, Conc, dConc, yout, ip)
       USE secsse_dimmod
       USE iso_c_binding
       IMPLICIT NONE
@@ -476,11 +476,11 @@
       ENDDO
       dConc = dC
 
-      END SUBROUTINE cla_secsse_runmod_ct_E
+      END SUBROUTINE cla_secsse_runmod_ct_e
       
 !==========================================================================
 
-      SUBROUTINE cla_secsse_runmod_ct_D (neq, t, Conc, dConc, yout, ip)
+      SUBROUTINE cla_secsse_runmod_ct_d (neq, t, Conc, dConc, yout, ip)
       USE secsse_dimmod
       USE iso_c_binding
       IMPLICIT NONE
@@ -538,5 +538,5 @@
       ENDDO
       dConc = dC
 
-      END SUBROUTINE cla_secsse_runmod_ct_D
+      END SUBROUTINE cla_secsse_runmod_ct_d
       
