@@ -58,6 +58,10 @@ cla_secsse_loglik(
 \item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
 
 \item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
+
+\item{reltol}{relative tolerance in integration}
+
+\item{abstol}{absolute tolerance in integration}
 }
 \value{
 The loglikelihood of the data given the parameters

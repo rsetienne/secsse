@@ -790,5 +790,5 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0,
                                       is_complete_tree = TRUE)
-  testthat::expect_equal(secsse_cla_LL6,-541.6825,tol = 1E-4)
+  testthat::expect_equal(secsse_cla_LL6,-547.6823,tol = 1E-4)
 })

@@ -252,6 +252,7 @@ secsse_ml_func_def_pars <- function(phy,
       setting_parallel = setting_parallel,
       see_ancestral_states = see_ancestral_states,
       loglik_penalty = loglik_penalty,
+      is_complete_tree = is_complete_tree,
       func = func,
       verbose = verbose
     )
@@ -292,6 +293,7 @@ secsse_ml_func_def_pars <- function(phy,
         see_ancestral_states = see_ancestral_states,
         num_cycles = num_cycles,
         loglik_penalty = loglik_penalty,
+        is_complete_tree = is_complete_tree,
         func = func,
         verbose = verbose
       )

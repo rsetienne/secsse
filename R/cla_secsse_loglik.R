@@ -30,8 +30,8 @@ cla_calThruNodes <- function(
   methode,
   phy,
   func,
-  reltol = 1E-12,
-  abstol = 1E-16
+  reltol,
+  abstol
 ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -186,6 +186,8 @@ cla_doParalThing <- function(take_ancesSub,
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param func function to be used in solving the ODE system. Currently only for testing purposes.
+#' @param reltol relative tolerance in integration
+#' @param abstol absolute tolerance in integration
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
@@ -418,15 +420,15 @@ cla_secsse_loglik <- function(parameter,
 
   if(cond == "maddison_cond"){
     preCond <- rep(NA,lmb)
-    for(j in 1:lw){
-      #preCond[j] <- sum(weightStates[j] * lambdas[[j]] *  (1 - nodeM[1:d][j]) ^ 2)
-      preCond[j] <- sum(weightStates[j] * lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+    for(j in 1:lmb){
+      preCond[j] <- sum(weightStates[j] * lambdas[[j]] *  (1 - nodeM[1:d][j]) ^ 2)
+      #preCond[j] <- sum(weightStates[j] * lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
     mergeBranch2 <- mergeBranch2/sum(preCond)
   }
   
   if(is_complete_tree) {
-    timeInte <- max(abs(branching.times(phy)))
+    timeInte <- max(abs(ape::branching.times(phy)))
     y <- rep(0,2 * lmb)
     nodeMN <- ode_FORTRAN(y = y,
                           func = 'cla_secsse_runmod_ct_e',
