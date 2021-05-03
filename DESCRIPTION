@@ -50,4 +50,5 @@ VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 LinkingTo: 
     Rcpp,
-    RcppParallel
+    RcppParallel,
+    BH

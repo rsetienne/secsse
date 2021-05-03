@@ -13,16 +13,19 @@ double calc_ll(const Rcpp::NumericVector& ll,
                const std::vector< std::vector< double >>& for_time,
                std::vector<std::vector<double>>& states,
                Rcpp::NumericVector& merge_branch_out,
-               Rcpp::NumericVector& nodeM_out) {
+               Rcpp::NumericVector& nodeM_out,
+               double absolute_tol,
+               double relative_tol,
+               std::string method) {
 
-  MyOde od(ll, mm, Q);
+  ode_standard od(ll, mm, Q);
   size_t d = ll.size();
 
   double loglik = 0.0;
 
-  std::vector<double> mergeBranch(d);
-  std::vector<double> nodeN;
-  std::vector<double> nodeM;
+  std::vector< double > mergeBranch(d);
+  std::vector< double  > nodeN;
+  std::vector< double  > nodeM;
 
   for (int i = 0; i < ances.size(); ++i) {
     int focal = ances[i];
@@ -33,15 +36,25 @@ double calc_ll(const Rcpp::NumericVector& ll,
 
     for (int i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
-      std::vector<double> y = states[focal_node - 1];
-      bno::integrate(od, y, 0.0, timeInte[i], 0.1 * timeInte[i]);
-     // odeintcpp::integrate(*od, y, 0.0, timeInte[i]);
+      std::vector< double > y = states[focal_node - 1];
+      
+      std::unique_ptr<ode_standard> od_ptr = std::make_unique<ode_standard>(od);
+     
+      odeintcpp::integrate(method, 
+                          std::move(od_ptr), // ode class object
+                          y,// state vector
+                          0.0,// t0
+                          timeInte[i], //t1
+                          timeInte[i] * 0.01,
+                          absolute_tol,
+                          relative_tol); // t1
+     
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
 
-    normalize_loglik_node(nodeM, loglik, d);
-    normalize_loglik_node(nodeN, loglik, d);
+    normalize_loglik_node(nodeM, loglik);
+    normalize_loglik_node(nodeN, loglik);
 
     // code correct up till here.
     for (int i = 0; i < d; ++i) {
@@ -49,7 +62,7 @@ double calc_ll(const Rcpp::NumericVector& ll,
     }
     normalize_loglik(mergeBranch, loglik);
 
-    std::vector<double> newstate(d);
+    std::vector< double > newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
@@ -69,7 +82,10 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
                             const NumericVector& lambdas,
                             const NumericVector& mus,
                             const NumericMatrix& Q,
-                            int num_threads) {
+                            int num_threads,
+                            double abstol,
+                            double reltol,
+                            std::string method) {
 
   std::vector< std::vector< double >> states, forTime;
   numericmatrix_to_vector(states_R, states);
@@ -78,27 +94,17 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
   NumericVector mergeBranch;
   NumericVector nodeM;
 
-  double loglik;
- // if (num_threads == 1) {
-    loglik = calc_ll(lambdas,
+  double loglik = calc_ll(lambdas,
                           mus,
                           Q,
                           std::vector<int>(ances.begin(), ances.end()),
                           forTime,
                           states,
                           mergeBranch,
-                          nodeM);
-  /*} else {
-    loglik = calc_ll_threaded(lambdas,
-                     mus,
-                     Q,
-                     std::vector<int>(ances.begin(), ances.end()),
-                     forTime,
-                     states,
-                     mergeBranch,
-                     nodeM,
-                     num_threads);
-  }*/
+                          nodeM,
+                          abstol,
+                          reltol,
+                          method);
 
   NumericMatrix states_out;
   vector_to_numericmatrix(states, states_out);

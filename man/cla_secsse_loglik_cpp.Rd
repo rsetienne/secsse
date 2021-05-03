@@ -16,7 +16,10 @@ cla_secsse_loglik_cpp(
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  num_threads = 1
+  num_threads = 1,
+  method,
+  atol,
+  rtol
 )
 }
 \arguments{
@@ -43,6 +46,12 @@ cla_secsse_loglik_cpp(
 \item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
 
 \item{num_threads}{number of threads to be used, default is 1. Set to -1 to use all available threads.}
+
+\item{method}{method}
+
+\item{atol}{atol}
+
+\item{rtol}{rtol}
 }
 \value{
 The loglikelihood of the data given the parameters

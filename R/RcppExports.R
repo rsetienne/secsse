@@ -17,15 +17,25 @@ calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads) {
     .Call(`_secsseCPP_calc_ll_threaded`, ll, mm, Q, ances, for_time, states, num_threads)
 }
 
-calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads) {
-    .Call(`_secsseCPP_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads)
+calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method) {
+    .Call(`_secsseCPP_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method)
 }
 
-calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads) {
-    .Call(`_secsseCPP_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads)
+#' cla log likelihood using tbb flow
+#' @description cla loglik
+#' @param ances ances
+#' @param states_R states
+#' @param forTime_r ff
+#' @param lambdas list of lambdas
+#' @param mus vector of mus
+#' @param Q q
+#' @param num_threads num threads
+#' @export
+calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads) {
+    .Call(`_secsseCPP_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads)
 }
 
-cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q) {
-    .Call(`_secsseCPP_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q)
+cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol) {
+    .Call(`_secsseCPP_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol)
 }
 

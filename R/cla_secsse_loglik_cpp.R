@@ -12,6 +12,9 @@
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param num_threads number of threads to be used, default is 1. Set to -1 to use all available threads.
+#' @param method method
+#' @param atol atol
+#' @param rtol rtol
 #' @return The loglikelihood of the data given the parameters
 #' @examples
 #'rm(list=ls(all=TRUE))
@@ -60,23 +63,26 @@
 #'# LL = -37.8741
 #' @export
 cla_secsse_loglik_cpp <- function(parameter,
-                              phy,
-                              traits,
-                              num_concealed_states,
-                              cond = "proper_cond",
-                              root_state_weight = "proper_weights",
-                              sampling_fraction,
-                              setting_calculation = NULL,
-                              see_ancestral_states = FALSE,
-                              loglik_penalty = 0,
-                              is_complete_tree = FALSE,
-                              num_threads = 1) {
+                                  phy,
+                                  traits,
+                                  num_concealed_states,
+                                  cond = "proper_cond",
+                                  root_state_weight = "proper_weights",
+                                  sampling_fraction,
+                                  setting_calculation = NULL,
+                                  see_ancestral_states = FALSE,
+                                  loglik_penalty = 0,
+                                  is_complete_tree = FALSE,
+                                  num_threads = 1,
+                                  method,
+                                  atol,
+                                  rtol) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
-
-
+  
+  
   if (is.null(setting_calculation)) {
     check_input(traits,
                 phy,
@@ -90,58 +96,82 @@ cla_secsse_loglik_cpp <- function(parameter,
                                                  is_complete_tree,
                                                  mus)
   }
-
-
-    states <- setting_calculation$states
-    forTime <- setting_calculation$forTime
-    ances <- setting_calculation$ances
-
-    if (num_concealed_states != round(num_concealed_states)) {
-      # for testing
-      d <- ncol(states)/2
-      new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
-      new_states <- states[, c(1, 2, 3, 10, 11, 12)]
-      states <- new_states
-    }
-
-    loglik <- 0
-    ly <- ncol(states)
+  
+  
+  states <- setting_calculation$states
+  forTime <- setting_calculation$forTime
+  ances <- setting_calculation$ances
+  
+  if (num_concealed_states != round(num_concealed_states)) {
+    # for testing
     d <- ncol(states)/2
-
-    calcul <- c()
-    if (num_threads == 1) {
+    new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
+    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
+    states <- new_states
+  }
+  
+  loglik <- 0
+  ly <- ncol(states)
+  d <- ncol(states)/2
+  
+  calcul <- c()
+ # if (num_threads == 1) {
+  ancescpp <- ances - 1
+  forTimecpp <- forTime
+  forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
+    calcul <- cla_calThruNodes_cpp(ancescpp,
+                                   states,
+                                   forTimecpp,
+                                   lambdas,
+                                   mus,
+                                   Q,
+                                   method,
+                                   atol,
+                                   rtol)
+ # } else {
+ # SWITCHED OFF MULTITHREADING FOR TESTING
+  if (1 == 2) {  
+    # because C++ indexes from 0, we need to adjust the indexing:
+    ancescpp <- ances - 1
+    forTimecpp <- forTime
+    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
     
-      calcul <- cla_calThruNodes_cpp(ances,
+    if (num_threads == -2) {
+      calcul <- calc_cla_ll_threaded(ancescpp,
                                      states,
-                                     forTime,
+                                     forTimecpp,
                                      lambdas,
                                      mus,
-                                     Q)
+                                     Q,
+                                     1)
     } else {
-      calcul <- calc_cla_ll_threaded(ances,
+      calcul <- calc_cla_ll_threaded(ancescpp,
                                      states,
-                                     forTime,
+                                     forTimecpp,
                                      lambdas,
                                      mus,
                                      Q,
                                      num_threads)
     }
-
+  }
+  
+ # cat("calculated calcul\n");
+  
   mergeBranch <- calcul$mergeBranch
   nodeM <- calcul$nodeM
   loglik <- calcul$loglik
-
+  
   ## At the root
   mergeBranch2 <- (mergeBranch)
   if (is.numeric(root_state_weight)) {
     giveWeights <- root_state_weight/num_concealed_states
     weightStates <- rep(giveWeights, num_concealed_states)
-
+    
   } else {
     if (root_state_weight == "maddison_weights") {
       weightStates <- (mergeBranch2)/sum((mergeBranch2))
     }
-
+    
     if (root_state_weight == "proper_weights") {
       numerator <- NULL
       for (j in 1:length(mergeBranch2)) {
@@ -155,14 +185,14 @@ cla_secsse_loglik_cpp <- function(parameter,
                      (mergeBranch2[j] /
                         (sum(lambdas[[j]] * (1 - nodeM[1:d][j])^2))))
       }
-
+      
       weightStates <- numerator/sum(denomin)
     }
     if (root_state_weight == "equal_weights") {
       weightStates <- rep(1 / length(mergeBranch2), length(mergeBranch2))
     }
   }
-
+  
   if (cond == "maddison_cond") {
     preCond <- NULL
     for (j in 1:length(weightStates)) {
@@ -173,7 +203,7 @@ cla_secsse_loglik_cpp <- function(parameter,
     }
     mergeBranch2 <- mergeBranch2/(sum(preCond))
   }
-
+  
   if (cond == "proper_cond") {
     preCond <- NULL
     for (j in 1:length(mergeBranch2)) {
@@ -182,13 +212,13 @@ cla_secsse_loglik_cpp <- function(parameter,
     }
     mergeBranch2 <- mergeBranch2/preCond
   }
-
+  
   atRoot <- ((mergeBranch2) * (weightStates))
-
+  
   wholeLike <- sum(atRoot)
   LL <- log(wholeLike) + loglik - penalty(pars = parameter,
                                           loglik_penalty = loglik_penalty)
-
+  
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):nrow(states), ]

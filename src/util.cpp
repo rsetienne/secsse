@@ -5,7 +5,7 @@
 
 void force_output() {
   //  std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
   R_FlushConsole();
   R_ProcessEvents();
   R_CheckUserInterrupt();
@@ -80,32 +80,35 @@ double get_time_inte(const std::vector< std::vector<double>>& forTime,
   // stop("could not find time inte");
 }
 
+
+
 std::vector<double> normalize_loglik_node(std::vector<double>& probvec,
-                                          double& loglik,
-                                          size_t d) {
-  // 4 5 6 7
-  // // d = 4
-  double sumabsprobs = 0.0;
+                                          double& loglik) {
+  
+  size_t d = probvec.size() / 2;
+  
+  double sumabsprobs(0.0);
   for(size_t i = d; i < (d + d); ++i) {
     sumabsprobs += std::abs(probvec[i]);
   }
   for(size_t i = d; i < (d + d); ++i) {
     probvec[i] *= 1.0 / sumabsprobs;
   }
-  loglik = loglik + log(sumabsprobs);
+  loglik += log(sumabsprobs);
   return probvec;
 }
 
 void normalize_loglik(std::vector<double>& probvec,
                       double& loglik) {
   static const auto abssum = [] (auto x, auto y) {return x + std::abs(y);};
-
+  
   double sumabsprobs = std::accumulate(probvec.begin(), probvec.end(), 0.0,
                                        abssum);
+  
   for (auto& i : probvec) {
     i *= 1.0 / sumabsprobs;
   }
-  loglik = loglik + log(sumabsprobs);
+  loglik += log(sumabsprobs);
   return;
 }
 
@@ -113,15 +116,31 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>& v) {
 
   v = std::vector< std::vector< double>>(m.nrow());
-  for (int i = 0; i < m.nrow(); ++i) {
+  for (size_t i = 0; i < m.nrow(); ++i) {
     std::vector<double> row(m.ncol());
-    for (int j = 0; j < m.ncol(); ++j) {
+    for (size_t j = 0; j < m.ncol(); ++j) {
       row[j] = m(i, j);
     }
     v[i] = row;
   }
   return;
 }
+
+void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
+                    std::vector< std::vector< std::vector<double >>>& v) {
+  
+  int n = l.size();
+  
+  v = std::vector< std::vector< std::vector<double>>>(n);
+  for (size_t i = 0; i < n; ++i) {
+    std::vector< std::vector< double >> entry;
+    Rcpp::NumericMatrix temp = l[i];
+    numericmatrix_to_vector(temp, entry);
+    v.push_back(entry);
+  }
+  return;
+}
+
 
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix& m) {
@@ -135,4 +154,11 @@ void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
     }
   }
   return;
+}
+
+void output_vec(const std::vector<double>& v) {
+ // std::cerr << "vec: ";
+//  for (int i = 0; i < v.size(); ++i) {
+//    std::cerr << v[i] << " ";
+  //} std::cerr << "\n";
 }

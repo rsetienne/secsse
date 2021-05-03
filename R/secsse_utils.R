@@ -314,6 +314,7 @@ normalize_loglik <- function(probs, loglik) {
     sumabsprobs <- sum(abs(probs))
     probs <- probs / sumabsprobs
     loglik <- loglik + log(sumabsprobs)
+    cat(probs, loglik, "\n")
     return(list(probs = probs, loglik = loglik))
 }
 

@@ -16,7 +16,10 @@ secsse_loglik_cpp(
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  num_threads = 1
+  num_threads = 1,
+  atol = 1e-08,
+  rtol = 1e-08,
+  method = "odeint::bulirsch_stoer"
 )
 }
 \arguments{
@@ -43,6 +46,12 @@ secsse_loglik_cpp(
 \item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads. Default is one thread.}
+
+\item{atol}{atol}
+
+\item{rtol}{rtol}
+
+\item{method}{method}
 }
 \value{
 The loglikelihood of the data given the parameters

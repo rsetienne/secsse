@@ -13,6 +13,9 @@
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param num_threads number of threads. Set to -1 to use all available threads. Default is one thread.
+#' @param atol atol
+#' @param rtol rtol
+#' @param method method
 #' @return The loglikelihood of the data given the parameters
 #' @examples
 #' rm(list = ls(all = TRUE))
@@ -52,7 +55,10 @@ secsse_loglik_cpp <- function(parameter,
                           see_ancestral_states = FALSE,
                           loglik_penalty = 0,
                           is_complete_tree = FALSE,
-                          num_threads = 1) {
+                          num_threads = 1,
+                          atol = 1e-8,
+                          rtol = 1e-8,
+                          method = "odeint::bulirsch_stoer") {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -77,39 +83,49 @@ secsse_loglik_cpp <- function(parameter,
   ly <- ncol(states)
   d <- ncol(states) / 2
 
-  ancescpp <- ances - 1
-  forTimecpp <- forTime
-  forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
+ 
   
   calcul <- c()
   
-  if (num_threads == 1) {
+#  if (num_threads == 1) {
     calcul <- calThruNodes_cpp(ances,
                                states,
                                forTime,
                                lambdas,
                                mus,
                                Q,
-                               1)
-  } else {
-    if (num_threads == -2) {
-      calcul <- calc_ll_threaded(lambdas,
-                                 mus,
-                                 Q,
-                                 ancescpp,
-                                 forTimecpp,
-                                 states,
-                                 1)
-    } else {
-    calcul <- calc_ll_threaded(lambdas,
-                               mus,
-                               Q,
-                               ancescpp,
-                               forTimecpp,
-                               states,
-                               num_threads)
-    }
-  }
+                               1,
+                               atol,
+                               rtol,
+                               method)
+#  } else {
+#  
+#  switch off multithreading hard coded, to avoid getting stuck here.
+ if (1 == 2) {   
+    # because C++ indexes from 0, we need to adjust the indexing:
+          ancescpp <- ances - 1
+          forTimecpp <- forTime
+          forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
+          
+          if (num_threads == -2) {
+            calcul <- calc_ll_threaded(lambdas,
+                                       mus,
+                                       Q,
+                                       ancescpp,
+                                       forTimecpp,
+                                       states,
+                                       1)
+          } else {
+          calcul <- calc_ll_threaded(lambdas,
+                                     mus,
+                                     Q,
+                                     ancescpp,
+                                     forTimecpp,
+                                     states,
+                                     num_threads)
+          }
+ }
+
   
   loglik <- calcul$loglik
   nodeM <- calcul$nodeM

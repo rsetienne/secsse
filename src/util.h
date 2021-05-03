@@ -24,16 +24,21 @@ double get_time_inte(const std::vector< std::vector<double>>& forTime,
                      int focal_node);
 
 std::vector<double> normalize_loglik_node(std::vector<double>& probvec,
-                                          double& loglik,
-                                          size_t d);
+                                          double& loglik);
 
 void normalize_loglik(std::vector<double>& probvec,
                       double& loglik);
+
 
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>& v);
 
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix& m);
+
+void output_vec(const std::vector<double>& v);
+
+void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
+                    std::vector< std::vector< std::vector<double >>>& v);
 
 #endif /* util_h */
