@@ -87,7 +87,7 @@ secsse_loglik_cpp <- function(parameter,
   
   calcul <- c()
   
-#  if (num_threads == 1) {
+  if (num_threads == 1) {
     calcul <- calThruNodes_cpp(ances,
                                states,
                                forTime,
@@ -98,10 +98,10 @@ secsse_loglik_cpp <- function(parameter,
                                atol,
                                rtol,
                                method)
-#  } else {
+  } else {
 #  
 #  switch off multithreading hard coded, to avoid getting stuck here.
- if (1 == 2) {   
+ #if (1 == 1) {   
     # because C++ indexes from 0, we need to adjust the indexing:
           ancescpp <- ances - 1
           forTimecpp <- forTime

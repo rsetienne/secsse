@@ -14,6 +14,8 @@
 // [[Rcpp::depends(BH)]]
 #include "Rcpp.h"
 #include "boost/numeric/odeint.hpp"
+
+// boost headers, not used now:
 // #include <boost/multiprecision/mpfr.hpp>
 // #include <quadmath.h>
 // #include <boost/multiprecision/float128.hpp>
@@ -51,103 +53,34 @@ public:
     
     d = l_.size();
   }
-  
+
   void operator()( const std::vector< double > &x ,
                 std::vector<  double > &dxdt,
-                const double ) {
-    for (int i = 0; i < d; ++i) {
-      double q_mult_one = 0.0;
-      double q_ds = 0.0;
-      double q_es = 0.0;
-      for (int j = 0; j < d; ++j) {
-        q_mult_one += q_[i][j];
-        q_ds += q_[i][j] * x[j + d];
-        q_es += q_[i][j] * x[j];
-      }
-      
-      //dxdt[i] = m_[i] -
-      //  (l_[i] + m_[i] + q_mult_one) * x[i] +
-      //  l_[i] * x[i] * x[i] +
-      //  q_es;
-      
-      dxdt[i] = m_[i] - x[i] * (m_[i] + q_mult_one + l_[i] * (x[i] + 1)) + q_es;
-        
-      dxdt[i + d] =  x[i + d] * (l_[i] * (x[i] * 2 - 1) - m_[i] - q_mult_one) + q_ds;
-      
-    }
-    return;
-  }
-  
-  /*
-  
-  void operator()( const std::vector< double > &x ,
-                std::vector<  double > &dxdt,
-                const double ) {
+                const double /* t */ ) {
     for (size_t i = 0; i < d; ++i) {
-      high_prec_double q_mult_one(0.0);
-      high_prec_double q_ds(0.0);
-      high_prec_double q_es(0.0);
-      for (size_t j = 0; j < d; ++j) {
-        q_mult_one += q_[i][j];
-        q_ds += q_[i][j] * x[j + d];
-        q_es += q_[i][j] * x[j];
+      
+      if (l_[i] != 0.0) {
+        
+        dxdt[i]     =  m_[i] - x[i] * (l_[i] * (m_[i] + x[i]));
+        dxdt[i + d] =  x[i + d]     * (l_[i] * (2 * x[i] - 1) - m_[i]);
+      } else {
+        dxdt[i] = m_[i];
+        dxdt[i + d] = -1 * x[i + d] * m_[i];
       }
-     
-     high_prec_double mult1  = l_[i] * (x[i] + 1);
-     high_prec_double sum    = m_[i] + q_mult_one   + mult1;
-     high_prec_double Edt = m_[i] - (x[i] * sum) + q_es;
-     
-     dxdt[i] = Edt.convert_to<double>();
-     
-     // dxdt[i + d] = (l_[i] + m_[i] + q_mult_one) * x[i + d] * -1 +
-    //    l_[i] * x[i] * x[i + d] * 2 +
-    //    q_ds;
-    //    
-     high_prec_double subtr = l_[i] * (x[i] * 2 - 1) - m_[i] - q_mult_one;        // l_[i] * (x[i] * 2) - (l_[i] + m_[i] + q_mult_one);
-     high_prec_double mult  = x[i + d] * subtr;
-     high_prec_double Ds    = mult + q_ds;
-     dxdt[i + d] = Ds.convert_to<double>();   
+      
+      for (size_t j = 0; j < d; ++j) {
+        long double dd = (x[j] - x[i]);
+        dxdt[i]     += q_[i][j] * dd;
+        
+        long double dd2 = (x[j + d] - x[i + d]);
+        dxdt[i + d] += q_[i][j] * dd2;
+      }
+      
     }
     return;
   }
-   */
-  /*
-     void operator()( const std::vector< double > &x ,
-                   std::vector<  double > &dxdt,
-                   const double  ) {
-       for (size_t i = 0; i < d; ++i) {
-        // dxdt[i] = m_[i] - (l_[i] + m_[i]) * x[i] +  l_[i] * x[i] * x[i];
-         
-         if (l_[i] != 0.0) {
-         
-           dxdt[i] = m_[i] - x[i] * (l_[i] * (m_[i] + x[i]));
-           
-          //dxdt[i + d] = (-1 * (l_[i] + m_[i]) + 2 * l_[i] * x[i]) * x[i + d];
-          
-           // dxdt[i + d] =  x[i + d] * (2 * l_[i] * x[i] - (l_[i] + m_[i]))
-           dxdt[i + d] =  x[i + d] * (l_[i] * (2 * x[i] - 1) - m_[i]);
-         } else {
-           dxdt[i] = m_[i];
-           dxdt[i + d] = -1 * x[i + d] * m_[i];
-        }
-         
-         
-         for (int j = 0; j < d; ++j) {
-           
-           long double dd = (x[j] - x[i]);
-           
-           dxdt[i] += q_[i][j] * dd;
-           
-           long double dd2 = (x[j + d] - x[i + d]);
-           dxdt[i + d] += q_[i][j] * dd2;
-         }
-        
-       }
-       return;
-     }
-     */    
      
-     
+
   double get_l(int index) const {
     return l_[index];
   } 
@@ -171,11 +104,11 @@ public:
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
- //   std::cerr << "ode_cla made\n";
     c_e = 0.0;
     c_d = 0.0;
   }
   
+  // rename to operator() to use this version of the operator, withouth kahan sum.
   void operator_base(const std::vector< double > &x ,
                 std::vector< double > &dxdt,
                 const double /* t */ ) const {
@@ -193,7 +126,7 @@ public:
           }
         }
       }
-      // dxdt[i] = Ef - x[i] * lambda_sum + m_[i] * (x[i] + 1); // remaining: Q_es - x[i] * Q_one
+
       dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum);
       dxdt[i + d] = Df - x[i + d] * (lambda_sum + m_[i]); //remaining: Q_ds - x[i+d] * Q_one
       
@@ -213,7 +146,6 @@ public:
     t = sum + add;
     c = (t - sum) - add;
     sum = t;
-  //  std::cerr << sum << " " << c << " " << add << "\n";
   }
   
   void operator()(const std::vector< double > &x ,
@@ -233,10 +165,8 @@ public:
           }
         }
       }
-      // dxdt[i] = Ef - x[i] * lambda_sum + m_[i] * (x[i] + 1); // remaining: Q_es - x[i] * Q_one
       dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum);
-      dxdt[i + d] = Df - x[i + d] * (lambda_sum + m_[i]); //remaining: Q_ds - x[i+d] * Q_one
-      
+      dxdt[i + d] = Df - x[i + d] * (lambda_sum + m_[i]); 
       
       for (size_t j = 0; j < d; ++j) {
         kahan_sum(dxdt[i],     c_e, q_[i][j] * (x[j]     - x[i]));
@@ -246,54 +176,12 @@ public:
     return;
   }
   
-  // code below can be renamed to 'operator()' to function
-  // but is incredibly slow.
-  void kahan_operator(const std::vector< double > &x ,
-                    std::vector< double > &dxdt,
-                    const double /* t */ ) {
-    
-    double c1 = 0.0;
-    double c2 = 0.0;
-    double c3 = 0.0; // correction factor for kahan-sum
-  
-    for (int i = 0; i < d; ++i) {
-      double lambda_sum(0.0);
-      double Df(0.0);
-      double Ef(0.0);
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
-          if (l_[i][j][k] != 0.0) { // slightly safer.
-            
-            kahan_sum(lambda_sum, c1, l_[i][j][k]);
-            kahan_sum(Df, c2, l_[i][j][k] * (x[j] * x[k + d] + x[j + d] * x[k]));
-            kahan_sum(Ef, c3, l_[i][j][k] * (x[j] * x[k]));
-          }
-        }
-      }
-      kahan_sum(dxdt[i], c_e, Ef - x[i] * lambda_sum + m_[i] * (x[i] + 1));
-      kahan_sum(dxdt[i + d], c_d, Df - x[i + d] * (lambda_sum + m_[i]));
-      
-      for (size_t j = 0; j < d; ++j) {
-        kahan_sum(dxdt[i], c_e, q_[i][j] * (x[j] - x[i]));
-        kahan_sum(dxdt[i + d], c_d, q_[i][j] * (x[j + d] - x[i + d]));
-      }
-    }
-    return;
-  }
   
   double get_l(size_t i, size_t j, size_t k) const {
-    
-    std::cerr << i << " " << j << " " << k << " " << l_[i][j][k] << "\n" <<  std::flush;
-    
     return l_[i][j][k];
   } 
-  
- /* size_t get_ll_size() const {
-    return l_.size();
- }*/
-  
+
   size_t get_d() const {
- //   std::cerr << "d: " << d << "\n";
     return d;
   }
   
@@ -308,7 +196,6 @@ private:
   double t;
 };
 
-namespace bno = boost::numeric::odeint;
 
 namespace odeintcpp {
 

@@ -16,7 +16,7 @@ using namespace Rcpp;
 #include <RcppParallel.h>
 
 
-using state_vec = std::vector<double>; 
+using state_vec  = std::vector<double>; 
 using state_node = tbb::flow::function_node< state_vec, state_vec>;
 using merge_node = tbb::flow::function_node< std::tuple<state_vec, state_vec>, state_vec>;
 using join_node  = tbb::flow::join_node< std::tuple<state_vec, state_vec>, tbb::flow::queueing >;
@@ -33,7 +33,17 @@ struct update_state {
     // extract log likelihood:
     double loglik = current_state.back(); current_state.pop_back();
     
-    bno::integrate(od_, current_state, 0.0, dt_, 0.1 * dt_);
+    std::unique_ptr<OD_OBJECT> od_ptr = std::make_unique<OD_OBJECT>(od_);
+    
+    odeintcpp::integrate("odeint::bulirsch_stoer", 
+                        std::move(od_ptr), // ode class object
+                        current_state, // state vector
+                        0.0,// t0
+                        dt_, // t1
+                        dt_ * 0.01, // dt
+                        1e-10,  // atol
+                        1e-10); // rtol 
+   
     normalize_loglik_node(current_state, loglik);
     current_state.push_back(loglik);
     
@@ -51,7 +61,6 @@ struct collect_ll {
 public:
   collect_ll( state_vec &ll ) : my_ll(ll) {}
   state_vec operator()( const state_vec& v ) {
-    // my_sum += get<0>(v) + get<1>(v);
     my_ll = v;
     return my_ll;
   }
