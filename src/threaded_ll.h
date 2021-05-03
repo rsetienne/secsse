@@ -93,10 +93,17 @@ public:
   od(od_in), ances(ances_in), for_time(for_time_in), states(states_in), num_threads(n_threads), d(od_in.get_d()) {
   }
   
-  Rcpp::List calc_ll() {
+  ~threaded_ll() {
+    for (auto i : state_nodes) delete i;
+    for (auto i : merge_nodes) delete i;
+    for (auto i : join_nodes)  delete i;
+    
     state_nodes.clear();
     merge_nodes.clear();
     join_nodes.clear();
+  }
+  
+  Rcpp::List calc_ll() {
     
     tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
     
@@ -138,8 +145,6 @@ public:
     tbb::flow::make_edge(*state_nodes[connections[1]], collect_nodeM);
     
   //  Rcpp::Rcout << "graph is setup\n"; force_output();
-    
-    
     for (size_t i = 0; i < num_tips; ++i) {
       tbb::flow::broadcast_node< state_vec > input(g);
       
@@ -168,7 +173,5 @@ public:
                               Rcpp::Named("loglik") = loglikelihood);
   }
 };
-
-
 
 #endif
