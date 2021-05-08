@@ -109,7 +109,7 @@ build_states <- function(phy,
   ## In a example of 3 states, the names of the colums would be like:
   ##
   ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
-  ##                   "D0A","D1A","D2B","D0B","D1B","D2B")
+  ##                   "D0A","D1A","D2A","D0B","D1B","D2B")
   states[1:nb_tip,] <- 0
   #if(is.matrix(traits)){ ## I repeat the process of state assignment as many times as columns I have
   for(iv in 1:ncol(traits)){
@@ -138,7 +138,7 @@ build_states <- function(phy,
       if(!is.null(extinct_species))
       {
         for(i in 1:length(extinct_species)){
-          states[which(phy$tip.label == extinct_species[i]),(d + 1):ly] <- mus
+          states[which(phy$tip.label == extinct_species[i]),(d + 1):ly] <- mus * states[which(phy$tip.label == extinct_species[i]),(d + 1):ly]
         }
       }
       for(iii in 1:nb_tip){
