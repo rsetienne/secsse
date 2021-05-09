@@ -197,7 +197,7 @@ cla_secsse_ml <- function(
   }
   
   if(length(idparsfix) != length(parsfix)){
-    stop("idparsfix and parsfix must be the same length.Number of fixed elements does not match the fixed figures")
+    stop("idparsfix and parsfix must be the same length. Number of fixed elements does not match the fixed figures")
   }
   
   if(anyDuplicated(c(idparsopt,idparsfix)) != 0){

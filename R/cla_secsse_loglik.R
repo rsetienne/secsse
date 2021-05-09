@@ -266,7 +266,7 @@ cla_secsse_loglik <- function(parameter,
   Q <- parameter[[3]]
   
   if(run_parallel == TRUE){ 
-    if(is.null(setting_calculation)){
+    if(is.null(setting_calculation) || is_complete_tree){
       check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- 
         build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
@@ -346,7 +346,7 @@ cla_secsse_loglik <- function(parameter,
       
     }
   } else {
-    if(is.null(setting_calculation)){
+    if(is.null(setting_calculation) || is_complete_tree){
       check_input(traits = traits,
                   phy = phy,
                   sampling_fraction= sampling_fraction,

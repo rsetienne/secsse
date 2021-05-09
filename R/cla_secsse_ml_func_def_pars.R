@@ -127,7 +127,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   see_ancestral_states <- FALSE
   if (is.null(idfactorsopt) == FALSE) {
     if (length(initfactors) != length(idfactorsopt)) {
-      stop("idfactorsopt should have the same length than initfactors.")
+      stop("idfactorsopt should have the same length as initfactors.")
     }
   }
   
@@ -139,7 +139,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   if (length(functions_defining_params) != length(idparsfuncdefpar)) {
     stop(
-      "the argument functions_defining_params should have the same length as idparsfuncdefpar"
+      "The argument functions_defining_params should have the same length as idparsfuncdefpar"
     )
   }
   
@@ -155,7 +155,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
   
   if (length(idparsfix) != length(parsfix)) {
     stop(
-      "idparsfix and parsfix must be the same length.Number of fixed elements does not match the fixed figures"
+      "idparsfix and parsfix must be the same length. Number of fixed elements does not match the fixed figures"
     )
   }
   
