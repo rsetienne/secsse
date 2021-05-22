@@ -29,15 +29,15 @@ cla_calThruNodes <- function(
   use_fortran,
   methode,
   phy,
-  func
+  func,
+  reltol,
+  abstol
 ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
   nb_node <- phy$Nnode
-  reltol <- 1e-12
-  abstol <- 1e-16
   hmax <- NULL
   ly <- ncol(states)
   d <- ncol(states)/2
@@ -57,7 +57,7 @@ cla_calThruNodes <- function(
     timeInte <- forTime[which(forTime[,2] == desNodes[desIndex]),3]
     ##  To make the calculation in both lineages
     
-    if(use_fortran == FALSE){
+    if(use_fortran == FALSE) {
        nodeMN <- deSolve::ode(y = y,
                               func = cla_secsse_loglik_rhs,
                               times = c(0,timeInte),
@@ -125,14 +125,10 @@ cla_doParalThing <- function(take_ancesSub,
                          use_fortran,
                          methode,
                          phy,
-                         func
+                         func,
+                         reltol,
+                         abstol
 ){
-  #cl <- makeCluster(2)
-  #registerDoParallel(cl)
-  
-  
-  
-  #.packages=c("foreach"),
   ii <- NULL
   rm(ii)
   statesNEW <- foreach::foreach (ii = 1:2,
@@ -161,7 +157,9 @@ cla_doParalThing <- function(take_ancesSub,
                                                           use_fortran = use_fortran,
                                                           methode = methode,
                                                           phy = phy,
-                                                          func = func)
+                                                          func = func,
+                                                          reltol = reltol,
+                                                          abstol = abstol)
                                        loglik <- calcul$loglik
                                        states <- calcul$states
                                      }
@@ -188,6 +186,8 @@ cla_doParalThing <- function(take_ancesSub,
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
 #' @param func function to be used in solving the ODE system. Currently only for testing purposes.
+#' @param reltol relative tolerance in integration
+#' @param abstol absolute tolerance in integration
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return The loglikelihood of the data given the parameters
 #' @examples
@@ -252,11 +252,13 @@ cla_secsse_loglik <- function(parameter,
                               loglik_penalty = 0,
                               is_complete_tree = FALSE,
                               func = ifelse(is_complete_tree,
-                                            "cla_secsse_runmod_ct",
+                                            "cla_secsse_runmod_ct_d",
                                             ifelse(use_fortran == FALSE,
                                                    cla_secsse_loglik_rhs,
                                                    "cla_secsse_runmod")
-                                            )
+                                            ),
+                              reltol = 1E-12,
+                              abstol = 1E-16
                               ){
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -264,13 +266,18 @@ cla_secsse_loglik <- function(parameter,
   Q <- parameter[[3]]
   
   if(run_parallel == TRUE){ 
-    if(is.null(setting_calculation)){
+    if(is.null(setting_calculation)) {
       check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
       setting_calculation <- 
         build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
     }
-    
     states <- setting_calculation$states
+    if(is_complete_tree) states <- build_states(phy = phy,
+                                                traits = traits,
+                                                num_concealed_states = num_concealed_states,
+                                                sampling_fraction = sampling_fraction,
+                                                is_complete_tree = is_complete_tree,
+                                                mus = mus)
     forTime <- setting_calculation$forTime
     ancesSub1 <- setting_calculation$ancesSub1
     ancesSub2 <- setting_calculation$ancesSub2
@@ -302,16 +309,17 @@ cla_secsse_loglik <- function(parameter,
         doMC::registerDoMC(2)
       } 
     }
-    statesNEW <- cla_doParalThing(take_ancesSub,
-                              states,
-                              loglik,
-                              forTime,
-                              parameter,
-                              use_fortran,
-                              methode,
-                              phy,
-                              func
-    )
+    statesNEW <- cla_doParalThing(take_ancesSub = take_ancesSub,
+                              states = states,
+                              loglik = loglik,
+                              forTime = forTime,
+                              parameter = parameter,
+                              use_fortran = use_fortran,
+                              methode = methode,
+                              phy = phy,
+                              func = func,
+                              reltol = reltol,
+                              abstol = abstol)
     
     comingfromSub1 <- statesNEW[[1]][[1]]
     comingfromSub2 <- statesNEW[[2]][[1]]
@@ -327,18 +335,43 @@ cla_secsse_loglik <- function(parameter,
     
     for(i in 1:length(ancesRest)){
       calcul <- 
-        cla_calThruNodes(ancesRest[i], states, loglik, forTime, parameter, use_fortran = use_fortran,methode = methode, phy = phy, func = func)
+        cla_calThruNodes(ances = ancesRest[i],
+                         states = states,
+                         loglik = loglik,
+                         forTime = forTime,
+                         parameter = parameter,
+                         use_fortran = use_fortran,
+                         methode = methode,
+                         phy = phy,
+                         func = func,
+                         reltol = reltol,
+                         abstol = abstol)
       states <- calcul$states
       loglik <- calcul$loglik
       
     }
   } else {
-    if(is.null(setting_calculation)){
-      check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
-      setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
+    if(is.null(setting_calculation)) {
+      check_input(traits = traits,
+                  phy = phy,
+                  sampling_fraction= sampling_fraction,
+                  root_state_weight = root_state_weight,
+                  is_complete_tree = is_complete_tree)
+      setting_calculation <- build_initStates_time(phy = phy,
+                                                   traits = traits,
+                                                   num_concealed_states = num_concealed_states,
+                                                   sampling_fraction = sampling_fraction,
+                                                   is_complete_tree = is_complete_tree,
+                                                   mus = mus)
     } 
     
     states <- setting_calculation$states
+    if(is_complete_tree) states <- build_states(phy = phy,
+                                                traits = traits,
+                                                num_concealed_states = num_concealed_states,
+                                                sampling_fraction = sampling_fraction,
+                                                is_complete_tree = is_complete_tree,
+                                                mus = mus)
     forTime <- setting_calculation$forTime
     ances <- setting_calculation$ances
     
@@ -354,15 +387,17 @@ cla_secsse_loglik <- function(parameter,
     d <- ncol(states)/2
     
     for(i in 1:length(ances)){
-      calcul <- cla_calThruNodes(ances[i],
-                                 states,
-                                 loglik,
-                                 forTime,
-                                 parameter,
+      calcul <- cla_calThruNodes(ances = ances[i],
+                                 states = states,
+                                 loglik = loglik,
+                                 forTime = forTime,
+                                 parameter = parameter,
                                  use_fortran = use_fortran,
                                  methode = methode,
                                  phy = phy,
-                                 func = func)
+                                 func = func,
+                                 reltol = reltol,
+                                 abstol = abstol)
       states <- calcul$states
       loglik <- calcul$loglik
       nodeN <- calcul$nodeN
@@ -373,76 +408,67 @@ cla_secsse_loglik <- function(parameter,
   nodeM <- calcul$nodeM
   
   ## At the root
-  
-  mergeBranch2 <- (mergeBranch)
+  mergeBranch2 <- mergeBranch
+  lmb <- length(mergeBranch2)
   if(is.numeric(root_state_weight)){
-    giveWeights <- root_state_weight/num_concealed_states
-    weightStates <- rep(giveWeights,num_concealed_states)
-    
+    weightStates <- rep(root_state_weight/num_concealed_states,num_concealed_states)
   } else {
     if(root_state_weight == "maddison_weights"){  
-      weightStates <- (mergeBranch2)/sum((mergeBranch2))
+      weightStates <- mergeBranch/sum(mergeBranch2)
     }
-    
     if(root_state_weight == "proper_weights"){
-      numerator <- NULL
-      for(j in 1:length(mergeBranch2)){
-        numerator <- c(numerator,
-                      (mergeBranch2[j]/(sum(lambdas[[j]] * (1 - nodeM[1:d][j])^2))))
+      numerator <- rep(NA,lmb)
+      for(j in 1:lmb){
+        #numerator[j] <- mergeBranch2[j]/(sum(lambdas[[j]] * (1 - nodeM[1:d][j])^2))
+        numerator[j] <- mergeBranch2[j]/sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
       }
-      denomin <- NULL
-      for(j in 1:length(mergeBranch2)){
-        denomin <- c(denomin,(mergeBranch2[j]/(sum(lambdas[[j]] * (1 -nodeM[1:d][j]) ^2))))
-      }
-      
-      weightStates <- numerator/sum(denomin)
+      weightStates <- numerator/sum(numerator)
     }
-    #     if(root_state_weight == "proper_weights"){
-    #   weightStates <- NULL
-    #   for(j in 1:length(mergeBranch2)){
-    #     weightStates <- c(weightStates,
-    #                      (mergeBranch2[j]/(sum(lambdas[[j]] * (1 - nodeM[1:d][j]) ^2)))/
-    #                        sum((mergeBranch2[j]/(sum(lambdas[[j]] * (1 -nodeM[1:d][j]) ^2)))))
-    #   }
-    # }
-    
     if(root_state_weight == "equal_weights"){  
-      weightStates <- rep(1/length(mergeBranch2),length(mergeBranch2))
+      weightStates <- rep(1/lmb,lmb)
     }
   }  
-  
+
   if(cond == "maddison_cond"){
-    preCond <- NULL
-    for(j in 1:length(weightStates)){
-      preCond <- c(preCond,
-                  sum(weightStates[j] * lambdas[[j]] *  (1 - nodeM[1:d][j]) ^ 2)
-      )
+    preCond <- rep(NA,lmb)
+    for(j in 1:lmb){
+      preCond[j] <- sum(weightStates[j] * lambdas[[j]] *  (1 - nodeM[1:d][j]) ^ 2)
+      #preCond[j] <- sum(weightStates[j] * lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
-    mergeBranch2 <- 
-      mergeBranch2/(sum(preCond))
+    mergeBranch2 <- mergeBranch2/sum(preCond)
   }
   
+  if(is_complete_tree) {
+    timeInte <- max(abs(ape::branching.times(phy)))
+    y <- rep(0,2 * lmb)
+    nodeMN <- ode_FORTRAN(y = y,
+                          func = 'cla_secsse_runmod_ct_e',
+                          times = c(0,timeInte),
+                          parms = parameter,
+                          rtol = reltol,
+                          atol = abstol,
+                          method = methode)
+    nodeM <- as.numeric(nodeMN[2,-1])
+  }
+
   if(cond == "proper_cond"){
-    preCond <- NULL
-    for(j in 1:length(mergeBranch2)){
-      preCond <- c(preCond,
-                  sum((lambdas[[j]] *  (1 - nodeM[1:d][j]) ^ 2)))
+    preCond <- rep(NA,lmb)
+    for(j in 1:lmb){
+      #preCond[j] <- sum((lambdas[[j]] * (1 - nodeM[1:d][j]) ^ 2))
+      preCond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
-    mergeBranch2 <- 
-      mergeBranch2/preCond
+    mergeBranch2 <- mergeBranch2/preCond
   }
   
-  atRoot <- ((mergeBranch2) * (weightStates))
-  
-  wholeLike <- sum(atRoot)
-  LL <- log(wholeLike) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
+  wholeLike_atRoot <- sum(mergeBranch2 * weightStates)
+  LL <- log(wholeLike_atRoot) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
   #print(unique(unlist(parameter[[1]]))); print(LL);  
   if(see_ancestral_states == TRUE){
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips+1):nrow(states),]
     ancestral_states <- ancestral_states[,-(1:(ncol(ancestral_states)/2))]
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states=ancestral_states,LL=LL))
+    return(list(ancestral_states = ancestral_states, LL = LL))
     } else {
     return(LL)
   }

@@ -25,7 +25,7 @@ cla_secsse_ml(
   run_parallel = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = "cla_secsse_runmod",
+  func = if (is_complete_tree) "cla_secsse_runmod_ct_d" else "cla_secsse_runmod",
   verbose = (optimmethod == "subplex")
 )
 }

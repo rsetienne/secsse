@@ -182,7 +182,7 @@ cla_secsse_ml <- function(
   run_parallel = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = 'cla_secsse_runmod',
+  func = if(is_complete_tree) 'cla_secsse_runmod_ct_d' else 'cla_secsse_runmod',
   verbose = (optimmethod == 'subplex')
 ){
   
@@ -197,7 +197,7 @@ cla_secsse_ml <- function(
   }
   
   if(length(idparsfix) != length(parsfix)){
-    stop("idparsfix and parsfix must be the same length.Number of fixed elements does not match the fixed figures")
+    stop("idparsfix and parsfix must be the same length. Number of fixed elements does not match the fixed figures")
   }
   
   if(anyDuplicated(c(idparsopt,idparsfix)) != 0){

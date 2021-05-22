@@ -20,8 +20,10 @@ cla_secsse_loglik(
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = ifelse(is_complete_tree, "cla_secsse_runmod_ct", ifelse(use_fortran == FALSE,
-    cla_secsse_loglik_rhs, "cla_secsse_runmod"))
+  func = ifelse(is_complete_tree, "cla_secsse_runmod_ct_d", ifelse(use_fortran ==
+    FALSE, cla_secsse_loglik_rhs, "cla_secsse_runmod")),
+  reltol = 1e-12,
+  abstol = 1e-16
 )
 }
 \arguments{
@@ -56,6 +58,10 @@ cla_secsse_loglik(
 \item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
 
 \item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
+
+\item{reltol}{relative tolerance in integration}
+
+\item{abstol}{absolute tolerance in integration}
 }
 \value{
 The loglikelihood of the data given the parameters
