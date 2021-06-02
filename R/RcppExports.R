@@ -11,10 +11,11 @@
 #' @param merge_branch_out
 #' @param node_M out
 #' @param num_threads
+#' @param method integration method
 #' @return log likelihood
 #' @export
-calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads) {
-    .Call(`_secsseCPP_calc_ll_threaded`, ll, mm, Q, ances, for_time, states, num_threads)
+calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads, method = "odeint::bulirsch_stoer") {
+    .Call(`_secsseCPP_calc_ll_threaded`, ll, mm, Q, ances, for_time, states, num_threads, method)
 }
 
 calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method) {
@@ -30,9 +31,10 @@ calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_th
 #' @param mus vector of mus
 #' @param Q q
 #' @param num_threads num threads
+#' @param method integration method
 #' @export
-calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads) {
-    .Call(`_secsseCPP_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads)
+calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads = 1L, method = "odeint::bulirsch_stoer") {
+    .Call(`_secsseCPP_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method)
 }
 
 cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol) {

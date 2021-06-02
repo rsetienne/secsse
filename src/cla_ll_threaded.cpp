@@ -42,24 +42,16 @@ struct combine_states_cla {
                            nodeM[j + d_] * nodeN[k + d_]);
             
             mergeBranch[i] += a * mult;
-            
-            if (j+d_ > nodeN.size()) mergeBranch[i] = -1;
-            if (j+d_ > nodeM.size()) mergeBranch[i] = -2;
-            if (k+d_ > nodeN.size()) mergeBranch[i] = -3;
-            if (k+d_ > nodeM.size()) mergeBranch[i] = -4;
-            
           }
         }
       }
+      mergeBranch[i] *= 0.5;
     }
     
     double loglik = ll1 + ll2;
     
-    // next line does get called:
     normalize_loglik(mergeBranch, loglik);
-    // output_vec(nodeN); // somehow doesn't get called
-    // output_vec(nodeM); // somehow doesn't get called
-    
+
     state_vec newstate(d_);
     for (int i = 0; i < d_; ++i) {
       newstate[i] = nodeM[i];
@@ -83,6 +75,7 @@ struct combine_states_cla {
 //' @param mus vector of mus
 //' @param Q q
 //' @param num_threads num threads
+//' @param method integration method
 //' @export
 // [[Rcpp::export]]
 Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
@@ -91,22 +84,9 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
                                 const Rcpp::List& lambdas_R,
                                 const Rcpp::NumericVector& mus_R,
                                 const Rcpp::NumericMatrix& Q,
-                                int num_threads) {
+                                int num_threads = 1,
+                                std::string method = "odeint::bulirsch_stoer") {
   try {
-    
-    // let's see if the list stuff works!
-    /* for (int i = 0; i < lambdas.size(); ++i) {
-     NumericMatrix temp = lambdas[i];
-     for (int j = 0; j < temp.nrow(); ++j) {
-     for (int k = 0; k < temp.ncol(); ++k) {
-     std::cerr << temp(j, k) << " ";  
-     }  std::cerr << "\n";
-     }
-     std::cerr << "\n\n";
-     std::cerr << i << "\n";
-     
-     }
-     */
     
     std::vector< std::vector< double >> states_cpp, for_time_cpp, Q_cpp;
     numericmatrix_to_vector(states_R, states_cpp);
@@ -117,17 +97,27 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
     
     std::vector<double> mus_cpp(mus_R.begin(), mus_R.end());
     
-    std::vector<std::vector<std::vector<double>>> lambdas_cpp;
+    std::vector< std::vector< std::vector< double > >> ll_cpp;
+    for (size_t i = 0; i < lambdas_R.size(); ++i) {
+      Rcpp::NumericMatrix temp = lambdas_R[i];
+      std::vector< std::vector< double >> temp2;
+      for (size_t j = 0; j < temp.nrow(); ++j) {
+        std::vector<double> row;
+        for (size_t k = 0; k < temp.ncol(); ++k) {
+          row.push_back(temp(j, k));  
+        }
+        temp2.push_back(row);
+      }
+      ll_cpp.push_back(temp2);
+    }
     
-    list_to_vector(lambdas_R, lambdas_cpp);
+    ode_cla od_(ll_cpp, mus_cpp, Q_cpp);
     
-    ode_cla od_(lambdas_cpp, mus_cpp, Q_cpp);
-    
-    threaded_ll<ode_cla, combine_states_cla> ll_calc(od_, ances_cpp, for_time_cpp, states_cpp, num_threads);
-    
-   // Rcout << "set up threaded_ll object\n"; force_output();
-    
+    threaded_ll<ode_cla, combine_states_cla> ll_calc(od_, ances_cpp, 
+                                                     for_time_cpp, states_cpp, 
+                                                     num_threads, method);
     return ll_calc.calc_ll();
+    
   } catch(std::exception &ex) {
     forward_exception_to_r(ex);
   } catch(...) {

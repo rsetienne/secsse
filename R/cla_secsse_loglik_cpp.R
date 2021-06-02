@@ -115,22 +115,22 @@ cla_secsse_loglik_cpp <- function(parameter,
   d <- ncol(states)/2
   
   calcul <- c()
- # if (num_threads == 1) {
-  ancescpp <- ances - 1
-  forTimecpp <- forTime
-  forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
-    calcul <- cla_calThruNodes_cpp(ancescpp,
-                                   states,
-                                   forTimecpp,
-                                   lambdas,
-                                   mus,
-                                   Q,
-                                   method,
-                                   atol,
-                                   rtol)
- # } else {
+  if (num_threads == 1) {
+    ancescpp <- ances - 1
+    forTimecpp <- forTime
+    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
+      calcul <- cla_calThruNodes_cpp(ancescpp,
+                                     states,
+                                     forTimecpp,
+                                     lambdas,
+                                     mus,
+                                     Q,
+                                     method,
+                                     atol,
+                                     rtol)
+  } else {
  # SWITCHED OFF MULTITHREADING FOR TESTING
-  if (1 == 2) {  
+  #if (1 == 2) {  
     # because C++ indexes from 0, we need to adjust the indexing:
     ancescpp <- ances - 1
     forTimecpp <- forTime

@@ -66,7 +66,6 @@ double calc_ll_cla(const Rcpp::List& ll,
   for (int a = 0; a < ances.size(); ++a) {
     double loglik = 0;
 
-    
     int focal = ances[a];
     std::vector<int> desNodes;
     std::vector<double> timeInte;
@@ -79,8 +78,6 @@ double calc_ll_cla(const Rcpp::List& ll,
       assert((focal_node) < states.size());
       
       y = states[focal_node];
-      
-   //   Rcpp::Rcout << i << " " << timeInte[i] << " " << y.size() << "\n"; force_output();
       
       std::unique_ptr<ode_cla> od_ptr = std::make_unique<ode_cla>(od);
       odeintcpp::integrate(method,
@@ -95,25 +92,19 @@ double calc_ll_cla(const Rcpp::List& ll,
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
-  //  Rcpp::Rcout << "done integrating\n";
-    
+
     normalize_loglik_node(nodeM, loglik); //Rcout << "nodeM: " << loglik<< "\n";
     normalize_loglik_node(nodeN, loglik); //Rcout << "nodeN: " << loglik<< "\n";
-    
-    std::vector<std::vector<double>> cross_M_N(d, std::vector<double>(d, 0.0));
-    for (size_t i = 0; i < d; ++i) {
-      for (size_t j = 0; j < d; ++j) {
-        cross_M_N[i][j] = nodeN[i + d] * nodeM[j + d] +
-                          nodeM[i + d] * nodeN[j + d];
-      }
-    }
     
     mergeBranch = std::vector<double>(d, 0.0);
     
     for (size_t i = 0; i < d; ++i) {
       for (size_t j = 0; j < d; ++j) {
         for (size_t k = 0; k < d; ++k) {
-          mergeBranch[i] += ll_cpp[i][j][k] * cross_M_N[j][k];
+          if (ll_cpp[i][j][k] != 0.0) {
+           mergeBranch[i] += ll_cpp[i][j][k] * (nodeN[j + d] * nodeM[k + d] +
+                                                nodeM[j + d] * nodeN[k + d]);
+          }
         }
       }
       mergeBranch[i] *= 0.5;
@@ -129,11 +120,8 @@ double calc_ll_cla(const Rcpp::List& ll,
     assert((focal) < states.size());
     states[focal] = newstate; // -1 because of R conversion to C++ indexing
     logliks[a] = loglik;
-    //Rcout << a << " " << loglik << "\n";
   }
 
- // merge_branch_out = NumericVector(mergeBranch.begin(), mergeBranch.end());
-// nodeM_out = NumericVector(nodeM.begin(), nodeM.end());
   for (int i = 0; i < mergeBranch.size(); ++i) {
     merge_branch_out.push_back(mergeBranch[i]);
   }
@@ -181,18 +169,6 @@ try {
   NumericMatrix states_out;
   vector_to_numericmatrix(states, states_out);
 
-/*  Rcpp::Rcout << loglik << "\n";
-  Rcpp::Rcout << "mergeBranch: ";
-  for (auto i : mergeBranch) {
-    Rcpp::Rcout << i << " ";
-  } Rcpp::Rcout << "\n";
-  
-  Rcpp::Rcout << "nodeM: ";
-  for (auto i : nodeM) {
-    Rcpp::Rcout << i << " ";
-  } Rcpp::Rcout << "\n";
-  */
-  
   Rcpp::List output = Rcpp::List::create( Named("states") = states_out,
                                           Named("loglik") = loglik,
                                           Named("mergeBranch") = mergeBranch,

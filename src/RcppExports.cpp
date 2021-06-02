@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // calc_ll_threaded
-Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& for_time, const Rcpp::NumericMatrix& states, int num_threads);
-RcppExport SEXP _secsseCPP_calc_ll_threaded(SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP ancesSEXP, SEXP for_timeSEXP, SEXP statesSEXP, SEXP num_threadsSEXP) {
+Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& for_time, const Rcpp::NumericMatrix& states, int num_threads, std::string method);
+RcppExport SEXP _secsseCPP_calc_ll_threaded(SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP ancesSEXP, SEXP for_timeSEXP, SEXP statesSEXP, SEXP num_threadsSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -18,7 +18,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type for_time(for_timeSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type states(statesSEXP);
     Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_ll_threaded(ll, mm, Q, ances, for_time, states, num_threads));
+    Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_ll_threaded(ll, mm, Q, ances, for_time, states, num_threads, method));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -43,8 +44,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_cla_ll_threaded
-Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas_R, const Rcpp::NumericVector& mus_R, const Rcpp::NumericMatrix& Q, int num_threads);
-RcppExport SEXP _secsseCPP_calc_cla_ll_threaded(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdas_RSEXP, SEXP mus_RSEXP, SEXP QSEXP, SEXP num_threadsSEXP) {
+Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas_R, const Rcpp::NumericVector& mus_R, const Rcpp::NumericMatrix& Q, int num_threads, std::string method);
+RcppExport SEXP _secsseCPP_calc_cla_ll_threaded(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdas_RSEXP, SEXP mus_RSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -55,7 +56,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mus_R(mus_RSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
     Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_cla_ll_threaded(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads));
+    Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_cla_ll_threaded(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -80,9 +82,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_secsseCPP_calc_ll_threaded", (DL_FUNC) &_secsseCPP_calc_ll_threaded, 7},
+    {"_secsseCPP_calc_ll_threaded", (DL_FUNC) &_secsseCPP_calc_ll_threaded, 8},
     {"_secsseCPP_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_calThruNodes_cpp, 10},
-    {"_secsseCPP_calc_cla_ll_threaded", (DL_FUNC) &_secsseCPP_calc_cla_ll_threaded, 7},
+    {"_secsseCPP_calc_cla_ll_threaded", (DL_FUNC) &_secsseCPP_calc_cla_ll_threaded, 8},
     {"_secsseCPP_cla_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_cla_calThruNodes_cpp, 9},
     {NULL, NULL, 0}
 };

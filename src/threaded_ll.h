@@ -25,7 +25,8 @@ template<typename OD_OBJECT>
 struct update_state {
   
   update_state(double dt, int id,
-               const OD_OBJECT& od) : dt_(dt), id_(id), od_(od) {}
+               const OD_OBJECT& od,
+               std::string m) : dt_(dt), id_(id), od_(od), method(m) {}
   
   
   state_vec operator()(const state_vec& input) {
@@ -35,15 +36,15 @@ struct update_state {
     
     std::unique_ptr<OD_OBJECT> od_ptr = std::make_unique<OD_OBJECT>(od_);
     
-    odeintcpp::integrate("odeint::bulirsch_stoer", 
-                        std::move(od_ptr), // ode class object
-                        current_state, // state vector
-                        0.0,// t0
-                        dt_, // t1
-                        dt_ * 0.01, // dt
-                        1e-10,  // atol
-                        1e-10); // rtol 
-   
+    odeintcpp::integrate(method, 
+                         std::move(od_ptr), // ode class object
+                         current_state, // state vector
+                         0.0,// t0
+                         dt_, // t1
+                         dt_ * 0.1, // dt
+                         1e-10,  // atol
+                         1e-10); // rtol 
+    
     normalize_loglik_node(current_state, loglik);
     current_state.push_back(loglik);
     
@@ -53,6 +54,7 @@ struct update_state {
   double dt_;
   int id_;
   OD_OBJECT od_;
+  std::string method;
 };
 
 
@@ -69,7 +71,7 @@ public:
 
 template <typename OD_OBJECT, typename MERGE_STATE>
 struct threaded_ll {
-
+  
 private:  
   std::vector< state_node* > state_nodes;
   std::vector< merge_node* > merge_nodes;
@@ -80,17 +82,22 @@ private:
   const std::vector<int> ances;
   const std::vector< std::vector< double >> for_time;
   const std::vector<std::vector<double>> states;
-  const int num_threads;
+  int num_threads;
   const int d;
-
+  const std::string method;
+  
 public:
   
   threaded_ll(const OD_OBJECT& od_in,
               const std::vector<int>& ances_in,
               const std::vector< std::vector< double >>& for_time_in,
               const std::vector< std::vector< double >>& states_in,
-              int n_threads) :
-  od(od_in), ances(ances_in), for_time(for_time_in), states(states_in), num_threads(n_threads), d(od_in.get_d()) {
+              int n_threads,
+              std::string m) :
+  od(od_in), ances(ances_in), for_time(for_time_in), states(states_in), num_threads(n_threads), d(od_in.get_d()), method(m) {
+    if (num_threads < 0) {
+      num_threads = tbb::task_scheduler_init::default_num_threads();
+    }
   }
   
   ~threaded_ll() {
@@ -105,16 +112,18 @@ public:
   
   Rcpp::List calc_ll() {
     
-    tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
+   // tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
+    
+    tbb::global_control   gc(tbb::global_control::max_allowed_parallelism, num_threads);
     
     int num_tips = ances.size() + 1;
-
+    
     // connect flow graph
     tbb::flow::broadcast_node<double> start(g);
     
     for (size_t i = 0; i < states.size() + 1; ++i) {
       double dt = get_dt(for_time, i); 
-      auto new_node = new state_node(g, tbb::flow::unlimited, update_state<OD_OBJECT>(dt, i, od));
+      auto new_node = new state_node(g, tbb::flow::unlimited, update_state<OD_OBJECT>(dt, i, od, method));
       state_nodes.push_back(new_node);
     }
     
@@ -144,7 +153,7 @@ public:
     tbb::flow::function_node< state_vec, state_vec> collect_nodeM( g, tbb::flow::serial, collect_ll(nodeM) );
     tbb::flow::make_edge(*state_nodes[connections[1]], collect_nodeM);
     
-  //  Rcpp::Rcout << "graph is setup\n"; force_output();
+    //  Rcpp::Rcout << "graph is setup\n"; force_output();
     for (size_t i = 0; i < num_tips; ++i) {
       tbb::flow::broadcast_node< state_vec > input(g);
       
@@ -152,13 +161,13 @@ public:
       
       std::vector<double> startvec = states[i];
       startvec.push_back(0.0);
-
+      
       input.try_put(startvec);
     }  
     
     g.wait_for_all();
-
-  //  Rcpp::Rcout << "graph fully ran through\n"; force_output();
+    
+    //  Rcpp::Rcout << "graph fully ran through\n"; force_output();
     
     double loglikelihood = output.back();
     

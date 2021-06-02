@@ -109,7 +109,7 @@ public:
   }
   
   // rename to operator() to use this version of the operator, withouth kahan sum.
-  void operator_base(const std::vector< double > &x ,
+  void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,
                 const double /* t */ ) const {
     
@@ -148,7 +148,7 @@ public:
     sum = t;
   }
   
-  void operator()(const std::vector< double > &x ,
+  void operator_kahan(const std::vector< double > &x ,
                       std::vector< double > &dxdt,
                       const double /* t */ ) {
     

@@ -27,7 +27,7 @@ struct combine_states {
     
     state_vec mergeBranch(d_);
     for (int i = 0; i < d_; ++i) {
-      mergeBranch[i] = vec2[i + d_] * vec1[i + d_] * od_.get_l(i);
+      mergeBranch[i] = vec1[i + d_] * vec2[i + d_] * od_.get_l(i);
     }
     
     double loglik = ll1 + ll2;
@@ -58,6 +58,7 @@ struct combine_states {
 //' @param merge_branch_out
 //' @param node_M out
 //' @param num_threads
+//' @param method integration method
 //' @return log likelihood
 //' @export
 // [[Rcpp::export]]
@@ -67,7 +68,8 @@ Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
                             const Rcpp::NumericVector& ances,
                             const Rcpp::NumericMatrix& for_time,
                             const Rcpp::NumericMatrix& states,
-                            int num_threads) {
+                            int num_threads,
+                            std::string method = "odeint::bulirsch_stoer") {
   try {
     std::vector< int > ances_cpp(ances.begin(), ances.end());
     
@@ -79,7 +81,9 @@ Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
     
     ode_standard od_(ll, mm, Q);
     
-    threaded_ll<ode_standard, combine_states> ll_calc(od_, ances_cpp, for_time_cpp, states_cpp, num_threads);
+    threaded_ll<ode_standard, combine_states> ll_calc(od_, ances_cpp, 
+                                                      for_time_cpp, states_cpp, 
+                                                      num_threads, method);
     return ll_calc.calc_ll();
     
   } catch(std::exception &ex) {
