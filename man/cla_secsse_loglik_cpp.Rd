@@ -17,9 +17,9 @@ cla_secsse_loglik_cpp(
   loglik_penalty = 0,
   is_complete_tree = FALSE,
   num_threads = 1,
-  method,
-  atol,
-  rtol
+  method = "odeint::bulirsch_stoer",
+  atol = 1e-12,
+  rtol = 1e-12
 )
 }
 \arguments{

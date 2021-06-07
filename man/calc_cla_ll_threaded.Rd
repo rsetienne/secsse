@@ -11,7 +11,9 @@ calc_cla_ll_threaded(
   lambdas_R,
   mus_R,
   Q,
-  num_threads
+  num_threads = 1L,
+  method = "odeint::bulirsch_stoer",
+  is_complete_tree = FALSE
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ calc_cla_ll_threaded(
 \item{Q}{q}
 
 \item{num_threads}{num threads}
+
+\item{method}{integration method}
+
+\item{is_complete_tree}{is complete tree?}
 
 \item{forTime_r}{ff}
 

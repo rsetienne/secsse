@@ -4,7 +4,16 @@
 \alias{calc_ll_threaded}
 \title{ll threaded}
 \usage{
-calc_ll_threaded(ll, mm, Q, ances, for_time, states, num_threads)
+calc_ll_threaded(
+  ll,
+  mm,
+  Q,
+  ances,
+  for_time,
+  states,
+  num_threads,
+  method = "odeint::bulirsch_stoer"
+)
 }
 \arguments{
 \item{ll}{lambdas}
@@ -18,6 +27,8 @@ calc_ll_threaded(ll, mm, Q, ances, for_time, states, num_threads)
 \item{for_time}{fortime}
 
 \item{states}{states matrix}
+
+\item{method}{integration method}
 
 \item{node_M}{out}
 }
