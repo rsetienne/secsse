@@ -74,9 +74,9 @@ cla_secsse_loglik_cpp <- function(parameter,
                                   loglik_penalty = 0,
                                   is_complete_tree = FALSE,
                                   num_threads = 1,
-                                  method,
-                                  atol,
-                                  rtol) {
+                                  method = "odeint::bulirsch_stoer",
+                                  atol = 1e-12,
+                                  rtol = 1e-12) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -127,10 +127,9 @@ cla_secsse_loglik_cpp <- function(parameter,
                                      Q,
                                      method,
                                      atol,
-                                     rtol)
+                                     rtol,
+                                     is_complete_tree)
   } else {
- # SWITCHED OFF MULTITHREADING FOR TESTING
-  #if (1 == 2) {  
     # because C++ indexes from 0, we need to adjust the indexing:
     ancescpp <- ances - 1
     forTimecpp <- forTime
@@ -143,7 +142,9 @@ cla_secsse_loglik_cpp <- function(parameter,
                                      lambdas,
                                      mus,
                                      Q,
-                                     1)
+                                     1,
+                                     method,
+                                     is_complete_tree)
     } else {
       calcul <- calc_cla_ll_threaded(ancescpp,
                                      states,
@@ -151,7 +152,9 @@ cla_secsse_loglik_cpp <- function(parameter,
                                      lambdas,
                                      mus,
                                      Q,
-                                     num_threads)
+                                     num_threads,
+                                     method,
+                                     is_complete_tree)
     }
   }
   

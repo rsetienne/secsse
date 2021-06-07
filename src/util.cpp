@@ -4,7 +4,6 @@
 #include "util.h"
 
 void force_output() {
-  //  std::this_thread::sleep_for(std::chrono::nanoseconds(100));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   R_FlushConsole();
   R_ProcessEvents();
@@ -64,20 +63,15 @@ std::vector<int> find_connections(const std::vector< std::vector<double>>& phy_e
 }
 
 
-
-
 double get_time_inte(const std::vector< std::vector<double>>& forTime,
                      int focal_node) {
-  //     timeInte <- forTime[which(forTime[,2] == desNodes[desIndex]), 3]
-
+  //  R code:   timeInte <- forTime[which(forTime[,2] == desNodes[desIndex]), 3]
   for (const auto& i : forTime) {
     if (i[1] == focal_node) {
-      //      double output = ;
       return(i[2]);
     }
   }
   return 0.0;
-  // stop("could not find time inte");
 }
 
 

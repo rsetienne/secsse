@@ -17,9 +17,10 @@ using namespace Rcpp;
 
 #include "threaded_ll.h"
 
+template< typename OD_TYPE>
 struct combine_states_cla {
   
-  combine_states_cla(int d, const ode_cla& od) : d_(d), od_(od) {}
+  combine_states_cla(int d, const OD_TYPE& od) : d_(d), od_(od) {}
   
   state_vec operator()(const std::tuple< state_vec, state_vec >& input_states) {
     
@@ -63,7 +64,7 @@ struct combine_states_cla {
   }
   
   size_t d_;
-  ode_cla od_;
+  OD_TYPE od_;
 };
 
 //' cla log likelihood using tbb flow
@@ -76,6 +77,7 @@ struct combine_states_cla {
 //' @param Q q
 //' @param num_threads num threads
 //' @param method integration method
+//' @param is_complete_tree is complete tree?
 //' @export
 // [[Rcpp::export]]
 Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
@@ -85,7 +87,8 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericVector& mus_R,
                                 const Rcpp::NumericMatrix& Q,
                                 int num_threads = 1,
-                                std::string method = "odeint::bulirsch_stoer") {
+                                std::string method = "odeint::bulirsch_stoer",
+                                bool is_complete_tree = false) {
   try {
     
     std::vector< std::vector< double >> states_cpp, for_time_cpp, Q_cpp;
@@ -111,12 +114,22 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
       ll_cpp.push_back(temp2);
     }
     
-    ode_cla od_(ll_cpp, mus_cpp, Q_cpp);
-    
-    threaded_ll<ode_cla, combine_states_cla> ll_calc(od_, ances_cpp, 
-                                                     for_time_cpp, states_cpp, 
-                                                     num_threads, method);
-    return ll_calc.calc_ll();
+    if (is_complete_tree) {
+      ode_cla_ct od_(ll_cpp, mus_cpp, Q_cpp);
+      
+      threaded_ll<ode_cla_ct, combine_states_cla<ode_cla_ct>  > ll_calc(od_, ances_cpp, 
+                                                       for_time_cpp, states_cpp, 
+                                                       num_threads, method);
+      return ll_calc.calc_ll();
+    } else {
+      
+      ode_cla od_(ll_cpp, mus_cpp, Q_cpp);
+      
+      threaded_ll<ode_cla, combine_states_cla<ode_cla> > ll_calc(od_, ances_cpp, 
+                                                                 for_time_cpp, states_cpp, 
+                                                                 num_threads, method);
+      return ll_calc.calc_ll();
+    } 
     
   } catch(std::exception &ex) {
     forward_exception_to_r(ex);

@@ -5,6 +5,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+template <typename ODE_TYPE>
 double calc_ll_cla(const Rcpp::List& ll,
                    const Rcpp::NumericVector& mm,
                    const Rcpp::NumericMatrix& Q,
@@ -41,7 +42,7 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector< std::vector<double >> Q_cpp;
   numericmatrix_to_vector(Q, Q_cpp);
   
-  ode_cla od(ll_cpp, mm_cpp, Q_cpp);
+  ODE_TYPE od(ll_cpp, mm_cpp, Q_cpp);
 
   size_t d = od.get_d();
 
@@ -79,7 +80,7 @@ double calc_ll_cla(const Rcpp::List& ll,
       
       y = states[focal_node];
       
-      std::unique_ptr<ode_cla> od_ptr = std::make_unique<ode_cla>(od);
+      std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr), // ode class object
                            y,// state vector
@@ -110,7 +111,7 @@ double calc_ll_cla(const Rcpp::List& ll,
       mergeBranch[i] *= 0.5;
     }
     
-    normalize_loglik(mergeBranch, loglik); //Rcout << "mergeBranch: " << loglik<< "\n";
+    normalize_loglik(mergeBranch, loglik);
     
     std::vector<double> newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
@@ -144,7 +145,8 @@ Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& Q,
                                 std::string method,
                                 double atol,
-                                double rtol) {
+                                double rtol,
+                                bool is_complete_tree) {
 
 try {
   std::vector< std::vector< double >> states, forTime;
@@ -156,15 +158,28 @@ try {
 
  // Rcout << "welcome into cla_calThruNodes_cpp\n"; force_output();
 
-  double loglik = calc_ll_cla(lambdas,
-                               mus,
-                               Q,
-                               std::vector<int>(ances.begin(), ances.end()),
-                               forTime,
-                               states,
-                               mergeBranch,
-                               nodeM,
-                               method, atol, rtol);
+ double loglik = 0.0;
+ if (is_complete_tree) {
+   loglik = calc_ll_cla< ode_cla_ct >(lambdas,
+                                      mus,
+                                      Q,
+                                      std::vector<int>(ances.begin(), ances.end()),
+                                      forTime,
+                                      states,
+                                      mergeBranch,
+                                      nodeM,
+                                      method, atol, rtol);
+ } else {
+   loglik = calc_ll_cla< ode_cla >(lambdas,
+                                   mus,
+                                   Q,
+                                   std::vector<int>(ances.begin(), ances.end()),
+                                   forTime,
+                                   states,
+                                   mergeBranch,
+                                   nodeM,
+                                   method, atol, rtol);
+ }
 
   NumericMatrix states_out;
   vector_to_numericmatrix(states, states_out);

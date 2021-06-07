@@ -44,8 +44,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_cla_ll_threaded
-Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas_R, const Rcpp::NumericVector& mus_R, const Rcpp::NumericMatrix& Q, int num_threads, std::string method);
-RcppExport SEXP _secsseCPP_calc_cla_ll_threaded(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdas_RSEXP, SEXP mus_RSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP methodSEXP) {
+Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas_R, const Rcpp::NumericVector& mus_R, const Rcpp::NumericMatrix& Q, int num_threads, std::string method, bool is_complete_tree);
+RcppExport SEXP _secsseCPP_calc_cla_ll_threaded(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdas_RSEXP, SEXP mus_RSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -57,13 +57,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
     Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
     Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_cla_ll_threaded(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method));
+    Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_cla_ll_threaded(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method, is_complete_tree));
     return rcpp_result_gen;
 END_RCPP
 }
 // cla_calThruNodes_cpp
-Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol);
-RcppExport SEXP _secsseCPP_cla_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP) {
+Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol, bool is_complete_tree);
+RcppExport SEXP _secsseCPP_cla_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -76,7 +77,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type atol(atolSEXP);
     Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
-    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_cpp(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol));
+    Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_cpp(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -84,8 +86,8 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_secsseCPP_calc_ll_threaded", (DL_FUNC) &_secsseCPP_calc_ll_threaded, 8},
     {"_secsseCPP_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_calThruNodes_cpp, 10},
-    {"_secsseCPP_calc_cla_ll_threaded", (DL_FUNC) &_secsseCPP_calc_cla_ll_threaded, 8},
-    {"_secsseCPP_cla_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_cla_calThruNodes_cpp, 9},
+    {"_secsseCPP_calc_cla_ll_threaded", (DL_FUNC) &_secsseCPP_calc_cla_ll_threaded, 9},
+    {"_secsseCPP_cla_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_cla_calThruNodes_cpp, 10},
     {NULL, NULL, 0}
 };
 

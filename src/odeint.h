@@ -97,7 +97,7 @@ private:
 };
 
 
-class ode_cla{
+class ode_cla {
 public:
   
   ode_cla(const std::vector<std::vector<std::vector<double>>>& l,
@@ -106,6 +106,15 @@ public:
   l_(l), m_(m), q_(q), d(m.size()) {
     c_e = 0.0;
     c_d = 0.0;
+    
+    lambda_sum =std::vector<double>(d, 0.0);
+    for (int i = 0; i < d; ++i) {
+      for (int j = 0; j < d; ++j) {
+        for (int k = 0; k < d; ++k) {
+          lambda_sum[i] += l_[i][j][k];
+        }
+      }
+    }
   }
   
   // rename to operator() to use this version of the operator, withouth kahan sum.
@@ -114,21 +123,19 @@ public:
                 const double /* t */ ) const {
     
     for (int i = 0; i < d; ++i) {
-      double lambda_sum(0.0);
       double Df(0.0);
       double Ef(0.0);
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0.0) { // slightly safer.
-            lambda_sum += l_[i][j][k];
             Df +=         l_[i][j][k] * (x[j] * x[k + d] + x[j + d] * x[k]);
             Ef +=         l_[i][j][k] * (x[j] * x[k]);
           }
         }
       }
 
-      dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum);
-      dxdt[i + d] = Df - x[i + d] * (lambda_sum + m_[i]); //remaining: Q_ds - x[i+d] * Q_one
+      dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum[i]);
+      dxdt[i + d] = Df - x[i + d] * (lambda_sum[i] + m_[i]); //remaining: Q_ds - x[i+d] * Q_one
       
       for (size_t j = 0; j < d; ++j) {
         // q_[i][j] is always non-zero.
@@ -153,20 +160,18 @@ public:
                       const double /* t */ ) {
     
     for (int i = 0; i < d; ++i) {
-      double lambda_sum = 0.0;
       double Df = 0.0;
       double Ef = 0.0;
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0.0) { // slightly safer.
-            lambda_sum += l_[i][j][k];
-            Df +=         l_[i][j][k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+             Df +=         l_[i][j][k] * (x[j] * x[k + d] + x[j + d] * x[k]);
             Ef +=         l_[i][j][k] * (x[j] * x[k]);
           }
         }
       }
-      dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum);
-      dxdt[i + d] = Df - x[i + d] * (lambda_sum + m_[i]); 
+      dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum[i]);
+      dxdt[i + d] = Df - x[i + d] * (lambda_sum[i] + m_[i]); 
       
       for (size_t j = 0; j < d; ++j) {
         kahan_sum(dxdt[i],     c_e, q_[i][j] * (x[j]     - x[i]));
@@ -190,10 +195,60 @@ private:
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
   const size_t d;
+  std::vector<double> lambda_sum;
   // kahan sum parameters:
   double c_e;
   double c_d;
   double t;
+};
+
+class ode_cla_ct {
+public:
+  
+  ode_cla_ct(const std::vector<std::vector<std::vector<double>>>& l,
+          const std::vector<double>& m,
+          const std::vector<std::vector<double>>& q) :
+  l_(l), m_(m), q_(q), d(m.size()) { 
+    lambda_sum =std::vector<double>(d, 0.0);
+    for (int i = 0; i < d; ++i) {
+      for (int j = 0; j < d; ++j) {
+        for (int k = 0; k < d; ++k) {
+          lambda_sum[i] += l_[i][j][k];
+        }
+      }
+    }
+    
+    
+  }
+  
+  // rename to operator() to use this version of the operator, withouth kahan sum.
+  void operator()(const std::vector< double > &x ,
+                std::vector< double > &dxdt,
+                const double /* t */ ) const {
+    
+   std::vector<double> dC(d, 0);
+   for (int i = 0; i < d; ++i) {
+     dxdt[i + d] = - (lambda_sum[i] + m_[i]) * x[i + d];
+     for (int j = 0; j < d; ++j) {
+      dxdt[i + d] += q_[i][j] * (x[j + d] - x[i + d]);
+     }
+   }
+  }
+  
+  double get_l(size_t i, size_t j, size_t k) const {
+    return l_[i][j][k];
+  } 
+  
+  size_t get_d() const {
+    return d;
+  }
+  
+private:
+  const std::vector< std::vector< std::vector< double > > > l_;
+  const std::vector< double > m_;
+  const std::vector< std::vector< double >> q_;
+  const size_t d;
+  std::vector<double> lambda_sum;
 };
 
 
