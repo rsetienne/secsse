@@ -1,3 +1,22 @@
+cla_secsse_runmod_ct_e_R <- function(t, y, parameter) {
+  d <- length(y)
+  
+  Es <- y[1:d]
+  lambdas <- parameter[[1]]
+  mus <- parameter[[2]]
+  Q <- parameter[[3]]
+  diag(Q) <- 0
+  
+  dE <- -((unlist(lapply(lambdas, sum))) + mus + Q %*% (rep(1, d))) *
+    Es +
+    (Q %*% Es) +
+    mus +
+    unlist(lapply(lapply(lambdas, "*", Es %*% t(Es)), sum))
+  
+  return(list(c(dE)))
+}
+
+
 #' Logikelihood calculation for the cla_SecSSE model given a set of parameters and data using Rcpp
 #' @title Likelihood for SecSSE model, using Rcpp
 #' @param parameter list where the first is a table where lambdas across different modes of speciation are shown, the second mus and the third transition rates.
@@ -167,28 +186,37 @@ cla_secsse_loglik_cpp <- function(parameter,
   ## At the root
   mergeBranch2 <- mergeBranch
   lmb <- length(mergeBranch2)
-  if(is.numeric(root_state_weight)){
+  if (is.numeric(root_state_weight)) {
     weightStates <- rep(root_state_weight/num_concealed_states,num_concealed_states)
   } else {
-    if(root_state_weight == "maddison_weights"){  
+    if (root_state_weight == "maddison_weights") {  
       weightStates <- mergeBranch/sum(mergeBranch2)
     }
-    if(root_state_weight == "proper_weights"){
+    if (root_state_weight == "proper_weights") {
       numerator <- rep(NA,lmb)
-      for(j in 1:lmb){
+      for (j in 1:lmb) {
         #numerator[j] <- mergeBranch2[j]/(sum(lambdas[[j]] * (1 - nodeM[1:d][j])^2))
         numerator[j] <- mergeBranch2[j]/sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
       }
       weightStates <- numerator/sum(numerator)
     }
-    if(root_state_weight == "equal_weights"){  
+    if (root_state_weight == "equal_weights") {  
       weightStates <- rep(1/lmb,lmb)
     }
   }  
   
-  if(cond == "maddison_cond"){
+  if (cond == "maddison_cond") { 
     preCond <- rep(NA,lmb)
-    for(j in 1:lmb){
+    for (j in 1:lmb) {
+      if (root_state_weight == "equal_weights") {  
+        weightStates <- rep(1 / lmb,lmb)
+      }
+    }
+  }  
+  
+  if (cond == "maddison_cond") {
+    preCond <- rep(NA,lmb)
+    for (j in 1:lmb) {
       preCond[j] <- sum(weightStates[j] * lambdas[[j]] *  (1 - nodeM[1:d][j]) ^ 2)
       #preCond[j] <- sum(weightStates[j] * lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
@@ -200,39 +228,33 @@ cla_secsse_loglik_cpp <- function(parameter,
     y <- rep(0,2 * lmb)
     
     nodeMN <- deSolve::ode(y = y,
-                           func = cla_secsse_loglik_rhs,
+                           func = cla_secsse_runmod_ct_e_R,
                            times = c(0, timeInte),
                            parms = parameter,
                            rtol = rtol,
                            atol = atol,
                            method = "ode45")
     
-   # nodeMN <- ode_FORTRAN(y = y,
-   #                        func = 'cla_secsse_runmod_ct_e',
-   #                        times = c(0,timeInte),
-   #                        parms = parameter,
-   #                        rtol = reltol,
-   #                        atol = abstol,
-  #                        method = methode)
     nodeM <- as.numeric(nodeMN[2,-1])
+    nodeM <- as.numeric(nodeMN[2, -1])
   }
   
-  if(cond == "proper_cond"){
-    preCond <- rep(NA,lmb)
-    for(j in 1:lmb){
-      #preCond[j] <- sum((lambdas[[j]] * (1 - nodeM[1:d][j]) ^ 2))
+  if (cond == "proper_cond") {
+    preCond <- rep(NA, lmb)
+    for (j in 1:lmb) {
       preCond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
     mergeBranch2 <- mergeBranch2/preCond
   }
   
   wholeLike_atRoot <- sum(mergeBranch2 * weightStates)
-  LL <- log(wholeLike_atRoot) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
+  LL <- log(wholeLike_atRoot) + loglik - penalty(pars = parameter, 
+                                                 loglik_penalty = loglik_penalty)
   #print(unique(unlist(parameter[[1]]))); print(LL);  
-  if(see_ancestral_states == TRUE){
+  if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips+1):nrow(states),]
-    ancestral_states <- ancestral_states[,-(1:(ncol(ancestral_states)/2))]
+    ancestral_states <- states[(num_tips + 1):nrow(states), ]
+    ancestral_states <- ancestral_states[, -(1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL))
   } else {
