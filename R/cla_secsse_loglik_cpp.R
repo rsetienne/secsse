@@ -165,67 +165,74 @@ cla_secsse_loglik_cpp <- function(parameter,
   loglik <- calcul$loglik
   
   ## At the root
-  mergeBranch2 <- (mergeBranch)
-  if (is.numeric(root_state_weight)) {
-    giveWeights <- root_state_weight/num_concealed_states
-    weightStates <- rep(giveWeights, num_concealed_states)
-    
+  mergeBranch2 <- mergeBranch
+  lmb <- length(mergeBranch2)
+  if(is.numeric(root_state_weight)){
+    weightStates <- rep(root_state_weight/num_concealed_states,num_concealed_states)
   } else {
-    if (root_state_weight == "maddison_weights") {
-      weightStates <- (mergeBranch2)/sum((mergeBranch2))
+    if(root_state_weight == "maddison_weights"){  
+      weightStates <- mergeBranch/sum(mergeBranch2)
     }
+    if(root_state_weight == "proper_weights"){
+      numerator <- rep(NA,lmb)
+      for(j in 1:lmb){
+        #numerator[j] <- mergeBranch2[j]/(sum(lambdas[[j]] * (1 - nodeM[1:d][j])^2))
+        numerator[j] <- mergeBranch2[j]/sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+      }
+      weightStates <- numerator/sum(numerator)
+    }
+    if(root_state_weight == "equal_weights"){  
+      weightStates <- rep(1/lmb,lmb)
+    }
+  }  
+  
+  if(cond == "maddison_cond"){
+    preCond <- rep(NA,lmb)
+    for(j in 1:lmb){
+      preCond[j] <- sum(weightStates[j] * lambdas[[j]] *  (1 - nodeM[1:d][j]) ^ 2)
+      #preCond[j] <- sum(weightStates[j] * lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+    }
+    mergeBranch2 <- mergeBranch2/sum(preCond)
+  }
+  
+  if (is_complete_tree) {
+    timeInte <- max(abs(ape::branching.times(phy)))
+    y <- rep(0,2 * lmb)
     
-    if (root_state_weight == "proper_weights") {
-      numerator <- NULL
-      for (j in 1:length(mergeBranch2)) {
-        numerator <- c(numerator,
-                       (mergeBranch2[j] /
-                          (sum(lambdas[[j]] * (1 - nodeM[1:d][j])^2))))
-      }
-      denomin <- NULL
-      for (j in 1:length(mergeBranch2)) {
-        denomin <- c(denomin,
-                     (mergeBranch2[j] /
-                        (sum(lambdas[[j]] * (1 - nodeM[1:d][j])^2))))
-      }
-      
-      weightStates <- numerator/sum(denomin)
-    }
-    if (root_state_weight == "equal_weights") {
-      weightStates <- rep(1 / length(mergeBranch2), length(mergeBranch2))
-    }
+    nodeMN <- deSolve::ode(y = y,
+                           func = cla_secsse_loglik_rhs,
+                           times = c(0, timeInte),
+                           parms = parameter,
+                           rtol = rtol,
+                           atol = atol,
+                           method = "ode45")
+    
+   # nodeMN <- ode_FORTRAN(y = y,
+   #                        func = 'cla_secsse_runmod_ct_e',
+   #                        times = c(0,timeInte),
+   #                        parms = parameter,
+   #                        rtol = reltol,
+   #                        atol = abstol,
+  #                        method = methode)
+    nodeM <- as.numeric(nodeMN[2,-1])
   }
   
-  if (cond == "maddison_cond") {
-    preCond <- NULL
-    for (j in 1:length(weightStates)) {
-      preCond <- c(preCond,
-                   sum(weightStates[j] *
-                         lambdas[[j]] *
-                         (1 - nodeM[1:d][j])^2))
-    }
-    mergeBranch2 <- mergeBranch2/(sum(preCond))
-  }
-  
-  if (cond == "proper_cond") {
-    preCond <- NULL
-    for (j in 1:length(mergeBranch2)) {
-      preCond <- c(preCond,
-                   sum((lambdas[[j]] * (1 - nodeM[1:d][j])^2)))
+  if(cond == "proper_cond"){
+    preCond <- rep(NA,lmb)
+    for(j in 1:lmb){
+      #preCond[j] <- sum((lambdas[[j]] * (1 - nodeM[1:d][j]) ^ 2))
+      preCond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
     mergeBranch2 <- mergeBranch2/preCond
   }
   
-  atRoot <- ((mergeBranch2) * (weightStates))
-  
-  wholeLike <- sum(atRoot)
-  LL <- log(wholeLike) + loglik - penalty(pars = parameter,
-                                          loglik_penalty = loglik_penalty)
-  
-  if (see_ancestral_states == TRUE) {
+  wholeLike_atRoot <- sum(mergeBranch2 * weightStates)
+  LL <- log(wholeLike_atRoot) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
+  #print(unique(unlist(parameter[[1]]))); print(LL);  
+  if(see_ancestral_states == TRUE){
     num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips + 1):nrow(states), ]
-    ancestral_states <- ancestral_states[, -(1:(ncol(ancestral_states)/2))]
+    ancestral_states <- states[(num_tips+1):nrow(states),]
+    ancestral_states <- ancestral_states[,-(1:(ncol(ancestral_states)/2))]
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL))
   } else {
