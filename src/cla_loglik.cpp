@@ -121,7 +121,6 @@ double calc_ll_cla(const Rcpp::List& ll,
     assert((focal) < states.size());
     states[focal] = newstate; // -1 because of R conversion to C++ indexing
     logliks[a] = loglik;
-    Rcpp::Rcout << a << " " << loglik << "\n";  
   }
 
   for (int i = 0; i < mergeBranch.size(); ++i) {

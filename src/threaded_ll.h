@@ -112,9 +112,9 @@ public:
   
   Rcpp::List calc_ll() {
     
-   // tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
+    tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
     
-    tbb::global_control   gc(tbb::global_control::max_allowed_parallelism, num_threads);
+   // tbb::global_control   gc(tbb::global_control::max_allowed_parallelism, num_threads);
     
     int num_tips = ances.size() + 1;
     

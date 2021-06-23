@@ -1,20 +1,4 @@
-cla_secsse_runmod_ct_e_R <- function(t, y, parameter) {
-  d <- length(y)
-  
-  Es <- y[1:d]
-  lambdas <- parameter[[1]]
-  mus <- parameter[[2]]
-  Q <- parameter[[3]]
-  diag(Q) <- 0
-  
-  dE <- -((unlist(lapply(lambdas, sum))) + mus + Q %*% (rep(1, d))) *
-    Es +
-    (Q %*% Es) +
-    mus +
-    unlist(lapply(lapply(lambdas, "*", Es %*% t(Es)), sum))
-  
-  return(list(c(dE)))
-}
+
 
 
 #' Logikelihood calculation for the cla_SecSSE model given a set of parameters and data using Rcpp
@@ -93,8 +77,10 @@ cla_secsse_loglik_cpp <- function(parameter,
                                   loglik_penalty = 0,
                                   is_complete_tree = FALSE,
                                   num_threads = 1,
-                                  method = "odeint::bulirsch_stoer",
-                                  atol = 1e-12,
+                                  method = ifelse(num_threads == 1, 
+                                              "odeint::bulirsch_stoer",
+                                              "odeint::runge_kutta_fehlberg78"),
+                                  atol = 1e-14,
                                   rtol = 1e-12) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -226,7 +212,7 @@ cla_secsse_loglik_cpp <- function(parameter,
   if (is_complete_tree) {
     timeInte <- max(abs(ape::branching.times(phy)))
     y <- rep(0,2 * lmb)
-    
+
     nodeMN <- deSolve::ode(y = y,
                            func = cla_secsse_runmod_ct_e_R,
                            times = c(0, timeInte),
@@ -234,9 +220,8 @@ cla_secsse_loglik_cpp <- function(parameter,
                            rtol = rtol,
                            atol = atol,
                            method = "ode45")
-    
-    nodeM <- as.numeric(nodeMN[2,-1])
     nodeM <- as.numeric(nodeMN[2, -1])
+   # cat("nodeM: ", nodeM, "\n")
   }
   
   if (cond == "proper_cond") {

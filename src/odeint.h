@@ -165,7 +165,7 @@ public:
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0.0) { // slightly safer.
-             Df +=         l_[i][j][k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+            Df +=         l_[i][j][k] * (x[j] * x[k + d] + x[j + d] * x[k]);
             Ef +=         l_[i][j][k] * (x[j] * x[k]);
           }
         }
@@ -217,28 +217,19 @@ public:
         }
       }
     }
-    
-    
   }
   
-  // rename to operator() to use this version of the operator, withouth kahan sum.
+
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,
                 const double /* t */ ) const {
     
-   
    for (int i = 0; i < d; ++i) {
-     
-     dxdt[i] = m_[i] * (1.0 - x[i]);
-     dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];
-     
+      dxdt[i + d] = -1.0 * ((lambda_sum[i] + m_[i]) * x[i + d]);
+    
      for (int j = 0; j < d; ++j) {
-      dxdt[i]     += q_[i][j] * (x[j] - x[i]);
-      dxdt[i + d] += q_[i][j] * (x[j + d] - x[i + d]);
-      
-      for (int k = 0; k < d; ++k) {
-        dxdt[i] += l_[i][j][k] * (x[j] * x[k] - x[i]);
-      }
+       long double dx = x[j + d] - x[i + d];
+       dxdt[i + d] +=  q_[i][j] * dx;;
      }
    }
   }

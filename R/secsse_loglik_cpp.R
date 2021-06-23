@@ -1,3 +1,29 @@
+secsse_runmod_ct_R <- function(t, y, parameter) {
+  ly <- length(y)
+  d <- ly/2
+  dC <- rep(0, 2 * d)
+  
+  Es <- y[1:d]
+  Ds <- y[d:(d + d)]
+  
+  
+  lambdas <- parameter[[1]]
+  mus <- parameter[[2]]
+  Q <- parameter[[3]]
+  diag(Q) <- 0
+  
+  dC[1:d] <- (mus - (lambdas * Es)) * (1 - Es)
+  dC[d:(d + d)] <- -(lambdas + mus) * Ds
+  
+  for (I in 1:d) {
+    for (II in 1:d) {
+      dC[I] = dC[I] + Q[I, II] * (Es[II] - Es[I])
+      dC[d + I] = dC[d + I] + Q[I, II] * (Ds[II] - Ds[I])
+    }
+  }
+  return(list(c(dC)))
+}
+
 
 #' Logikelihood calculation for the SecSSE model given a set of parameters and data
 #' @title Likelihood for SecSSE model
@@ -147,6 +173,19 @@ secsse_loglik_cpp <- function(parameter,
     if (root_state_weight == "equal_weights") {
       weightStates <- rep(1/length(mergeBranch2),length(mergeBranch2))
     }
+  }
+  
+  if (is_complete_tree) {
+    timeInte <- max(abs(ape::branching.times(phy)))
+    y <- rep(0,2 * length(mergeBranch2))
+    nodeMN <- ode_FORTRAN(y = y,
+                          func = secsse_runmod_ct_R,
+                          times = c(0,timeInte),
+                          parms = parameter,
+                          rtol = 1e-12,
+                          atol = 1e-12,
+                          method = "ode45")
+    nodeM <- as.numeric(nodeMN[2,-1])
   }
   
   if (cond == "maddison_cond") {
