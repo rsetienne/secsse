@@ -188,8 +188,8 @@ secsse_loglik_choosepar <- function(trparsopt, trparsfix, idparsopt, idparsfix, 
                 func = func)
         } else {
             loglik <- secsse_loglik_cpp(parameter = pars1, phy = phy, traits = traits, num_concealed_states = num_concealed_states,
-                use_fortran = use_fortran, methode = methode, cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
-                run_parallel = run_parallel, setting_calculation = setting_calculation, setting_parallel = setting_parallel,
+                cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
+                setting_calculation = setting_calculation,
                 see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree,
                 func = func)
         }
@@ -219,8 +219,6 @@ secsse_loglik_choosepar <- function(trparsopt, trparsfix, idparsopt, idparsfix, 
 #' @param sampling_fraction vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.
 #' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
 #' @param maxiter max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.
-#' @param use_fortran Should the Fortran code for numerical integration be called? Default is TRUE.
-#' @param methode method used for integration calculation. Default is 'ode45'.
 #' @param optimmethod method used for optimization. Default is 'simplex'.
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param run_parallel should the routine to run in parallel be called?
@@ -290,11 +288,25 @@ secsse_loglik_choosepar <- function(trparsopt, trparsfix, idparsopt, idparsfix, 
 #'# $ML
 #'# [1] -16.43162
 #' @export
-secsse_ml <- function(phy, traits, num_concealed_states, idparslist, idparsopt, initparsopt, idparsfix, parsfix, cond = "proper_cond",
-    root_state_weight = "proper_weights", sampling_fraction, tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)),
-    use_fortran = TRUE, methode = "ode45", optimmethod = "simplex", num_cycles = 1, run_parallel = FALSE, loglik_penalty = 0,
-    is_complete_tree = FALSE, func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE, secsse_loglik_rhs,
-        "secsse_runmod2")), verbose = (optimmethod == "subplex")) {
+secsse_ml <- function(phy, 
+                      traits, 
+                      num_concealed_states, 
+                      idparslist, 
+                      idparsopt, 
+                      initparsopt, 
+                      idparsfix, 
+                      parsfix, 
+                      cond = "proper_cond",
+                      root_state_weight = "proper_weights", 
+                      sampling_fraction,
+                      tol = c(1e-04, 1e-05, 1e-07), 
+                      maxiter = 1000 * round((1.25)^length(idparsopt)),
+                      optimmethod = "simplex", 
+                      num_cycles = 1, 
+                      loglik_penalty = 0,
+                      is_complete_tree = FALSE, 
+                      func = ifelse(is_complete_tree, "secsse_runmod_ct", secsse_loglik_rhs),
+                      verbose = (optimmethod == "subplex")) {
     structure_func <- NULL
     check_input(traits, phy, sampling_fraction, root_state_weight, is_complete_tree)
 

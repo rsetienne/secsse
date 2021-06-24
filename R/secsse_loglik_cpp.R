@@ -4,8 +4,7 @@ secsse_runmod_ct_R <- function(t, y, parameter) {
   dC <- rep(0, 2 * d)
   
   Es <- y[1:d]
-  Ds <- y[d:(d + d)]
-  
+  Ds <- y[(d + 1):(d + d)]
   
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
@@ -13,7 +12,7 @@ secsse_runmod_ct_R <- function(t, y, parameter) {
   diag(Q) <- 0
   
   dC[1:d] <- (mus - (lambdas * Es)) * (1 - Es)
-  dC[d:(d + d)] <- -(lambdas + mus) * Ds
+  dC[(d + 1):(d + d)] <- -(lambdas + mus) * Ds
   
   for (I in 1:d) {
     for (II in 1:d) {
@@ -178,13 +177,13 @@ secsse_loglik_cpp <- function(parameter,
   if (is_complete_tree) {
     timeInte <- max(abs(ape::branching.times(phy)))
     y <- rep(0,2 * length(mergeBranch2))
-    nodeMN <- ode_FORTRAN(y = y,
-                          func = secsse_runmod_ct_R,
-                          times = c(0,timeInte),
-                          parms = parameter,
-                          rtol = 1e-12,
-                          atol = 1e-12,
-                          method = "ode45")
+    nodeMN <- deSolve::ode(y = y,
+                           func = secsse_runmod_ct_R,
+                           times = c(0,timeInte),
+                           parms = parameter,
+                           rtol = 1e-12,
+                           atol = 1e-12,
+                           method = "ode45")
     nodeM <- as.numeric(nodeMN[2,-1])
   }
   

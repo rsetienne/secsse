@@ -160,8 +160,6 @@ cla_secsse_loglik_cpp <- function(parameter,
     }
   }
   
- # cat("calculated calcul\n");
-  
   mergeBranch <- calcul$mergeBranch
   nodeM <- calcul$nodeM
   loglik <- calcul$loglik
@@ -218,7 +216,6 @@ cla_secsse_loglik_cpp <- function(parameter,
                            atol = atol,
                            method = "ode45")
     nodeM <- as.numeric(nodeMN[2, -1])
-   # cat("nodeM: ", nodeM, "\n")
   }
   
   if (cond == "proper_cond") {
