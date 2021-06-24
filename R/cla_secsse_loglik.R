@@ -42,7 +42,7 @@ cla_secsse_runmod_ct_e_R <- function(t, y, parameter) {
       dC[i] <- dC[i] + Q[i, j] * (Es[j] - Es[i])
       for (k in 1:d) {
         if (lambdas[[i]][j, k] != 0) {
-          dC[i] <- dC[i] + lambdas[[i]][j, j] * (Es[j] * Es[k] - Es[i])
+          dC[i] <- dC[i] + lambdas[[i]][j, k] * (Es[j] * Es[k] - Es[i])
         }
       }
     }
