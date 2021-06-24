@@ -201,8 +201,6 @@ Rcpp::NumericVector ct_condition(int d,
   return out;
 }
 
-
-
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& states_R,

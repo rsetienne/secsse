@@ -65,7 +65,6 @@ secsse_loglik_rhs <- function(t,y,parameter){
   return(list(c(dE,dD)))
 }
 
-#' @useDynLib secsse 
 ode_FORTRAN <- function(
   y,
   times,
