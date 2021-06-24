@@ -202,10 +202,10 @@ private:
   double t;
 };
 
-class ode_cla_ct {
+class ode_cla_d {
 public:
   
-  ode_cla_ct(const std::vector<std::vector<std::vector<double>>>& l,
+  ode_cla_d(const std::vector<std::vector<std::vector<double>>>& l,
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) { 
@@ -248,6 +248,51 @@ private:
   const std::vector< std::vector< double >> q_;
   const size_t d;
   std::vector<double> lambda_sum;
+};
+
+class ode_cla_e {
+public:
+  
+  ode_cla_e(const std::vector<std::vector<std::vector<double>>>& l,
+            const std::vector<double>& m,
+            const std::vector<std::vector<double>>& q) :
+  l_(l), m_(m), q_(q), d(m.size()) { 
+  }
+  
+  void operator()(const std::vector< double > &x ,
+                std::vector< double > &dxdt,
+                const double /* t */ ) const {
+    
+    for (int i = 0; i < d; ++i) {
+      dxdt[i] = 0.0; 
+      if (m_[i] != 0.0)  {
+        dxdt[i] = m_[i] * (1.0 - x[i]);
+      }
+      
+      for (int j = 0; i < d; ++i) {
+        dxdt[i] += q_[i][j] * (x[j] - x[i]);
+        for (int k = 0; i < d; ++i) {
+          if (l_[i][j][k] != 0) {
+            dxdt[i] += l_[i][j][k] * (x[j] * x[k] - x[i]);
+          }
+        }
+      }
+    }
+  }
+  
+  double get_l(size_t i, size_t j, size_t k) const {
+    return l_[i][j][k];
+  } 
+  
+  size_t get_d() const {
+    return d;
+  }
+  
+private:
+  const std::vector< std::vector< std::vector< double > > > l_;
+  const std::vector< double > m_;
+  const std::vector< std::vector< double >> q_;
+  const size_t d;
 };
 
 

@@ -8,9 +8,9 @@
 #' @param ances vector of ances
 #' @param for_time fortime
 #' @param states states matrix
-#' @param merge_branch_out
+#' @param merge_branch_out merge_branch_out
 #' @param node_M out
-#' @param num_threads
+#' @param num_threads num_threads
 #' @param method integration method
 #' @return log likelihood
 #' @export
@@ -36,6 +36,21 @@ calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_th
 #' @export
 calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads = 1L, method = "odeint::bulirsch_stoer", is_complete_tree = FALSE) {
     .Call(`_secsseCPP_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method, is_complete_tree)
+}
+
+#' function to condition
+#' @param d dd
+#' @param y yd
+#' @param t td
+#' @param ll ll
+#' @param mm mm
+#' @param Q qd
+#' @param method method
+#' @param atol atol
+#' @param rtol rtol
+#' @export
+ct_condition <- function(d, y, t, ll, mm, Q, method, atol, rtol) {
+    .Call(`_secsseCPP_ct_condition`, d, y, t, ll, mm, Q, method, atol, rtol)
 }
 
 cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree) {

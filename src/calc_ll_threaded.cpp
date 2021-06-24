@@ -55,9 +55,9 @@ struct combine_states {
 //' @param ances vector of ances
 //' @param for_time fortime
 //' @param states states matrix
-//' @param merge_branch_out
+//' @param merge_branch_out merge_branch_out
 //' @param node_M out
-//' @param num_threads
+//' @param num_threads num_threads
 //' @param method integration method
 //' @return log likelihood
 //' @export

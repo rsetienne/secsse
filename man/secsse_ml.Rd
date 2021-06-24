@@ -18,15 +18,11 @@ secsse_ml(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  use_fortran = TRUE,
-  methode = "ode45",
   optimmethod = "simplex",
   num_cycles = 1,
-  run_parallel = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE,
-    secsse_loglik_rhs, "secsse_runmod2")),
+  func = ifelse(is_complete_tree, "secsse_runmod_ct", secsse_loglik_rhs),
   verbose = (optimmethod == "subplex")
 )
 }
@@ -57,15 +53,9 @@ secsse_ml(
 
 \item{maxiter}{max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.}
 
-\item{use_fortran}{Should the Fortran code for numerical integration be called? Default is TRUE.}
-
-\item{methode}{method used for integration calculation. Default is 'ode45'.}
-
 \item{optimmethod}{method used for optimization. Default is 'simplex'.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
-
-\item{run_parallel}{should the routine to run in parallel be called?}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
 
@@ -74,6 +64,8 @@ secsse_ml(
 \item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
 
 \item{verbose}{sets verbose output; default is verbose when optimmethod is 'subplex'}
+
+\item{run_parallel}{should the routine to run in parallel be called?}
 }
 \value{
 Parameter estimated and maximum likelihood

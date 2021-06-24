@@ -190,8 +190,7 @@ secsse_loglik_choosepar <- function(trparsopt, trparsfix, idparsopt, idparsfix, 
             loglik <- secsse_loglik_cpp(parameter = pars1, phy = phy, traits = traits, num_concealed_states = num_concealed_states,
                 cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
                 setting_calculation = setting_calculation,
-                see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree,
-                func = func)
+                see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree)
         }
         if (is.nan(loglik) || is.na(loglik)) {
             cat("There are parameter values used which cause numerical problems.\n")

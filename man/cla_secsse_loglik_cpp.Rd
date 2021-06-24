@@ -17,8 +17,9 @@ cla_secsse_loglik_cpp(
   loglik_penalty = 0,
   is_complete_tree = FALSE,
   num_threads = 1,
-  method = "odeint::bulirsch_stoer",
-  atol = 1e-12,
+  method = ifelse(num_threads == 1, "odeint::bulirsch_stoer",
+    "odeint::runge_kutta_fehlberg78"),
+  atol = 1e-14,
   rtol = 1e-12
 )
 }

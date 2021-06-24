@@ -28,7 +28,11 @@ calc_ll_threaded(
 
 \item{states}{states matrix}
 
+\item{num_threads}{num_threads}
+
 \item{method}{integration method}
+
+\item{merge_branch_out}{merge_branch_out}
 
 \item{node_M}{out}
 }

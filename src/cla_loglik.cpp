@@ -136,6 +136,73 @@ double calc_ll_cla(const Rcpp::List& ll,
   return sum_loglik;
 }
 
+//' function to condition
+//' @param d dd
+//' @param y yd
+//' @param t td
+//' @param ll ll
+//' @param mm mm
+//' @param Q qd
+//' @param method method
+//' @param atol atol
+//' @param rtol rtol
+//' @export
+// [[Rcpp::export]]
+Rcpp::NumericVector ct_condition(int d,
+                                 const Rcpp::NumericVector& y,
+                                 double t,
+                                 const Rcpp::List& ll,
+                                 const Rcpp::NumericVector& mm,
+                                 const Rcpp::NumericMatrix& Q,
+                                 std::string method,
+                                 double atol,
+                                 double rtol) {
+  
+  std::vector< std::vector< std::vector< double > >> ll_cpp;
+  //list_to_vector(ll, ll_);
+  for (size_t i = 0; i < ll.size(); ++i) {
+    Rcpp::NumericMatrix temp = ll[i];
+    std::vector< std::vector< double >> temp2;
+    for (size_t j = 0; j < temp.nrow(); ++j) {
+      std::vector<double> row;
+      for (size_t k = 0; k < temp.ncol(); ++k) {
+        row.push_back(temp(j, k));  
+      }
+      temp2.push_back(row);
+    }
+    ll_cpp.push_back(temp2);
+  }
+  
+  // Rcpp::Rcout << "list converted\n"; force_output();
+  
+  std::vector<double> mm_cpp(mm.begin(), mm.end());
+  
+  std::vector< std::vector<double >> Q_cpp;
+  numericmatrix_to_vector(Q, Q_cpp);
+  
+  ode_cla_e od(ll_cpp, mm_cpp, Q_cpp);
+  
+  std::vector<double> init_state(y.begin(), y.end());
+  
+  std::unique_ptr<ode_cla_e> od_ptr = std::make_unique<ode_cla_e>(od);
+  odeintcpp::integrate(method,
+                       std::move(od_ptr), // ode class object
+                       init_state,// state vector
+                       0.0,// t0
+                       t, //t1
+                       t * 0.01,
+                       atol,
+                       rtol); // t1
+  
+  Rcpp::NumericVector out;
+  for (int i = 0; i < init_state.size(); ++i) {
+    out.push_back(init_state[i]);
+  }
+  return out;
+}
+
+
+
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& states_R,
@@ -160,7 +227,7 @@ try {
 
  double loglik = 0.0;
  if (is_complete_tree) {
-   loglik = calc_ll_cla< ode_cla_ct >(lambdas,
+   loglik = calc_ll_cla< ode_cla_d >(lambdas,
                                       mus,
                                       Q,
                                       std::vector<int>(ances.begin(), ances.end()),

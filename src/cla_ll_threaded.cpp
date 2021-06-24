@@ -115,9 +115,9 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
     }
     
     if (is_complete_tree) {
-      ode_cla_ct od_(ll_cpp, mus_cpp, Q_cpp);
+      ode_cla_d od_(ll_cpp, mus_cpp, Q_cpp);
       
-      threaded_ll<ode_cla_ct, combine_states_cla<ode_cla_ct>  > ll_calc(od_, ances_cpp, 
+      threaded_ll<ode_cla_d, combine_states_cla<ode_cla_d>  > ll_calc(od_, ances_cpp, 
                                                        for_time_cpp, states_cpp, 
                                                        num_threads, method);
       return ll_calc.calc_ll();
