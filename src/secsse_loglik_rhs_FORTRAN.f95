@@ -258,7 +258,8 @@
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*), FF1, FF2
       DOUBLE PRECISION  :: mus(N/2), Qs(N/2,N/2)
       REAL(c_intptr_t * 2) :: lambdas(N/2,N/2,N/2), lamEE(N/2,N/2,N/2)
-      REAL(c_intptr_t * 2) :: lamDE(N/2,N/2,N/2)
+      REAL(c_intptr_t * 2) :: lamDE(N/2,N/2,N/2), lambda_sum(N/2)
+      REAL(c_intptr_t * 2) :: DIFF1, DIFF2
 
 ! parameters - named here
       DOUBLE PRECISION rn
@@ -323,11 +324,12 @@
 !  dE <-  -((unlist(lapply(lambdas,sum))) + mus + Q %*% (rep(1,d))) * Es + ( Q %*% Es ) + mus + unlist(lapply(lapply(lambdas,"*",Es%*%t(Es)),sum))
 
       DO I = 1, N/2
-        FF1 = mus(I) - (SUM(lambdas(I,:,:)) + mus(I)) * Conc(I)
+        lambda_sum(I) = SUM(lambdas(I,:,:))
+        FF1 = mus(I) - (lambda_sum(I) + mus(I)) * Conc(I)
         dConc(I) = FF1 + SUM(lamEE(I,:,:))
         DO II = 1, N/2
-           FF1 = Conc(II) - Conc(I)
-           dConc(I) = dConc(I) + Qs(I, II) * FF1
+           DIFF1 = Conc(II) - Conc(I)
+           dConc(I) = dConc(I) + Qs(I, II) * DIFF1
         ENDDO
       ENDDO
 
@@ -335,11 +337,11 @@
 !  dD <-  -((unlist(lapply(lambdas,sum))) + mus + Q %*% (rep(1,d))) * Ds +( Q %*% Ds ) + unlist(lapply(lapply(lambdas,"*",cross_D_E),sum))
 
       DO I = 1, N/2
-       FF1 = (-SUM(lambdas(I,:,:)) - mus(I)) * Conc(N/2 + I) 
+       FF1 = -(lambda_sum(I) + mus(I)) * Conc(N/2 + I) 
        dConc(N/2 + I) = FF1 + SUM(lamDE(I,:,:)) 
         DO II = 1, N/2
-           FF1 = Conc(N/2 + II) - Conc(N/2 + I)
-           dConc(N/2 + I) = dConc(N/2 + I) + Qs(I, II) * FF1
+           DIFF2 = Conc(N/2 + II) - Conc(N/2 + I)
+           dConc(N/2 + I) = dConc(N/2 + I) + Qs(I, II) * DIFF2
         ENDDO
       ENDDO
 
@@ -359,6 +361,7 @@
       INTEGER           :: d, d2, d3
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
       REAL(c_intptr_t * 2)  :: dC(N), lambdas(N/2,N/2,N/2)
+      REAL(c_intptr_t * 2)  :: lambda_sum(N/2), DIFF0, DIFF1, DIFF2, DIFF3
       DOUBLE PRECISION  :: mus(N/2), Q(N/2,N/2), Ds(N/2), Es(N/2)
 
 ! parameters - named here
@@ -399,14 +402,19 @@
       Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
       lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
       DO I = 1,d
-        dC(I) = mus(I) * (1 - Es(I))
-        dC(d + I) = -(SUM(lambdas(I,:,:)) + mus(I)) * Ds(I)
+        lambda_sum(I) = SUM(lambdas(I,:,:))
+        DIFF0 = 1 - Es(I)
+        dC(I) = mus(I) * DIFF0
+        dC(d + I) = -(lambda_sum(I) + mus(I)) * Ds(I)
         DO II = 1,d
-           dC(I) = dC(I) + Q(I, II) * (Es(II) - Es(I))
+           DIFF1 = Es(II) - Es(I)
+           dC(I) = dC(I) + Q(I, II) * DIFF1
            DO III = 1,d
-              dC(I) = dC(I) + lambdas(I, II, III) * (Es(II) * Es(III) - Es(I))
+              DIFF2 = Es(II) * Es(III) - Es(I)
+              dC(I) = dC(I) + lambdas(I, II, III) * DIFF2
            ENDDO
-           dC(d + I) = dC(d + I) + Q(I, II) * (Ds(II) - Ds(I))
+           DIFF3 = Ds(II) - Ds(I)
+           dC(d + I) = dC(d + I) + Q(I, II) * DIFF3
         ENDDO
       ENDDO
       dConc = dC
@@ -426,6 +434,7 @@
       INTEGER           :: d, d2, d3
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
       REAL(c_intptr_t * 2)  :: dC(N), lambdas(N/2,N/2,N/2)
+      REAL(c_intptr_t * 2)  :: DIFF0, DIFF1, DIFF2
       DOUBLE PRECISION  :: mus(N/2), Q(N/2,N/2), Es(N/2)
 
 ! parameters - named here
@@ -466,11 +475,14 @@
       Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
       lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
       DO I = 1,d
-        dC(I) = mus(I) * (1 - Es(I))
+        DIFF0 = 1 - Es(I)
+        dC(I) = mus(I) * DIFF0
         DO II = 1,d
-           dC(I) = dC(I) + Q(I, II) * (Es(II) - Es(I))
+           DIFF1 = Es(II) - Es(I)
+           dC(I) = dC(I) + Q(I, II) * DIFF1
            DO III = 1,d
-              dC(I) = dC(I) + lambdas(I, II, III) * (Es(II) * Es(III) - Es(I))
+              DIFF2 = Es(II) * Es(III) - Es(I)
+              dC(I) = dC(I) + lambdas(I, II, III) * DIFF2
            ENDDO
         ENDDO
       ENDDO
@@ -491,6 +503,7 @@
       INTEGER           :: d, d2, d3
       DOUBLE PRECISION  :: t, Conc(N), dConc(N), yout(*)
       REAL(c_intptr_t * 2)  :: dC(N), lambdas(N/2,N/2,N/2)
+      REAL(c_intptr_t * 2)  :: DIFF1, lambda_sum(N/2)
       DOUBLE PRECISION  :: mus(N/2), Q(N/2,N/2), Ds(N/2)
 
 ! parameters - named here
@@ -531,9 +544,11 @@
       Q = RESHAPE(P((d3 + d + 1):(d3 + d + d2)),(/d,d/), order = (/1,2/))
       lambdas = RESHAPE(P(1:d3),(/d,d,d/), order = (/2,3,1/))
       DO I = 1,d
-        dC(d + I) = -(SUM(lambdas(I,:,:)) + mus(I)) * Ds(I)
+        lambda_sum(I) = SUM(lambdas(I,:,:))
+        dC(d + I) = -(lambda_sum(I) + mus(I)) * Ds(I)
         DO II = 1,d
-           dC(d + I) = dC(d + I) + Q(I, II) * (Ds(II) - Ds(I))
+           DIFF1 = Ds(II) - Ds(I)
+           dC(d + I) = dC(d + I) + Q(I, II) * DIFF1
         ENDDO
       ENDDO
       dConc = dC
