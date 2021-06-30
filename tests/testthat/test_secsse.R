@@ -41,8 +41,6 @@ test_that("secsse gives the same result as hisse", {
                      phy = phy,
                      traits = traits,
                      num_concealed_states = num_concealed_states,
-                     use_fortran = use_fortran,
-                     methode = methode,
                      cond = cond,
                      root_state_weight = root_state_weight,
                      sampling_fraction = sampling_fraction)
@@ -51,8 +49,6 @@ test_that("secsse gives the same result as hisse", {
                                        phy = phy,
                                        traits = traits,
                                        num_concealed_states = num_concealed_states,
-                                       use_fortran = TRUE,
-                                       methode = "ode45",
                                        cond = cond,
                                        root_state_weight = root_state_weight,
                                        sampling_fraction = sampling_fraction)
@@ -66,8 +62,6 @@ test_that("secsse gives the same result as hisse", {
                                        phy = phy,
                                        traits = traits,
                                        num_concealed_states = num_concealed_states,
-                                       use_fortran = TRUE,
-                                       methode = "ode45",
                                        cond = cond,
                                        root_state_weight = root_state_weight,
                                        sampling_fraction = sampling_fraction)
@@ -78,8 +72,6 @@ test_that("secsse gives the same result as hisse", {
                                  phy = phy,
                                  traits = traits,
                                  num_concealed_states = num_concealed_states,
-                                 use_fortran = FALSE,
-                                 methode = "ode45",
                                  cond = cond,
                                  root_state_weight = root_state_weight,
                                  sampling_fraction = sampling_fraction))
@@ -87,8 +79,6 @@ test_that("secsse gives the same result as hisse", {
                                  phy = phy,
                                  traits = traits,
                                  num_concealed_states = num_concealed_states,
-                                 use_fortran = TRUE,
-                                 methode = "ode45",
                                  cond = cond,
                                  root_state_weight = root_state_weight,
                                  sampling_fraction = sampling_fraction))
@@ -96,15 +86,12 @@ test_that("secsse gives the same result as hisse", {
                                  phy = phy,
                                  traits = traits,
                                  num_concealed_states = num_concealed_states,
-                                 use_fortran = TRUE,
-                                 methode = "ode45",
                                  cond = cond,
                                  root_state_weight = root_state_weight,
-                                 sampling_fraction = sampling_fraction,
-                                 func = "secsse_runmod"))
+                                 sampling_fraction = sampling_fraction))
   
-  testthat::expect_equal(-237.8611,y1)##-237.8611 is the right one, 
-  testthat::expect_equal(-243.8611,y2)
+  testthat::expect_equal(-237.8611, y1) ##-237.8611 is the right one, 
+  testthat::expect_equal(-243.8611, y2)
   testthat::expect_equal(z1, z2) 
   testthat::expect_equal(z2, z3) 
   # Parallel code doesn't work on CI unless running on windows
@@ -114,13 +101,10 @@ test_that("secsse gives the same result as hisse", {
                                    phy = phy,
                                    traits = traits,
                                    num_concealed_states = num_concealed_states,
-                                   use_fortran = TRUE,
-                                   methode = "ode45",
                                    cond = cond,
                                    root_state_weight = root_state_weight,
                                    sampling_fraction = sampling_fraction,
-                                   func = "secsse_runmod",
-                                   run_parallel = TRUE))
+                                   num_threads = 4))
     testthat::expect_equal(z3, z4)
   }
 })
@@ -184,32 +168,31 @@ test_that("secsse gives the same result as GeoSSE", {
                                      phy,
                                      traits,
                                      num_concealed_states,
-                                     use_fortran = FALSE,
-                                     methode = "ode45",
                                      cond = "maddison_cond",
                                      root_state_weight = "maddison_weights",
                                      sampling_fraction = c(1,1,1),
-                                     run_parallel = FALSE,
                                      setting_calculation = NULL,
-                                     setting_parallel = NULL,
                                      see_ancestral_states = FALSE,
-                                     loglik_penalty = 0)
+                                     loglik_penalty = 0,
+                                     atol = 1e-12,
+                                     rtol = 1e-12)
+  
+  
   testthat::expect_equal(classe_diversitree_LL,secsse_cla_LL)
   
   secsse_cla_LL2 <- cla_secsse_loglik(parameter,
                                       phy,
                                       traits,
                                       num_concealed_states,
-                                      use_fortran = TRUE,
-                                      methode = "ode45",
                                       cond = "maddison_cond",
                                       root_state_weight = "maddison_weights",
                                       sampling_fraction = c(1,1,1),
-                                      run_parallel = FALSE,
                                       setting_calculation = NULL,
-                                      setting_parallel = NULL,
                                       see_ancestral_states = FALSE,
-                                      loglik_penalty = 0)
+                                      loglik_penalty = 0,
+                                      atol = 1e-15,
+                                      rtol = 1e-14)
+  
   testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
   
   # Parallel code doesn't work on CI unless running on windows
@@ -219,16 +202,13 @@ test_that("secsse gives the same result as GeoSSE", {
                                         phy,
                                         traits,
                                         num_concealed_states,
-                                        use_fortran = TRUE,
-                                        methode = "ode45",
                                         cond = "maddison_cond",
                                         root_state_weight = "maddison_weights",
                                         sampling_fraction = c(1,1,1),
-                                        run_parallel = TRUE,
                                         setting_calculation = NULL,
-                                        setting_parallel = NULL,
                                         see_ancestral_states = FALSE,
-                                        loglik_penalty = 0)
+                                        loglik_penalty = 0,
+                                        num_threads = 4)
     testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL2)
   }
 })
@@ -242,7 +222,7 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   
   Sys.unsetenv("R_TESTS")
   parenthesis <- "(((6:0.2547423371,(1:0.0496153503,4:0.0496153503):0.2051269868):0.1306304758,(9:0.2124135406,5:0.2124135406):0.1729592723):1.151205247,(((7:0.009347664296,3:0.009347664296):0.2101416075,10:0.2194892718):0.1035186448,(2:0.2575886319,8:0.2575886319):0.06541928469):1.213570144);"
-  phylotree<-ape::read.tree(file="",parenthesis)
+  phylotree <- ape::read.tree(file = "",parenthesis)
   traits <-  c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
   num_concealed_states <- 3
   idparslist <- id_paramPos(traits, num_concealed_states)
@@ -250,7 +230,7 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   idparslist[[1]][c(2,5,8)] <- 2
   idparslist[[1]][c(3,6,9)] <- 3
   idparslist[[2]][] <- 4
-  masterBlock<-matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
+  masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
   idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
@@ -263,32 +243,26 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   parsfix <- c(0,0,0.1)
   tol = c(1e-04, 1e-05, 1e-07)
   maxiter = 1000 * round((1.25)^length(idparsopt))
-  use_fortran = TRUE
-  methode = "ode45"
   optimmethod = "simplex"
-  run_parallel = TRUE
-  cond<-"proper_cond"
+  cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)
   model <- secsse_ml(
-    phylotree,
-    traits,
-    num_concealed_states,
-    idparslist,
-    idparsopt,
-    initparsopt,
-    idparsfix,
-    parsfix,
-    cond,
-    root_state_weight,
-    sampling_fraction,
-    tol,
-    maxiter,
-    use_fortran,
-    methode,
-    optimmethod,
-    num_cycles = 1,
-    run_parallel
+    phy = phylotree,
+    traits = traits,
+    num_concealed_states = num_concealed_states,
+    idparslist = idparslist,
+    idparsopt = idparsopt,
+    initparsopt = initparsopt,
+    idparsfix = idparsfix,
+    parsfix = parsfix,
+    cond = cond,
+    root_state_weight = root_state_weight,
+    sampling_fraction = sampling_fraction,
+    tol = tol,
+    maxiter = maxiter,
+    optimmethod = optimmethod,
+    num_cycles = 1
   )
   
   testthat::expect_equal(model$ML,-29.89993)
@@ -325,10 +299,7 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
   }
   tol <- c(1e-04, 1e-05, 1e-07)
   maxiter <- 1000 * round((1.25)^length(idparsopt))
-  use_fortran <- TRUE
-  methode <- "ode45"
   optimmethod <- "simplex"
-  run_parallel <- FALSE
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)
@@ -349,11 +320,8 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
                                    sampling_fraction = sampling_fraction,
                                    tol = tol,
                                    maxiter = maxiter,
-                                   use_fortran = use_fortran,
-                                   methode = methode,
                                    optimmethod = optimmethod,
-                                   num_cycles = 1,
-                                   run_parallel = run_parallel)
+                                   num_cycles = 1)
   testthat::expect_equal(model$ML,-12.87974)
 })
 
@@ -379,10 +347,7 @@ test_that("trying a short ML search: cla_secsse", {
   parsfix <- c(0,0,0.01)
   tol <- c(1e-04, 1e-05, 1e-07)
   maxiter <- 1000 * round((1.25)^length(idparsopt))
-  use_fortran <- FALSE
-  methode <- "ode45"
   optimmethod <- "simplex"
-  run_parallel <- FALSE
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)
@@ -401,33 +366,10 @@ test_that("trying a short ML search: cla_secsse", {
     sampling_fraction,
     tol,
     maxiter,
-    use_fortran,
-    methode,
     optimmethod,
-    num_cycles = 1,
-    run_parallel)
-  testthat::expect_equal(model_R$ML,-16.1342246206186)
+    num_cycles = 1)
   
-  model_FORTRAN <- cla_secsse_ml(
-    phylotree,
-    traits,
-    num_concealed_states,
-    idparslist,
-    idparsopt,
-    initparsopt,
-    idparsfix,
-    parsfix,
-    cond,
-    root_state_weight,
-    sampling_fraction,
-    tol,
-    maxiter,
-    use_fortran = TRUE,
-    methode,
-    optimmethod,
-    num_cycles = 1,
-    run_parallel)
-  testthat::expect_equal(model_R$ML,model_FORTRAN$ML)
+  testthat::expect_equal(model_R$ML,-16.1342246206186)
 })
 
 test_that("trying a short ML search: cla_secsse", {
@@ -460,11 +402,8 @@ test_that("trying a short ML search: cla_secsse", {
     sampling_fraction = c(1,1,1),
     tol = c(1e-04, 1e-05, 1e-07),
     maxiter = 1000 * round((1.25)),
-    use_fortran = TRUE,
-    methode = "ode45",
     optimmethod = "simplex",
     num_cycles = 1,
-    run_parallel = FALSE,
     is_complete_tree = FALSE
   )
   testthat::expect_equal(model$ML,-16.1342246206186)
@@ -487,28 +426,21 @@ test_that("the loglik for the complete tree", {
   toCheck[[3]][,] <- userTransRate
   diag(toCheck[[3]]) <- NA
   root_state_weight <- "maddison_weights"
-  use_fortran <- TRUE
-  methode <- "ode45"
   cond <- "noCondit"
   
   loglik1 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                               phy = phy,
                                               traits = traits,
                                               num_concealed_states = num_concealed_states,
-                                              use_fortran = TRUE,
-                                              methode = "ode45",
                                               cond = cond,
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction,
-                                              is_complete_tree = TRUE,
-                                              func = "secsse_runmod_ct")
+                                              is_complete_tree = TRUE)
   )
   loglik2 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                               phy = phy,
                                               traits = traits,
                                               num_concealed_states = num_concealed_states,
-                                              use_fortran = TRUE,
-                                              methode = "ode45",
                                               cond = cond,
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction)
@@ -521,20 +453,15 @@ test_that("the loglik for the complete tree", {
                                               phy = phy,
                                               traits = traits,
                                               num_concealed_states = num_concealed_states,
-                                              use_fortran = TRUE,
-                                              methode = "ode45",
                                               cond = cond,
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction,
-                                              is_complete_tree = TRUE,
-                                              func = "secsse_runmod_ct")
+                                              is_complete_tree = TRUE)
   )
   loglik4 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                               phy = phy,
                                               traits = traits,
                                               num_concealed_states = num_concealed_states,
-                                              use_fortran = TRUE,
-                                              methode = "ode45",
                                               cond = cond,
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction)
@@ -555,13 +482,10 @@ test_that("the loglik for the complete tree", {
                                               phy = phy,
                                               traits = traits,
                                               num_concealed_states = num_concealed_states,
-                                              use_fortran = TRUE,
-                                              methode = "ode45",
                                               cond = cond,
                                               root_state_weight = root_state_weight,
                                               sampling_fraction = sampling_fraction,
-                                              is_complete_tree = TRUE,
-                                              func = "secsse_runmod_ct"))
+                                              is_complete_tree = TRUE))
   testthat::expect_equal(loglik5,-298.3583,tolerance = 1E-4)
   
   lambdas <- list()
@@ -577,14 +501,10 @@ test_that("the loglik for the complete tree", {
                                        phy = phy,
                                        traits = traits,
                                        num_concealed_states = num_concealed_states,
-                                       use_fortran = TRUE,
-                                       methode = "ode45",
                                        cond = cond,
                                        root_state_weight = root_state_weight,
                                        sampling_fraction = sampling_fraction,
-                                       run_parallel = FALSE,
                                        setting_calculation = NULL,
-                                       setting_parallel = NULL,
                                        see_ancestral_states = FALSE,
                                        loglik_penalty = 0,
                                        is_complete_tree = TRUE)
@@ -593,36 +513,30 @@ test_that("the loglik for the complete tree", {
   # Parallel code doesn't work on CI unless running on windows
   if (!isTRUE(as.logical(Sys.getenv("CI"))) || .Platform$OS.type == "windows") {
     skip_on_cran()
-    loglik6 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+    loglik6 <- as.numeric(secsse_loglik(parameter = toCheck,
                                                 phy = phy,
                                                 traits = traits,
                                                 num_concealed_states = num_concealed_states,
-                                                use_fortran = TRUE,
-                                                run_parallel = TRUE,
-                                                methode = "ode45",
                                                 cond = cond,
                                                 root_state_weight = root_state_weight,
                                                 sampling_fraction = sampling_fraction,
                                                 is_complete_tree = TRUE,
-                                                func = "secsse_runmod_ct"))
+                                                num_threads = 4))
     testthat::expect_equal(loglik6,loglik5,tolerance = 1E-4)
     
-    loglik8 <- secsse::cla_secsse_loglik(parameter = parameter,
+    loglik8 <- cla_secsse_loglik(parameter = parameter,
                                          phy = phy,
                                          traits = traits,
                                          num_concealed_states = num_concealed_states,
-                                         use_fortran = TRUE,
-                                         methode = "ode45",
                                          cond = cond,
                                          root_state_weight = root_state_weight,
                                          sampling_fraction = sampling_fraction,
-                                         run_parallel = TRUE,
                                          setting_calculation = NULL,
-                                         setting_parallel = NULL,
                                          see_ancestral_states = FALSE,
                                          loglik_penalty = 0,
-                                         is_complete_tree = TRUE)
-    testthat::expect_equal(loglik8,loglik7)
+                                         is_complete_tree = TRUE,
+                                 num_threads = 4)
+    testthat::expect_equal(loglik8,loglik7, tolerance = 0.001)
   }
   #lambdas <- list()
   #lambdas[[1]] <- matrix(0,ncol = 4,nrow = 4,byrow = TRUE)
@@ -662,14 +576,10 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                       phy = phy,
                                       traits = traits,
                                       num_concealed_states = num_concealed_states,
-                                      use_fortran = TRUE,
-                                      methode = "ode45",
                                       cond = "maddison_cond",
                                       root_state_weight = "maddison_weights",
                                       sampling_fraction = sampling_fraction,
-                                      run_parallel = FALSE,
                                       setting_calculation = NULL,
-                                      setting_parallel = NULL,
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0,
                                       is_complete_tree = FALSE)
@@ -678,14 +588,10 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                       phy = phy,
                                       traits = traits,
                                       num_concealed_states = num_concealed_states,
-                                      use_fortran = TRUE,
-                                      methode = "ode45",
                                       cond = "maddison_cond",
                                       root_state_weight = "maddison_weights",
                                       sampling_fraction = sampling_fraction,
-                                      run_parallel = FALSE,
                                       setting_calculation = NULL,
-                                      setting_parallel = NULL,
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0,
                                       is_complete_tree = TRUE)
@@ -697,17 +603,14 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                         phy = phy,
                                         traits = traits,
                                         num_concealed_states = num_concealed_states,
-                                        use_fortran = TRUE,
-                                        methode = "ode45",
                                         cond = "maddison_cond",
                                         root_state_weight = "maddison_weights",
                                         sampling_fraction = sampling_fraction,
-                                        run_parallel = TRUE,
                                         setting_calculation = NULL,
-                                        setting_parallel = NULL,
                                         see_ancestral_states = FALSE,
                                         loglik_penalty = 0,
-                                        is_complete_tree = TRUE)
+                                        is_complete_tree = TRUE,
+                                        num_threads = 4)
     testthat::expect_equal(secsse_cla_LL5,secsse_cla_LL4)
   }
   
@@ -718,14 +621,10 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                        phy = phy,
                                        traits = traits,
                                        num_concealed_states = num_concealed_states,
-                                       use_fortran = TRUE,
-                                       methode = "ode45",
                                        cond = "maddison_cond",
                                        root_state_weight = "maddison_weights",
                                        sampling_fraction = sampling_fraction,
-                                       run_parallel = FALSE,
                                        setting_calculation = setting_calculation,
-                                       setting_parallel = NULL,
                                        see_ancestral_states = FALSE,
                                        loglik_penalty = 0,
                                        is_complete_tree = TRUE)

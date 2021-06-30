@@ -32,7 +32,7 @@ struct update_state {
   state_vec operator()(const state_vec& input) {
     state_vec current_state = input;
     // extract log likelihood:
-    double loglik = current_state.back(); current_state.pop_back();
+    long double loglik = current_state.back(); current_state.pop_back();
     
     std::unique_ptr<OD_OBJECT> od_ptr = std::make_unique<OD_OBJECT>(od_);
     

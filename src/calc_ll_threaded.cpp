@@ -30,7 +30,7 @@ struct combine_states {
       mergeBranch[i] = vec1[i + d_] * vec2[i + d_] * od_.get_l(i);
     }
     
-    double loglik = ll1 + ll2;
+    long double loglik = ll1 + ll2;
     normalize_loglik(mergeBranch, loglik);
     
     state_vec newstate(d_);

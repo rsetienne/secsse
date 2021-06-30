@@ -77,7 +77,7 @@ double get_time_inte(const std::vector< std::vector<double>>& forTime,
 
 
 std::vector<double> normalize_loglik_node(std::vector<double>& probvec,
-                                          double& loglik) {
+                                          long double& loglik) {
   
   size_t d = probvec.size() / 2;
   
@@ -93,7 +93,7 @@ std::vector<double> normalize_loglik_node(std::vector<double>& probvec,
 }
 
 void normalize_loglik(std::vector<double>& probvec,
-                      double& loglik) {
+                      long double& loglik) {
   static const auto abssum = [] (auto x, auto y) {return x + std::abs(y);};
   
   double sumabsprobs = std::accumulate(probvec.begin(), probvec.end(), 0.0,

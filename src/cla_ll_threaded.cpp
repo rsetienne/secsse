@@ -49,7 +49,7 @@ struct combine_states_cla {
       mergeBranch[i] *= 0.5;
     }
     
-    double loglik = ll1 + ll2;
+    long double loglik = ll1 + ll2;
     
     normalize_loglik(mergeBranch, loglik);
 

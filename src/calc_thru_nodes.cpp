@@ -21,7 +21,7 @@ double calc_ll(const Rcpp::NumericVector& ll,
   ode_standard od(ll, mm, Q);
   size_t d = ll.size();
 
-  double loglik = 0.0;
+  long double loglik = 0.0;
 
   std::vector< double > mergeBranch(d);
   std::vector< double  > nodeN;

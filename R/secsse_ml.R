@@ -168,11 +168,23 @@ secsse_transform_parameters <- function(trparsopt, trparsfix, idparsopt, idparsf
     return(pars1)
 }
 
-secsse_loglik_choosepar <- function(trparsopt, trparsfix, idparsopt, idparsfix, idparslist, structure_func = structure_func,
-    phy = phy, traits = traits, num_concealed_states = num_concealed_states, use_fortran = use_fortran, methode, cond = cond,
-    root_state_weight = root_state_weight, sampling_fraction = sampling_fraction, setting_calculation = setting_calculation,
-    run_parallel = run_parallel, setting_parallel = setting_parallel, see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty,
-    is_complete_tree = is_complete_tree, func = func, verbose = verbose) {
+secsse_loglik_choosepar <- function(trparsopt, 
+                                    trparsfix, 
+                                    idparsopt, 
+                                    idparsfix, 
+                                    idparslist, 
+                                    structure_func = structure_func,
+                                    phy = phy, 
+                                    traits = traits, 
+                                    num_concealed_states = num_concealed_states, 
+                                    cond = cond,
+                                    root_state_weight = root_state_weight, 
+                                    sampling_fraction = sampling_fraction, 
+                                    setting_calculation = setting_calculation,
+                                    see_ancestral_states = see_ancestral_states, 
+                                    loglik_penalty = loglik_penalty,
+                                    is_complete_tree = is_complete_tree, 
+                                    verbose = verbose) {
     alltrpars <- c(trparsopt, trparsfix)
     if (max(alltrpars) > 1 | min(alltrpars) < 0) {
         loglik = -Inf
@@ -181,16 +193,29 @@ secsse_loglik_choosepar <- function(trparsopt, trparsfix, idparsopt, idparsfix, 
 
         if (is.list(pars1[[1]])) {
             # is the cla_ used?
-            loglik <- cla_secsse_loglik(parameter = pars1, phy = phy, traits = traits, num_concealed_states = num_concealed_states,
-                use_fortran = use_fortran, methode = methode, cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
-                run_parallel = run_parallel, setting_calculation = setting_calculation, setting_parallel = setting_parallel,
-                see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree,
-                func = func)
+            loglik <- cla_secsse_loglik(parameter = pars1,
+                                        phy = phy,
+                                        traits = traits,
+                                        num_concealed_states = num_concealed_states,
+                                        cond = cond,
+                                        root_state_weight = root_state_weight,
+                                        sampling_fraction = sampling_fraction,
+                                        setting_calculation = setting_calculation, 
+                                        see_ancestral_states = see_ancestral_states,
+                                        loglik_penalty = loglik_penalty,
+                                        is_complete_tree = is_complete_tree)
         } else {
-            loglik <- secsse_loglik_cpp(parameter = pars1, phy = phy, traits = traits, num_concealed_states = num_concealed_states,
-                cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
-                setting_calculation = setting_calculation,
-                see_ancestral_states = see_ancestral_states, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree)
+            loglik <- secsse_loglik(parameter = pars1,
+                                    phy = phy,
+                                    traits = traits,
+                                    num_concealed_states = num_concealed_states,
+                                    cond = cond,
+                                    root_state_weight = root_state_weight,
+                                    sampling_fraction = sampling_fraction,
+                                    setting_calculation = setting_calculation,
+                                    see_ancestral_states = see_ancestral_states,
+                                    loglik_penalty = loglik_penalty,
+                                    is_complete_tree = is_complete_tree)
         }
         if (is.nan(loglik) || is.na(loglik)) {
             cat("There are parameter values used which cause numerical problems.\n")
@@ -223,7 +248,6 @@ secsse_loglik_choosepar <- function(trparsopt, trparsfix, idparsopt, idparsfix, 
 #' @param run_parallel should the routine to run in parallel be called?
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
-#' @param func function to be used in solving the ODE system. Currently only for testing purposes.
 #' @param verbose sets verbose output; default is verbose when optimmethod is 'subplex'
 #' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
 #' @return Parameter estimated and maximum likelihood
@@ -304,7 +328,6 @@ secsse_ml <- function(phy,
                       num_cycles = 1, 
                       loglik_penalty = 0,
                       is_complete_tree = FALSE, 
-                      func = ifelse(is_complete_tree, "secsse_runmod_ct", secsse_loglik_rhs),
                       verbose = (optimmethod == "subplex")) {
     structure_func <- NULL
     check_input(traits, phy, sampling_fraction, root_state_weight, is_complete_tree)
@@ -344,50 +367,28 @@ secsse_ml <- function(phy,
     trparsfix[which(parsfix == Inf)] = 1
     mus <- calc_mus(is_complete_tree, idparslist, idparsfix, parsfix, idparsopt, initparsopt)
     optimpars <- c(tol, maxiter)
-
-    if (run_parallel == TRUE) {
-        setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree,
-            mus)
-        setting_parallel <- 1
-        if (.Platform$OS.type == "windows") {
-            cl <- parallel::makeCluster(2)
-            doParallel::registerDoParallel(cl)
-            # pass libPath to workers see
-            # https://stackoverflow.com/questions/6412459/how-to-specify-the-location-of-r-packages-in-foreach-packages-pkg-do
-            # https://gitlab.com/CarlBrunius/MUVR/-/issues/11
-            parallel::clusterCall(cl, function(x) .libPaths(x), .libPaths())
-            on.exit(parallel::stopCluster(cl))
-        }
-        if (.Platform$OS.type == "unix") {
-            doMC::registerDoMC(2)
-        }
-    } else {
-        setting_calculation <- build_initStates_time(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree,
-            mus)
-        setting_parallel <- NULL
-    }
+    
+    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
 
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt, trparsfix = trparsfix, idparsopt = idparsopt, idparsfix = idparsfix,
-        idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits, num_concealed_states = num_concealed_states,
-        use_fortran = use_fortran, methode = methode, cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
-        setting_calculation = setting_calculation, run_parallel = run_parallel, setting_parallel = setting_parallel, see_ancestral_states = see_ancestral_states,
-        loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree, func = func, verbose = verbose)
+        idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits, num_concealed_states = num_concealed_states,cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
+            setting_calculation = setting_calculation,  see_ancestral_states = see_ancestral_states,
+        loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree, verbose = verbose)
+    
     cat("The loglikelihood for the initial parameter values is", initloglik, "\n")
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.")
     } else {
         cat("Optimizing the likelihood - this may take a while.", "\n")
         utils::flush.console()
-        cat(setting_parallel, "\n")
         if (is_complete_tree == TRUE) {
             setting_calculation <- NULL
         }
         out <- DDD::optimizer(optimmethod = optimmethod, optimpars = optimpars, fun = secsse_loglik_choosepar, trparsopt = trparsopt,
             idparsopt = idparsopt, trparsfix = trparsfix, idparsfix = idparsfix, idparslist = idparslist, structure_func = structure_func,
-            phy = phy, traits = traits, num_concealed_states = num_concealed_states, use_fortran = use_fortran, methode = methode,
-            cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction, setting_calculation = setting_calculation,
-            run_parallel = run_parallel, setting_parallel = setting_parallel, see_ancestral_states = see_ancestral_states,
-            num_cycles = num_cycles, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree, func = func,
+            phy = phy, traits = traits, num_concealed_states = num_concealed_states, 
+            cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction, setting_calculation = setting_calculation,see_ancestral_states = see_ancestral_states,
+            num_cycles = num_cycles, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree,
             verbose = verbose)
         if (out$conv != 0) {
             stop("Optimization has not converged. Try again with different initial values.\n")

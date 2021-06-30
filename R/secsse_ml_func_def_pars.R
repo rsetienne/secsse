@@ -94,11 +94,27 @@
 #'# ML -136.5796
 #' @export
 
-secsse_ml_func_def_pars <- function(phy, traits, num_concealed_states, idparslist, idparsopt, initparsopt, idfactorsopt, 
-    initfactors, idparsfix, parsfix, idparsfuncdefpar, functions_defining_params, cond = "proper_cond", root_state_weight = "proper_weights", 
-    sampling_fraction, tol = c(1e-04, 1e-05, 1e-07), maxiter = 1000 * round((1.25)^length(idparsopt)), use_fortran = TRUE, 
-    methode = "ode45", optimmethod = "simplex", num_cycles = 1, run_parallel = FALSE, loglik_penalty = 0, is_complete_tree = FALSE, 
-    func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE, secsse_loglik_rhs, "secsse_runmod2"))) {
+secsse_ml_func_def_pars <- function(phy, 
+                                    traits, 
+                                    num_concealed_states, 
+                                    idparslist, 
+                                    idparsopt, 
+                                    initparsopt, 
+                                    idfactorsopt, 
+                                    initfactors,
+                                    idparsfix,
+                                    parsfix,
+                                    idparsfuncdefpar,
+                                    functions_defining_params,
+                                    cond = "proper_cond",
+                                    root_state_weight = "proper_weights", 
+                                    sampling_fraction,
+                                    tol = c(1e-04, 1e-05, 1e-07),
+                                    maxiter = 1000 * round((1.25)^length(idparsopt)),
+                                    optimmethod = "simplex",
+                                    num_cycles = 1, 
+                                    loglik_penalty = 0,
+                                    is_complete_tree = FALSE) {
     
     structure_func <- list()
     structure_func[[1]] <- idparsfuncdefpar
@@ -165,27 +181,8 @@ secsse_ml_func_def_pars <- function(phy, traits, num_concealed_states, idparslis
     
     optimpars <- c(tol, maxiter)
     
-    if (run_parallel == TRUE) {
-        setting_calculation <- build_initStates_time_bigtree(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, 
+    setting_calculation <- build_initStates_time(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, 
             mus)
-        setting_parallel <- 1
-        if (.Platform$OS.type == "windows") {
-            cl <- parallel::makeCluster(2)
-            doParallel::registerDoParallel(cl)
-            # pass libPath to workers see
-            # https://stackoverflow.com/questions/6412459/how-to-specify-the-location-of-r-packages-in-foreach-packages-pkg-do
-            # https://gitlab.com/CarlBrunius/MUVR/-/issues/11
-            parallel::clusterCall(cl, function(x) .libPaths(x), .libPaths())
-            on.exit(parallel::stopCluster(cl))
-        }
-        if (.Platform$OS.type == "unix") {
-            doMC::registerDoMC(2)
-        }
-    } else {
-        setting_calculation <- build_initStates_time(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, 
-            mus)
-        setting_parallel <- NULL
-    }
     
     if (optimmethod == "subplex") {
         verbose <- TRUE
@@ -194,22 +191,21 @@ secsse_ml_func_def_pars <- function(phy, traits, num_concealed_states, idparslis
     }
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt, trparsfix = trparsfix, idparsopt = idparsopt, idparsfix = idparsfix, 
         idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits, num_concealed_states = num_concealed_states, 
-        use_fortran = use_fortran, methode = methode, cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction, 
-        setting_calculation = setting_calculation, run_parallel = run_parallel, setting_parallel = setting_parallel, see_ancestral_states = see_ancestral_states, 
-        loglik_penalty = loglik_penalty, func = func, verbose = verbose)
+        cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction, 
+        setting_calculation = setting_calculation, see_ancestral_states = see_ancestral_states, 
+        loglik_penalty = loglik_penalty, verbose = verbose)
     cat("The loglikelihood for the initial parameter values is", initloglik, "\n")
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.")
     } else {
         cat("Optimizing the likelihood - this may take a while.", "\n")
         utils::flush.console()
-        cat(setting_parallel, "\n")
         out <- DDD::optimizer(optimmethod = optimmethod, optimpars = optimpars, fun = secsse_loglik_choosepar, trparsopt = trparsopt, 
             idparsopt = idparsopt, trparsfix = trparsfix, idparsfix = idparsfix, idparslist = idparslist, structure_func = structure_func, 
-            phy = phy, traits = traits, num_concealed_states = num_concealed_states, use_fortran = use_fortran, methode = methode, 
+            phy = phy, traits = traits, num_concealed_states = num_concealed_states, 
             cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction, setting_calculation = setting_calculation, 
-            run_parallel = run_parallel, setting_parallel = setting_parallel, see_ancestral_states = see_ancestral_states, 
-            num_cycles = num_cycles, loglik_penalty = loglik_penalty, func = func, verbose = verbose)
+            see_ancestral_states = see_ancestral_states, 
+            num_cycles = num_cycles, loglik_penalty = loglik_penalty,verbose = verbose)
         if (out$conv != 0) {
             stop("Optimization has not converged. Try again with different initial values.\n")
         } else {

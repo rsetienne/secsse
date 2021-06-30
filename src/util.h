@@ -24,10 +24,10 @@ double get_time_inte(const std::vector< std::vector<double>>& forTime,
                      int focal_node);
 
 std::vector<double> normalize_loglik_node(std::vector<double>& probvec,
-                                          double& loglik);
+                                          long double& loglik);
 
 void normalize_loglik(std::vector<double>& probvec,
-                      double& loglik);
+                      long double& loglik);
 
 
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,

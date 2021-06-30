@@ -32,7 +32,6 @@ using high_prec_double = mp::mpf_float_100;
 #include "util.h"
 
 
-
 class ode_standard {
 public:
   
@@ -107,7 +106,7 @@ public:
     c_e = 0.0;
     c_d = 0.0;
     
-    lambda_sum =std::vector<double>(d, 0.0);
+    lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
@@ -195,7 +194,7 @@ private:
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
   const size_t d;
-  std::vector<double> lambda_sum;
+  std::vector<long double> lambda_sum;
   // kahan sum parameters:
   double c_e;
   double c_d;
@@ -209,7 +208,8 @@ public:
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) { 
-    lambda_sum =std::vector<double>(d, 0.0);
+   
+    lambda_sum = std::vector<double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
@@ -224,14 +224,14 @@ public:
                 std::vector< double > &dxdt,
                 const double /* t */ ) const {
     
-   for (int i = 0; i < d; ++i) {
-      dxdt[i + d] = -1.0 * ((lambda_sum[i] + m_[i]) * x[i + d]);
-    
-     for (int j = 0; j < d; ++j) {
-       long double dx = x[j + d] - x[i + d];
-       dxdt[i + d] +=  q_[i][j] * dx;;
-     }
-   }
+    for (int i = 0; i < d; ++i) {
+      dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];
+      
+      for (int j = 0; j < d; ++j) {
+        long double dx = x[j + d] - x[i + d];
+        dxdt[i + d] +=  q_[i][j] * dx;
+      }
+    }
   }
   
   double get_l(size_t i, size_t j, size_t k) const {
@@ -263,17 +263,21 @@ public:
                 std::vector< double > &dxdt,
                 const double /* t */ ) const {
     
+    
     for (int i = 0; i < d; ++i) {
-      dxdt[i] = 0.0; 
-      if (m_[i] != 0.0)  {
+      dxdt[i] = 0.0;
+      if (m_[i] != 0.0) {
         dxdt[i] = m_[i] * (1.0 - x[i]);
       }
       
-      for (int j = 0; i < d; ++i) {
-        dxdt[i] += q_[i][j] * (x[j] - x[i]);
-        for (int k = 0; i < d; ++i) {
-          if (l_[i][j][k] != 0) {
-            dxdt[i] += l_[i][j][k] * (x[j] * x[k] - x[i]);
+      for (int j = 0; j < d; ++j) {
+        long double diff = (x[j] - x[i]);
+        dxdt[i] += q_[i][j] * diff;
+        
+        for (int k = 0; k < d; ++k) {
+          if (l_[i][j][k] != 0.0) {
+            long double diff2 = (x[j] * x[k] - x[i]);
+            dxdt[i] += l_[i][j][k] * diff2;
           }
         }
       }

@@ -55,24 +55,24 @@ double calc_ll_cla(const Rcpp::List& ll,
     std::vector< double > add(states[0].size(), 0.0);
     states.push_back(add);
   }
-  std::vector< double > add(states[0].size(), 0.0);
-  states.push_back(add);
+ // std::vector< double > add(states[0].size(), 0.0);
+ // states.push_back(add);
 
   std::vector< double > logliks(ances.size());
   std::vector<double> y;
  
   std::vector<int> desNodes;
   std::vector<double> timeInte;
+  long double loglik = 0;
   
   for (int a = 0; a < ances.size(); ++a) {
-    double loglik = 0;
+    
 
     int focal = ances[a];
-    std::vector<int> desNodes;
-    std::vector<double> timeInte;
     find_desNodes(for_time, focal, desNodes, timeInte);
     
     int focal_node;
+    std::cerr << a << "\t";
     for (int i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
       assert((focal_node) >= 0);
@@ -83,8 +83,8 @@ double calc_ll_cla(const Rcpp::List& ll,
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr), // ode class object
-                           y,// state vector
-                           0.0,// t0
+                           y, // state vector
+                           0.0, // t0
                            timeInte[i], //t1
                            timeInte[i] * 0.01,
                            absolute_tol,
@@ -92,6 +92,7 @@ double calc_ll_cla(const Rcpp::List& ll,
       
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
+      std::cerr << timeInte[i] << "\t";
     }
 
     normalize_loglik_node(nodeM, loglik); //Rcout << "nodeM: " << loglik<< "\n";
@@ -102,6 +103,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     for (size_t i = 0; i < d; ++i) {
       for (size_t j = 0; j < d; ++j) {
         for (size_t k = 0; k < d; ++k) {
+          
           if (ll_cpp[i][j][k] != 0.0) {
            mergeBranch[i] += ll_cpp[i][j][k] * (nodeN[j + d] * nodeM[k + d] +
                                                 nodeM[j + d] * nodeN[k + d]);
@@ -120,7 +122,8 @@ double calc_ll_cla(const Rcpp::List& ll,
     assert((focal) >= 0);
     assert((focal) < states.size());
     states[focal] = newstate; // -1 because of R conversion to C++ indexing
-    logliks[a] = loglik;
+  //  logliks[a] = loglik;
+    std::cerr << std::setprecision(20) << loglik << "\n";
   }
 
   for (int i = 0; i < mergeBranch.size(); ++i) {
@@ -130,10 +133,9 @@ double calc_ll_cla(const Rcpp::List& ll,
     nodeM_out.push_back(nodeM[i]);
   }
 
+ // auto sum_loglik = std::accumulate(logliks.begin(), logliks.end(), 0.0);
 
-  auto sum_loglik = std::accumulate(logliks.begin(), logliks.end(), 0.0);
-
-  return sum_loglik;
+  return loglik;
 }
 
 //' function to condition
@@ -148,8 +150,7 @@ double calc_ll_cla(const Rcpp::List& ll,
 //' @param rtol rtol
 //' @export
 // [[Rcpp::export]]
-Rcpp::NumericVector ct_condition(int d,
-                                 const Rcpp::NumericVector& y,
+Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
                                  double t,
                                  const Rcpp::List& ll,
                                  const Rcpp::NumericVector& mm,
@@ -159,7 +160,6 @@ Rcpp::NumericVector ct_condition(int d,
                                  double rtol) {
   
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  //list_to_vector(ll, ll_);
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
@@ -172,8 +172,6 @@ Rcpp::NumericVector ct_condition(int d,
     }
     ll_cpp.push_back(temp2);
   }
-  
-  // Rcpp::Rcout << "list converted\n"; force_output();
   
   std::vector<double> mm_cpp(mm.begin(), mm.end());
   
@@ -188,11 +186,11 @@ Rcpp::NumericVector ct_condition(int d,
   odeintcpp::integrate(method,
                        std::move(od_ptr), // ode class object
                        init_state,// state vector
-                       0.0,// t0
-                       t, //t1
+                       0.0,  // t0
+                       t,    //t1
                        t * 0.01,
                        atol,
-                       rtol); // t1
+                       rtol); 
   
   Rcpp::NumericVector out;
   for (int i = 0; i < init_state.size(); ++i) {

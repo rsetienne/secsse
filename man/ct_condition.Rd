@@ -4,11 +4,9 @@
 \alias{ct_condition}
 \title{function to condition}
 \usage{
-ct_condition(d, y, t, ll, mm, Q, method, atol, rtol)
+ct_condition(y, t, ll, mm, Q, method, atol, rtol)
 }
 \arguments{
-\item{d}{dd}
-
 \item{y}{yd}
 
 \item{t}{td}
@@ -24,6 +22,8 @@ ct_condition(d, y, t, ll, mm, Q, method, atol, rtol)
 \item{atol}{atol}
 
 \item{rtol}{rtol}
+
+\item{d}{dd}
 }
 \description{
 function to condition

@@ -69,7 +69,7 @@ secsse_runmod_ct_R <- function(t, y, parameter) {
 #'
 #' #[1] -113.1018
 #' @export
-secsse_loglik_cpp <- function(parameter,
+secsse_loglik <- function(parameter,
                               phy,
                               traits,
                               num_concealed_states,

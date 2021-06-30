@@ -49,8 +49,8 @@ calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q
 #' @param atol atol
 #' @param rtol rtol
 #' @export
-ct_condition <- function(d, y, t, ll, mm, Q, method, atol, rtol) {
-    .Call(`_secsseCPP_ct_condition`, d, y, t, ll, mm, Q, method, atol, rtol)
+ct_condition <- function(y, t, ll, mm, Q, method, atol, rtol) {
+    .Call(`_secsseCPP_ct_condition`, y, t, ll, mm, Q, method, atol, rtol)
 }
 
 cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree) {
