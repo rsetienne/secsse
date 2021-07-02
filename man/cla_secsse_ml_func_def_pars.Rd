@@ -102,11 +102,6 @@ States-dependent Speciation and Extinction (SecSSE) where some paramaters are
 functions of other parameters and/or factors. Offers the option of
 cladogenesis
 }
-\note{
-To run in parallel the following libraries must be loaded under 
-windows: apTreeshape, doparallel and foreach. Under unix/linux, apTreeshape,
-doparallel, foreach and doMC must be loaded.
-}
 \examples{
 # Example of how to set the arguments for a ML search.
 rm(list=ls(all=TRUE))
@@ -135,9 +130,9 @@ parsfix <- c(0,0)
 idfactorsopt <- 1
 initfactors <- 4
 # functions_defining_params is a list of functions. Each function has no 
-arguments and to refer
+# arguments and to refer
 # to parameters ids should be indicated as 'par_' i.e. par_3 refers to 
-parameter 3. When a
+# parameter 3. When a
 # function is defined, be sure that all the parameters involved are either 
 # estimated, fixed or
 # defined by previous functions (i.e, a function that defines parameter in

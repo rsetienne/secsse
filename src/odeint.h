@@ -103,8 +103,6 @@ public:
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
-    c_e = 0.0;
-    c_d = 0.0;
     
     lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
@@ -122,8 +120,8 @@ public:
                 const double /* t */ ) const {
     
     for (int i = 0; i < d; ++i) {
-      double Df(0.0);
-      double Ef(0.0);
+      double Df = 0.0;
+      double Ef = 0.0;
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0.0) { // slightly safer.
@@ -138,48 +136,15 @@ public:
       
       for (size_t j = 0; j < d; ++j) {
         // q_[i][j] is always non-zero.
-        long double t1 = (x[j]     - x[i]);
-        dxdt[i]     += q_[i][j] * t1;
+        long double temp1 = (x[j]     - x[i]);
+        dxdt[i]     += q_[i][j] * temp1;
         
-        long double t2 = (x[j + d] - x[i + d]);
-        dxdt[i + d] += q_[i][j] * t2;
+        long double temp2 = (x[j + d] - x[i + d]);
+        dxdt[i + d] += q_[i][j] * temp2;
       }
     }
     return;
   }
-  
-  void kahan_sum(double& sum, double& c, const double& add) {
-    t = sum + add;
-    c = (t - sum) - add;
-    sum = t;
-  }
-  
-  void operator_kahan(const std::vector< double > &x ,
-                      std::vector< double > &dxdt,
-                      const double /* t */ ) {
-    
-    for (int i = 0; i < d; ++i) {
-      double Df = 0.0;
-      double Ef = 0.0;
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
-          if (l_[i][j][k] != 0.0) { // slightly safer.
-            Df +=         l_[i][j][k] * (x[j] * x[k + d] + x[j + d] * x[k]);
-            Ef +=         l_[i][j][k] * (x[j] * x[k]);
-          }
-        }
-      }
-      dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum[i]);
-      dxdt[i + d] = Df - x[i + d] * (lambda_sum[i] + m_[i]); 
-      
-      for (size_t j = 0; j < d; ++j) {
-        kahan_sum(dxdt[i],     c_e, q_[i][j] * (x[j]     - x[i]));
-        kahan_sum(dxdt[i + d], c_d, q_[i][j] * (x[j + d] - x[i + d]));
-      }
-    }
-    return;
-  }
-  
   
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
@@ -194,11 +159,7 @@ private:
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
   const size_t d;
-  std::vector<long double> lambda_sum;
-  // kahan sum parameters:
-  double c_e;
-  double c_d;
-  double t;
+  std::vector< long double > lambda_sum;
 };
 
 class ode_cla_d {
@@ -209,7 +170,7 @@ public:
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) { 
    
-    lambda_sum = std::vector<double>(d, 0.0);
+    lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
@@ -247,7 +208,7 @@ private:
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
   const size_t d;
-  std::vector<double> lambda_sum;
+  std::vector<long double> lambda_sum;
 };
 
 class ode_cla_e {

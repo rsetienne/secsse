@@ -46,10 +46,11 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector<double> nodeM;
 
   int max_ances = *std::max_element(ances.begin(), ances.end());
+  std::vector< double > add(states[0].size(), 0.0);
   while (max_ances > states.size()) {
-    std::vector< double > add(states[0].size(), 0.0);
     states.push_back(add);
   }
+  states.push_back(add);
 
   std::vector< double > logliks(ances.size());
   std::vector<double> y;
@@ -71,6 +72,10 @@ double calc_ll_cla(const Rcpp::List& ll,
       assert((focal_node) < states.size());
       
       y = states[focal_node];
+      std::cerr << timeInte[i] << " y_before: ";
+      for (auto yy : y) {
+        std::cerr << yy << " ";
+      }  std::cerr << "\n";
       
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
@@ -78,16 +83,35 @@ double calc_ll_cla(const Rcpp::List& ll,
                            y, // state vector
                            0.0, // t0
                            timeInte[i], //t1
-                           timeInte[i] * 0.01,
+                           timeInte[i] * 0.1,
                            absolute_tol,
                            relative_tol); // t1
       
+      std::cerr << "y_after: ";
+      for (auto yy : y) {
+        std::cerr << yy << " ";
+      }  std::cerr << "\n";
+      
+
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
-
+    
+    /*std::cerr<< "\n";
+    std::cerr<< "nodeM: ";
+    for (auto n : nodeM) {
+      std::cerr << n << " ";
+    } std::cerr << "\n";
+    
+    std::cerr<< "nodeN: ";
+    for (auto n : nodeN) {
+      std::cerr << n << " ";
+    } std::cerr << "\n";*/
+    
     normalize_loglik_node(nodeM, loglik); //Rcout << "nodeM: " << loglik<< "\n";
+    std::cerr << loglik << " ";
     normalize_loglik_node(nodeN, loglik); //Rcout << "nodeN: " << loglik<< "\n";
+    std::cerr << loglik << " ";
     
     mergeBranch = std::vector<double>(d, 0.0);
     
@@ -105,6 +129,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     }
     
     normalize_loglik(mergeBranch, loglik);
+    std::cerr << loglik << "\n";
     
     std::vector<double> newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
