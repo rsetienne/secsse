@@ -13,7 +13,7 @@
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:'maddison_weigh
-#' ,'proper_weights'(default) or 'equal_weights'. It can also be specified the 
+#' ,'proper_weights'(default) or 'equal_weights'. It can also be specified the
 #' root state:the vector c(1,0,0) indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per trait
 #' state. It must have as many elements as trait states.
@@ -38,13 +38,11 @@
 #'library(deSolve)
 #'#library(diversitree)
 #'library(apTreeshape)
-#'library(foreach)
 #'set.seed(13)
 #'phylotree <- ape::rcoal(12, tip.label = 1:12)
 #'traits <- sample(c(0,1,2),ape::Ntip(phylotree),replace=TRUE)
 #'num_concealed_states <- 3
 #'sampling_fraction <- c(1,1,1)
-#'methode <- 'ode45'
 #'phy <- phylotree
 
 #'# the idparlist for a ETD model (dual state inheritance model of evolution)
@@ -59,24 +57,23 @@
 #'idparlist [[3]] <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
 #'# Now, internally, clasecsse sorts the lambda matrices, so they look like:
 #'prepare_full_lambdas(traits,num_concealed_states,idparlist[[1]])
-#'# which is a list with 9 matrices, corresponding to the 9 states 
-#'(0A,1A,2A,0B,etc)
+#'# which is a list with 9 matrices, corresponding to the 9 states
+#'# (0A,1A,2A,0B,etc)
 #'# if we want to calculate a single likelihood:
 #'parameter <- idparlist
-#'lambd_and_modeSpe <- parameter$lambdas
-#'lambd_and_modeSpe[1,] <- c(0.2,0.2,0.2,0.4,0.4,0.4,0.01,0.01,0.01)
+#'lambda_and_modeSpe <- parameter$lambdas
+#'lambda_and_modeSpe[1,] <- c(0.2,0.2,0.2,0.4,0.4,0.4,0.01,0.01,0.01)
 #'parameter[[1]] <- prepare_full_lambdas(traits,num_concealed_states,
 #'lambda_and_modeSpe)
 #'parameter[[2]] <- rep(0,9)
-#'masterBlock <- matrix(0.07,ncol=3,nrow=3,byrow=TRUE)
+#'masterBlock <- matrix(0.07, ncol=3, nrow=3, byrow=TRUE)
 #'diag(masterBlock) <- NA
 #'parameter [[3]] <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
-#'cla_secsse_loglik_cpp(parameter, phy, traits, num_concealed_states,
-#'                  use_fortran = FALSE, methode = 'ode45', 
+#'cla_secsse_loglik(parameter, phy, traits, num_concealed_states,
 #'                  cond = 'maddison_cond',
 #'                  root_state_weight = 'maddison_weights', sampling_fraction,
-#'                  run_parallel = FALSE, setting_calculation = NULL,
-#'                  setting_parallel = NULL, see_ancestral_states = FALSE,
+#'                  setting_calculation = NULL,
+#'                  see_ancestral_states = FALSE,
 #'                  loglik_penalty = 0)
 #'# LL = -37.8741
 #' @export
@@ -100,7 +97,7 @@ cla_secsse_loglik <- function(parameter,
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
-  Q <- parameter[[3]]
+  Q <- parameter[[3]]  # nolint
 
 
   if (is.null(setting_calculation)) {
@@ -118,9 +115,9 @@ cla_secsse_loglik <- function(parameter,
   }
 
   states <- setting_calculation$states
-  forTime <- setting_calculation$forTime
+  forTime <- setting_calculation$forTime  # nolint
   ances <- setting_calculation$ances
-  
+
   if (num_concealed_states != round(num_concealed_states)) {
     # for testing
     d <- ncol(states) / 2
@@ -128,16 +125,15 @@ cla_secsse_loglik <- function(parameter,
     new_states <- states[, c(1, 2, 3, 10, 11, 12)]
     states <- new_states
   }
-  
+
   loglik <- 0
-  ly <- ncol(states)
   d <- ncol(states) / 2
 
   calcul <- c()
   if (num_threads == 1) {
     ancescpp <- ances - 1
     forTimecpp <- forTime
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
+    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
       calcul <- cla_calThruNodes_cpp(ancescpp,
                                      states,
                                      forTimecpp,
@@ -152,8 +148,8 @@ cla_secsse_loglik <- function(parameter,
     # because C++ indexes from 0, we need to adjust the indexing:
     ancescpp <- ances - 1
     forTimecpp <- forTime
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
-    
+    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
+
     if (num_threads == -2) {
       calcul <- calc_cla_ll_threaded(ancescpp,
                                      states,
@@ -176,53 +172,53 @@ cla_secsse_loglik <- function(parameter,
                                      is_complete_tree)
     }
   }
-  
-  mergeBranch <- calcul$mergeBranch
-  nodeM <- calcul$nodeM
+
+  mergeBranch <- calcul$mergeBranch # nolint
+  nodeM <- calcul$nodeM  # nolint
   loglik <- calcul$loglik
-  
+
   ## At the root
-  mergeBranch2 <- mergeBranch
+  mergeBranch2 <- mergeBranch # nolint
   lmb <- length(mergeBranch2)
   if (is.numeric(root_state_weight)) {
-    weightStates <- rep(root_state_weight/num_concealed_states,
+    weightStates <- rep(root_state_weight / num_concealed_states,
                         num_concealed_states)
   } else {
-    if (root_state_weight == "maddison_weights") {  
+    if (root_state_weight == "maddison_weights") {
       weightStates <- mergeBranch / sum(mergeBranch2)
     }
     if (root_state_weight == "proper_weights") {
       numerator <- rep(NA, lmb)
       for (j in 1:lmb) {
-        numerator[j] <- mergeBranch2[j] / sum(lambdas[[j]] * 
+        numerator[j] <- mergeBranch2[j] / sum(lambdas[[j]] *
                                   ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
       }
       weightStates <- numerator / sum(numerator)
     }
-    if (root_state_weight == "equal_weights") {  
-      weightStates <- rep(1 / lmb, lmb)
+    if (root_state_weight == "equal_weights") {
+      weightStates <- rep(1 / lmb, lmb) # nolint
     }
   }  
-  
-  if (cond == "maddison_cond") { 
-    preCond <- rep(NA, lmb)
-    for (j in 1:lmb) {
-      if (root_state_weight == "equal_weights") {  
-        weightStates <- rep(1 / lmb,lmb)
-      }
-    }
-  }  
-  
+
   if (cond == "maddison_cond") {
     preCond <- rep(NA, lmb)
     for (j in 1:lmb) {
-      preCond[j] <- sum(weightStates[j] * 
-                        lambdas[[j]] *  
+      if (root_state_weight == "equal_weights") {  
+        weightStates <- rep(1 / lmb, lmb)
+      }
+    }
+  }
+
+  if (cond == "maddison_cond") {
+    preCond <- rep(NA, lmb)
+    for (j in 1:lmb) {
+      preCond[j] <- sum(weightStates[j] *
+                        lambdas[[j]] *
                         (1 - nodeM[1:d][j]) ^ 2)
      }
     mergeBranch2 <- mergeBranch2 / sum(preCond)
   }
-  
+
   if (is_complete_tree) {
     timeInte <- max(abs(ape::branching.times(phy)))
     y <- rep(0, lmb)

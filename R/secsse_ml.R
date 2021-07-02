@@ -1,5 +1,10 @@
-transf_funcdefpar <- function(idparsfuncdefpar, functions_defining_params, idfactorsopt, trparsfix, trparsopt, idparsfix,
-    idparsopt) {
+transf_funcdefpar <- function(idparsfuncdefpar,
+                              functions_defining_params,
+                              idfactorsopt,
+                              trparsfix,
+                              trparsopt,
+                              idparsfix,
+                              idparsopt) {
     trparfuncdefpar <- NULL
     ids_all <- c(idparsfix, idparsopt)
 
@@ -17,10 +22,10 @@ transf_funcdefpar <- function(idparsfuncdefpar, functions_defining_params, idfac
     for (jj in 1:length(functions_defining_params)) {
         myfunc <- functions_defining_params[[jj]]
         environment(myfunc) <- a_new_envir
-        # local(myfunc,envir = a_new_envir)
         value_func_defining_parm <- local(myfunc(), envir = a_new_envir)
 
-        ## Now, declare the variable that is just calculated, so it is available for the next calculation if needed
+        ## Now, declare the variable that is just calculated, so it is available 
+        ## for the next calculation if needed
         y <- as.list(value_func_defining_parm)
         names(y) <- paste0("par_", idparsfuncdefpar[jj])
         list2env(y, envir = a_new_envir)
@@ -35,7 +40,12 @@ transf_funcdefpar <- function(idparsfuncdefpar, functions_defining_params, idfac
     return(trparfuncdefpar)
 }
 
-secsse_transform_parameters <- function(trparsopt, trparsfix, idparsopt, idparsfix, idparslist, structure_func) {
+secsse_transform_parameters <- function(trparsopt,
+                                        trparsfix,
+                                        idparsopt,
+                                        idparsfix,
+                                        idparslist,
+                                        structure_func) {
     if (is.null(structure_func) == FALSE) {
         idparsfuncdefpar <- structure_func[[1]]
         functions_defining_params <- structure_func[[2]]
@@ -51,8 +61,13 @@ secsse_transform_parameters <- function(trparsopt, trparsfix, idparsopt, idparsf
             }
         }
 
-        trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar = idparsfuncdefpar, functions_defining_params = functions_defining_params,
-            idfactorsopt = idfactorsopt, trparsfix = trparsfix, trparsopt = trparsopt, idparsfix = idparsfix, idparsopt = idparsopt)
+        trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar = idparsfuncdefpar,
+                                             functions_defining_params = functions_defining_params,
+                                             idfactorsopt = idfactorsopt,
+                                             trparsfix = trparsfix,
+                                             trparsopt = trparsopt,
+                                             idparsfix = idparsfix,
+                                             idparsopt = idparsopt)
     }
 
     if (is.list(idparslist[[1]])) {
@@ -228,28 +243,35 @@ secsse_loglik_choosepar <- function(trparsopt,
     return(loglik)
 }
 
-#' Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE)
+#' Maximum likehood estimation under Several examined and concealed 
+#' States-dependent Speciation and Extinction (SecSSE)
 #' @title Maximum likehood estimation for (SecSSE)
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.
+#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with 
+#' branch lengths.
 #' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent to the number of examined states in the dataset.
+#' @param num_concealed_states number of concealed states, generally equivalent 
+#' to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
 #' @param idparsopt id of parameters to be estimated.
 #' @param initparsopt initial guess of the parameters to be estimated.
 #' @param idparsfix id of the fixed parameters.
 #' @param parsfix value of the fixed parameters.
-#' @param cond condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.
+#' @param cond condition on the existence of a node root: 'maddison_cond',
+#' 'proper_cond'(default). For details, see vignette.
+#' @param root_state_weight the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 
+#' root state:the vector c(1,0,0) indicates state 1 was the root state.
+#' @param sampling_fraction vector that states the sampling proportion per 
+#' trait state. It must have as many elements as there are trait states.
 #' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
 #' @param maxiter max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.
 #' @param optimmethod method used for optimization. Default is 'simplex'.
 #' @param num_cycles number of cycles of the optimization (default is 1).
-#' @param run_parallel should the routine to run in parallel be called?
-#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species is provided
-#' @param verbose sets verbose output; default is verbose when optimmethod is 'subplex'
-#' @note To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+#' @param loglik_penalty the size of the penalty for all parameters; default 
+#' is 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species 
+#' is provided
+#' @param verbose sets verbose output; default is verbose when optimmethod is 
+#' 'subplex'
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -281,10 +303,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'parsfix <- c(0,0)
 #'tol <- c(1e-04, 1e-05, 1e-07)
 #'maxiter <- 1000 * round((1.25)^length(idparsopt))
-#'use_fortran <- TRUE
-#'methode <- 'ode45'
 #'optimmethod <- 'simplex'
-#'run_parallel <- FALSE
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
@@ -302,11 +321,8 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'#sampling_fraction,
 #'#tol,
 #'#maxiter,
-#'#use_fortran,
-#'#methode,
 #'#optimmethod,
 #'#num_cycles = 1,
-#'#run_parallel
 #'#)
 #'# $ML
 #'# [1] -16.43162
@@ -330,7 +346,11 @@ secsse_ml <- function(phy,
                       is_complete_tree = FALSE, 
                       verbose = (optimmethod == "subplex")) {
     structure_func <- NULL
-    check_input(traits, phy, sampling_fraction, root_state_weight, is_complete_tree)
+    check_input(traits, 
+                phy,
+                sampling_fraction,
+                root_state_weight,
+                is_complete_tree)
 
     if (is.matrix(traits)) {
         cat("You are setting a model where some species had more than one trait state \n")
@@ -365,15 +385,38 @@ secsse_ml <- function(phy,
     trparsopt[which(initparsopt == Inf)] = 1
     trparsfix <- parsfix/(1 + parsfix)
     trparsfix[which(parsfix == Inf)] = 1
-    mus <- calc_mus(is_complete_tree, idparslist, idparsfix, parsfix, idparsopt, initparsopt)
+    mus <- calc_mus(is_complete_tree,
+                    idparslist,
+                    idparsfix,
+                    parsfix,
+                    idparsopt,
+                    initparsopt)
     optimpars <- c(tol, maxiter)
     
-    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
+    setting_calculation <- build_initStates_time(phy,
+                                                 traits,
+                                                 num_concealed_states,
+                                                 sampling_fraction,
+                                                 is_complete_tree,
+                                                 mus)
 
-    initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt, trparsfix = trparsfix, idparsopt = idparsopt, idparsfix = idparsfix,
-        idparslist = idparslist, structure_func = structure_func, phy = phy, traits = traits, num_concealed_states = num_concealed_states,cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction,
-            setting_calculation = setting_calculation,  see_ancestral_states = see_ancestral_states,
-        loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree, verbose = verbose)
+    initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
+                                          trparsfix = trparsfix,
+                                          idparsopt = idparsopt,
+                                          idparsfix = idparsfix,
+                                          idparslist = idparslist,
+                                          structure_func = structure_func,
+                                          phy = phy,
+                                          traits = traits,
+                                          num_concealed_states = num_concealed_states,
+                                          cond = cond,
+                                          root_state_weight = root_state_weight,
+                                          sampling_fraction = sampling_fraction,
+                                          setting_calculation = setting_calculation,
+                                          see_ancestral_states = see_ancestral_states,
+                                          loglik_penalty = loglik_penalty,
+                                          is_complete_tree = is_complete_tree,
+                                          verbose = verbose)
     
     cat("The loglikelihood for the initial parameter values is", initloglik, "\n")
     if (initloglik == -Inf) {
@@ -384,18 +427,39 @@ secsse_ml <- function(phy,
         if (is_complete_tree == TRUE) {
             setting_calculation <- NULL
         }
-        out <- DDD::optimizer(optimmethod = optimmethod, optimpars = optimpars, fun = secsse_loglik_choosepar, trparsopt = trparsopt,
-            idparsopt = idparsopt, trparsfix = trparsfix, idparsfix = idparsfix, idparslist = idparslist, structure_func = structure_func,
-            phy = phy, traits = traits, num_concealed_states = num_concealed_states, 
-            cond = cond, root_state_weight = root_state_weight, sampling_fraction = sampling_fraction, setting_calculation = setting_calculation,see_ancestral_states = see_ancestral_states,
-            num_cycles = num_cycles, loglik_penalty = loglik_penalty, is_complete_tree = is_complete_tree,
-            verbose = verbose)
+        out <- DDD::optimizer(optimmethod = optimmethod,
+                              optimpars = optimpars,
+                              fun = secsse_loglik_choosepar,
+                              trparsopt = trparsopt,
+                              idparsopt = idparsopt,
+                              trparsfix = trparsfix,
+                              idparsfix = idparsfix,
+                              idparslist = idparslist,
+                              structure_func = structure_func,
+                              phy = phy,
+                              traits = traits,
+                              num_concealed_states = num_concealed_states, 
+                              cond = cond,
+                              root_state_weight = root_state_weight,
+                              sampling_fraction = sampling_fraction,
+                              setting_calculation = setting_calculation,
+                              see_ancestral_states = see_ancestral_states,
+                              num_cycles = num_cycles,
+                              loglik_penalty = loglik_penalty,
+                              is_complete_tree = is_complete_tree,
+                              verbose = verbose)
         if (out$conv != 0) {
             stop("Optimization has not converged. Try again with different initial values.\n")
         } else {
-            MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)), trparsfix, idparsopt, idparsfix, idparslist,
-                structure_func)
-            out2 <- list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)), conv = out$conv)
+            MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)), 
+                                                   trparsfix,
+                                                   idparsopt,
+                                                   idparsfix,
+                                                   idparslist,
+                                                   structure_func)
+            out2 <- list(MLpars = MLpars1,
+                         ML = as.numeric(unlist(out$fvalues)),
+                         conv = out$conv)
         }
     }
     return(out2)

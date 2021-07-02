@@ -22,16 +22,17 @@ secsse_ml(
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = ifelse(is_complete_tree, "secsse_runmod_ct", secsse_loglik_rhs),
   verbose = (optimmethod == "subplex")
 )
 }
 \arguments{
-\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.}
+\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with 
+branch lengths.}
 
 \item{traits}{a vector with trait states for each tip in the phylogeny.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent to the number of examined states in the dataset.}
+\item{num_concealed_states}{number of concealed states, generally equivalent 
+to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
 
@@ -43,11 +44,14 @@ secsse_ml(
 
 \item{parsfix}{value of the fixed parameters.}
 
-\item{cond}{condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: 'maddison_cond',
+'proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 
+root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
-\item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.}
+\item{sampling_fraction}{vector that states the sampling proportion per 
+trait state. It must have as many elements as there are trait states.}
 
 \item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
@@ -57,24 +61,21 @@ secsse_ml(
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
-\item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+\item{loglik_penalty}{the size of the penalty for all parameters; default 
+is 0 (no penalty)}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
+\item{is_complete_tree}{whether or not a tree with all its extinct species 
+is provided}
 
-\item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
-
-\item{verbose}{sets verbose output; default is verbose when optimmethod is 'subplex'}
-
-\item{run_parallel}{should the routine to run in parallel be called?}
+\item{verbose}{sets verbose output; default is verbose when optimmethod is 
+'subplex'}
 }
 \value{
 Parameter estimated and maximum likelihood
 }
 \description{
-Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE)
-}
-\note{
-To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+Maximum likehood estimation under Several examined and concealed 
+States-dependent Speciation and Extinction (SecSSE)
 }
 \examples{
 # Example of how to set the arguments for a ML search.
@@ -106,10 +107,7 @@ idparsfix <- c(0,4)
 parsfix <- c(0,0)
 tol <- c(1e-04, 1e-05, 1e-07)
 maxiter <- 1000 * round((1.25)^length(idparsopt))
-use_fortran <- TRUE
-methode <- 'ode45'
 optimmethod <- 'simplex'
-run_parallel <- FALSE
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
@@ -127,11 +125,8 @@ sampling_fraction <- c(1,1,1)
 #sampling_fraction,
 #tol,
 #maxiter,
-#use_fortran,
-#methode,
 #optimmethod,
 #num_cycles = 1,
-#run_parallel
 #)
 # $ML
 # [1] -16.43162

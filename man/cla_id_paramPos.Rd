@@ -7,9 +7,11 @@
 cla_id_paramPos(traits, num_concealed_states)
 }
 \arguments{
-\item{traits}{vector with trait states, order of states must be the same as tree tips, for help, see vignette.}
+\item{traits}{vector with trait states, order of states must be the same as 
+tree tips, for help, see vignette.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent to number of examined states.}
+\item{num_concealed_states}{number of concealed states, generally equivalent 
+to number of examined states.}
 }
 \value{
 A list that includes the ids of the parameters for ML analysis.

@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // calc_ll_threaded
 Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& for_time, const Rcpp::NumericMatrix& states, int num_threads, std::string method);
-RcppExport SEXP _secsseCPP_calc_ll_threaded(SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP ancesSEXP, SEXP for_timeSEXP, SEXP statesSEXP, SEXP num_threadsSEXP, SEXP methodSEXP) {
+RcppExport SEXP _secsse_calc_ll_threaded(SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP ancesSEXP, SEXP for_timeSEXP, SEXP statesSEXP, SEXP num_threadsSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -25,7 +25,7 @@ END_RCPP
 }
 // calThruNodes_cpp
 Rcpp::List calThruNodes_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas, const NumericVector& mus, const NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method);
-RcppExport SEXP _secsseCPP_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP) {
+RcppExport SEXP _secsse_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -45,7 +45,7 @@ END_RCPP
 }
 // calc_cla_ll_threaded
 Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas_R, const Rcpp::NumericVector& mus_R, const Rcpp::NumericMatrix& Q, int num_threads, std::string method, bool is_complete_tree);
-RcppExport SEXP _secsseCPP_calc_cla_ll_threaded(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdas_RSEXP, SEXP mus_RSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
+RcppExport SEXP _secsse_calc_cla_ll_threaded(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdas_RSEXP, SEXP mus_RSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -64,7 +64,7 @@ END_RCPP
 }
 // ct_condition
 Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y, double t, const Rcpp::List& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol);
-RcppExport SEXP _secsseCPP_ct_condition(SEXP ySEXP, SEXP tSEXP, SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP) {
+RcppExport SEXP _secsse_ct_condition(SEXP ySEXP, SEXP tSEXP, SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -82,7 +82,7 @@ END_RCPP
 }
 // cla_calThruNodes_cpp
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol, bool is_complete_tree);
-RcppExport SEXP _secsseCPP_cla_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP) {
+RcppExport SEXP _secsse_cla_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -102,15 +102,15 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_secsseCPP_calc_ll_threaded", (DL_FUNC) &_secsseCPP_calc_ll_threaded, 8},
-    {"_secsseCPP_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_calThruNodes_cpp, 10},
-    {"_secsseCPP_calc_cla_ll_threaded", (DL_FUNC) &_secsseCPP_calc_cla_ll_threaded, 9},
-    {"_secsseCPP_ct_condition", (DL_FUNC) &_secsseCPP_ct_condition, 8},
-    {"_secsseCPP_cla_calThruNodes_cpp", (DL_FUNC) &_secsseCPP_cla_calThruNodes_cpp, 10},
+    {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 8},
+    {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 10},
+    {"_secsse_calc_cla_ll_threaded", (DL_FUNC) &_secsse_calc_cla_ll_threaded, 9},
+    {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
+    {"_secsse_cla_calThruNodes_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_cpp, 10},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_secsseCPP(DllInfo *dll) {
+RcppExport void R_init_secsse(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

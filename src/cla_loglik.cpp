@@ -18,10 +18,7 @@ double calc_ll_cla(const Rcpp::List& ll,
                    double absolute_tol,
                    double relative_tol) {
 
-  // std::cerr << method << ' ' << absolute_tol << " " << relative_tol << "\n";
-  
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  //list_to_vector(ll, ll_);
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
@@ -34,8 +31,6 @@ double calc_ll_cla(const Rcpp::List& ll,
     }
     ll_cpp.push_back(temp2);
   }
-  
-  // Rcpp::Rcout << "list converted\n"; force_output();
   
   std::vector<double> mm_cpp(mm.begin(), mm.end());
   
@@ -55,8 +50,6 @@ double calc_ll_cla(const Rcpp::List& ll,
     std::vector< double > add(states[0].size(), 0.0);
     states.push_back(add);
   }
- // std::vector< double > add(states[0].size(), 0.0);
- // states.push_back(add);
 
   std::vector< double > logliks(ances.size());
   std::vector<double> y;
@@ -72,7 +65,6 @@ double calc_ll_cla(const Rcpp::List& ll,
     find_desNodes(for_time, focal, desNodes, timeInte);
     
     int focal_node;
-    std::cerr << a << "\t";
     for (int i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
       assert((focal_node) >= 0);
@@ -92,7 +84,6 @@ double calc_ll_cla(const Rcpp::List& ll,
       
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
-      std::cerr << timeInte[i] << "\t";
     }
 
     normalize_loglik_node(nodeM, loglik); //Rcout << "nodeM: " << loglik<< "\n";
@@ -122,8 +113,6 @@ double calc_ll_cla(const Rcpp::List& ll,
     assert((focal) >= 0);
     assert((focal) < states.size());
     states[focal] = newstate; // -1 because of R conversion to C++ indexing
-  //  logliks[a] = loglik;
-    std::cerr << std::setprecision(20) << loglik << "\n";
   }
 
   for (int i = 0; i < mergeBranch.size(); ++i) {
@@ -133,22 +122,9 @@ double calc_ll_cla(const Rcpp::List& ll,
     nodeM_out.push_back(nodeM[i]);
   }
 
- // auto sum_loglik = std::accumulate(logliks.begin(), logliks.end(), 0.0);
-
   return loglik;
 }
 
-//' function to condition
-//' @param d dd
-//' @param y yd
-//' @param t td
-//' @param ll ll
-//' @param mm mm
-//' @param Q qd
-//' @param method method
-//' @param atol atol
-//' @param rtol rtol
-//' @export
 // [[Rcpp::export]]
 Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
                                  double t,

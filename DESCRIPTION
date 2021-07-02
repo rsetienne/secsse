@@ -1,9 +1,9 @@
-Package: secsseCPP
+Package: secsse
 Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
-Version: 2.0.7
-Date: 2021-02-10
+Version: 2.2.0
+Date: 2021-07-02
 License: GPL-3
 Authors@R: c(
  person(given = "Leonel",
@@ -14,6 +14,10 @@ Authors@R: c(
         family = "van Els",
         email = "paulvanels@gmail.com",
         role = "aut"),
+ person(given = "Thijs",
+        family = "Janzen",
+        email = "t.janzen@rug.nl",
+        role = "ctb"),
  person(given = "Rampal S.",
         family = "Etienne",
         email = "r.s.etienne@rug.nl",
@@ -28,13 +32,12 @@ Imports:
     utils,
     DDD (>= 4.0),
     ape,
-    foreach,
-    doParallel,
     apTreeshape,
     phylobase,
     geiger,
     deSolve,
     Rcpp,
+    RcppParallel,
     BH
 Suggests: diversitree,
  phytools,

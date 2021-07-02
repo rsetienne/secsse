@@ -1,11 +1,10 @@
 secsse_runmod_ct_R <- function(t, y, parameter) {
   ly <- length(y)
-  d <- ly/2
+  d <- ly / 2
   dC <- rep(0, 2 * d)
-  
+
   Es <- y[1:d]
   Ds <- y[(d + 1):(d + d)]
-  
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   Q <- parameter[[3]]
@@ -16,28 +15,41 @@ secsse_runmod_ct_R <- function(t, y, parameter) {
   
   for (I in 1:d) {
     for (II in 1:d) {
-      dC[I] = dC[I] + Q[I, II] * (Es[II] - Es[I])
-      dC[d + I] = dC[d + I] + Q[I, II] * (Ds[II] - Ds[I])
+      dC[I] <- dC[I] + Q[I, II] * (Es[II] - Es[I])
+      dC[d + I] <- dC[d + I] + Q[I, II] * (Ds[II] - Ds[I])
     }
   }
   return(list(c(dC)))
 }
 
 
-#' Logikelihood calculation for the SecSSE model given a set of parameters and data
+#' Logikelihood calculation for the SecSSE model given a set of parameters and 
+#' data
 #' @title Likelihood for SecSSE model
-#' @param parameter list where first vector represents lambdas, the second mus and the third transition rates.
-#' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved, rooted and with branch lengths.
-#' @param traits vector with trait states, order of states must be the same as tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent to number of examined states.
-#' @param cond condition on the existence of a node root: "maddison_cond","proper_cond"(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per trait state. It must have as many elements as trait states.
-#' @param setting_calculation argument used internally to speed up calculation. It should be left blank (default : setting_calculation = NULL)
-#' @param see_ancestral_states should the ancestral states be shown? Deafault FALSE
-#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species is provided
-#' @param num_threads number of threads. Set to -1 to use all available threads. Default is one thread.
+#' @param parameter list where first vector represents lambdas, the second mus 
+#' and the third transition rates.
+#' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved, 
+#' rooted and with branch lengths.
+#' @param traits vector with trait states, order of states must be the same as 
+#' tree tips, for help, see vignette.
+#' @param num_concealed_states number of concealed states, generally equivalent 
+#' to number of examined states.
+#' @param cond condition on the existence of a node root: "maddison_cond",
+#' "proper_cond"(default). For details, see vignette.
+#' @param root_state_weight the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the 
+#' root state:the vector c(1,0,0) indicates state 1 was the root state.
+#' @param sampling_fraction vector that states the sampling proportion per 
+#' trait state. It must have as many elements as trait states.
+#' @param setting_calculation argument used internally to speed up calculation. 
+#' It should be left blank (default : setting_calculation = NULL)
+#' @param see_ancestral_states should the ancestral states be shown? Default 
+#' FALSE
+#' @param loglik_penalty the size of the penalty for all parameters; default is 
+#' 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species 
+#' is provided
+#' @param num_threads number of threads. Set to -1 to use all available threads. 
+#' Default is one thread.
 #' @param atol atol
 #' @param rtol rtol
 #' @param method method
@@ -65,33 +77,43 @@ secsse_runmod_ct_R <- function(t, y, parameter) {
 #' drill[[3]][,] <- 0.1
 #' diag(drill[[3]]) <- NA
 #' secsse_loglik(parameter = drill,phylotree,traits,num_concealed_states,
-#'    use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
+#'    use_fortran,methode,cond,root_state_weight,sampling_fraction,
+#'    see_ancestral_states = FALSE)
 #'
 #' #[1] -113.1018
 #' @export
 secsse_loglik <- function(parameter,
-                              phy,
-                              traits,
-                              num_concealed_states,
-                              cond = "proper_cond",
-                              root_state_weight = "proper_weights",
-                              sampling_fraction,
-                              setting_calculation = NULL,
-                              see_ancestral_states = FALSE,
-                              loglik_penalty = 0,
-                              is_complete_tree = FALSE,
-                              num_threads = 1,
-                              atol = 1e-12,
-                              rtol = 1e-12,
-                              method = "odeint::bulirsch_stoer") {
+                          phy,
+                          traits,
+                          num_concealed_states,
+                          cond = "proper_cond",
+                          root_state_weight = "proper_weights",
+                          sampling_fraction,
+                          setting_calculation = NULL,
+                          see_ancestral_states = FALSE,
+                          loglik_penalty = 0,
+                          is_complete_tree = FALSE,
+                          num_threads = 1,
+                          atol = 1e-12,
+                          rtol = 1e-12,
+                          method = "odeint::bulirsch_stoer") {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]
   
   if (is.null(setting_calculation)) {
-    check_input(traits,phy,sampling_fraction,root_state_weight,is_complete_tree)
-    setting_calculation <- build_initStates_time(phy,traits,num_concealed_states,sampling_fraction,is_complete_tree,mus)
+    check_input(traits,
+                phy,
+                sampling_fraction,
+                root_state_weight,
+                is_complete_tree)
+    setting_calculation <- build_initStates_time(phy,
+                                                 traits,
+                                                 num_concealed_states,
+                                                 sampling_fraction,
+                                                 is_complete_tree,
+                                                 mus)
   }
   
   states <- setting_calculation$states
@@ -166,7 +188,9 @@ secsse_loglik <- function(parameter,
     }
     
     if (root_state_weight == "proper_weights") {
-      weightStates <- (mergeBranch2/(lambdas * (1 - nodeM[1:d]) ^ 2))/sum((mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)))
+      weightStates <- (mergeBranch2 / 
+                         (lambdas * (1 - nodeM[1:d]) ^ 2)) / 
+                          sum((mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)))
     }
     
     if (root_state_weight == "equal_weights") {
@@ -204,10 +228,11 @@ secsse_loglik <- function(parameter,
   
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips + 1):nrow(states),]
-    ancestral_states <- ancestral_states[,-(1:(ncol(ancestral_states)/2))]
+    ancestral_states <- states[(num_tips + 1):nrow(states), ]
+    ancestral_states <- ancestral_states[,-(1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states,LL = LL))
+    return(list(ancestral_states = ancestral_states,
+                LL = LL))
   } else {
     return(LL)
   }

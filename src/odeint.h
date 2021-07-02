@@ -21,13 +21,13 @@
 // #include <boost/multiprecision/float128.hpp>
 // #include "boost/multiprecision/cpp_bin_float.hpp"
 
-#include <boost/multiprecision/mpfr.hpp>
+//#include <boost/multiprecision/mpfr.hpp>
 
-namespace mp = boost::multiprecision;
+//namespace mp = boost::multiprecision;
 
 // using high_prec_double = mp::cpp_bin_float_quad;   //mp::mpf_float_100;
 
-using high_prec_double = mp::mpf_float_100;
+//using high_prec_double = mp::mpf_float_100;
 
 #include "util.h"
 

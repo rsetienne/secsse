@@ -2,7 +2,8 @@
 % Please edit documentation in R/secsse_ml_func_def_pars.R
 \name{secsse_ml_func_def_pars}
 \alias{secsse_ml_func_def_pars}
-\title{Maximum likehood estimation for (SecSSE) with parameter as complex functions.}
+\title{Maximum likehood estimation for (SecSSE) with parameter as complex 
+functions.}
 \usage{
 secsse_ml_func_def_pars(
   phy,
@@ -22,23 +23,20 @@ secsse_ml_func_def_pars(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  use_fortran = TRUE,
-  methode = "ode45",
   optimmethod = "simplex",
   num_cycles = 1,
-  run_parallel = FALSE,
   loglik_penalty = 0,
-  is_complete_tree = FALSE,
-  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE,
-    secsse_loglik_rhs, "secsse_runmod2"))
+  is_complete_tree = FALSE
 )
 }
 \arguments{
-\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.}
+\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with 
+branch lengths.}
 
 \item{traits}{a vector with trait states for each tip in the phylogeny.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent to the number of examined states in the dataset.}
+\item{num_concealed_states}{number of concealed states, generally equivalent 
+to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
 
@@ -46,52 +44,57 @@ secsse_ml_func_def_pars(
 
 \item{initparsopt}{initial guess of the parameters to be estimated.}
 
-\item{idfactorsopt}{id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.}
+\item{idfactorsopt}{id of the factors that will be optimized. There are not 
+fixed factors, so use a constant within 'functions_defining_params'.}
 
-\item{initfactors}{the initial guess for a factor (it should be set to NULL when no factors).}
+\item{initfactors}{the initial guess for a factor (it should be set to NULL 
+when no factors).}
 
-\item{idparsfix}{id of the fixed parameters (it should be set to NULL when there are no factors).}
+\item{idparsfix}{id of the fixed parameters (it should be set to NULL when
+there are no factors).}
 
 \item{parsfix}{value of the fixed parameters.}
 
-\item{idparsfuncdefpar}{id of the parameters which will be a function of optimized and/or fixed parameters. The order of id should match functions_defining_params}
+\item{idparsfuncdefpar}{id of the parameters which will be a function of 
+optimized and/or fixed parameters. The order of id should match 
+functions_defining_params}
 
-\item{functions_defining_params}{a list of functions. Each element will be a function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example and vigenette}
+\item{functions_defining_params}{a list of functions. Each element will be a 
+function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example 
+and vigenette}
 
-\item{cond}{condition on the existence of a node root: 'maddison_cond','proper_cond'(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: 'maddison_cond',
+'proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:'maddison_weights',
+'proper_weights'(default) or 'equal_weights'. It can also be specified the 
+root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
-\item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.}
+\item{sampling_fraction}{vector that states the sampling proportion per 
+trait state. It must have as many elements as there are trait states.}
 
 \item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
-\item{maxiter}{max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.}
-
-\item{use_fortran}{Should the Fortran code for numerical integration be called? Default is TRUE.}
-
-\item{methode}{method used for integration calculation. Default is 'ode45'.}
+\item{maxiter}{max number of iterations. Default is 
+'1000*round((1.25)^length(idparsopt))'.}
 
 \item{optimmethod}{method used for optimization. Default is 'simplex'.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
-\item{run_parallel}{should the routine to run in parallel be called? Read note below}
+\item{loglik_penalty}{the size of the penalty for all parameters; default is 
+0 (no penalty)}
 
-\item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
-
-\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
-
-\item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
+\item{is_complete_tree}{whether or not a tree with all its extinct species is 
+provided}
 }
 \value{
 Parameter estimated and maximum likelihood
 }
 \description{
-Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE) where some paramaters are functions of other parameters and/or factors.
-}
-\note{
-To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+Maximum likehood estimation under Several examined and concealed 
+States-dependent Speciation and Extinction (SecSSE) where some paramaters 
+are functions of other parameters and/or factors.
 }
 \examples{
 # Example of how to set the arguments for a ML search.
@@ -121,14 +124,21 @@ initparsopt <- c(rep(intGuessLamba,2))
 parsfix <- c(0,0)
 idfactorsopt <- 1
 initfactors <- 4
-# functions_defining_params is a list of functions. Each function has no arguments and to refer
-# to parameters ids should be indicated as 'par_' i.e. par_3 refers to parameter 3. When a
-# function is defined, be sure that all the parameters involved are either estimated, fixed or
+# functions_defining_params is a list of functions. Each function has no 
+# arguments and to refer
+# to parameters ids should be indicated as 'par_' i.e. par_3 refers to 
+# parameter 3. When a
+# function is defined, be sure that all the parameters involved are either 
+# estimated, fixed or
 # defined by previous functions (i.e, a function that defines parameter in
-# 'functions_defining_params'). The user is responsible for this. In this example, par_3
-# (i.e., parameter 3) is needed to calculate par_6. This is correct because par_3 is defined in
-# the first function of 'functions_defining_params'. Notice that factor_1 indicates a value
-# that will be estimated to satisfy the equation. The same factor can be shared to define
+# 'functions_defining_params'). The user is responsible for this. In this 
+# example, par_3
+# (i.e., parameter 3) is needed to calculate par_6. This is correct because 
+# par_3 is defined in
+# the first function of 'functions_defining_params'. Notice that factor_1 
+# indicates a value
+# that will be estimated to satisfy the equation. The same factor can be
+# shared to define
 # several parameters.
 functions_defining_params <- list()
 functions_defining_params[[1]] <- function(){
@@ -143,18 +153,30 @@ functions_defining_params[[3]] <- function(){
 
 tol = c(1e-04, 1e-05, 1e-07)
 maxiter = 1000 * round((1.25)^length(idparsopt))
-use_fortran = TRUE
-methode = 'ode45'
 optimmethod = 'simplex'
-run_parallel = FALSE
 cond<-'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
-#model <- secsse_ml_func_def_pars(phylotree, traits, num_concealed_states, idparslist, idparsopt,
-#                               initparsopt, idfactorsopt, initfactors, idparsfix, parsfix,
-#                               idparsfuncdefpar, functions_defining_params, cond,
-#                               root_state_weight, sampling_fraction, tol, maxiter, use_fortran,
-#                               methode, optimmethod, num_cycles = 1, run_parallel)
-
+\dontrun{
+model <- secsse_ml_func_def_pars(phylotree,
+traits,
+num_concealed_states,
+idparslist,
+idparsopt,
+initparsopt,
+idfactorsopt,
+initfactors,
+idparsfix,
+parsfix,
+idparsfuncdefpar,
+functions_defining_params,
+cond,
+root_state_weight,
+sampling_fraction,
+tol,
+maxiter,
+optimmethod,
+num_cycles = 1)
+}
 # ML -136.5796
 }

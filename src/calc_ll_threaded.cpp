@@ -48,19 +48,7 @@ struct combine_states {
 };
 
 
-//' ll threaded
-//' @param ll lambdas
-//' @param mm mus
-//' @param Q qs
-//' @param ances vector of ances
-//' @param for_time fortime
-//' @param states states matrix
-//' @param merge_branch_out merge_branch_out
-//' @param node_M out
-//' @param num_threads num_threads
-//' @param method integration method
-//' @return log likelihood
-//' @export
+
 // [[Rcpp::export]]
 Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
                             const Rcpp::NumericVector& mm,

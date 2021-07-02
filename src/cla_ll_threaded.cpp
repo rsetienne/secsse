@@ -67,18 +67,6 @@ struct combine_states_cla {
   OD_TYPE od_;
 };
 
-//' cla log likelihood using tbb flow
-//' @description cla loglik
-//' @param ances ances
-//' @param states_R states
-//' @param forTime_r ff
-//' @param lambdas list of lambdas
-//' @param mus vector of mus
-//' @param Q q
-//' @param num_threads num threads
-//' @param method integration method
-//' @param is_complete_tree is complete tree?
-//' @export
 // [[Rcpp::export]]
 Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& states_R,

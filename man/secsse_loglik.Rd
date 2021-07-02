@@ -23,29 +23,41 @@ secsse_loglik(
 )
 }
 \arguments{
-\item{parameter}{list where first vector represents lambdas, the second mus and the third transition rates.}
+\item{parameter}{list where first vector represents lambdas, the second mus 
+and the third transition rates.}
 
-\item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved, rooted and with branch lengths.}
+\item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved, 
+rooted and with branch lengths.}
 
-\item{traits}{vector with trait states, order of states must be the same as tree tips, for help, see vignette.}
+\item{traits}{vector with trait states, order of states must be the same as 
+tree tips, for help, see vignette.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent to number of examined states.}
+\item{num_concealed_states}{number of concealed states, generally equivalent 
+to number of examined states.}
 
-\item{cond}{condition on the existence of a node root: "maddison_cond","proper_cond"(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: "maddison_cond",
+"proper_cond"(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the 
+root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
-\item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as trait states.}
+\item{sampling_fraction}{vector that states the sampling proportion per 
+trait state. It must have as many elements as trait states.}
 
-\item{setting_calculation}{argument used internally to speed up calculation. It should be left blank (default : setting_calculation = NULL)}
+\item{setting_calculation}{argument used internally to speed up calculation. 
+It should be left blank (default : setting_calculation = NULL)}
 
-\item{see_ancestral_states}{should the ancestral states be shown? Deafault FALSE}
+\item{see_ancestral_states}{should the ancestral states be shown? Default 
+FALSE}
 
-\item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+\item{loglik_penalty}{the size of the penalty for all parameters; default is 
+0 (no penalty)}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
+\item{is_complete_tree}{whether or not a tree with all its extinct species 
+is provided}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads. Default is one thread.}
+\item{num_threads}{number of threads. Set to -1 to use all available threads. 
+Default is one thread.}
 
 \item{atol}{atol}
 
@@ -57,7 +69,8 @@ secsse_loglik(
 The loglikelihood of the data given the parameters
 }
 \description{
-Logikelihood calculation for the SecSSE model given a set of parameters and data
+Logikelihood calculation for the SecSSE model given a set of parameters and 
+data
 }
 \examples{
 rm(list = ls(all = TRUE))
@@ -82,7 +95,8 @@ drill[[2]][] <- 0
 drill[[3]][,] <- 0.1
 diag(drill[[3]]) <- NA
 secsse_loglik(parameter = drill,phylotree,traits,num_concealed_states,
-   use_fortran,methode,cond,root_state_weight,sampling_fraction,see_ancestral_states = FALSE)
+   use_fortran,methode,cond,root_state_weight,sampling_fraction,
+   see_ancestral_states = FALSE)
 
 #[1] -113.1018
 }

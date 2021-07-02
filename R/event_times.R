@@ -1,8 +1,10 @@
 #' Times at which speciation or extinction occurs
 #' @title Event times of a (possibly non-ultrametric) phylogenetic tree
-#' @param phy phylogenetic tree of class phylo, without polytomies, rooted and with branch lengths. Need not be ultrametric.
+#' @param phy phylogenetic tree of class phylo, without polytomies, rooted and 
+#' with branch lengths. Need not be ultrametric.
 #' @return times at which speciation or extinction happens.
-#' @note This script has been modified from BAMMtools' internal function NU.branching.times
+#' @note This script has been modified from BAMMtools' internal function 
+#' NU.branching.times
 #' @export
 event_times <- function(phy) {
     if (ape::is.ultrametric(phy)) {
