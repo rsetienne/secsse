@@ -132,7 +132,7 @@ cla_secsse_loglik <- function(parameter,
   calcul <- c()
   if (num_threads == 1) {
     ancescpp <- ances - 1
-    forTimecpp <- forTime
+    forTimecpp <- forTime # nolint
     forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
       calcul <- cla_calThruNodes_cpp(ancescpp,
                                      states,
@@ -147,7 +147,7 @@ cla_secsse_loglik <- function(parameter,
   } else {
     # because C++ indexes from 0, we need to adjust the indexing:
     ancescpp <- ances - 1
-    forTimecpp <- forTime
+    forTimecpp <- forTime # nolint
     forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
 
     if (num_threads == -2) {
@@ -181,7 +181,7 @@ cla_secsse_loglik <- function(parameter,
   mergeBranch2 <- mergeBranch # nolint
   lmb <- length(mergeBranch2)
   if (is.numeric(root_state_weight)) {
-    weightStates <- rep(root_state_weight / num_concealed_states,
+    weightStates <- rep(root_state_weight / num_concealed_states, # nolint
                         num_concealed_states)
   } else {
     if (root_state_weight == "maddison_weights") {
@@ -193,37 +193,37 @@ cla_secsse_loglik <- function(parameter,
         numerator[j] <- mergeBranch2[j] / sum(lambdas[[j]] *
                                   ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
       }
-      weightStates <- numerator / sum(numerator)
+      weightStates <- numerator / sum(numerator) # nolint
     }
     if (root_state_weight == "equal_weights") {
       weightStates <- rep(1 / lmb, lmb) # nolint
     }
-  }  
+  }
 
   if (cond == "maddison_cond") {
-    preCond <- rep(NA, lmb)
+    preCond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
-      if (root_state_weight == "equal_weights") {  
-        weightStates <- rep(1 / lmb, lmb)
+      if (root_state_weight == "equal_weights") {
+        weightStates <- rep(1 / lmb, lmb) # nolint
       }
     }
   }
 
   if (cond == "maddison_cond") {
-    preCond <- rep(NA, lmb)
+    preCond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
       preCond[j] <- sum(weightStates[j] *
                         lambdas[[j]] *
                         (1 - nodeM[1:d][j]) ^ 2)
      }
-    mergeBranch2 <- mergeBranch2 / sum(preCond)
+    mergeBranch2 <- mergeBranch2 / sum(preCond) # nolint
   }
 
   if (is_complete_tree) {
-    timeInte <- max(abs(ape::branching.times(phy)))
+    timeInte <- max(abs(ape::branching.times(phy))) # nolint
     y <- rep(0, lmb)
 
-    nodeM <- secsseCPP::ct_condition(y,
+    nodeM <- secsseCPP::ct_condition(y, # nolint
                                      timeInte,
                                      lambdas,
                                      mus,
@@ -231,27 +231,28 @@ cla_secsse_loglik <- function(parameter,
                                      "odeint::bulirsch_stoer",
                                      1e-16,
                                      1e-12)
-    nodeM <- c(nodeM, y) # second half is not updated with _e
+    nodeM <- c(nodeM, y) # nolint
   }
-  
+
   if (cond == "proper_cond") {
-    preCond <- rep(NA, lmb)
+    preCond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
       preCond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
-    mergeBranch2 <- mergeBranch2 / preCond
+    mergeBranch2 <- mergeBranch2 / preCond # nolint
   }
-  
-  wholeLike_atRoot <- sum(mergeBranch2 * weightStates)
-  LL <- log(wholeLike_atRoot) + 
-        loglik - 
-        penalty(pars = parameter, 
+
+  wholeLike_atRoot <- sum(mergeBranch2 * weightStates) # nolint
+  LL <- log(wholeLike_atRoot) + # nolint
+        loglik -
+        penalty(pars = parameter,
                 loglik_penalty = loglik_penalty)
 
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):nrow(states), ]
-    ancestral_states <- ancestral_states[, -(1:(ncol(ancestral_states) / 2))]
+    ancestral_states <- 
+        ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL))
   } else {

@@ -78,7 +78,7 @@ test_that("the loglik for the complete tree", {
                                       root_state_weight = root_state_weight,
                                       sampling_fraction = sampling_fraction,
                                       is_complete_tree = TRUE))
-  testthat::expect_equal(loglik5, -305.6504, tolerance = 1E-4) # TJ: hardcoded modified LL
+  testthat::expect_equal(loglik5, -312.7751, tolerance = 1E-4) # TJ: hardcoded modified LL
   
   lambdas <- list()
   for (i in 1:4) {
@@ -123,9 +123,6 @@ test_that("the loglik for the complete tree", {
                                cond = cond,
                                root_state_weight = root_state_weight,
                                sampling_fraction = sampling_fraction,
-                               setting_calculation = NULL,
-                               see_ancestral_states = FALSE,
-                               loglik_penalty = 0,
                                is_complete_tree = TRUE,
                                num_threads = 4)
   testthat::expect_equal(loglik8, loglik7, tolerance = 0.001)

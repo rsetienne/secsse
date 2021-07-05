@@ -43,13 +43,13 @@ test_that("secsse gives the same result as GeoSSE", {
   lambdas[[3]][3,3] <- 0.5
   #lambdas[[3]][3,3] <- 1
   
-  mus <- c(0,0.7,0.7)
+  mus <- c(0, 0.7, 0.7)
   
   q <- matrix(0, ncol = 3, nrow = 3, byrow = TRUE)
-  q[2,1] <- 1.4
-  q[3,1] <- 1.3
-  q[1,2] <- 0.7
-  q[1,3] <- 0.7
+  q[2, 1] <- 1.4
+  q[3, 1] <- 1.3
+  q[1, 2] <- 0.7
+  q[1, 3] <- 0.7
   
   parameter <- list()
   parameter[[1]] <- lambdas
@@ -64,15 +64,17 @@ test_that("secsse gives the same result as GeoSSE", {
                                      num_concealed_states,
                                      cond = "maddison_cond",
                                      root_state_weight = "maddison_weights",
-                                     sampling_fraction = c(1,1,1),
+                                     sampling_fraction = c(1, 1, 1),
                                      setting_calculation = NULL,
                                      see_ancestral_states = FALSE,
                                      loglik_penalty = 0,
+                                     method = "odeint::runge_kutta4"
+                                     ,
                                      atol = 1e-12,
                                      rtol = 1e-12)
   
   
-  testthat::expect_equal(classe_diversitree_LL,secsse_cla_LL)
+  testthat::expect_equal(classe_diversitree_LL,  secsse_cla_LL)
   
   secsse_cla_LL2 <- cla_secsse_loglik(parameter,
                                       phy,
@@ -101,6 +103,7 @@ test_that("secsse gives the same result as GeoSSE", {
                                       setting_calculation = NULL,
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0,
-                                      num_threads = 4)
+                                      num_threads = 1,
+                                      atol = 1e-12)
   testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL2)
 })
