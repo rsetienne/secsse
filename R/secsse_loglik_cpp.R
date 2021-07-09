@@ -144,9 +144,10 @@ secsse_loglik <- function(parameter,
                                1,
                                atol,
                                rtol,
-                               method)
+                               method,
+                               is_complete_tree)
   } else {
-    ancescpp <- ances - 1
+     ancescpp <- ances - 1
     forTimecpp <- forTime
     forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
     
@@ -158,7 +159,8 @@ secsse_loglik <- function(parameter,
                                  forTimecpp,
                                  states,
                                  1,
-                                 method)
+                                 method,
+                                 is_complete_tree)
     } else {
       calcul <- calc_ll_threaded(lambdas,
                                  mus,
@@ -167,7 +169,8 @@ secsse_loglik <- function(parameter,
                                  forTimecpp,
                                  states,
                                  num_threads,
-                                 method)
+                                 method,
+                                 is_complete_tree)
     }
   }
   
@@ -199,40 +202,42 @@ secsse_loglik <- function(parameter,
   }
   
   if (is_complete_tree) {
-    timeInte <- max(abs(ape::branching.times(phy)))
-    y <- rep(0,2 * length(mergeBranch2))
-    nodeMN <- deSolve::ode(y = y,
-                           func = secsse_runmod_ct_R,
-                           times = c(0,timeInte),
-                           parms = parameter,
-                           rtol = 1e-12,
-                           atol = 1e-12,
-                           method = "ode45")
-    nodeM <- as.numeric(nodeMN[2,-1])
+    time_inte <- max(abs(ape::branching.times(phy))) # nolint
+    y <- rep(0, 2 * length(mergeBranch2))
+    
+    nodeM <- ct_condition(y, # nolint
+                          time_inte,
+                          lambdas,
+                          mus,
+                          Q,
+                          method,
+                          atol,
+                          rtol)
   }
   
   if (cond == "maddison_cond") {
-    mergeBranch2 <-
+  #  cat("maddison_cond", "\n")
+    mergeBranch2 <- 
       mergeBranch2 / sum(weightStates * lambdas * (1 - nodeM[1:d]) ^ 2)
   }
   
   if (cond == "proper_cond") {
+ #   cat("proper_cond\n")
     mergeBranch2 <- mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)
   }
   
-  atRoot <- ((mergeBranch2) * (weightStates))
+#  cat(mergeBranch2, "\n")
+#  cat(weightStates, "\n")
   
-  wholeLike <- sum(atRoot)
-  LL <- log(wholeLike) + loglik - penalty(pars = parameter,
-                                          loglik_penalty = loglik_penalty)
+  wholeLike <- sum((mergeBranch2) * (weightStates))
+  LL <- log(wholeLike) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)
   
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):nrow(states), ]
-    ancestral_states <- ancestral_states[,-(1:(ncol(ancestral_states) / 2))]
+    ancestral_states <- ancestral_states[, -(1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states,
-                LL = LL))
+    return(list(ancestral_states = ancestral_states,LL = LL))
   } else {
     return(LL)
   }

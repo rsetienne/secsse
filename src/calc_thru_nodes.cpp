@@ -6,6 +6,7 @@ using namespace Rcpp;
 #include "odeint.h"
 #include "util.h"
 
+template <typename OD_TYPE>
 double calc_ll(const Rcpp::NumericVector& ll,
                const Rcpp::NumericVector& mm,
                const Rcpp::NumericMatrix& Q,
@@ -18,7 +19,7 @@ double calc_ll(const Rcpp::NumericVector& ll,
                double relative_tol,
                std::string method) {
 
-  ode_standard od(ll, mm, Q);
+  OD_TYPE od(ll, mm, Q);
   size_t d = ll.size();
 
   long double loglik = 0.0;
@@ -27,31 +28,34 @@ double calc_ll(const Rcpp::NumericVector& ll,
   std::vector< double  > nodeN;
   std::vector< double  > nodeM;
 
-  for (int i = 0; i < ances.size(); ++i) {
-    int focal = ances[i];
+  for (int a = 0; a < ances.size(); ++a) {
+    int focal = ances[a];
     std::vector<int> desNodes;
     std::vector<double> timeInte;
     find_desNodes(for_time, focal, desNodes, timeInte);
 
-
+   // Rcpp::Rcout << a << " ";
     for (int i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
       std::vector< double > y = states[focal_node - 1];
       
-      std::unique_ptr<ode_standard> od_ptr = std::make_unique<ode_standard>(od);
+      std::unique_ptr<OD_TYPE> od_ptr = std::make_unique<OD_TYPE>(od);
+     
+    //  Rcpp::Rcout << timeInte[i] << " "; 
      
       odeintcpp::integrate(method, 
-                          std::move(od_ptr), // ode class object
-                          y,// state vector
-                          0.0,// t0
-                          timeInte[i], //t1
-                          timeInte[i] * 0.01,
-                          absolute_tol,
-                          relative_tol); // t1
+                           std::move(od_ptr), // ode class object
+                           y,// state vector
+                           0.0,// t0
+                           timeInte[i], //t1
+                           timeInte[i] * 0.01,
+                           absolute_tol,
+                           relative_tol); // t1
      
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
+   // force_output();
 
     normalize_loglik_node(nodeM, loglik);
     normalize_loglik_node(nodeN, loglik);
@@ -67,6 +71,7 @@ double calc_ll(const Rcpp::NumericVector& ll,
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
     states[focal - 1] = newstate; // -1 because of R conversion to C++ indexing
+   // Rcpp::Rcout << loglik << "\n"; //force_output();
   }
 
   merge_branch_out = NumericVector(mergeBranch.begin(), mergeBranch.end());
@@ -85,27 +90,47 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
                             int num_threads,
                             double abstol,
                             double reltol,
-                            std::string method) {
+                            std::string method,
+                            bool is_complete_tree) {
 
+ // Rcpp::Rcout << "welcome!\n"; force_output();
+  
   std::vector< std::vector< double >> states, forTime;
   numericmatrix_to_vector(states_R, states);
   numericmatrix_to_vector(forTime_R, forTime);
 
   NumericVector mergeBranch;
   NumericVector nodeM;
-
-  double loglik = calc_ll(lambdas,
-                          mus,
-                          Q,
-                          std::vector<int>(ances.begin(), ances.end()),
-                          forTime,
-                          states,
-                          mergeBranch,
-                          nodeM,
-                          abstol,
-                          reltol,
-                          method);
-
+  
+  double loglik;
+  if (is_complete_tree) {
+    
+    loglik = calc_ll<ode_standard_ct>(lambdas,
+                                   mus,
+                                   Q,
+                                   std::vector<int>(ances.begin(), ances.end()),
+                                   forTime,
+                                   states,
+                                   mergeBranch,
+                                   nodeM,
+                                   abstol,
+                                   reltol,
+                                   method);
+  } else {
+    
+    loglik = calc_ll<ode_standard>(lambdas,
+                                   mus,
+                                   Q,
+                                   std::vector<int>(ances.begin(), ances.end()),
+                                   forTime,
+                                   states,
+                                   mergeBranch,
+                                   nodeM,
+                                   abstol,
+                                   reltol,
+                                   method);
+  }
+  
   NumericMatrix states_out;
   vector_to_numericmatrix(states, states_out);
 
@@ -114,4 +139,39 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
                                           Named("mergeBranch") = mergeBranch,
                                           Named("nodeM") = nodeM);
   return output;
+}
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
+                                 const double t,
+                                 const Rcpp::NumericVector& ll,
+                                 const Rcpp::NumericVector& mm,
+                                 const Rcpp::NumericMatrix& Q,
+                                 const std::string& method,
+                                 double atol,
+                                 double rtol) {
+  
+  ode_standard_ct od(ll, mm, Q);
+  
+  std::vector<double> init_state(y.begin(), y.end());
+  
+  std::unique_ptr<ode_standard_ct> od_ptr = std::make_unique<ode_standard_ct>(od);
+  
+//  Rcpp::Rcout << "ct_correction for: " << t << "\n"; force_output();
+  
+  odeintcpp::integrate(method,
+                       std::move(od_ptr), // ode class object
+                       init_state,// state vector
+                       0.0,  // t0
+                       t,    //t1
+                       t * 0.01,
+                       atol,
+                       rtol); 
+  
+  Rcpp::NumericVector out;
+  for (int i = 0; i < init_state.size(); ++i) {
+    out.push_back(init_state[i]);
+  }
+  return out;
 }

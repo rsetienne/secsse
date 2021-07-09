@@ -47,7 +47,7 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0,
                                       is_complete_tree = TRUE)
-  testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL4)
+  testthat::expect_equal(secsse_cla_LL3, secsse_cla_LL4)
   
   
   skip_on_cran()

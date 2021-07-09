@@ -67,29 +67,9 @@ test_that("secsse gives the same result as GeoSSE", {
                                      sampling_fraction = c(1, 1, 1),
                                      setting_calculation = NULL,
                                      see_ancestral_states = FALSE,
-                                     loglik_penalty = 0,
-                                     method = "odeint::runge_kutta4"
-                                     ,
-                                     atol = 1e-12,
-                                     rtol = 1e-12)
-  
+                                     loglik_penalty = 0)
   
   testthat::expect_equal(classe_diversitree_LL,  secsse_cla_LL)
-  
-  secsse_cla_LL2 <- cla_secsse_loglik(parameter,
-                                      phy,
-                                      traits,
-                                      num_concealed_states,
-                                      cond = "maddison_cond",
-                                      root_state_weight = "maddison_weights",
-                                      sampling_fraction = c(1,1,1),
-                                      setting_calculation = NULL,
-                                      see_ancestral_states = FALSE,
-                                      loglik_penalty = 0,
-                                      atol = 1e-15,
-                                      rtol = 1e-14)
-  
-  testthat::expect_equal(secsse_cla_LL,secsse_cla_LL2)
   
   # Parallel code doesn't work on CI
   skip_on_cran()
@@ -99,11 +79,10 @@ test_that("secsse gives the same result as GeoSSE", {
                                       num_concealed_states,
                                       cond = "maddison_cond",
                                       root_state_weight = "maddison_weights",
-                                      sampling_fraction = c(1,1,1),
+                                      sampling_fraction = c(1, 1, 1),
                                       setting_calculation = NULL,
                                       see_ancestral_states = FALSE,
                                       loglik_penalty = 0,
-                                      num_threads = 1,
-                                      atol = 1e-12)
-  testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL2)
+                                      num_threads = 4)
+  testthat::expect_equal(classe_diversitree_LL, secsse_cla_LL3)
 })

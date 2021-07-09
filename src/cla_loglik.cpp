@@ -36,7 +36,7 @@ double calc_ll_cla(const Rcpp::List& ll,
   
   std::vector< std::vector<double >> Q_cpp;
   numericmatrix_to_vector(Q, Q_cpp);
-  
+
   ODE_TYPE od(ll_cpp, mm_cpp, Q_cpp);
 
   size_t d = od.get_d();
@@ -61,21 +61,23 @@ double calc_ll_cla(const Rcpp::List& ll,
   
   for (int a = 0; a < ances.size(); ++a) {
     
-
     int focal = ances[a];
     find_desNodes(for_time, focal, desNodes, timeInte);
     
     int focal_node;
+  //  Rcpp::Rcout << a << " ";
     for (int i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
       assert((focal_node) >= 0);
       assert((focal_node) < states.size());
       
       y = states[focal_node];
-      std::cerr << timeInte[i] << " y_before: ";
+    /*  std::cerr << timeInte[i] << " y_before: ";
       for (auto yy : y) {
         std::cerr << yy << " ";
-      }  std::cerr << "\n";
+      }  std::cerr << "\n";*/
+      
+    //  Rcpp::Rcout << timeInte[i] << " ";
       
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
@@ -87,10 +89,10 @@ double calc_ll_cla(const Rcpp::List& ll,
                            absolute_tol,
                            relative_tol); // t1
       
-      std::cerr << "y_after: ";
+     /* std::cerr << "y_after: ";
       for (auto yy : y) {
         std::cerr << yy << " ";
-      }  std::cerr << "\n";
+      }  std::cerr << "\n";*/
       
 
       if (i == 0) nodeN = y;
@@ -109,9 +111,9 @@ double calc_ll_cla(const Rcpp::List& ll,
     } std::cerr << "\n";*/
     
     normalize_loglik_node(nodeM, loglik); //Rcout << "nodeM: " << loglik<< "\n";
-    std::cerr << loglik << " ";
+  //  std::cerr << loglik << " ";
     normalize_loglik_node(nodeN, loglik); //Rcout << "nodeN: " << loglik<< "\n";
-    std::cerr << loglik << " ";
+   // std::cerr << loglik << " ";
     
     mergeBranch = std::vector<double>(d, 0.0);
     
@@ -129,7 +131,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     }
     
     normalize_loglik(mergeBranch, loglik);
-    std::cerr << loglik << "\n";
+   // Rcpp::Rcout << loglik << "\n";
     
     std::vector<double> newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
@@ -151,7 +153,7 @@ double calc_ll_cla(const Rcpp::List& ll,
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
+Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
                                  double t,
                                  const Rcpp::List& ll,
                                  const Rcpp::NumericVector& mm,

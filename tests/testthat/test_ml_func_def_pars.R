@@ -54,5 +54,6 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
                                    maxiter = maxiter,
                                    optimmethod = optimmethod,
                                    num_cycles = 1)
-  testthat::expect_equal(model$ML,-12.87974)
+  
+  testthat::expect_equal(model$ML, -12.87974)
 })

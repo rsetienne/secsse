@@ -223,14 +223,14 @@ cla_secsse_loglik <- function(parameter,
     timeInte <- max(abs(ape::branching.times(phy))) # nolint
     y <- rep(0, lmb)
 
-    nodeM <- secsseCPP::ct_condition(y, # nolint
-                                     timeInte,
-                                     lambdas,
-                                     mus,
-                                     Q,
-                                     "odeint::bulirsch_stoer",
-                                     1e-16,
-                                     1e-12)
+    nodeM <- ct_condition_cla(y, # nolint
+                              timeInte,
+                              lambdas,
+                              mus,
+                              Q,
+                              "odeint::bulirsch_stoer",
+                              1e-16,
+                              1e-12)
     nodeM <- c(nodeM, y) # nolint
   }
 
