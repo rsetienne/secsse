@@ -172,10 +172,13 @@ public:
     double loglikelihood = output.back();
     
     NumericVector mergeBranch;
-    for (int i = d; i < (d + d); ++i) {
-      mergeBranch.push_back(output[d]);
+    for (int i = 0; i < d; ++i) {
+   //   Rcpp::Rcout << output[d + i]<< "\n";
+      mergeBranch.push_back(output[d + i]);
     }
     nodeM.pop_back();
+    
+    //Rcpp::Rcout << loglikelihood << "\n";
     
     return Rcpp::List::create(Rcpp::Named("mergeBranch") = mergeBranch,
                               Rcpp::Named("nodeM") = nodeM,

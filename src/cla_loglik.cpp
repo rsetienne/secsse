@@ -99,22 +99,9 @@ double calc_ll_cla(const Rcpp::List& ll,
       if (i == 1) nodeM = y;
     }
     
-    /*std::cerr<< "\n";
-    std::cerr<< "nodeM: ";
-    for (auto n : nodeM) {
-      std::cerr << n << " ";
-    } std::cerr << "\n";
-    
-    std::cerr<< "nodeN: ";
-    for (auto n : nodeN) {
-      std::cerr << n << " ";
-    } std::cerr << "\n";*/
-    
     normalize_loglik_node(nodeM, loglik); //Rcout << "nodeM: " << loglik<< "\n";
-  //  std::cerr << loglik << " ";
     normalize_loglik_node(nodeN, loglik); //Rcout << "nodeN: " << loglik<< "\n";
-   // std::cerr << loglik << " ";
-    
+
     mergeBranch = std::vector<double>(d, 0.0);
     
     for (size_t i = 0; i < d; ++i) {
@@ -131,7 +118,6 @@ double calc_ll_cla(const Rcpp::List& ll,
     }
     
     normalize_loglik(mergeBranch, loglik);
-   // Rcpp::Rcout << loglik << "\n";
     
     std::vector<double> newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
