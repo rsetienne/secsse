@@ -26,7 +26,7 @@
 #' @param is_complete_tree whether or not a tree with all its extinct species is
 #' provided
 #' @param num_threads number of threads to be used, default is 1. Set to -1 to
-#' use all available threads.
+#' use all available threads. 
 #' @param method integration method used, available are: 
 #' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
 #' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
@@ -34,6 +34,7 @@
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
 #' @return The loglikelihood of the data given the parameters
+#' @note Multithreading might lead to a slightly reduced accuracy and is therefore not enabled by default. Please use at your own discretion. 
 #' @examples
 #'rm(list=ls(all=TRUE))
 #'library(secsse)
