@@ -6,7 +6,7 @@ test_that("the loglik for the complete tree under cla_secsse", {
   utils::data('example_phy_GeoSSE', package = 'secsse');
   traits <- as.numeric(phy$tip.state)
   lambdas <- list()
-  lambdas[[1]] <- matrix(0,ncol = 9,nrow = 9,byrow = TRUE)
+  lambdas[[1]] <- matrix(0,ncol = 9,nrow = 9, byrow = TRUE)
   lambdas[[1]][2,1] <- 1.5
   lambdas[[1]][3,1] <- 0.5
   lambdas[[1]][3,2] <- 1
