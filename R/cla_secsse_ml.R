@@ -1,35 +1,3 @@
-# cla_secsse_transform_parameters <- function(trparsopt,trparsfix,idparsopt,
-# idparsfix,idparslist){ trpars1 <- idparslist
-# for(j in 1:nrow(trpars1[[3]])){ trpars1[[1]][[j]][,] <- NA } for(j in 2:3){ trpars1[[j]][] <- NA }
-# if(length(idparsfix) != 0){ for(i in 1:length(idparsfix)){ 
-# for(j in 1:nrow(trpars1[[3]])){ id <-
-# which(idparslist[[1]][[j]] == idparsfix[i]) trpars1[[1]][[j]][id] 
-# <- trparsfix[i] } for(j in 2:3) { id <-
-# which(idparslist[[j]] == idparsfix[i]) trpars1[[j]][id] <- trparsfix[i] } } } 
-# for(i in 1:length(idparsopt)){ for(j in
-# 1:nrow(trpars1[[3]])){ id <- which(idparslist[[1]][[j]] == idparsopt[i]) trpars1[[1]][[j]][id] <- trparsopt[i] } for(j
-# in 2:3){ id <- which(idparslist[[j]] == idparsopt[i]) trpars1[[j]][id] 
-# <- trparsopt[i] } } pre_pars1 <- list() pars1
-# <- list() for(j in 1:nrow(trpars1[[3]])){ pre_pars1[[j]] <- 
-# trpars1[[1]][[j]][,]/(1 - trpars1[[1]][[j]][,]) }
-# pars1[[1]]<-pre_pars1 for(j in 2:3){ pars1[[j]] <- 
-# trpars1[[j]]/(1 - trpars1[[j]]) } return(pars1) }
-# cla_secsse_loglik_choosepar <-
-# function(trparsopt,trparsfix,idparsopt,idparsfix,idparslist,phy=phy,
-# traits=traits,num_concealed_states=num_concealed_states,
-# cond=cond,root_state_weight=root_state_weight,
-# sampling_fraction=sampling_fraction,setting_calculation=setting_calculation,
-# see_ancestral_states
-#  = see_ancestral_states){ alltrpars <- c(trparsopt,trparsfix)
-#  if(max(alltrpars) > 1 | min(alltrpars) < 0) { loglik =
-# -Inf } else { pars1 <- cla_secsse_transform_parameters(trparsopt,
-# trparsfix,idparsopt,idparsfix,idparslist) loglik <-
-# cla_secsse_loglik(parameter=pars1,phy=phy,traits=traits,num_concealed_states
-# =num_concealed_states,cond=cond,root_state_weight=root_state_weight,
-# sampling_fraction=sampling_fraction, setting_calculation=setting_calculation,see_ancestral_states = see_ancestral_states) if(is.nan(loglik) || 
-# is.na(loglik)){ print(trparsopt) ## new thing cat('There are parameter
-# values used which cause numerical problems.\n') loglik <- -Inf } } 
-# return(loglik) }
 #' Maximum likehood estimation under Several examined and concealed 
 #' States-dependent Speciation and Extinction (SecSSE) with cladogenetic option
 #' @title Maximum likehood estimation for (SecSSE)
@@ -94,23 +62,23 @@
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-
-#'#model <- cla_secsse_ml(
-#'#  phylotree,
-#'#  traits,
-#'#  num_concealed_states,
-#'#  idparslist,
-#'#  idparsopt,
-#'#  initparsopt,
-#'#  idparsfix,
-#'#  parsfix,
-#'#  cond,
-#'#  root_state_weight,
-#'#  sampling_fraction,
-#'#  tol,
-#'#  maxiter,
-#'#  optimmethod,
-#'#  num_cycles = 1)
+#' \dontrun{ 
+#'model <- cla_secsse_ml(
+#'  phylotree,
+#'  traits,
+#'  num_concealed_states,
+#'  idparslist,
+#'  idparsopt,
+#'  initparsopt,
+#'  idparsfix,
+#'  parsfix,
+#'  cond,
+#'  root_state_weight,
+#'  sampling_fraction,
+#'  tol,
+#'  maxiter,
+#'  optimmethod,
+#'  num_cycles = 1) }
 #' # [1] -90.97626
 #' @export
 cla_secsse_ml <- function(phy,

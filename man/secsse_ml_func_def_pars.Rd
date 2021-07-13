@@ -106,21 +106,17 @@ parsfix <- c(0,0)
 idfactorsopt <- 1
 initfactors <- 4
 # functions_defining_params is a list of functions. Each function has no
-arguments and to refer
-# to parameters ids should be indicated as "par_" i.e. par_3 refers to parameter
-3. When a
-# function is defined, be sure that all the parameters involved are either
-estimated, fixed or
+# arguments and to refer
+# to parameters ids should be indicated as "par_" i.e. par_3 refers to 
+# parameter 3. When a function is defined, be sure that all the parameters 
+# involved are either estimated, fixed or
 # defined by previous functions (i.e, a function that defines parameter in
-# 'functions_defining_params'). The user is responsible for this. In this exampl
-, par_3
-# (i.e., parameter 3) is needed to calculate par_6. This is correct because par_3
-is defined in
+# 'functions_defining_params'). The user is responsible for this. In this 
+# exampl3, par_3 (i.e., parameter 3) is needed to calculate par_6. This is 
+# correct because par_3 is defined in
 # the first function of 'functions_defining_params'. Notice that factor_1
-indicates a value
-# that will be estimated to satisfy the equation. The same factor can be shared
-to define
-# several parameters.
+# indicates a value that will be estimated to satisfy the equation. The same 
+# factor can be shared to define several parameters.
 functions_defining_params <- list()
 functions_defining_params[[1]] <- function(){
  par_3 <- par_1 + par_2
@@ -135,19 +131,29 @@ functions_defining_params[[3]] <- function(){
 tol = c(1e-04, 1e-05, 1e-07)
 maxiter = 1000 * round((1.25)^length(idparsopt))
 optimmethod = "simplex"
-run_parallel = FALSE
 cond<-"proper_cond"
 root_state_weight <- "proper_weights"
 sampling_fraction <- c(1,1,1)
-#model <- secsse_ml_func_def_pars(phylotree, traits, num_concealed_states,
-idparslist, idparsopt,
-#                               initparsopt, idfactorsopt, initfactors, idparsfi
-, parsfix,
-#                               idparsfuncdefpar, functions_defining_params, con
-,
-#                               root_state_weight, sampling_fraction, tol,
-maxiter, 
-#                               optimmethod, num_cycles = 1)
-
+\dontrun{
+model <- secsse_ml_func_def_pars(phylotree,
+traits,
+num_concealed_states,
+idparslist,
+idparsopt,
+initparsopt,
+idfactorsopt,
+initfactors,
+idparsfix,
+parsfix,
+idparsfuncdefpar,
+functions_defining_params,
+cond,
+root_state_weight,
+sampling_fraction,
+tol,
+maxiter,
+optimmethod,
+num_cycles = 1)
+}
 # ML -136.5796
 }

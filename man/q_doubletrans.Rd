@@ -25,8 +25,7 @@ Sets a Q matrix where double transitions are not allowed
 }
 \examples{
 traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) #For a three-state 
-trait
+masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) # For a three-state trait
 diag(masterBlock) <- NA
 masterBlock[1,2] <- 6
 masterBlock[1,3] <- 7

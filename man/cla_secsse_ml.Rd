@@ -111,21 +111,22 @@ optimmethod <- 'simplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
-#model <- cla_secsse_ml(
-#  phylotree,
-#  traits,
-#  num_concealed_states,
-#  idparslist,
-#  idparsopt,
-#  initparsopt,
-#  idparsfix,
-#  parsfix,
-#  cond,
-#  root_state_weight,
-#  sampling_fraction,
-#  tol,
-#  maxiter,
-#  optimmethod,
-#  num_cycles = 1)
+\dontrun{ 
+model <- cla_secsse_ml(
+ phylotree,
+ traits,
+ num_concealed_states,
+ idparslist,
+ idparsopt,
+ initparsopt,
+ idparsfix,
+ parsfix,
+ cond,
+ root_state_weight,
+ sampling_fraction,
+ tol,
+ maxiter,
+ optimmethod,
+ num_cycles = 1) }
 # [1] -90.97626
 }
