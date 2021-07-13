@@ -216,18 +216,14 @@ secsse_loglik <- function(parameter,
   }
   
   if (cond == "maddison_cond") {
-  #  cat("maddison_cond", "\n")
     mergeBranch2 <- 
       mergeBranch2 / sum(weightStates * lambdas * (1 - nodeM[1:d]) ^ 2)
   }
   
   if (cond == "proper_cond") {
- #   cat("proper_cond\n")
     mergeBranch2 <- mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)
   }
-  
-#  cat(mergeBranch2, "\n")
-#  cat(weightStates, "\n")
+
   
   wholeLike <- sum((mergeBranch2) * (weightStates))
   LL <- log(wholeLike) + loglik - penalty(pars = parameter,loglik_penalty = loglik_penalty)

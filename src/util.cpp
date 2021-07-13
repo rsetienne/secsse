@@ -4,7 +4,7 @@
 #include "util.h"
 
 void force_output() {
-  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  std::this_thread::sleep_for(std::chrono::milliseconds(30));
   R_FlushConsole();
   R_ProcessEvents();
   R_CheckUserInterrupt();
@@ -109,11 +109,13 @@ void normalize_loglik(std::vector<double>& probvec,
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>& v) {
 
-  v = std::vector< std::vector< double>>(m.nrow());
+  v = std::vector< std::vector< double> >(m.nrow(), std::vector<double>(m.ncol(), 0.0));
   for (size_t i = 0; i < m.nrow(); ++i) {
-    std::vector<double> row(m.ncol());
+    std::vector<double> row(m.ncol(), 0.0);
     for (size_t j = 0; j < m.ncol(); ++j) {
+   //   Rcpp::Rcout << i << " " << j << " " << m(i, j) << " "; force_output();
       row[j] = m(i, j);
+   //   Rcpp::Rcout << row[j] << "\n"; 
     }
     v[i] = row;
   }

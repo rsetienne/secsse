@@ -72,12 +72,7 @@ double calc_ll_cla(const Rcpp::List& ll,
       assert((focal_node) < states.size());
       
       y = states[focal_node];
-    /*  std::cerr << timeInte[i] << " y_before: ";
-      for (auto yy : y) {
-        std::cerr << yy << " ";
-      }  std::cerr << "\n";*/
-      
-    //  Rcpp::Rcout << timeInte[i] << " ";
+
       
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
@@ -88,12 +83,6 @@ double calc_ll_cla(const Rcpp::List& ll,
                            timeInte[i] * 0.1,
                            absolute_tol,
                            relative_tol); // t1
-      
-     /* std::cerr << "y_after: ";
-      for (auto yy : y) {
-        std::cerr << yy << " ";
-      }  std::cerr << "\n";*/
-      
 
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
@@ -125,7 +114,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     
     assert((focal) >= 0);
     assert((focal) < states.size());
-    states[focal] = newstate; // -1 because of R conversion to C++ indexing
+    states[focal] = newstate;
   }
 
   for (int i = 0; i < mergeBranch.size(); ++i) {

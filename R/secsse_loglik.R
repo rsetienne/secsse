@@ -18,33 +18,33 @@ check_input <- function(traits,
     }
   }
   
-  if(ape::is.rooted(phy) == FALSE){
+  if (ape::is.rooted(phy) == FALSE) {
     stop("The tree needs to be rooted.")
   }
   
-  if(ape::is.binary(phy) == FALSE){
+  if (ape::is.binary(phy) == FALSE) {
     stop("The tree needs to be fully resolved.")
   }
-  if(ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE){
+  if (ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE){
     stop("The tree needs to be ultrametric.")
   }
   if(any(phy$edge.length == 0)){
     stop('The tree must have internode distancs that are all larger than 0.')
   }
   
-  if(is.matrix(traits)){
+  if (is.matrix(traits)) {
     if(length(sampling_fraction) != length(sort(unique(traits[, 1])))){
       stop("Sampling_fraction must have as many elements as the number of traits.")
     }
     
-    if(all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) == 
+    if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) == 
        FALSE){
       stop(
         "Check your trait argument; if you have more than one column, make sure all your states are included in the first column."
       )
     }
   } else{
-    if(length(sampling_fraction) != length(sort(unique(traits)))){
+    if (length(sampling_fraction) != length(sort(unique(traits)))){
       stop("Sampling_fraction must have as many elements as the number of traits.")
     }
   }
@@ -53,52 +53,6 @@ check_input <- function(traits,
   {
     stop("The trait has only one state.")
   }
-}
-
-secsse_loglik_rhs <- function(t,y,parameter){
-  ly <- length(y)
-  d <- ly/2
-  Es <- y[1:d]
-  Ds <- y[(d+1):ly]
-  lambdas <- parameter[[1]]
-  mus <- parameter[[2]]
-  Q <- parameter[[3]]
-  diag(Q) <- 0
-  dE <- mus - 
-        (lambdas + mus + Q %*% (rep(1,d))) * Es + 
-        lambdas * Es * Es + ( Q %*% Es )
-  dD <- -(lambdas + mus + Q %*% (rep(1,d))) * Ds + 
-         2 * lambdas * Es * Ds + 
-         ( Q %*% Ds )
-  return(list(c(dE,dD)))
-}
-
-ode_FORTRAN <- function(
-  y,
-  times,
-  func = "secsse_runmod",
-  parms,
-  method,
-  ...
-)
-{
-  n_vars <- length(y)
-  parms <- as.numeric(unlist(parms))
-  n_pars <- length(parms)
-  probs <- deSolve::ode(y = y, 
-                        parms = c(n_vars + 0.),
-                        rpar = parms,
-                        times = times,
-                        func = func,
-                        initfunc = "secsse_initmod",
-                        ynames = c("SV"),
-                        dimens = n_pars,
-                        nout = 1, 
-                        dllname = "secsse",
-                        method = method, ...
-  )[,1:(n_vars + 1)]
-  #print(as.numeric(c(probs[1,1],probs[2,c(1,6:9)])));
-  return(probs)
 }
 
 build_states <- function(phy,
@@ -203,96 +157,3 @@ build_initStates_time <- function(phy,
     forTime = forTime
   ))
 }
-
-
-build_initStates_time_bigtree <- function(phy,
-                                          traits,
-                                          num_concealed_states,
-                                          sampling_fraction,
-                                          is_complete_tree = FALSE,
-                                          mus = NULL) {
-    initStates_list <- build_initStates_time(phy,
-                                             traits,
-                                             num_concealed_states,
-                                             sampling_fraction,
-                                             is_complete_tree,
-                                             mus) 
-    states <- initStates_list$states
-    ances <- initStates_list$ances
-    forTime <- initStates_list$forTime
-    
-    phySplit <- phy
-    phySplit$node.label <- NULL
-    nspp <- length(phySplit$tip.label)
-    
-    split_times <- 
-      sort(event_times(phySplit), decreasing = T)
-    interNodes <- as.numeric(names(split_times))
-    
-    formattedtree <- apTreeshape::as.treeshape(phySplit)
-    smaller <- apTreeshape::smaller.clade.spectrum(formattedtree)
-    smaller <- cbind(smaller, (nspp + 1):(nrow(phySplit$edge) + 1))
-    
-    optSplit <- NULL
-    for (I in 1:length(interNodes)) {
-      optSplit <- 
-        rbind(optSplit, smaller[which(smaller[, 3] == interNodes[I]),])
-    }
-    
-    optSplit <- optSplit[-1,] # To prevent the root to be chosen
-    NodeOptimSplit <- 
-      optSplit[which(optSplit[, 2] == max(optSplit[, 2]))[1], 3]
-    
-    phy2 <- phylobase::phylo4(phy)
-    
-    sub1 <- as.numeric(phylobase::children(phy2,NodeOptimSplit)[1])
-    sub2 <- as.numeric(phylobase::children(phy2,NodeOptimSplit)[2])
-    jointSubs <- NodeOptimSplit
-    
-    cat("The best split is into two subtrees with",
-        length(geiger::tips(phy, sub1)), "and",
-        length(geiger::tips(phy, sub2)), "tips \n")    
-    
-    descenSub1 <- sort(phylobase::descendants(phy2, sub1, type = "all"))
-    descenSub1 <- 
-      as.numeric(descenSub1[(length(geiger::tips(phy, sub1)) + 1):length(descenSub1)])
-    
-    descenSub2 <- sort(phylobase::descendants(phy2, sub2, type = "all"))
-    descenSub2 <- 
-      as.numeric(descenSub2[(length(geiger::tips(phy, sub2)) + 1):length(descenSub2)])
-    
-    if (length(geiger::tips(phy, sub2)) == length(descenSub2)) { # the sibling node has no descendent nodes 
-      descenSub2 <- sub2
-    }
-    
-    ancesSub1 <- NULL
-    for (i in 1:length(ances)) {
-      if (any(ances[i] == descenSub1)) {
-        ancesSub1 <- c(ancesSub1, ances[i])
-      }
-    }
-    
-    ancesSub2 <- NULL
-    for (i in 1:length(ances)) {
-      if (any(ances[i] == descenSub2)) {
-        ancesSub2 <- c(ancesSub2, ances[i])
-      }
-    }
-    
-    ancesRest <- NULL
-    for (i in 1:length(ances)) {
-      if (any(any(ances[i] == descenSub1) |
-             any(ances[i] == descenSub2)) == FALSE) {
-        ancesRest <- c(ancesRest, ances[i])
-      }
-    }
-    
-    return(list(
-      states = states,
-      ancesSub1 = ancesSub1,
-      ancesSub2 = ancesSub2,
-      ancesRest = ancesRest,
-      forTime = forTime
-    )
-    )
-  }

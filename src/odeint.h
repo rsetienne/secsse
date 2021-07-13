@@ -17,13 +17,12 @@
 
 #include "util.h"
 
-
 class ode_standard {
 public:
   
   ode_standard(const std::vector<double>& l,
-               const std::vector<double>& m,
-               const std::vector<std::vector<double>>& q) :
+                      const std::vector<double>& m,
+                      const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
@@ -38,34 +37,37 @@ public:
     
     d = l_.size();
   }
-
+  
   void operator()( const std::vector< double > &x ,
                 std::vector<  double > &dxdt,
                 const double /* t */ ) {
     for (size_t i = 0; i < d; ++i) {
       
       if (l_[i] != 0.0) {
+      
+        dxdt[i] = m_[i] - (l_[i] + m_[i]) * x [i]  +
+                  l_[i] * x[i] * x[i];
         
-        dxdt[i]     =  m_[i] - x[i] * (l_[i] * (m_[i] + x[i]));
-        dxdt[i + d] =  x[i + d]     * (l_[i] * (2 * x[i] - 1) - m_[i]);
+        long double FF3 = -1.0 * l_[i] - m_[i] + 2 * l_[i] * x[i];
+        dxdt[i + d] = FF3 * x[ i + d];
       } else {
-        dxdt[i] = m_[i];
-        dxdt[i + d] = -1 * x[i + d] * m_[i];
+        dxdt[i] = - 1.0 * m_[i] * x [i] + m_[i];
+        
+        dxdt[i + d] = -1.0 * m_[i] * x[ i + d];
       }
       
       for (size_t j = 0; j < d; ++j) {
-        long double dd = (x[j] - x[i]);
-        dxdt[i]     += q_[i][j] * dd;
+        long double diff_e = x[j] - x[i];
+        dxdt[i] += diff_e * q_[i][j];
         
-        long double dd2 = (x[j + d] - x[i + d]);
-        dxdt[i + d] += q_[i][j] * dd2;
+        long double diff_d = x[j + d] - x[i + d];
+        dxdt[i + d] += diff_d * q_[i][j];
       }
-      
     }
     return;
   }
-     
-
+  
+  
   double get_l(int index) const {
     return l_[index];
   } 

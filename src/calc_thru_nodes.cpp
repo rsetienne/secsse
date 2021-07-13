@@ -34,14 +34,15 @@ double calc_ll(const Rcpp::NumericVector& ll,
     std::vector<double> timeInte;
     find_desNodes(for_time, focal, desNodes, timeInte);
 
-   // Rcpp::Rcout << a << " ";
+  //  std::cerr << focal << " ";
     for (int i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
+    //  Rcpp::Rcout << focal_node << " " << states.size() << "\n";
       std::vector< double > y = states[focal_node - 1];
       
       std::unique_ptr<OD_TYPE> od_ptr = std::make_unique<OD_TYPE>(od);
      
-    //  Rcpp::Rcout << timeInte[i] << " "; 
+   //   std::cerr << focal << " " << timeInte[i] << " "; 
      
       odeintcpp::integrate(method, 
                            std::move(od_ptr), // ode class object
@@ -54,9 +55,12 @@ double calc_ll(const Rcpp::NumericVector& ll,
      
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
+      
+  /*    for (auto x : y) {
+        std::cerr << x << " ";
+  } std::cerr << "\n";*/
     }
-   // force_output();
-
+  
     normalize_loglik_node(nodeM, loglik);
     normalize_loglik_node(nodeN, loglik);
 
@@ -71,7 +75,7 @@ double calc_ll(const Rcpp::NumericVector& ll,
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
     states[focal - 1] = newstate; // -1 because of R conversion to C++ indexing
-   // Rcpp::Rcout << loglik << "\n"; //force_output();
+  //  std::cerr << std::setprecision(20) << loglik << "\n"; 
   }
 
   merge_branch_out = NumericVector(mergeBranch.begin(), mergeBranch.end());
@@ -96,13 +100,18 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
  // Rcpp::Rcout << "welcome!\n"; force_output();
   
   std::vector< std::vector< double >> states, forTime;
+ // Rcpp::Rcout << "states to matrix " << states_R.nrow() << " " << states_R.ncol() << "\n"; 
+  force_output();
+  
   numericmatrix_to_vector(states_R, states);
+ // Rcpp::Rcout << "forTime_R to matrix\n"; force_output();
   numericmatrix_to_vector(forTime_R, forTime);
 
   NumericVector mergeBranch;
   NumericVector nodeM;
   
   double loglik;
+ // Rcpp::Rcout << "starting calc\n"; force_output();
   if (is_complete_tree) {
     
     loglik = calc_ll<ode_standard_ct>(lambdas,
