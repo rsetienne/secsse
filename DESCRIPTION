@@ -32,20 +32,15 @@ Imports:
     utils,
     DDD (>= 4.0),
     ape,
-    apTreeshape,
-    phylobase,
     geiger,
-    deSolve,
     Rcpp,
-    RcppParallel,
-    BH
+    RcppParallel
 Suggests: diversitree,
  phytools,
  testthat,
  testit,
  knitr,
  rmarkdown
-Enhances: doMC
 NeedsCompilation: yes
 Encoding: UTF-8
 LazyData: true
