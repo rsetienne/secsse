@@ -27,9 +27,12 @@
 #' provided
 #' @param num_threads number of threads to be used, default is 1. Set to -1 to
 #' use all available threads.
-#' @param method method
-#' @param atol atol
-#' @param rtol rtol
+#' @param method integration method used, available are: 
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#' @param atol absolute tolerance of integration
+#' @param rtol relative tolerance of integration
 #' @return The loglikelihood of the data given the parameters
 #' @examples
 #'rm(list=ls(all=TRUE))

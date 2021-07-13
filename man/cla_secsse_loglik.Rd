@@ -62,11 +62,14 @@ provided}
 \item{num_threads}{number of threads to be used, default is 1. Set to -1 to
 use all available threads.}
 
-\item{method}{method}
+\item{method}{integration method used, available are: 
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 
-\item{atol}{atol}
+\item{atol}{absolute tolerance of integration}
 
-\item{rtol}{rtol}
+\item{rtol}{relative tolerance of integration}
 }
 \value{
 The loglikelihood of the data given the parameters
