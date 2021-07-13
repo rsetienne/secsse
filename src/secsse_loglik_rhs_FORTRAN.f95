@@ -404,7 +404,7 @@
         DO II = 1,d
            dC(I) = dC(I) + Q(I, II) * (Es(II) - Es(I))
            DO III = 1,d
-              dC(I) = dC(I) + lambdas(I, II, II) * (Es(II) * Es(III) - Es(I))
+              dC(I) = dC(I) + lambdas(I, II, III) * (Es(II) * Es(III) - Es(I))
            ENDDO
            dC(d + I) = dC(d + I) + Q(I, II) * (Ds(II) - Ds(I))
         ENDDO
@@ -470,7 +470,7 @@
         DO II = 1,d
            dC(I) = dC(I) + Q(I, II) * (Es(II) - Es(I))
            DO III = 1,d
-              dC(I) = dC(I) + lambdas(I, II, II) * (Es(II) * Es(III) - Es(I))
+              dC(I) = dC(I) + lambdas(I, II, III) * (Es(II) * Es(III) - Es(I))
            ENDDO
         ENDDO
       ENDDO
