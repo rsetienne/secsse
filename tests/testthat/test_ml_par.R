@@ -24,9 +24,9 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   initparsopt <- c(rep(intGuessLamba,3))
   idparsfix <- c(0,4,5)
   parsfix <- c(0,0,0.1)
-  tol = c(1e-04, 1e-05, 1e-07)
-  maxiter = 1000 * round((1.25)^length(idparsopt))
-  optimmethod = "simplex"
+  tol <- c(1e-04, 1e-05, 1e-07)
+  maxiter <- 1000 * round((1.25)^length(idparsopt))
+  optimmethod <- "simplex"
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)

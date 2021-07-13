@@ -27,7 +27,7 @@ id_paramPos <- function(traits, num_concealed_states) {
         toMatrix <- c(toMatrix, matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
     }
     toMatrix <- toMatrix[1:d^2]
-    Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = T)
+    Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = TRUE)
     diag(Q) <- NA
     idparslist[[3]] <- Q
 
@@ -42,7 +42,7 @@ id_paramPos <- function(traits, num_concealed_states) {
     }
 
     statesCombiNames <- character()
-    for (i in 1:length(lab_states)) {
+    for (i in seq_along(lab_states)) {
         statesCombiNames <- c(statesCombiNames,
                               paste0(lab_states[i],
                                      lab_conceal[i]))
@@ -96,7 +96,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
                                                  length(factorstoExpand))
         newshareFac <- newshareFac/10
         
-        for (iii in 1:length(newshareFac)) {
+        for (iii in seq_along(newshareFac)) {
             factorBlock[which(factorBlock == factorstoExpand[iii])] <- newshareFac[iii]
             
         }
@@ -106,7 +106,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
         concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
         
-        for (iii in 1:length(concealnewQ)) {
+        for (iii in seq_along(concealnewQ)) {
             integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <- concealnewQ[iii]
             
         }
@@ -125,7 +125,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
                     outDiagBlock <- matrix(0, 
                                            ncol = ntraits, 
                                            nrow = ntraits,
-                                           byrow = T)
+                                           byrow = TRUE)
                     diag(outDiagBlock) <- entry
                     Qrow <- cbind(Qrow, outDiagBlock)
                 }
@@ -140,7 +140,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
         concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
         concealnewQMatr <- masterBlock
-        for (I in 1:length(uniqParQ2)) {
+        for (I in seq_along(uniqParQ2)) {
             uniqParQ2
             concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
         }
@@ -159,7 +159,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
                     outDiagBlock <- matrix(0,
                                            ncol = ntraits,
                                            nrow = ntraits,
-                                           byrow = T)
+                                           byrow = TRUE)
                     diag(outDiagBlock) <- entry
                     Qrow <- cbind(Qrow, outDiagBlock)
                 }
@@ -243,7 +243,7 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
 
     }
     toMatrix <- toMatrix[1:d^2]
-    Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = T)
+    Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = TRUE)
     diag(Q) <- NA
     lab_states <- rep(as.character(sort(unique(traits))), num_concealed_states)
 
@@ -320,7 +320,7 @@ prepare_full_lambdas <- function(traits,
         # symet_state_emerge
 
         m4 <- matrix(0, ncol = mat_size, nrow = mat_size)
-        for (i in 1:length(which(posib_trans[jj, ] == 1))) {
+        for (i in seq_along(which(posib_trans[jj, ] == 1))) {
             m4[which(posib_trans[jj, ] == 1)[i], ] <- posib_trans[jj, ]
         }
         m4[, jj] <- 0
@@ -360,7 +360,7 @@ calc_mus <- function(is_complete_tree,
     mus <- NULL
     if (is_complete_tree) {
         mus <- rep(NA, length(idparslist[[2]]))
-        for (i in 1:length(idparslist[[2]])) {
+        for (i in seq_along(idparslist[[2]])) {
             mus[i] <- c(parsfix[which(idparsfix == idparslist[[2]][i])], initparsopt[which(idparsopt == idparslist[[2]][i])])
         }
     }

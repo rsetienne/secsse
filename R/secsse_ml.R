@@ -138,9 +138,9 @@ secsse_ml <- function(phy,
     cat("Calculating the likelihood for the initial parameters.", "\n")
     utils::flush.console()
     trparsopt <- initparsopt/(1 + initparsopt)
-    trparsopt[which(initparsopt == Inf)] = 1
+    trparsopt[which(initparsopt == Inf)] <- 1
     trparsfix <- parsfix/(1 + parsfix)
-    trparsfix[which(parsfix == Inf)] = 1
+    trparsfix[which(parsfix == Inf)] <- 1
     mus <- calc_mus(is_complete_tree,
                     idparslist,
                     idparsfix,
@@ -242,7 +242,7 @@ transf_funcdefpar <- function(idparsfuncdefpar,
     }
     list2env(x, envir = a_new_envir)
     
-    for (jj in 1:length(functions_defining_params)) {
+    for (jj in seq_along(functions_defining_params)) {
         myfunc <- functions_defining_params[[jj]]
         environment(myfunc) <- a_new_envir
         value_func_defining_parm <- local(myfunc(), envir = a_new_envir)
@@ -308,7 +308,7 @@ secsse_transform_parameters <- function(trparsopt,
         
         if (length(idparsfix) != 0) {
             
-            for (i in 1:length(idparsfix)) {
+            for (i in seq_along(idparsfix)) {
                 
                 for (j in 1:nrow(trpars1[[3]])) {
                     id <- which(idparslist[[1]][[j]] == idparsfix[i])
@@ -370,7 +370,7 @@ secsse_transform_parameters <- function(trparsopt,
             trpars1[[j]][] <- NA
         }
         if (length(idparsfix) != 0) {
-            for (i in 1:length(idparsfix)) {
+            for (i in seq_along(idparsfix)) {
                 for (j in 1:3) {
                     id <- which(idparslist[[j]] == idparsfix[i])
                     trpars1[[j]][id] <- trparsfix[i]
@@ -378,7 +378,7 @@ secsse_transform_parameters <- function(trparsopt,
                 }
             }
         }
-        for (i in 1:length(idparsopt)) {
+        for (i in seq_along(idparsopt)) {
             for (j in 1:3) {
                 id <- which(idparslist[[j]] == idparsopt[i])
                 trpars1[[j]][id] <- trparsopt[i]
@@ -389,7 +389,7 @@ secsse_transform_parameters <- function(trparsopt,
         ## if structure_func part
         
         if (is.null(structure_func) == FALSE) {
-            for (i in 1:length(idparsfuncdefpar)) {
+            for (i in seq_along(idparsfuncdefpar)) {
                 
                 for (j in 1:3) {
                     id <- which(idparslist[[j]] == idparsfuncdefpar[i])
@@ -425,7 +425,7 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     verbose = verbose) {
     alltrpars <- c(trparsopt, trparsfix)
     if (max(alltrpars) > 1 | min(alltrpars) < 0) {
-        loglik = -Inf
+        loglik <- -Inf
     } else {
         pars1 <- secsse_transform_parameters(trparsopt, trparsfix, idparsopt, idparsfix, idparslist, structure_func)
         

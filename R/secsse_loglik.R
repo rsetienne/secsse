@@ -303,13 +303,13 @@ build_states <- function(phy,
     usetraits <- traits[,iv]
     if (anyNA(usetraits)) {
       nas <- which(is.na(traits))
-      for (iii in 1:length(nas)) {
+      for (iii in seq_along(nas)) {
         states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
                                rep(sampling_fraction, num_concealed_states))
       }
     }
     
-    for (iii in 1:length(traitStates)) { # Initial state probabilities
+    for (iii in seq_along(traitStates)) { # Initial state probabilities
       StatesPresents <- d + iii
       toPlaceOnes <- StatesPresents + 
         length(traitStates) * (0:(num_concealed_states - 1))
@@ -319,7 +319,7 @@ build_states <- function(phy,
     if (is_complete_tree) {
       extinct_species <- geiger::is.extinct(phy)
       if (!is.null(extinct_species)) {
-        for (i in 1:length(extinct_species)) {
+        for (i in seq_along(extinct_species)) {
           states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <- 
             mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
         }
@@ -349,12 +349,12 @@ build_initStates_time <- function(phy,
                          is_complete_tree,
                          mus)
   phy$node.label <- NULL
-  split_times <- sort(event_times(phy), decreasing = F)
+  split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
   forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
   forTime[,1:2] <- phy$edge
   
-  for (ab in 1:length(ances)) {
+  for (ab in seq_along(ances)) {
     focalTime <- ances[ab]
     desRows <- which(phy$edge[, 1] == focalTime)
     desNodes <- phy$edge[desRows, 2]

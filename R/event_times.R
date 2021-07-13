@@ -41,7 +41,7 @@ event_times <- function(phy) {
         nodes <- (length(phy$tip.label) + 1):(2 * length(phy$tip.label) - 1)
         bt <- numeric(length(nodes))
         names(bt) <- nodes
-        for (i in 1:length(bt)) {
+        for (i in seq_along(bt)) {
             tt <- phy$begin[phy$edge[, 1] == nodes[i]][1]
             bt[i] <- maxbt - tt
         }

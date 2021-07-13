@@ -2,8 +2,9 @@ context("test_secsse_cla_ct")
 
 test_that("the loglik for the complete tree under cla_secsse", {
   Sys.unsetenv("R_TESTS")
-  phy <- NULL; rm(phy);
-  utils::data('example_phy_GeoSSE', package = 'secsse');
+  phy <- NULL
+  rm(phy)
+  utils::data('example_phy_GeoSSE', package = 'secsse')
   traits <- as.numeric(phy$tip.state)
   lambdas <- list()
   lambdas[[1]] <- matrix(0,ncol = 9,nrow = 9, byrow = TRUE)

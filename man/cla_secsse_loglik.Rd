@@ -79,7 +79,7 @@ Logikelihood calculation for the cla_SecSSE model given a set of parameters
 and data using Rcpp
 }
 \note{
-Multithreading might lead to a slightly reduced accuracy and is therefore not enabled by default. Please use at your own discretion.
+Multithreading might lead to a slightly reduced accuracy (in the order of 1e-8) and is therefore not enabled by default. Please use at your own discretion.
 }
 \examples{
 rm(list=ls(all=TRUE))
