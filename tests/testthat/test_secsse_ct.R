@@ -107,7 +107,7 @@ test_that("the loglik for the complete tree", {
                                is_complete_tree = TRUE)
   testthat::expect_equal(loglik7, loglik5) # not true ?
   
-  # Parallel code doesn't work on CI unless running on windows
+  # Parallel code doesn't work on CI 
   
   skip_on_cran()
   loglik6 <- as.numeric(secsse_loglik(parameter = toCheck,
