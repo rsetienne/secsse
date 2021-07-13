@@ -7,12 +7,14 @@ on:
       - master
       - develop
       - fix_coverage
+      - thijs
 
   pull_request:
     branches:
       - main
       - master
       - develop
+      - thijs
 
 name: R-CMD-check
 
