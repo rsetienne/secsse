@@ -74,7 +74,7 @@ is provided}
 Parameter estimated and maximum likelihood
 }
 \description{
-Maximum likehood estimation under Several examined and concealed 
+Maximum likehood estimation under Several examined and concealed
 States-dependent Speciation and Extinction (SecSSE)
 }
 \examples{
