@@ -44,6 +44,15 @@
 #' is provided
 #' @param verbose sets verbose output; default is verbose when optimmethod is
 #' 'subplex'
+#' @param num_threads number of threads. Set to -1 to use all available threads. 
+#' Default is one thread.
+#' @param atol absolute tolerance of integration
+#' @param rtol relative tolerance of integration
+#' @param method integration method used, available are: 
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#' @return Parameter estimated and maximum likelihood
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -148,7 +157,11 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                         num_cycles = 1,
                                         loglik_penalty = 0,
                                         is_complete_tree = FALSE,
-                                        verbose = (optimmethod == "subplex")) {
+                                        verbose = (optimmethod == "subplex"),
+                                        num_threads = 1,
+                                        atol = 1e-12,
+                                        rtol = 1e-12,
+                                        method = "odeint::bulirsch_stoer") {
     structure_func <- list()
     structure_func[[1]] <- idparsfuncdefpar
     structure_func[[2]] <- functions_defining_params
@@ -238,7 +251,11 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                           see_ancestral_states = see_ancestral_states,
                                           loglik_penalty = loglik_penalty,
                                           is_complete_tree = is_complete_tree, 
-                                          verbose = verbose)
+                                          verbose = verbose,
+                                          num_threads = num_threads,
+                                          atol = atol,
+                                          rtol = rtol,
+                                          method = method)
     cat("The loglikelihood for the initial parameter values is", initloglik, "\n")
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.")
@@ -265,7 +282,11 @@ cla_secsse_ml_func_def_pars <- function(phy,
                               num_cycles = num_cycles,
                               loglik_penalty = loglik_penalty,
                               is_complete_tree = is_complete_tree, 
-                              verbose = verbose)
+                              verbose = verbose,
+                              num_threads = num_threads,
+                              atol = atol,
+                              rtol = rtol,
+                              method = method)
         if (out$conv != 0) {
             stop("Optimization has not converged. Try again with different initial values.\n")
         } else {

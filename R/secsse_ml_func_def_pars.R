@@ -21,6 +21,15 @@
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is provided
+#' @param num_threads number of threads. Set to -1 to use all available threads. 
+#' Default is one thread.
+#' @param atol absolute tolerance of integration
+#' @param rtol relative tolerance of integration
+#' @param method integration method used, available are: 
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#' @return Parameter estimated and maximum likelihood
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -122,7 +131,11 @@ secsse_ml_func_def_pars <- function(phy,
                                     optimmethod = 'simplex',
                                     num_cycles = 1,
                                     loglik_penalty = 0,
-                                    is_complete_tree = FALSE)
+                                    is_complete_tree = FALSE,
+                                    num_threads = 1,
+                                    atol = 1e-12,
+                                    rtol = 1e-12,
+                                    method = "odeint::bulirsch_stoer")
 {
     
     structure_func <- list()
@@ -227,7 +240,11 @@ secsse_ml_func_def_pars <- function(phy,
             see_ancestral_states = see_ancestral_states,
             loglik_penalty = loglik_penalty,
             is_complete_tree = is_complete_tree,
-            verbose = verbose
+            verbose = verbose,
+            num_threads = num_threads,
+            atol = atol,
+            rtol = rtol,
+            method = method
         )
     cat("The loglikelihood for the initial parameter values is",
         initloglik,
@@ -262,7 +279,11 @@ secsse_ml_func_def_pars <- function(phy,
                 num_cycles = num_cycles,
                 loglik_penalty = loglik_penalty,
                 is_complete_tree = is_complete_tree,
-                verbose = verbose
+                verbose = verbose,
+                num_threads = num_threads,
+                atol = atol,
+                rtol = rtol,
+                method = method
             )
         if (out$conv != 0)
         {

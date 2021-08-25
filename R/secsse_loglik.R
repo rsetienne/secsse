@@ -222,17 +222,17 @@ check_input <- function(traits,
                         sampling_fraction,
                         root_state_weight,
                         is_complete_tree){
-  if(is.numeric(root_state_weight)){
-    if(length(root_state_weight) != length(sort(unique(traits)))){
+  if (is.numeric(root_state_weight)) {
+    if (length(root_state_weight) != length(sort(unique(traits)))) {
       stop("There need to be as many elements in root_state_weight as there are traits.")
     }
-    if(length(which(root_state_weight == 1)) != 1){
+    if (length(which(root_state_weight == 1)) != 1) {
       stop("The root_state_weight needs only one 1.")
     }
   } else {
-    if(any(root_state_weight == "maddison_weights" |
+    if (any(root_state_weight == "maddison_weights" |
            root_state_weight == "equal_weights" |
-           root_state_weight == "proper_weights") == FALSE){
+           root_state_weight == "proper_weights") == FALSE) {
       stop("The root_state_weight must be any of maddison_weights, equal_weights, or proper_weights.")
     }
   }
@@ -244,15 +244,15 @@ check_input <- function(traits,
   if (ape::is.binary(phy) == FALSE) {
     stop("The tree needs to be fully resolved.")
   }
-  if (ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE){
+  if (ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE) {
     stop("The tree needs to be ultrametric.")
   }
-  if(any(phy$edge.length == 0)){
+  if (any(phy$edge.length == 0)) {
     stop('The tree must have internode distancs that are all larger than 0.')
   }
   
   if (is.matrix(traits)) {
-    if(length(sampling_fraction) != length(sort(unique(traits[, 1])))){
+    if (length(sampling_fraction) != length(sort(unique(traits[, 1])))) {
       stop("Sampling_fraction must have as many elements as the number of traits.")
     }
     
