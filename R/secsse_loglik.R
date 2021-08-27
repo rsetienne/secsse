@@ -95,6 +95,16 @@ secsse_loglik <- function(parameter,
   }
   
   states <- setting_calculation$states
+  
+  if (is_complete_tree) {
+    states <- build_states(phy = phy,
+                           traits = traits,
+                           num_concealed_states = num_concealed_states,
+                           sampling_fraction = sampling_fraction,
+                           is_complete_tree = is_complete_tree,
+                           mus = mus)
+  }
+  
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
   
