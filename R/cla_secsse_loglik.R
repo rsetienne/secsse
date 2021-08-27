@@ -214,15 +214,6 @@ cla_secsse_loglik <- function(parameter,
   if (cond == "maddison_cond") {
     preCond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
-      if (root_state_weight == "equal_weights") {
-        weightStates <- rep(1 / lmb, lmb) # nolint
-      }
-    }
-  }
-
-  if (cond == "maddison_cond") {
-    preCond <- rep(NA, lmb) # nolint
-    for (j in 1:lmb) {
       preCond[j] <- sum(weightStates[j] *
                         lambdas[[j]] *
                         (1 - nodeM[1:d][j]) ^ 2)

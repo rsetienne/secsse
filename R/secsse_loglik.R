@@ -171,8 +171,8 @@ secsse_loglik <- function(parameter,
   ## At the root
   mergeBranch2 <- (mergeBranch)
   if (is.numeric(root_state_weight)) {
-    giveWeights <- root_state_weight / num_concealed_states
-    weightStates <- rep(giveWeights,num_concealed_states)
+    weightStates <- rep(root_state_weight / num_concealed_states, 
+                        num_concealed_states)
   } else {
     if (root_state_weight == "maddison_weights") {
       weightStates <- (mergeBranch2)/sum((mergeBranch2))
