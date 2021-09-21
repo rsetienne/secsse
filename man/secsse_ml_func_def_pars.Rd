@@ -25,7 +25,11 @@ secsse_ml_func_def_pars(
   optimmethod = "simplex",
   num_cycles = 1,
   loglik_penalty = 0,
-  is_complete_tree = FALSE
+  is_complete_tree = FALSE,
+  num_threads = 1,
+  atol = 1e-12,
+  rtol = 1e-12,
+  method = "odeint::bulirsch_stoer"
 )
 }
 \arguments{
@@ -70,8 +74,22 @@ secsse_ml_func_def_pars(
 \item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
 
 \item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
+
+\item{num_threads}{number of threads. Set to -1 to use all available threads. 
+Default is one thread.}
+
+\item{atol}{absolute tolerance of integration}
+
+\item{rtol}{relative tolerance of integration}
+
+\item{method}{integration method used, available are: 
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 }
 \value{
+Parameter estimated and maximum likelihood
+
 Parameter estimated and maximum likelihood
 }
 \description{
