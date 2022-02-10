@@ -843,9 +843,12 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                       loglik_penalty = 0,
                                       is_complete_tree = TRUE)
   testthat::expect_equal(secsse_cla_LL3,secsse_cla_LL4)
-  
-  skip_on_cran()
-  secsse_cla_LL5 <- cla_secsse_loglik(parameter = parameter,
+
+  # Parallel code doesn't work on CI unless running on windows
+  if (!isTRUE(as.logical(Sys.getenv("CI"))) || .Platform$OS.type == "windows") {  
+    skip_on_cran()
+
+    secsse_cla_LL5 <- cla_secsse_loglik(parameter = parameter,
                                       phy = phy,
                                       traits = traits,
                                       num_concealed_states = num_concealed_states,
@@ -857,7 +860,8 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                       loglik_penalty = 0,
                                       is_complete_tree = TRUE,
                                       run_parallel = TRUE)
-  testthat::expect_equal(secsse_cla_LL5, secsse_cla_LL4)
+    testthat::expect_equal(secsse_cla_LL5, secsse_cla_LL4)
+  }
   
   
   THIS_CODE_IS_NOW_OBSOLETE <- TRUE
