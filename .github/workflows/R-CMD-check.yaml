@@ -6,15 +6,14 @@ on:
       - main
       - master
       - develop
-      - fix_coverage
-      - thijs
+      - hp_fortran
 
   pull_request:
     branches:
       - main
       - master
       - develop
-      - thijs
+      - hp_fortan
 
 name: R-CMD-check
 
