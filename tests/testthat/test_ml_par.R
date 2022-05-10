@@ -17,7 +17,9 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
   idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
-  startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
+  testthat::expect_output(
+       startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
+  )
   intGuessLamba <- startingpoint$lambda0
   intGuessMu <- startingpoint$mu0
   idparsopt <- c(1,2,3)
@@ -30,23 +32,25 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)
-  model <- secsse_ml(
-    phy = phylotree,
-    traits = traits,
-    num_concealed_states = num_concealed_states,
-    idparslist = idparslist,
-    idparsopt = idparsopt,
-    initparsopt = initparsopt,
-    idparsfix = idparsfix,
-    parsfix = parsfix,
-    cond = cond,
-    root_state_weight = root_state_weight,
-    sampling_fraction = sampling_fraction,
-    tol = tol,
-    maxiter = maxiter,
-    optimmethod = optimmethod,
-    num_cycles = 1,
-    verbose = FALSE
+  testthat::expect_output(
+    model <- secsse_ml(
+      phy = phylotree,
+      traits = traits,
+      num_concealed_states = num_concealed_states,
+      idparslist = idparslist,
+      idparsopt = idparsopt,
+      initparsopt = initparsopt,
+      idparsfix = idparsfix,
+      parsfix = parsfix,
+      cond = cond,
+      root_state_weight = root_state_weight,
+      sampling_fraction = sampling_fraction,
+      tol = tol,
+      maxiter = maxiter,
+      optimmethod = optimmethod,
+      num_cycles = 1,
+      verbose = FALSE
+    )
   )
   
   testthat::expect_equal(model$ML,-29.89993)

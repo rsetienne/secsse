@@ -13,7 +13,9 @@ test_that("trying a short ML search: cla_secsse", {
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
   idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
-  startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
+  testthat::expect_output(
+      startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
+  )
   intGuessLamba <- startingpoint$lambda0
   intGuessMu <- startingpoint$mu0
   idparsopt <- c(1)
@@ -27,23 +29,25 @@ test_that("trying a short ML search: cla_secsse", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1,1,1)
   
-  model_R <- cla_secsse_ml(
-    phylotree,
-    traits,
-    num_concealed_states,
-    idparslist,
-    idparsopt,
-    initparsopt,
-    idparsfix,
-    parsfix,
-    cond,
-    root_state_weight,
-    sampling_fraction,
-    tol,
-    maxiter,
-    optimmethod,
-    num_cycles = 1,
-    verbose = FALSE)
+  testthat::expect_output(
+    model_R <- cla_secsse_ml(
+      phylotree,
+      traits,
+      num_concealed_states,
+      idparslist,
+      idparsopt,
+      initparsopt,
+      idparsfix,
+      parsfix,
+      cond,
+      root_state_weight,
+      sampling_fraction,
+      tol,
+      maxiter,
+      optimmethod,
+      num_cycles = 1,
+      verbose = FALSE)
+  )
   
   testthat::expect_equal(model_R$ML,-16.1342246206186)
 })
