@@ -127,6 +127,7 @@ event_traitshift <- function(shiftprob,
 #' @return a list with four components: 1) phy: the resulting phylogeny,
 #' 2) ltable the associated Ltable, 3) speciesID a list of species
 #' labels and 4) speciesTraits a list of species' traits.
+#' @export
 secsse_sim <- function(timeSimul,
                        states,
                        lambdas,
