@@ -38,7 +38,7 @@ event_extinction <- function(species_mus,
                              mus,
                              timeStep) {
   dying <- sample(speciesID, 1, prob = species_mus) 
-  Ltable[which(Ltable[,3] == dying), 4] <- timeStep
+  Ltable[which(Ltable[,3] == dying), 4] <- timeStep 
   speciesTraits <- speciesTraits[-which(speciesID == dying)]
   speciesID <- speciesID[-which(speciesID == dying)]
   return(list(speciesID = speciesID,
@@ -49,12 +49,12 @@ event_extinction <- function(species_mus,
 
 #' @keywords internal
 event_speciation <- function(species_lambdas,
-                             states,
-                             lambdas,
-                             Ltable,
-                             speciesTraits,
-                             speciesID,
-                             timeStep) {
+                              states,
+                              lambdas,
+                              Ltable,
+                              speciesTraits,
+                              speciesID,
+                              timeStep) {
   if (length(speciesID) == 1) {
     mother <- speciesID
   } else {
@@ -83,15 +83,17 @@ event_speciation <- function(species_lambdas,
   state_to_daugther <- states[state_to_daugther]
   speciesTraits[which(mother == speciesID)] <- state_to_parent
   speciesTraits <- c(speciesTraits,state_to_daugther)
+  newL = nrow(Ltable)
+  newL = newL + 1
   Ltable <- rbind(Ltable,
-                  matrix(c(timeStep, mother, max(Ltable[, 3]) + 1, 0), 
-                         ncol = 4))
-  speciesID <- c(speciesID, max(Ltable[, 3]))
+                  matrix(c(timeStep, mother, sign(mother) * newL, -1), ## sign(mother) * & (...,0)
+                         ncol = 4)) 
+  speciesID <- c(speciesID, sign(mother) * newL)
   return(list(Ltable = Ltable,
               speciesTraits = speciesTraits,
               speciesID = speciesID))
   
-}
+} 
 
 #' @keywords internal
 event_traitshift <- function(shiftprob,
@@ -137,12 +139,13 @@ secsse_sim <- function(timeSimul,
                        maxSpec) {
   
   timeStep <- 0
-  Ltable <- matrix(c(0, 0, 1, 0, 
-                     0, 1, 2, 0),
+  Ltable <- matrix(c(0, 0, -1, -1,  ## sing -
+                     0, -1, 2, -1), ## sing -
                    ncol = 4,
                    nrow = 2,
                    byrow = TRUE)
-  speciesID <- c(1, 2)
+  speciesID <- c(-1, 2)
+  speciesTraits<-sample(states, 2)
   
   while (length(speciesID != 0)  && 
          timeStep <= timeSimul) {
@@ -188,13 +191,13 @@ secsse_sim <- function(timeSimul,
     }
     
     if (event == 2) {
-      eventSpec <- event_speciation(species_lambdas,
-                                    states,
-                                    lambdas,
-                                    Ltable,
-                                    speciesTraits,
-                                    speciesID,
-                                    timeStep)
+      eventSpec <- event_speciation2(species_lambdas,
+                                     states,
+                                     lambdas,
+                                     Ltable,
+                                     speciesTraits,
+                                     speciesID,
+                                     timeStep)
       Ltable <- eventSpec$Ltable
       speciesTraits <- eventSpec$speciesTraits
       speciesID <- eventSpec$speciesID
@@ -215,7 +218,13 @@ secsse_sim <- function(timeSimul,
     }
     
   }
-  return(list(phy = DDD::L2phylo(Ltable),
+  
+  new_Ltable <- Ltable
+  time_change <- timeSimul - new_Ltable[, 1]
+  new_Ltable[, 1] <- time_change
+  
+  return(list(phy = DDD::L2phylo(new_Ltable),
+              new_Ltable = new_Ltable,
               Ltable = Ltable,
               speciesID = speciesID,
               speciesTraits = speciesTraits))
