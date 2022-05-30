@@ -1,10 +1,10 @@
 #' @keywords internal
 get_rates <- function(speciesID,
-                      states,
-                      speciesTraits,
-                      mus,
-                      lambdas,
-                      qs) {
+                     states,
+                     speciesTraits,
+                     mus,
+                     lambdas,
+                     qs) {
   species_mus <- NULL
   for (i in 1:length(speciesID)) {
     species_mus <- c(species_mus,
@@ -49,12 +49,12 @@ event_extinction <- function(species_mus,
 
 #' @keywords internal
 event_speciation <- function(species_lambdas,
-                              states,
-                              lambdas,
-                              Ltable,
-                              speciesTraits,
-                              speciesID,
-                              timeStep) {
+                             states,
+                             lambdas,
+                             Ltable,
+                             speciesTraits,
+                             speciesID,
+                             timeStep) {
   if (length(speciesID) == 1) {
     mother <- speciesID
   } else {
@@ -93,7 +93,7 @@ event_speciation <- function(species_lambdas,
               speciesTraits = speciesTraits,
               speciesID = speciesID))
   
-} 
+}
 
 #' @keywords internal
 event_traitshift <- function(shiftprob,
@@ -145,10 +145,10 @@ secsse_sim <- function(timeSimul,
                    nrow = 2,
                    byrow = TRUE)
   speciesID <- c(-1, 2)
-  speciesTraits<-sample(states, 2)
+  speciesTraits <- sample(states, 2)
   
-  while (length(speciesID != 0)  && 
-         timeStep <= timeSimul) {
+  while (length(speciesID) < maxSpec && length(speciesID) > 0) {
+    # && timeStep <= timeSimul) {
     
     rates <- get_rates(speciesID, states, speciesTraits, mus, lambdas, qs)
     species_mus <- rates$species_mus
@@ -160,12 +160,13 @@ secsse_sim <- function(timeSimul,
     
     #cat("the simulated time is:", timeStep, "\n")
     if (timeStep >= timeSimul) {
-      break  
+      break 
     }
     
-    if (length(speciesID) >= maxSpec) {
-      stop("too many species")
-    }
+    #if (length(speciesID) > maxSpec) {
+    # warning("Too many species")
+    # break
+    #}
     ##Events
     ## 1=trait shift
     ## 2=speciation
@@ -179,8 +180,8 @@ secsse_sim <- function(timeSimul,
     if (length(speciesID) == 1 && event == 3) {
       warning("Clade Extinction")
       break
+      
     }
-    
     
     if (event == 1) {
       speciesTraits <- event_traitshift(shiftprob,
@@ -191,13 +192,13 @@ secsse_sim <- function(timeSimul,
     }
     
     if (event == 2) {
-      eventSpec <- event_speciation2(species_lambdas,
-                                     states,
-                                     lambdas,
-                                     Ltable,
-                                     speciesTraits,
-                                     speciesID,
-                                     timeStep)
+      eventSpec <- event_speciation(species_lambdas,
+                                    states,
+                                    lambdas,
+                                    Ltable,
+                                    speciesTraits,
+                                    speciesID,
+                                    timeStep)
       Ltable <- eventSpec$Ltable
       speciesTraits <- eventSpec$speciesTraits
       speciesID <- eventSpec$speciesID
@@ -216,14 +217,19 @@ secsse_sim <- function(timeSimul,
       speciesTraits <- eventExt$speciesTraits
       Ltable <- eventExt$Ltable
     }
-    
+  }
+  new_Ltable <- Ltable
+  if (length(speciesID) > 1) {
+    time_change <- (timeSimul - new_Ltable[,1])
+    new_Ltable <- cbind(time_change, new_Ltable[, 2:4])
   }
   
-  new_Ltable <- Ltable
-  time_change <- timeSimul - new_Ltable[, 1]
-  new_Ltable[, 1] <- time_change
+  resulting_phylogeny <- NA
+  if (!is.null(dim(new_Ltable))) {
+    resulting_phylogeny <- DDD::L2phylo(new_Ltable)
+  }
   
-  return(list(phy = DDD::L2phylo(new_Ltable),
+  return(list(phy = resulting_phylogeny,
               new_Ltable = new_Ltable,
               Ltable = Ltable,
               speciesID = speciesID,
