@@ -38,7 +38,7 @@ event_extinction <- function(species_mus,
                              mus,
                              timeStep) {
   dying <- sample(speciesID, 1, prob = species_mus) 
-  Ltable[which(Ltable[,3] == dying), 4] <- timeSimul - timeStep 
+  Ltable[which(Ltable[,3] == dying), 4] <- timeStep 
   speciesTraits <- speciesTraits[-which(speciesID == dying)]
   speciesID <- speciesID[-which(speciesID == dying)]
   return(list(speciesID = speciesID,
@@ -64,7 +64,7 @@ event_speciation <- function(species_lambdas,
   mother_trait <- speciesTraits[which(mother == speciesID)]
   mother_lambdas <- lambdas[[which(mother_trait == states)]]
   all_lambdas_mother <- as.vector(mother_lambdas)
-  picked_speciation <- sample(1:(length(states)^2), 1, prob=all_lambdas_mother)
+  picked_speciation <- sample(1:(length(states)^2), 1, prob = all_lambdas_mother)
   matri_positio <- matrix(1:(length(states)^2),
                           ncol = length(states),
                           nrow = length(states),
@@ -212,11 +212,12 @@ secsse_sim <- function(timeSimul,
   
   #correcting Ltable to use DDD::L2phylo
   new_Ltable <- Ltable
-  #notmin1 = which(Ltable[,4] != -1)
-  #Ltable[notmin1,4] = timeSimul - c(Ltable[notmin1,4])
-  #Ltable[which(Ltable[,4] == timeSimul + 1),4] = -1
-  time_change <- timeSimul-(Ltable[,1])
-  new_Ltable <-cbind(time_change,Ltable[,2:4])
+  notmin1 = which(Ltable[,4] != -1)
+  Ltable[notmin1, 4] = timeSimul - c(Ltable[notmin1, 4])
+  #Ltable[which(Ltable[,4] == timeSimul + 1), 4] = -1
+  
+  time_change <- timeSimul - (Ltable[,1])
+  new_Ltable <- cbind(time_change, Ltable[,2:4])
   
   #getting only examined traits
   examTraits <- c()
