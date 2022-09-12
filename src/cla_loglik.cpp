@@ -58,10 +58,11 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector<int> desNodes;
   std::vector<double> timeInte;
   long double loglik = 0;
-  
+
   for (int a = 0; a < ances.size(); ++a) {
     
     int focal = ances[a];
+    
     find_desNodes(for_time, focal, desNodes, timeInte);
     
     int focal_node;
@@ -73,7 +74,6 @@ double calc_ll_cla(const Rcpp::List& ll,
       
       y = states[focal_node];
 
-      
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr), // ode class object
@@ -83,7 +83,7 @@ double calc_ll_cla(const Rcpp::List& ll,
                            timeInte[i] * 0.1,
                            absolute_tol,
                            relative_tol); // t1
-
+      
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
@@ -114,6 +114,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     
     assert((focal) >= 0);
     assert((focal) < states.size());
+    
     states[focal] = newstate;
   }
 
@@ -177,6 +178,19 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
   return out;
 }
 
+
+//' function to do cpp stuff
+//' @param ances ances
+//' @param states_R states_R
+//' @param forTime_R fr
+//' @param lambdas l
+//' @param mus mus
+//' @param Q Q
+//' @param method method
+//' @param atol atol
+//' @param rtol rtol
+//' @param is_complete_tree ss
+//' @export
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& states_R,
@@ -196,12 +210,10 @@ try {
 
   NumericVector mergeBranch;
   NumericVector nodeM;
-
- // Rcout << "welcome into cla_calThruNodes_cpp\n"; force_output();
-
+  
  double loglik = 0.0;
  if (is_complete_tree) {
-   loglik = calc_ll_cla< ode_cla_d >(lambdas,
+   loglik = calc_ll_cla< ode_cla_d >(lambdas, // should be ode_cla_d !
                                       mus,
                                       Q,
                                       std::vector<int>(ances.begin(), ances.end()),
@@ -221,7 +233,7 @@ try {
                                    nodeM,
                                    method, atol, rtol);
  }
-
+  
   NumericMatrix states_out;
   vector_to_numericmatrix(states, states_out);
 

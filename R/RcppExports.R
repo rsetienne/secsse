@@ -5,6 +5,18 @@ ct_condition_cla <- function(y, t, ll, mm, Q, method, atol, rtol) {
     .Call(`_secsse_ct_condition_cla`, y, t, ll, mm, Q, method, atol, rtol)
 }
 
+#' function to do cpp stuff
+#' @param ances ances
+#' @param states_R states_R
+#' @param forTime_R fr
+#' @param lambdas l
+#' @param mus mus
+#' @param Q Q
+#' @param method method
+#' @param atol atol
+#' @param rtol rtol
+#' @param is_complete_tree ss
+#' @export
 cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree) {
     .Call(`_secsse_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree)
 }

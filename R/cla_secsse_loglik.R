@@ -140,6 +140,14 @@ cla_secsse_loglik <- function(parameter,
   loglik <- 0
   d <- ncol(states) / 2
 
+  if (see_ancestral_states == TRUE) {
+    if (num_threads != 1) {
+      warning("see ancestral states only works with one thread, setting to one thread")
+      num_threads <- 1
+    }
+  }
+  
+  
   calcul <- c()
   if (num_threads == 1) {
     ancescpp <- ances - 1
@@ -187,6 +195,7 @@ cla_secsse_loglik <- function(parameter,
   mergeBranch <- calcul$mergeBranch # nolint
   nodeM <- calcul$nodeM  # nolint
   loglik <- calcul$loglik
+  states <- calcul$states
 
   ## At the root
   mergeBranch2 <- mergeBranch # nolint
@@ -252,11 +261,11 @@ cla_secsse_loglik <- function(parameter,
 
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips + 1):nrow(states), ]
+    ancestral_states <- states[(num_tips + 1):(nrow(states) - 1), ]
     ancestral_states <- 
         ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states, LL = LL))
+    return(list(ancestral_states = ancestral_states, LL = LL, states = states))
     } else {
     return(LL)
   }
