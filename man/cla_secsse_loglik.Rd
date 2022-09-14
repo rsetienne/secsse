@@ -75,7 +75,7 @@ use all available threads.}
 The loglikelihood of the data given the parameters
 }
 \description{
-Logikelihood calculation for the cla_SecSSE model given a set of parameters
+Loglikelihood calculation for the cla_SecSSE model given a set of parameters
 and data using Rcpp
 }
 \note{

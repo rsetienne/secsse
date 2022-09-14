@@ -313,10 +313,22 @@ public:
     }
   }
   
+  void single_step(const std::vector< double > &x ,
+                  std::vector< double > &dxdt) {
+    for (int i = 0; i < d; ++i) {
+      dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];
+      
+      for (int j = 0; j < d; ++j) {
+        long double dx = x[j + d] - x[i + d];
+        dxdt[i + d] +=  q_[i][j] * dx;
+      }
+    }
+  }
+  
 
   void operator()(const std::vector< double > &x ,
-                std::vector< double > &dxdt,
-                const double /* t */ ) const {
+                  std::vector< double > &dxdt,
+                  const double /* t */ ) const {
     
     for (int i = 0; i < d; ++i) {
       dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];

@@ -67,6 +67,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cla_calThruNodes_store_cpp
+Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, double dt, bool is_complete_tree);
+RcppExport SEXP _secsse_cla_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP dtSEXP, SEXP is_complete_treeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ances(ancesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type states_R(states_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type forTime_R(forTime_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type lambdas(lambdasSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< double >::type dt(dtSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_store_cpp(ances, states_R, forTime_R, lambdas, mus, Q, dt, is_complete_tree));
+    return rcpp_result_gen;
+END_RCPP
+}
 // calThruNodes_cpp
 Rcpp::List calThruNodes_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas, const NumericVector& mus, const NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree);
 RcppExport SEXP _secsse_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
@@ -130,6 +148,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_ct_condition_cla", (DL_FUNC) &_secsse_ct_condition_cla, 8},
     {"_secsse_cla_calThruNodes_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_cpp, 10},
     {"_secsse_calc_cla_ll_threaded", (DL_FUNC) &_secsse_calc_cla_ll_threaded, 9},
+    {"_secsse_cla_calThruNodes_store_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_store_cpp, 8},
     {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 11},
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
     {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 9},

@@ -1,4 +1,4 @@
-#' Logikelihood calculation for the cla_SecSSE model given a set of parameters
+#' Loglikelihood calculation for the cla_SecSSE model given a set of parameters
 #' and data using Rcpp
 #' @title Likelihood for SecSSE model, using Rcpp
 #' @param parameter list where the first is a table where lambdas across
