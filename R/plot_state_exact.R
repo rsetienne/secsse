@@ -23,7 +23,7 @@ plot_state_exact <- function(parameters,
     warning("dt chosen too large, changed to be 1/100th of the shortest branch length")
     dt <- min_branch_len / 10
   }
-  
+  message("collecting branch likelihoods\n")
   eval_res <- secsse::cla_secsse_eval(parameter = parameters,
                                       phy = focal_tree,
                                       traits = traits,
@@ -33,7 +33,7 @@ plot_state_exact <- function(parameters,
                                       sampling_fraction = c(1, 1, 1),
                                       is_complete_tree = TRUE)
   
-  res <- 50
+  message("converting collected likelihoods:\n")
   
   local_maps <- list()
   pb <- txtProgressBar(max = length(focal_tree$edge[, 1]), style = 3)
