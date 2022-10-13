@@ -63,6 +63,8 @@ plot_state_traits <- function(focal_tree, traits, ancestral_states) {
   plots <- list()
   max_col <- c("red", "blue", "purple")
   
+  namez <- c("Mainland", "Island", "Cosmopolitan")
+  
   cnt <- 1
   for (tt in unique(traits)) {
     focal_prob <- ancestral_states[, 1 + tt] + ancestral_states[, 4 + tt]
@@ -85,7 +87,8 @@ plot_state_traits <- function(focal_tree, traits, ancestral_states) {
       ggplot2::scale_color_gradientn(colours = c('grey', max_col[cnt]), 
                                      limits = c(0, 1)) +
       ggtree::geom_tiplab(size = 1) + 
-      ggtree::theme(legend.position = c(.05, .85))
+      ggtree::theme(legend.position = c(.05, .85)) +
+      ggplot2::ggtitle(namez[cnt])
     plots[[cnt]] <- t1
     cnt <- cnt + 1
   }

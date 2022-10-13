@@ -68,8 +68,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // cla_calThruNodes_store_cpp
-Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, double dt, bool is_complete_tree);
-RcppExport SEXP _secsse_cla_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP dtSEXP, SEXP is_complete_treeSEXP) {
+Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, int num_steps, bool is_complete_tree);
+RcppExport SEXP _secsse_cla_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_stepsSEXP, SEXP is_complete_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -79,9 +79,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::List& >::type lambdas(lambdasSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mus(musSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
-    Rcpp::traits::input_parameter< double >::type dt(dtSEXP);
+    Rcpp::traits::input_parameter< int >::type num_steps(num_stepsSEXP);
     Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
-    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_store_cpp(ances, states_R, forTime_R, lambdas, mus, Q, dt, is_complete_tree));
+    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_store_cpp(ances, states_R, forTime_R, lambdas, mus, Q, num_steps, is_complete_tree));
     return rcpp_result_gen;
 END_RCPP
 }

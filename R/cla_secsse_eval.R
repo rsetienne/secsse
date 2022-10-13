@@ -11,7 +11,7 @@
 #' to number of examined states.
 #' @param ancestral_states ancestral states matrix provided by 
 #' cla_secsse_loglik, this is used as starting points for manual integration
-#' @param dt timestep of the manual 'integration'.
+#' @param num_steps number of steps to integrate along a branch
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:'maddison_weigh
@@ -38,7 +38,7 @@ cla_secsse_eval <- function(parameter,
                             traits,
                             num_concealed_states,
                             ancestral_states,
-                            dt,
+                            num_steps = 10,
                             cond = "proper_cond",
                             root_state_weight = "proper_weights",
                             sampling_fraction,
@@ -79,7 +79,7 @@ cla_secsse_eval <- function(parameter,
                                        lambdas,
                                        mus,
                                        Q,
-                                       dt,
+                                       num_steps,
                                        is_complete_tree)
   
   return(calcul)

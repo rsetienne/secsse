@@ -38,7 +38,14 @@ struct storage {
 
 double calc_prob_a(const std::vector<double>& y) {
   double sum = y[6] + y[7] + y[8] + y[9] + y[10] + y[11];
-  return (y[6] + y[7] + y[8]) / sum;
+  auto rel_prob =  (y[6] + y[7] + y[8]) / sum;
+  if (rel_prob < 0.0) {
+    std::cerr << rel_prob << " " << "full: ";
+    for (auto i : y) {
+      std::cerr << i << " ";
+    } std::cerr << "\n";
+  }
+  return rel_prob;
 }
 
 
@@ -48,7 +55,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
                          const std::vector<int>& ances,
                          const std::vector< std::vector< double >>& for_time,
                          const std::vector<std::vector<double>>& states,
-                         double dt)  {
+                         int num_steps)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
@@ -115,15 +122,15 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
 
       ode_cla_d local_od(ll_cpp, mm_cpp, Q_cpp);
       
-      while(t <= timeInte[i]) {
-
+      double dt = timeInte[i] * 1.0 / num_steps;
+      
+      for (int i = 0; i < num_steps; ++i) {
+      
         local_od.single_step(y, dxdt); // updates dxdt
         
         for (size_t k = 0; k < y.size(); ++k) {
-        //  std::cerr << t << " " << k << " " << y[k] << " " << dxdt[k] << " ";
-          
           y[k] += dxdt[k] * dt;
-        //  std::cerr << y[k] << "\n";
+          if (y[k] < 0.0) y[k] = 0.0;
         }
 
         t += dt;
@@ -167,7 +174,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
 //' @param lambdas l
 //' @param mus mus
 //' @param Q Q
-//' @param dt dt
+//' @param num_steps num_steps
 //' @param is_complete_tree ss
 //' @export
 // [[Rcpp::export]]
@@ -177,7 +184,7 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
                                       const Rcpp::List& lambdas,
                                       const Rcpp::NumericVector& mus,
                                       const Rcpp::NumericMatrix& Q,
-                                      double dt,
+                                      int num_steps,
                                       bool is_complete_tree) {
   
   try {
@@ -194,7 +201,7 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
                                  std::vector<int>(ances.begin(), ances.end()),
                                  forTime,
                                  states,
-                                 dt);
+                                 num_steps);
      
     std::vector< std::vector< double >> prep_mat;
     for (auto i : found_results.data_) {
