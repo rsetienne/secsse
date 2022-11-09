@@ -125,6 +125,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calThruNodes_timezones_cpp
+Rcpp::List calThruNodes_timezones_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas1, const NumericVector& mus1, const NumericMatrix& Q1, const NumericVector& lambdas2, const NumericVector& mus2, const NumericMatrix& Q2, const double crit_t, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree);
+RcppExport SEXP _secsse_calThruNodes_timezones_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdas1SEXP, SEXP mus1SEXP, SEXP Q1SEXP, SEXP lambdas2SEXP, SEXP mus2SEXP, SEXP Q2SEXP, SEXP crit_tSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type ances(ancesSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type states_R(states_RSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type forTime_R(forTime_RSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type lambdas1(lambdas1SEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type mus1(mus1SEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type Q1(Q1SEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type lambdas2(lambdas2SEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type mus2(mus2SEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type Q2(Q2SEXP);
+    Rcpp::traits::input_parameter< const double >::type crit_t(crit_tSEXP);
+    Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
+    Rcpp::traits::input_parameter< double >::type abstol(abstolSEXP);
+    Rcpp::traits::input_parameter< double >::type reltol(reltolSEXP);
+    Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
+    rcpp_result_gen = Rcpp::wrap(calThruNodes_timezones_cpp(ances, states_R, forTime_R, lambdas1, mus1, Q1, lambdas2, mus2, Q2, crit_t, num_threads, abstol, reltol, method, is_complete_tree));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_secsse_ct_condition_cla", (DL_FUNC) &_secsse_ct_condition_cla, 8},
@@ -133,6 +158,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 11},
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
     {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 9},
+    {"_secsse_calThruNodes_timezones_cpp", (DL_FUNC) &_secsse_calThruNodes_timezones_cpp, 15},
     {NULL, NULL, 0}
 };
 

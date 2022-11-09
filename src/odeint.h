@@ -39,8 +39,8 @@ public:
   }
   
   void operator()( const std::vector< double > &x ,
-                std::vector<  double > &dxdt,
-                const double /* t */ ) {
+                         std::vector<  double > &dxdt,
+                         const double /* t */ ) const {
     for (size_t i = 0; i < d; ++i) {
       
       if (l_[i] != 0.0) {
@@ -106,7 +106,7 @@ public:
   
   void operator()( const std::vector< double > &x ,
                 std::vector<  double > &dxdt,
-                const double /* t */ ) {
+                const double /* t */ ) const {
     
     for (int i = 0; i < d; ++i) {
       long double diff_1 = (m_[i] - (l_[i] * x[i]));
@@ -393,6 +393,34 @@ private:
   const size_t d;
 };
 
+template <typename ODE_TYPE>
+class ode_transition {
+public:
+  ode_transition(const ODE_TYPE& before,
+                 const ODE_TYPE& after,
+                 double crit_t) : 
+  ode1_(before), ode2_(after), critical_t(crit_t) 
+  {
+  }
+  
+  void operator()(const std::vector< double > &x ,
+                        std::vector< double > &dxdt,
+                        const double t /* t */ ) const {
+    
+    if (t < critical_t) {
+      return ode1_(x, dxdt, t);
+    } else {
+      return ode2_(x, dxdt, t);
+    }
+    
+    return;
+  }
+  
+private:
+  const ODE_TYPE ode1_;
+  const ODE_TYPE ode2_;
+  const double critical_t;
+};
 
 namespace odeintcpp {
 
