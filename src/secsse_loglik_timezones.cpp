@@ -46,7 +46,6 @@ double calc_ll_timezone(const Rcpp::NumericVector& ll1,
       std::vector< double > y = states[focal_node - 1];
       
       std::unique_ptr<ode_transition<ode_standard>> od_ptr = std::make_unique<ode_transition<ode_standard>>(master_od);
-      
       odeintcpp::integrate(method, 
                            std::move(od_ptr), // ode class object
                            y,// state vector
@@ -55,7 +54,6 @@ double calc_ll_timezone(const Rcpp::NumericVector& ll1,
                                    timeInte[i] * 0.01,
                                    absolute_tol,
                                    relative_tol); // t1
-      
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
@@ -81,6 +79,7 @@ double calc_ll_timezone(const Rcpp::NumericVector& ll1,
   
   return loglik;
 }
+
 
 // [[Rcpp::export]]
 Rcpp::List calThruNodes_timezones_cpp(const NumericVector& ances,

@@ -79,15 +79,20 @@ secsse_loglik_timezones <- function(parameter,
                                     atol = 1e-12,
                                     rtol = 1e-12,
                                     method = "odeint::bulirsch_stoer") {
+  
+  if (length(parameter) != 6) {
+    stop("need two sets of lambdas, mus and Qs")
+  }
+  
   lambdas1 <- parameter[[1]]
   mus1 <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q1 <- parameter[[3]]
   
-  lambdas2 <- parameter[[1]]
-  mus2 <- parameter[[2]]
-  parameter[[3]][is.na(parameter[[3]])] <- 0
-  Q2 <- parameter[[3]]
+  lambdas2 <- parameter[[4]]
+  mus2 <- parameter[[5]]
+  parameter[[6]][is.na(parameter[[6]])] <- 0
+  Q2 <- parameter[[6]]
   
   if (is.null(setting_calculation)) {
     check_input(traits,
@@ -153,8 +158,8 @@ secsse_loglik_timezones <- function(parameter,
     
     if (root_state_weight == "proper_weights") {
       weightStates <- (mergeBranch2 / 
-                         (lambdas * (1 - nodeM[1:d]) ^ 2)) / 
-        sum((mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)))
+                         (lambdas1 * (1 - nodeM[1:d]) ^ 2)) / 
+        sum((mergeBranch2 / (lambdas1 * (1 - nodeM[1:d]) ^ 2)))
     }
     
     if (root_state_weight == "equal_weights") {
@@ -169,11 +174,11 @@ secsse_loglik_timezones <- function(parameter,
   
   if (cond == "maddison_cond") {
     mergeBranch2 <- 
-      mergeBranch2 / sum(weightStates * lambdas * (1 - nodeM[1:d]) ^ 2)
+      mergeBranch2 / sum(weightStates * lambdas1 * (1 - nodeM[1:d]) ^ 2)
   }
   
   if (cond == "proper_cond") {
-    mergeBranch2 <- mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)
+    mergeBranch2 <- mergeBranch2 / (lambdas1 * (1 - nodeM[1:d]) ^ 2)
   }
   
   
