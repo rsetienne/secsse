@@ -174,6 +174,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calThruNodes_timezones_compound_cpp
+Rcpp::List calThruNodes_timezones_compound_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const List& params, const NumericVector& crit_t, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree);
+RcppExport SEXP _secsse_calThruNodes_timezones_compound_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP paramsSEXP, SEXP crit_tSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type ances(ancesSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type states_R(states_RSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type forTime_R(forTime_RSEXP);
+    Rcpp::traits::input_parameter< const List& >::type params(paramsSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type crit_t(crit_tSEXP);
+    Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
+    Rcpp::traits::input_parameter< double >::type abstol(abstolSEXP);
+    Rcpp::traits::input_parameter< double >::type reltol(reltolSEXP);
+    Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
+    rcpp_result_gen = Rcpp::wrap(calThruNodes_timezones_compound_cpp(ances, states_R, forTime_R, params, crit_t, num_threads, abstol, reltol, method, is_complete_tree));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_secsse_ct_condition_cla", (DL_FUNC) &_secsse_ct_condition_cla, 8},
@@ -184,6 +204,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
     {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 9},
     {"_secsse_calThruNodes_timezones_cpp", (DL_FUNC) &_secsse_calThruNodes_timezones_cpp, 15},
+    {"_secsse_calThruNodes_timezones_compound_cpp", (DL_FUNC) &_secsse_calThruNodes_timezones_compound_cpp, 10},
     {NULL, NULL, 0}
 };
 

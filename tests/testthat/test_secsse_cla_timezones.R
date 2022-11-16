@@ -100,5 +100,8 @@ test_that("secsse gives the same result as GeoSSE", {
                                                                  loglik_penalty = 0)
 
   testthat::expect_true(secsse_cla_LL != secsse_cla_timezones_LL)
+
+  
+  
 })
   

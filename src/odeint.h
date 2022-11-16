@@ -21,11 +21,16 @@ class ode_standard {
 public:
   
   ode_standard(const std::vector<double>& l,
-                      const std::vector<double>& m,
-                      const std::vector<std::vector<double>>& q) :
+               const std::vector<double>& m,
+               const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
+  
+  ode_standard(const ode_standard& other) = default;
+  ode_standard(ode_standard&& other) = default;
+  ode_standard& operator=(const ode_standard& other) = default;
+  ode_standard& operator=(ode_standard&& other) = default;
   
   ode_standard(const Rcpp::NumericVector& l,
                const Rcpp::NumericVector& m,
@@ -64,6 +69,7 @@ public:
         dxdt[i + d] += diff_d * q_[i][j];
       }
     }
+    
     return;
   }
   
@@ -105,8 +111,8 @@ public:
   }
   
   void operator()( const std::vector< double > &x ,
-                std::vector<  double > &dxdt,
-                const double /* t */ ) const {
+                   std::vector<  double > &dxdt,
+                   const double /* t */ ) const {
     
     for (int i = 0; i < d; ++i) {
       long double diff_1 = (m_[i] - (l_[i] * x[i]));
@@ -124,7 +130,6 @@ public:
         dxdt[j + d] += q_[j][k] * diff_d;
       }
     }
-    
     
     return;
   }
@@ -394,6 +399,46 @@ private:
 };
 
 template <typename ODE_TYPE>
+class ode_transition_compound {
+public:
+  ode_transition_compound() {};
+  
+  void add_entry(ODE_TYPE input_ode,
+                 double t) {
+    ode_.push_back(input_ode);
+    time_.push_back(t);
+  }
+  
+  size_t get_size() {
+    return time_.size();
+  }
+  
+  void operator()(const std::vector< double > &x ,
+                        std::vector< double > &dxdt,
+                        const double t /* t */ ) const {
+    int index = get_index(t);
+    ode_[index](x, dxdt, t);
+    return; 
+  }
+  
+private:
+  
+  int get_index(double t) const {
+    int i = 0;
+    for (; i < time_.size(); ++i) {
+      if (time_[i] >= t) {
+        break;
+      }
+    }
+    if (i < 0) i = 0;
+    return i;
+  }
+  
+  std::vector< ODE_TYPE > ode_;
+  std::vector< double > time_;
+};
+
+template <typename ODE_TYPE>
 class ode_transition {
 public:
   ode_transition(const ODE_TYPE& before,
@@ -404,8 +449,8 @@ public:
   }
   
   void operator()(const std::vector< double > &x ,
-                        std::vector< double > &dxdt,
-                        const double t /* t */ ) const {
+                std::vector< double > &dxdt,
+                const double t /* t */ ) const {
     
     if (t < critical_t) {
       return ode1_(x, dxdt, t);
