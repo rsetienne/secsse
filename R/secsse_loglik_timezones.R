@@ -1,17 +1,14 @@
 #' Logikelihood calculation for the SecSSE model given a set of parameters and 
 #' data, using different parameters before and after a critical timepoint.
 #' @title Likelihood for SecSSE model
-#' @param parameter list where the first vector represents lambdas before,
-#' the second mus before and the third transition rates before. The fourth 
-#' vector represents lambdas after, the fifth vector mus after and the sixth
-#' vector transition rates after.
+#' @param parameter list of parameter lists.
 #' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved, 
 #' rooted and with branch lengths.
 #' @param traits vector with trait states, order of states must be the same as 
 #' tree tips, for help, see vignette.
 #' @param num_concealed_states number of concealed states, generally equivalent 
 #' to number of examined states.
-#' @param critical_t the critical time point at which all the rates change.
+#' @param critical_t a vector of critical time points.
 #' @param cond condition on the existence of a node root: "maddison_cond",
 #' "proper_cond"(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the 
@@ -80,19 +77,16 @@ secsse_loglik_timezones <- function(parameter,
                                     rtol = 1e-12,
                                     method = "odeint::bulirsch_stoer") {
   
-  if (length(parameter) != 6) {
-    stop("need two sets of lambdas, mus and Qs")
+  critical_t <- c(critical_t, 1e200)
+
+  if (length(critical_t) != length(parameter)) {
+    stop("the number of parameter sets does not match the number of time shifts")
   }
   
-  lambdas1 <- parameter[[1]]
-  mus1 <- parameter[[2]]
-  parameter[[3]][is.na(parameter[[3]])] <- 0
-  Q1 <- parameter[[3]]
+  for (i in 1:length(parameter)) {
+    parameter[[i]][[3]][is.na(parameter[[i]][[3]])] <- 0
+  }
   
-  lambdas2 <- parameter[[4]]
-  mus2 <- parameter[[5]]
-  parameter[[6]][is.na(parameter[[6]])] <- 0
-  Q2 <- parameter[[6]]
   
   if (is.null(setting_calculation)) {
     check_input(traits,
@@ -100,6 +94,7 @@ secsse_loglik_timezones <- function(parameter,
                 sampling_fraction,
                 root_state_weight,
                 is_complete_tree)
+    mus1 <- parameter[[1]][[2]]
     setting_calculation <- build_initStates_time(phy,
                                                  traits,
                                                  num_concealed_states,
@@ -109,35 +104,28 @@ secsse_loglik_timezones <- function(parameter,
   }
   
   states <- setting_calculation$states
-  
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
   
   if (num_concealed_states != round(num_concealed_states)) { # for testing
     d <- ncol(states) / 2
-    new_states <- states[,c(1:sqrt(d),(d + 1):((d + 1) + sqrt(d) - 1))]
-    new_states <- states[,c(1,2,3,10,11,12)]
+    new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
+    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
     states <- new_states
   }
   
-  ly <- ncol(states)
   d <- ncol(states) / 2
   
   calcul <- calThruNodes_timezones_cpp(ances,
-                                       states,
-                                       forTime,
-                                       lambdas1,
-                                       mus1,
-                                       Q1,
-                                       lambdas2,
-                                       mus2,
-                                       Q2,
-                                       critical_t,
-                                       1,
-                                       atol,
-                                       rtol,
-                                       method,
-                                       is_complete_tree)
+                                                states,
+                                                forTime,
+                                                parameter,
+                                                critical_t,
+                                                1,
+                                                atol,
+                                                rtol,
+                                                method,
+                                                is_complete_tree)
   
   loglik <- calcul$loglik
   nodeM <- calcul$nodeM
@@ -147,6 +135,8 @@ secsse_loglik_timezones <- function(parameter,
   
   ## At the root
   mergeBranch2 <- (mergeBranch)
+  lambdas1 <- parameter[[ length(parameter) ]]$lambdas
+  
   if (is.numeric(root_state_weight)) {
     weightStates <- rep(root_state_weight / num_concealed_states, 
                         num_concealed_states)
@@ -156,6 +146,7 @@ secsse_loglik_timezones <- function(parameter,
     }
     
     if (root_state_weight == "proper_weights") {
+      
       weightStates <- (mergeBranch2 / 
                          (lambdas1 * (1 - nodeM[1:d]) ^ 2)) / 
         sum((mergeBranch2 / (lambdas1 * (1 - nodeM[1:d]) ^ 2)))
@@ -195,4 +186,3 @@ secsse_loglik_timezones <- function(parameter,
     return(LL)
   }
 }
-  

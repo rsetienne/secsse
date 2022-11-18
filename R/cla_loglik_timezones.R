@@ -85,36 +85,35 @@
 #'# LL = -42.18407
 #' @export
 cla_secsse_loglik_timezones <- function(parameter,
-                              phy,
-                              traits,
-                              num_concealed_states,
-                              crit_t,
-                              cond = "proper_cond",
-                              root_state_weight = "proper_weights",
-                              sampling_fraction,
-                              setting_calculation = NULL,
-                              see_ancestral_states = FALSE,
-                              loglik_penalty = 0,
-                              is_complete_tree = FALSE,
-                              num_threads = 1,
-                              method = ifelse(num_threads == 1,
-                                              "odeint::bulirsch_stoer",
-                                              "odeint::runge_kutta_fehlberg78"),
-                              atol = 1e-16,
-                              rtol = 1e-16) {
-  if (length(parameter) != 6) {
-    stop("need two sets of lambdas, mus and Qs")
+                                        phy,
+                                        traits,
+                                        num_concealed_states,
+                                        critical_t,
+                                        cond = "proper_cond",
+                                        root_state_weight = "proper_weights",
+                                        sampling_fraction,
+                                        setting_calculation = NULL,
+                                        see_ancestral_states = FALSE,
+                                        loglik_penalty = 0,
+                                        is_complete_tree = FALSE,
+                                        num_threads = 1,
+                                        method = ifelse(num_threads == 1,
+                                                        "odeint::bulirsch_stoer",
+                                                        "odeint::runge_kutta_fehlberg78"),
+                                        atol = 1e-16,
+                                        rtol = 1e-16) {
+  
+  critical_t <- c(critical_t, 1e200)
+  
+  if (length(critical_t) != length(parameter)) {
+    stop("the number of parameter sets does not match the number of time shifts")
   }
   
-  lambdas1 <- parameter[[1]]
-  mus1 <- parameter[[2]]
-  parameter[[3]][is.na(parameter[[3]])] <- 0
-  Q1 <- parameter[[3]]
+  for (i in 1:length(parameter)) {
+    parameter[[i]][[3]][is.na(parameter[[i]][[3]])] <- 0
+  }
   
-  lambdas2 <- parameter[[4]]
-  mus2 <- parameter[[5]]
-  parameter[[6]][is.na(parameter[[6]])] <- 0
-  Q2 <- parameter[[6]]
+  mus1 <- parameter[[1]][[2]]
   
   if (is.null(setting_calculation)) {
     check_input(traits,
@@ -161,19 +160,14 @@ cla_secsse_loglik_timezones <- function(parameter,
     forTimecpp <- forTime # nolint
     forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
     calcul <- cla_calThruNodes_timezones_cpp(ancescpp,
-                                   states,
-                                   forTimecpp,
-                                   lambdas1,
-                                   mus1,
-                                   Q1,
-                                   lambdas2,
-                                   mus2,
-                                   Q2,
-                                   crit_t,
-                                   method,
-                                   atol,
-                                   rtol,
-                                   is_complete_tree)
+                                                      states,
+                                                      forTimecpp,
+                                                      parameter,
+                                                      critical_t,
+                                                      method,
+                                                      atol,
+                                                      rtol,
+                                                      is_complete_tree)
   } else {
     # because C++ indexes from 0, we need to adjust the indexing:
     stop("multithreading not yet supported with timezones")
@@ -185,6 +179,8 @@ cla_secsse_loglik_timezones <- function(parameter,
   
   ## At the root
   mergeBranch2 <- mergeBranch # nolint
+  lambdas1 <- parameter[[ length(parameter) ]][[1]]
+  
   lmb <- length(mergeBranch2)
   if (is.numeric(root_state_weight)) {
     weightStates <- rep(root_state_weight / num_concealed_states, # nolint

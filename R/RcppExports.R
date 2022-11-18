@@ -13,12 +13,8 @@ calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q
     .Call(`_secsse_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method, is_complete_tree)
 }
 
-cla_calThruNodes_timezones_cpp <- function(ances, states_R, forTime_R, lambdas1, mus1, Q1, lambdas2, mus2, Q2, crit_t, method, atol, rtol, is_complete_tree) {
-    .Call(`_secsse_cla_calThruNodes_timezones_cpp`, ances, states_R, forTime_R, lambdas1, mus1, Q1, lambdas2, mus2, Q2, crit_t, method, atol, rtol, is_complete_tree)
-}
-
-cla_calThruNodes_timezones_compound_cpp <- function(ances, states_R, forTime_R, params, crit_t, method, atol, rtol, is_complete_tree) {
-    .Call(`_secsse_cla_calThruNodes_timezones_compound_cpp`, ances, states_R, forTime_R, params, crit_t, method, atol, rtol, is_complete_tree)
+cla_calThruNodes_timezones_cpp <- function(ances, states_R, forTime_R, params, crit_t, method, atol, rtol, is_complete_tree) {
+    .Call(`_secsse_cla_calThruNodes_timezones_cpp`, ances, states_R, forTime_R, params, crit_t, method, atol, rtol, is_complete_tree)
 }
 
 calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree) {
@@ -33,11 +29,7 @@ calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads, me
     .Call(`_secsse_calc_ll_threaded`, ll, mm, Q, ances, for_time, states, num_threads, method, is_complete_tree)
 }
 
-calThruNodes_timezones_cpp <- function(ances, states_R, forTime_R, lambdas1, mus1, Q1, lambdas2, mus2, Q2, crit_t, num_threads, abstol, reltol, method, is_complete_tree) {
-    .Call(`_secsse_calThruNodes_timezones_cpp`, ances, states_R, forTime_R, lambdas1, mus1, Q1, lambdas2, mus2, Q2, crit_t, num_threads, abstol, reltol, method, is_complete_tree)
-}
-
-calThruNodes_timezones_compound_cpp <- function(ances, states_R, forTime_R, params, crit_t, num_threads, abstol, reltol, method, is_complete_tree) {
-    .Call(`_secsse_calThruNodes_timezones_compound_cpp`, ances, states_R, forTime_R, params, crit_t, num_threads, abstol, reltol, method, is_complete_tree)
+calThruNodes_timezones_cpp <- function(ances, states_R, forTime_R, params, crit_t, num_threads, abstol, reltol, method, is_complete_tree) {
+    .Call(`_secsse_calThruNodes_timezones_cpp`, ances, states_R, forTime_R, params, crit_t, num_threads, abstol, reltol, method, is_complete_tree)
 }
 

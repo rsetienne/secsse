@@ -9,7 +9,7 @@ cla_secsse_loglik_timezones(
   phy,
   traits,
   num_concealed_states,
-  crit_t,
+  critical_t,
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   sampling_fraction,
@@ -41,6 +41,8 @@ tree tips, for help, see vignette.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to number of examined states.}
+
+\item{critical_t}{the critical time point at which all the rates change.}
 
 \item{cond}{condition on the existence of a node root: 'maddison_cond',
 'proper_cond'(default). For details, see vignette.}
@@ -75,8 +77,6 @@ use all available threads.}
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
-
-\item{critical_t}{the critical time point at which all the rates change.}
 }
 \value{
 The loglikelihood of the data given the parameters

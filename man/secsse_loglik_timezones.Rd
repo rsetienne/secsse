@@ -24,10 +24,7 @@ secsse_loglik_timezones(
 )
 }
 \arguments{
-\item{parameter}{list where the first vector represents lambdas before,
-the second mus before and the third transition rates before. The fourth 
-vector represents lambdas after, the fifth vector mus after and the sixth
-vector transition rates after.}
+\item{parameter}{list of parameter lists.}
 
 \item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved, 
 rooted and with branch lengths.}
@@ -38,7 +35,7 @@ tree tips, for help, see vignette.}
 \item{num_concealed_states}{number of concealed states, generally equivalent 
 to number of examined states.}
 
-\item{critical_t}{the critical time point at which all the rates change.}
+\item{critical_t}{a vector of critical time points.}
 
 \item{cond}{condition on the existence of a node root: "maddison_cond",
 "proper_cond"(default). For details, see vignette.}

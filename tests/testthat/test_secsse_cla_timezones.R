@@ -58,24 +58,8 @@ test_that("secsse gives the same result as GeoSSE", {
   num_concealed_states <- 3.1
   
   secsse_cla_LL <- secsse::cla_secsse_loglik(parameter,
-                                     phy,
-                                     traits,
-                                     num_concealed_states,
-                                     cond = "maddison_cond",
-                                     root_state_weight = "maddison_weights",
-                                     sampling_fraction = c(1, 1, 1),
-                                     setting_calculation = NULL,
-                                     see_ancestral_states = FALSE,
-                                     loglik_penalty = 0)
-  
-  parameter[[4]] <- lambdas
-  parameter[[5]] <- mus
-  parameter[[6]] <- q
-  
-  secsse_cla_timezones_LL <- secsse::cla_secsse_loglik_timezones(parameter,
                                              phy,
                                              traits,
-                                             crit_t = 1.0,
                                              num_concealed_states,
                                              cond = "maddison_cond",
                                              root_state_weight = "maddison_weights",
@@ -83,24 +67,6 @@ test_that("secsse gives the same result as GeoSSE", {
                                              setting_calculation = NULL,
                                              see_ancestral_states = FALSE,
                                              loglik_penalty = 0)
-  
-  testthat::expect_equal(secsse_cla_LL, secsse_cla_timezones_LL)
-  
-  parameter[[5]] <- c(0, 0, 0)
-  secsse_cla_timezones_LL <- secsse::cla_secsse_loglik_timezones(parameter,
-                                                                 phy,
-                                                                 traits,
-                                                                 crit_t = 1.0,
-                                                                 num_concealed_states,
-                                                                 cond = "maddison_cond",
-                                                                 root_state_weight = "maddison_weights",
-                                                                 sampling_fraction = c(1, 1, 1),
-                                                                 setting_calculation = NULL,
-                                                                 see_ancestral_states = FALSE,
-                                                                 loglik_penalty = 0)
-
-  testthat::expect_true(secsse_cla_LL != secsse_cla_timezones_LL)
-
   
   # now, we add tests for compound / arbitrary length:
   
@@ -113,37 +79,36 @@ test_that("secsse gives the same result as GeoSSE", {
   param_compound[[1]] <- parameter
   param_compound[[2]] <- parameter
   
-  secsse_cla_timezones_compound_LL <- 
-    secsse::cla_secsse_loglik_timezones_compound(param_compound,
-                                                 phy,
-                                                 traits,
-                                                 critical_t =  c(1.0),
-                                                 num_concealed_states,
-                                                 cond = "maddison_cond",
-                                                 root_state_weight = "maddison_weights",
-                                                 sampling_fraction = c(1, 1, 1),
-                                                 setting_calculation = NULL,
-                                                 see_ancestral_states = FALSE,
-                                                 loglik_penalty = 0)
+  secsse_cla_timezones_LL <- 
+    secsse::cla_secsse_loglik_timezones(param_compound,
+                                        phy,
+                                        traits,
+                                        critical_t =  c(1.0),
+                                        num_concealed_states,
+                                        cond = "maddison_cond",
+                                        root_state_weight = "maddison_weights",
+                                        sampling_fraction = c(1, 1, 1),
+                                        setting_calculation = NULL,
+                                        see_ancestral_states = FALSE,
+                                        loglik_penalty = 0)
   
-  testthat::expect_equal(secsse_cla_LL, secsse_cla_timezones_compound_LL)
+  testthat::expect_equal(secsse_cla_LL, secsse_cla_timezones_LL)
   
   # we change the second parameter set, likelihood should change
   param_compound[[2]][[2]] <- c(0.0, 0.0, 0.0)
   
-  secsse_cla_timezones_compound_LL <- 
-    secsse::cla_secsse_loglik_timezones_compound(param_compound,
-                                                 phy,
-                                                 traits,
-                                                 critical_t =  c(1.0),
-                                                 num_concealed_states,
-                                                 cond = "maddison_cond",
-                                                 root_state_weight = "maddison_weights",
-                                                 sampling_fraction = c(1, 1, 1),
-                                                 setting_calculation = NULL,
-                                                 see_ancestral_states = FALSE,
-                                                 loglik_penalty = 0)
+  secsse_cla_timezones_LL <- 
+    secsse::cla_secsse_loglik_timezones(param_compound,
+                                        phy,
+                                        traits,
+                                        critical_t =  c(1.0),
+                                        num_concealed_states,
+                                        cond = "maddison_cond",
+                                        root_state_weight = "maddison_weights",
+                                        sampling_fraction = c(1, 1, 1),
+                                        setting_calculation = NULL,
+                                        see_ancestral_states = FALSE,
+                                        loglik_penalty = 0)
   
-  testthat::expect_false(secsse_cla_LL == secsse_cla_timezones_compound_LL)
+  testthat::expect_false(secsse_cla_LL == secsse_cla_timezones_LL)
 })
-  
