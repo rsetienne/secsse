@@ -17,6 +17,10 @@ cla_calThruNodes_timezones_cpp <- function(ances, states_R, forTime_R, lambdas1,
     .Call(`_secsse_cla_calThruNodes_timezones_cpp`, ances, states_R, forTime_R, lambdas1, mus1, Q1, lambdas2, mus2, Q2, crit_t, method, atol, rtol, is_complete_tree)
 }
 
+cla_calThruNodes_timezones_compound_cpp <- function(ances, states_R, forTime_R, params, crit_t, method, atol, rtol, is_complete_tree) {
+    .Call(`_secsse_cla_calThruNodes_timezones_compound_cpp`, ances, states_R, forTime_R, params, crit_t, method, atol, rtol, is_complete_tree)
+}
+
 calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree) {
     .Call(`_secsse_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree)
 }

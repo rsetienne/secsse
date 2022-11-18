@@ -102,6 +102,48 @@ test_that("secsse gives the same result as GeoSSE", {
   testthat::expect_true(secsse_cla_LL != secsse_cla_timezones_LL)
 
   
+  # now, we add tests for compound / arbitrary length:
   
+  parameter <- list()
+  parameter[[1]] <- lambdas
+  parameter[[2]] <- mus
+  parameter[[3]] <- q
+  
+  param_compound <- list()
+  param_compound[[1]] <- parameter
+  param_compound[[2]] <- parameter
+  
+  secsse_cla_timezones_compound_LL <- 
+    secsse::cla_secsse_loglik_timezones_compound(param_compound,
+                                                 phy,
+                                                 traits,
+                                                 critical_t =  c(1.0),
+                                                 num_concealed_states,
+                                                 cond = "maddison_cond",
+                                                 root_state_weight = "maddison_weights",
+                                                 sampling_fraction = c(1, 1, 1),
+                                                 setting_calculation = NULL,
+                                                 see_ancestral_states = FALSE,
+                                                 loglik_penalty = 0)
+  
+  testthat::expect_equal(secsse_cla_LL, secsse_cla_timezones_compound_LL)
+  
+  # we change the second parameter set, likelihood should change
+  param_compound[[2]][[2]] <- c(0.0, 0.0, 0.0)
+  
+  secsse_cla_timezones_compound_LL <- 
+    secsse::cla_secsse_loglik_timezones_compound(param_compound,
+                                                 phy,
+                                                 traits,
+                                                 critical_t =  c(1.0),
+                                                 num_concealed_states,
+                                                 cond = "maddison_cond",
+                                                 root_state_weight = "maddison_weights",
+                                                 sampling_fraction = c(1, 1, 1),
+                                                 setting_calculation = NULL,
+                                                 see_ancestral_states = FALSE,
+                                                 loglik_penalty = 0)
+  
+  testthat::expect_false(secsse_cla_LL == secsse_cla_timezones_compound_LL)
 })
   

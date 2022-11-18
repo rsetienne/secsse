@@ -3,6 +3,7 @@
 export(cla_id_paramPos)
 export(cla_secsse_loglik)
 export(cla_secsse_loglik_timezones)
+export(cla_secsse_loglik_timezones_compound)
 export(cla_secsse_ml)
 export(cla_secsse_ml_func_def_pars)
 export(event_times)

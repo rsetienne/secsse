@@ -130,12 +130,12 @@ secsse_loglik_timezones_compound <- function(parameter,
   loglik <- calcul$loglik
   nodeM <- calcul$nodeM
   mergeBranch <- calcul$mergeBranch
-
+  
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
   
   ## At the root
   mergeBranch2 <- (mergeBranch)
-  lambdas1 <- parameter[[1]]$lambdas
+  lambdas1 <- parameter[[ length(parameter) ]]$lambdas
   
   if (is.numeric(root_state_weight)) {
     weightStates <- rep(root_state_weight / num_concealed_states, 

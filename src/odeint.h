@@ -449,8 +449,8 @@ public:
   }
   
   void operator()(const std::vector< double > &x ,
-                std::vector< double > &dxdt,
-                const double t /* t */ ) const {
+                  std::vector< double > &dxdt,
+                  const double t /* t */ ) const {
     
     if (t < critical_t) {
       return ode1_(x, dxdt, t);
