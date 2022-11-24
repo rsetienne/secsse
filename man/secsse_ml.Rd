@@ -18,24 +18,25 @@ secsse_ml(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  use_fortran = TRUE,
-  methode = "ode45",
   optimmethod = "simplex",
   num_cycles = 1,
-  run_parallel = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  func = ifelse(is_complete_tree, "secsse_runmod_ct", ifelse(use_fortran == FALSE,
-    secsse_loglik_rhs, "secsse_runmod2")),
-  verbose = (optimmethod == "subplex")
+  verbose = (optimmethod == "subplex"),
+  num_threads = 1,
+  atol = 1e-12,
+  rtol = 1e-12,
+  method = "odeint::bulirsch_stoer"
 )
 }
 \arguments{
-\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.}
+\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with 
+branch lengths.}
 
 \item{traits}{a vector with trait states for each tip in the phylogeny.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent to the number of examined states in the dataset.}
+\item{num_concealed_states}{number of concealed states, generally equivalent 
+to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
 
@@ -47,51 +48,59 @@ secsse_ml(
 
 \item{parsfix}{value of the fixed parameters.}
 
-\item{cond}{condition on the existence of a node root: "maddison_cond","proper_cond"(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: 'maddison_cond',
+'proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 
+root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
-\item{sampling_fraction}{vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.}
+\item{sampling_fraction}{vector that states the sampling proportion per 
+trait state. It must have as many elements as there are trait states.}
 
-\item{tol}{maximum tolerance. Default is "c(1e-04, 1e-05, 1e-05)".}
+\item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
-\item{maxiter}{max number of iterations. Default is "1000 *round((1.25)^length(idparsopt))".}
+\item{maxiter}{max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.}
 
-\item{use_fortran}{Should the Fortran code for numerical integration be called? Default is TRUE.}
-
-\item{methode}{method used for integration calculation. Default is "ode45".}
-
-\item{optimmethod}{method used for optimization. Default is "simplex".}
+\item{optimmethod}{method used for optimization. Default is 'simplex'.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
-\item{run_parallel}{should the routine to run in parallel be called?}
+\item{loglik_penalty}{the size of the penalty for all parameters; default 
+is 0 (no penalty)}
 
-\item{loglik_penalty}{the size of the penalty for all parameters; default is 0 (no penalty)}
+\item{is_complete_tree}{whether or not a tree with all its extinct species 
+is provided}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species is provided}
+\item{verbose}{sets verbose output; default is verbose when optimmethod is 
+'subplex'}
 
-\item{func}{function to be used in solving the ODE system. Currently only for testing purposes.}
+\item{num_threads}{number of threads. Set to -1 to use all available threads. 
+Default is one thread.}
 
-\item{verbose}{sets verbose output; default is verbose when optimmethod is 'subplex'}
+\item{atol}{absolute tolerance of integration}
+
+\item{rtol}{relative tolerance of integration}
+
+\item{method}{integration method used, available are: 
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 }
 \value{
 Parameter estimated and maximum likelihood
 }
 \description{
-Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE)
-}
-\note{
-To run in parallel it is needed to load the following libraries when windows: apTreeshape, doparallel and foreach. When unix, it requires: apTreeshape, doparallel, foreach and doMC
+Maximum likehood estimation under Several examined and concealed
+States-dependent Speciation and Extinction (SecSSE)
 }
 \examples{
 # Example of how to set the arguments for a ML search.
 library(secsse)
 library(DDD)
 set.seed(13)
-# Check the vignette for a better working exercise. 
+# Check the vignette for a better working exercise.
 # lambdas for 0A and 1A and 2A are the same but need to be estimated
-# mus are fixed to 
+# mus are fixed to
 # the transition rates are constrained to be equal and fixed 0.01
 phylotree <- ape::rcoal(31, tip.label = 1:31)
 traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
@@ -101,7 +110,7 @@ idparslist[[1]][c(1,4,7)] <- 1
 idparslist[[1]][c(2,5,8)] <- 2
 idparslist[[1]][c(3,6,9)] <- 3
 idparslist[[2]][]<-4
-masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
+masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE)
 diag(masterBlock) <- NA
 diff.conceal <- FALSE
 idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
@@ -114,33 +123,28 @@ idparsfix <- c(0,4)
 parsfix <- c(0,0)
 tol <- c(1e-04, 1e-05, 1e-07)
 maxiter <- 1000 * round((1.25)^length(idparsopt))
-use_fortran <- TRUE
-methode <- "ode45"
-optimmethod <- "simplex"
-run_parallel <- FALSE
-cond <- "proper_cond"
-root_state_weight <- "proper_weights"
+optimmethod <- 'simplex'
+cond <- 'proper_cond'
+root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
-#model<-secsse_ml(
-#phylotree,
-#traits,
-#num_concealed_states,
-#idparslist,
-#idparsopt,
-#initparsopt,
-#idparsfix,
-#parsfix,
-#cond,
-#root_state_weight,
-#sampling_fraction,
-#tol,
-#maxiter,
-#use_fortran,
-#methode,
-#optimmethod,
-#num_cycles = 1,
-#run_parallel
-#)
-# $ML
-# [1] -16.43162
+\dontrun{
+model<-secsse_ml(
+phylotree,
+traits,
+num_concealed_states,
+idparslist,
+idparsopt,
+initparsopt,
+idparsfix,
+parsfix,
+cond,
+root_state_weight,
+sampling_fraction,
+tol,
+maxiter,
+optimmethod,
+num_cycles = 1,
+)}
+# model$ML
+# [1] -16.04127
 }

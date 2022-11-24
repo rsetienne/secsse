@@ -7,19 +7,22 @@
 sortingtraits(traitinfo, phy)
 }
 \arguments{
-\item{traitinfo}{data frame where first column has species ids and the second one is the trait associated information.}
+\item{traitinfo}{data frame where first column has species ids and the second 
+one is the trait associated information.}
 
-\item{phy}{phy phylogenetic tree of class phylo, ultrametric, fully-resolved, rooted and with branch lengths.}
+\item{phy}{phy phylogenetic tree of class phylo, ultrametric, fully-resolved, 
+rooted and with branch lengths.}
 }
 \value{
 Vector of traits
 }
 \description{
-In preparation for likelihood calculation, it orders trait data according the tree tips
+In preparation for likelihood calculation, it orders trait data according 
+the tree tips
 }
 \examples{
 # Some data we have prepared
 data(traitinfo)
-data("phylo_Vign")
+data('phylo_Vign')
 traits <- sortingtraits(traitinfo,phylo_Vign)
 }
