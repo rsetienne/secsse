@@ -78,7 +78,7 @@ secsse_loglik_timezones <- function(parameter,
                                     method = "odeint::bulirsch_stoer") {
   
   critical_t <- c(critical_t, 1e200)
-
+  
   if (length(critical_t) != length(parameter)) {
     stop("the number of parameter sets does not match the number of time shifts")
   }
@@ -117,15 +117,15 @@ secsse_loglik_timezones <- function(parameter,
   d <- ncol(states) / 2
   
   calcul <- calThruNodes_timezones_cpp(ances,
-                                                states,
-                                                forTime,
-                                                parameter,
-                                                critical_t,
-                                                1,
-                                                atol,
-                                                rtol,
-                                                method,
-                                                is_complete_tree)
+                                       states,
+                                       forTime,
+                                       parameter,
+                                       critical_t,
+                                       1,
+                                       atol,
+                                       rtol,
+                                       method,
+                                       is_complete_tree)
   
   loglik <- calcul$loglik
   nodeM <- calcul$nodeM
@@ -135,7 +135,7 @@ secsse_loglik_timezones <- function(parameter,
   
   ## At the root
   mergeBranch2 <- (mergeBranch)
-  lambdas1 <- parameter[[ length(parameter) ]]$lambdas
+  lambdas1 <- parameter[[ length(parameter) ]][[1]]
   
   if (is.numeric(root_state_weight)) {
     weightStates <- rep(root_state_weight / num_concealed_states, 

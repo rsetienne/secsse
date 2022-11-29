@@ -11,6 +11,8 @@
 #' @param initparsopt initial guess of the parameters to be estimated.
 #' @param idparsfix id of the fixed parameters.
 #' @param parsfix value of the fixed parameters.
+#' @param critical_t vector of time points at which a new parameter regime is
+#' used, if applicable.
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 

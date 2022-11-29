@@ -49,6 +49,9 @@ to the number of examined states in the dataset.}
 
 \item{parsfix}{value of the fixed parameters.}
 
+\item{critical_t}{vector of time points at which a new parameter regime is
+used, if applicable.}
+
 \item{cond}{condition on the existence of a node root: 'maddison_cond',
 'proper_cond'(default). For details, see vignette.}
 
