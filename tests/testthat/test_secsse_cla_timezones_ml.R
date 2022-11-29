@@ -14,7 +14,7 @@ test_that("trying a short ML search: cla_secsse", {
   diff.conceal <- FALSE
   idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
   testthat::expect_output(
-      startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
+    startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
   intGuessLamba <- startingpoint$lambda0
   intGuessMu <- startingpoint$mu0
@@ -39,7 +39,6 @@ test_that("trying a short ML search: cla_secsse", {
       initparsopt,
       idparsfix,
       parsfix,
-      critical_t = NULL,
       cond,
       root_state_weight,
       sampling_fraction,
@@ -51,4 +50,34 @@ test_that("trying a short ML search: cla_secsse", {
   )
   
   testthat::expect_equal(model_R$ML,-16.1342246206186)
+  
+  # and now with time zones:
+  
+  idparslist_t <- list()
+  idparslist_t[[1]] <- idparslist
+  idparslist_t[[2]] <- idparslist
+  
+  critical_t <- c(0.5)
+  
+  testthat::expect_output(
+    model_R_t <- cla_secsse_timezones_ml(
+      phylotree,
+      traits,
+      num_concealed_states,
+      idparslist_t,
+      idparsopt,
+      initparsopt,
+      idparsfix,
+      parsfix,
+      critical_t = critical_t,
+      cond,
+      root_state_weight,
+      sampling_fraction,
+      tol,
+      maxiter,
+      optimmethod,
+      num_cycles = 1,
+      verbose = FALSE)
+  )
+  testthat::expect_equal(model_R$ML, model_R_t$ML)
 })

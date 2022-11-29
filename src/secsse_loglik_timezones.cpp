@@ -23,9 +23,9 @@ double calc_ll_timezone(const Rcpp::List& params,
   
    for (int i = 0; i < crit_t.size(); ++i) {
     Rcpp::List loc = params[i];
-    NumericVector ll = loc["lambdas"];
-    NumericVector mm = loc["mus"];
-    NumericMatrix qq = loc["Q"];
+    NumericVector ll = loc[0];
+    NumericVector mm = loc[1];
+    NumericMatrix qq = loc[2];
     assert(ll.size() > 0);
     assert(mm.size() > 0);
     assert(qq.nrow() > 0);
@@ -38,7 +38,8 @@ double calc_ll_timezone(const Rcpp::List& params,
   // std::cerr << "size = " << master_od.get_size() << "\n";
   
   Rcpp::List loc = params[0];
-  NumericVector ll1_r = loc["lambdas"];
+  NumericVector ll1_r = loc[0];
+  
   std::vector<double> ll1(ll1_r.begin(), ll1_r.end());
   
   size_t d = ll1.size();
@@ -128,18 +129,18 @@ Rcpp::List calThruNodes_timezones_cpp(const NumericVector& ances,
   
   double loglik;
   if (is_complete_tree) {
-    Rcpp::stop("This is not implemented yet for multiple rates");
+    Rcpp::stop("Complete tree conditioning is not yet implemented for timezones");
   } else {
     loglik = calc_ll_timezone(params,
-                                       crit_t,
-                                       std::vector<int>(ances.begin(), ances.end()),
-                                       forTime,
-                                       states,
-                                       mergeBranch,
-                                       nodeM,
-                                       abstol,
-                                       reltol,
-                                       method);
+                             crit_t,
+                             std::vector<int>(ances.begin(), ances.end()),
+                             forTime,
+                             states,
+                             mergeBranch,
+                             nodeM,
+                             abstol,
+                             reltol,
+                             method);
   }
   
   NumericMatrix states_out;

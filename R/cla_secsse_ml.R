@@ -11,6 +11,8 @@
 #' @param initparsopt initial guess of the parameters to be estimated.
 #' @param idparsfix id of the fixed parameters.
 #' @param parsfix value of the fixed parameters.
+#' @param critical_t vector of time points at which a new parameter regime is
+#' used, if applicable.
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 
@@ -133,15 +135,23 @@ cla_secsse_ml <- function(phy,
         stop("All elements in idparslist must be included in either idparsopt or idparsfix ")
     }
     
-    if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
-        cat("Note: you set some transitions as impossible to happen.", "\n")
+    if (is.null(critical_t)) {
+        if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
+            cat("Note: you set some transitions as impossible to happen.", "\n")
+        }
+    } else {
+        for (j in 1:length(idparslist)) {
+            if (anyDuplicated(c(unique(sort(as.vector(idparslist[[j]][[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
+                cat("Note: you set some transitions as impossible to happen.", "\n")
+            } 
+        }
     }
     
     if (is.matrix(idparslist[[1]])) {
         ## it is a tailor case otherwise
         idparslist[[1]] <- prepare_full_lambdas(traits, num_concealed_states, idparslist[[1]])
     }
-    
+
     see_ancestral_states <- FALSE
     
     # options(warn=-1)
@@ -151,12 +161,16 @@ cla_secsse_ml <- function(phy,
     trparsopt[which(initparsopt == Inf)] <- 1
     trparsfix <- parsfix/(1 + parsfix)
     trparsfix[which(parsfix == Inf)] <- 1
+    
+   
     mus <- calc_mus(is_complete_tree,
                     idparslist,
                     idparsfix,
                     parsfix,
                     idparsopt,
                     initparsopt)
+   
+    
     optimpars <- c(tol, maxiter)
 
     setting_calculation <- build_initStates_time(phy, 
@@ -165,7 +179,6 @@ cla_secsse_ml <- function(phy,
                                                  sampling_fraction,
                                                  is_complete_tree, 
                                                  mus)
-    setting_parallel <- NULL
     
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                           trparsfix = trparsfix,
