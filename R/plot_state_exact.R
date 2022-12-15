@@ -31,7 +31,7 @@ plot_state_exact <- function(parameters,
                                       ancestral_states = states,
                                       dt = dt,
                                       sampling_fraction = c(1, 1, 1),
-                                      is_complete_tree = TRUE)
+                                      is_complete_tree = FALSE)
   
   message("converting collected likelihoods:\n")
   

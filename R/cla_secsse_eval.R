@@ -45,7 +45,7 @@ cla_secsse_eval <- function(parameter,
                             setting_calculation = NULL,
                             see_ancestral_states = FALSE,
                             loglik_penalty = 0,
-                            is_complete_tree = TRUE) {
+                            is_complete_tree = FALSE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
