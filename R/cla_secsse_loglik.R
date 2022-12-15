@@ -261,6 +261,7 @@ cla_secsse_loglik <- function(parameter,
 
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
+    # last row contains safety entry from C++ (all zeros)
     ancestral_states <- states[(num_tips + 1):(nrow(states) - 1), ]
     ancestral_states <- 
         ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]

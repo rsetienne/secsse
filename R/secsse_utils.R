@@ -346,11 +346,13 @@ normalize_loglik <- function(probs, loglik) {
     return(list(probs = probs, loglik = loglik))
 }
 
+#' @keywords internal
 penalty <- function(pars, loglik_penalty = 0) {
     pars <- unlist(unlist(pars))
     return(loglik_penalty * sum(pars^2)/(2 * length(pars)))
 }
 
+#' @keywords internal
 calc_mus <- function(is_complete_tree,
                      idparslist,
                      idparsfix,
