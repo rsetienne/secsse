@@ -29,7 +29,7 @@ plot_state_exact <- function(parameters,
                                       traits = traits,
                                       num_concealed_states = num_concealed_states,
                                       ancestral_states = states,
-                                      dt = dt,
+                                      num_steps = 1 / dt,
                                       sampling_fraction = c(1, 1, 1),
                                       is_complete_tree = FALSE)
   

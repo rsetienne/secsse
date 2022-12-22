@@ -10,11 +10,11 @@ using matrix = std::vector< std::vector< double >>;
 
 struct data_storage {
   std::vector<double> t;
-  std::vector<double> prob_A;
+  std::vector<std::vector<double>> probs;
   
-  void add_entry(double time, double prob) {
+  void add_entry(double time, std::vector<double> prob) {
     t.push_back(time);
-    prob_A.push_back(prob);
+    probs.push_back(prob);
   }
 };
 
@@ -114,7 +114,6 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
       
       y = states[focal_node];
     
-      
       std::vector< double > dxdt(y.size(), 0.0);
       
       double t = 0.0;
@@ -123,6 +122,8 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
       ode_cla_d local_od(ll_cpp, mm_cpp, Q_cpp);
       
       double dt = timeInte[i] * 1.0 / num_steps;
+      
+      local_storage.add_entry(t, y);
       
       for (int i = 0; i < num_steps; ++i) {
       
@@ -134,8 +135,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
         }
 
         t += dt;
-        auto prob_A = calc_prob_a(y);
-        local_storage.add_entry(t, prob_A);
+        local_storage.add_entry(t, y);
       }
       /*
       std::vector<double> y2 = states[focal_node];
@@ -209,8 +209,12 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
       for (size_t j = 0; j < i.probabilities.t.size(); ++j) {
           add = {static_cast<double>(i.ances), 
                  static_cast<double>(i.focal_node), 
-                 i.probabilities.t[j],
-                 i.probabilities.prob_A[j]};
+                 i.probabilities.t[j]};
+        
+          for (const auto& k : i.probabilities.probs[j]) {
+            add.push_back(k);
+          }
+        
           prep_mat.push_back(add);
       }
     }
