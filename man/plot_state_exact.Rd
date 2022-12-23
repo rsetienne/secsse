@@ -10,7 +10,8 @@ plot_state_exact(
   traits,
   num_concealed_states,
   states,
-  dt
+  dt,
+  res
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ plot_state_exact(
 \item{states}{the states matrix returned by cla_secsse_loglik}
 
 \item{dt}{chosen time step}
+
+\item{res}{resolution of the color scale used.}
 }
 \value{
 nothing

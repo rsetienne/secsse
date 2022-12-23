@@ -25,6 +25,12 @@
 #' 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species is
 #' provided
+#' @param method integration method used, available are: 
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#' @param atol absolute tolerance of integration
+#' @param rtol relative tolerance of integration
 #' @return The loglikelihood of the data given the parameters
 #' @description Using see_ancestral_states = TRUE in the function 
 #' cla_secsse_loglik will provide posterior probabilities of the states of the 
@@ -45,7 +51,10 @@ cla_secsse_eval <- function(parameter,
                             setting_calculation = NULL,
                             see_ancestral_states = FALSE,
                             loglik_penalty = 0,
-                            is_complete_tree = FALSE) {
+                            is_complete_tree = FALSE,
+                            method = "odeint::bulirsch_stoer",
+                            atol = 1e-16,
+                            rtol = 1e-16) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -79,6 +88,9 @@ cla_secsse_eval <- function(parameter,
                                        lambdas,
                                        mus,
                                        Q,
+                                       method,
+                                       atol,
+                                       rtol,
                                        num_steps,
                                        is_complete_tree)
   

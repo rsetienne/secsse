@@ -55,7 +55,10 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
                          const std::vector<int>& ances,
                          const std::vector< std::vector< double >>& for_time,
                          const std::vector<std::vector<double>>& states,
-                         int num_steps)  {
+                         int num_steps,
+                         std::string method,
+                         double atol,
+                         double rtol)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
@@ -95,11 +98,15 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   Rcout << "0--------25--------50--------75--------100\n";
   Rcout << "*";
   
+ // std::cerr << "starting ances loop\n"; force_output();
+  
   for (int a = 0; a < ances.size(); ++a) {
     if (a % update_freq == 0) {
       Rcout << "**";
     }
     Rcpp::checkUserInterrupt();
+    
+    //Rcpp::Rcout << a << " " << ances.size() << "\n"; force_output();
     
     int focal = ances[a];
     
@@ -111,6 +118,8 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
       focal_node = desNodes[i];
       assert((focal_node) >= 0);
       assert((focal_node) < states.size());
+      
+      // Rcpp::Rcout << focal_node << " " << states.size() << "\n"; force_output();
       
       y = states[focal_node];
     
@@ -125,67 +134,40 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
       
       local_storage.add_entry(t, y);
       
-      for (int i = 0; i < num_steps; ++i) {
+      for (int j = 0; j < num_steps; ++j) {
       
-        local_od.single_step(y, dxdt); // updates dxdt
-        
-        for (size_t k = 0; k < y.size(); ++k) {
-          y[k] += dxdt[k] * dt;
-          if (y[k] < 0.0) y[k] = 0.0;
-        }
+        std::unique_ptr<ode_cla_d> od_ptr = std::make_unique<ode_cla_d>(local_od);
+        odeintcpp::integrate(method,
+                             std::move(od_ptr), // ode class object
+                             y, // state vector
+                             t, // t0
+                             t + dt, //t1
+                             dt * 0.1,
+                             atol,
+                             rtol); // t1
 
         t += dt;
+       // Rcpp::Rcout << j << " adding\n"; force_output();
         local_storage.add_entry(t, y);
       }
-      /*
-      std::vector<double> y2 = states[focal_node];
       
-      // we actually expect integration to reach the same level, let's check.
-      std::unique_ptr<ode_cla_d> od_ptr = std::make_unique<ode_cla_d>(od);
-      odeintcpp::integrate("odeint::runge_kutta_fehlberg78",
-                           std::move(od_ptr), // ode class object
-                           y2, // state vector
-                           0.0, // t0
-                           timeInte[i], //t1
-                           timeInte[i] * 0.1,
-                           1e-16,
-                           1e-16); // t1
-      
-      std::cerr << focal << " " << i << " dt: ";
-      for (auto j : y) {
-        std::cerr << j << " ";
-      } std::cerr << "integr: ";
-      for (auto j : y2) {
-        std::cerr << j << " ";
-      } std::cerr << "\n";
-      */
       master_storage.add_entry(focal, focal_node, local_storage);
     }
   }
   return master_storage;
 }
 
-
-
-//' function to do cpp stuff
-//' @param ances ances
-//' @param states_R states_R
-//' @param forTime_R fr
-//' @param lambdas l
-//' @param mus mus
-//' @param Q Q
-//' @param num_steps num_steps
-//' @param is_complete_tree ss
-//' @export
-// [[Rcpp::export]]
 Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
                                       const Rcpp::NumericMatrix& states_R,
                                       const Rcpp::NumericMatrix& forTime_R,
                                       const Rcpp::List& lambdas,
                                       const Rcpp::NumericVector& mus,
                                       const Rcpp::NumericMatrix& Q,
-                                      int num_steps,
-                                      bool is_complete_tree) {
+                                      std::string method,
+                                      double atol,
+                                      double rtol,
+                                      bool is_complete_tree,
+                                      int num_steps) {
   
   try {
     std::vector< std::vector< double >> states, forTime;
@@ -194,14 +176,17 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
     
     NumericVector mergeBranch;
     NumericVector nodeM;
-    
     storage found_results = calc_ll_cla_store(lambdas,
                                  mus,
                                  Q,
                                  std::vector<int>(ances.begin(), ances.end()),
                                  forTime,
                                  states,
-                                 num_steps);
+                                 num_steps,
+                                 method,
+                                 atol,
+                                 rtol);
+     
      
     std::vector< std::vector< double >> prep_mat;
     for (auto i : found_results.data_) {

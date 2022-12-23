@@ -25,20 +25,6 @@ calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q
     .Call(`_secsse_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method, is_complete_tree)
 }
 
-#' function to do cpp stuff
-#' @param ances ances
-#' @param states_R states_R
-#' @param forTime_R fr
-#' @param lambdas l
-#' @param mus mus
-#' @param Q Q
-#' @param num_steps num_steps
-#' @param is_complete_tree ss
-#' @export
-cla_calThruNodes_store_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_steps, is_complete_tree) {
-    .Call(`_secsse_cla_calThruNodes_store_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_steps, is_complete_tree)
-}
-
 calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree) {
     .Call(`_secsse_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree)
 }

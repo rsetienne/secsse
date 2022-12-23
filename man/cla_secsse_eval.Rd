@@ -10,14 +10,17 @@ cla_secsse_eval(
   traits,
   num_concealed_states,
   ancestral_states,
-  dt,
+  num_steps = 10,
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   sampling_fraction,
   setting_calculation = NULL,
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
-  is_complete_tree = TRUE
+  is_complete_tree = FALSE,
+  method = "odeint::bulirsch_stoer",
+  atol = 1e-16,
+  rtol = 1e-16
 )
 }
 \arguments{
@@ -37,7 +40,7 @@ to number of examined states.}
 \item{ancestral_states}{ancestral states matrix provided by 
 cla_secsse_loglik, this is used as starting points for manual integration}
 
-\item{dt}{timestep of the manual 'integration'.}
+\item{num_steps}{number of steps to integrate along a branch}
 
 \item{cond}{condition on the existence of a node root: 'maddison_cond',
 'proper_cond'(default). For details, see vignette.}
@@ -57,6 +60,15 @@ It should be leave blank (default : setting_calculation = NULL)}
 
 \item{is_complete_tree}{whether or not a tree with all its extinct species is
 provided}
+
+\item{method}{integration method used, available are: 
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
+
+\item{atol}{absolute tolerance of integration}
+
+\item{rtol}{relative tolerance of integration}
 }
 \value{
 The loglikelihood of the data given the parameters
