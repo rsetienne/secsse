@@ -35,7 +35,7 @@
 #'  return(sum(x[1:3]) / sum(x))
 #' }
 #' @export
-plot_state_exact2 <- function(parameters,
+plot_state_exact_cla <- function(parameters,
                              focal_tree,
                              traits,
                              num_concealed_states,

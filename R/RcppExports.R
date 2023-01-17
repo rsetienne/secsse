@@ -25,12 +25,21 @@ calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q
     .Call(`_secsse_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method, is_complete_tree)
 }
 
+cla_calThruNodes_store_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree, num_steps) {
+    .Call(`_secsse_cla_calThruNodes_store_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree, num_steps)
+}
+
 calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree) {
     .Call(`_secsse_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree)
 }
 
 ct_condition <- function(y, t, ll, mm, Q, method, atol, rtol) {
     .Call(`_secsse_ct_condition`, y, t, ll, mm, Q, method, atol, rtol)
+}
+
+#' @export
+calThruNodes_store_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps) {
+    .Call(`_secsse_calThruNodes_store_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps)
 }
 
 calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads, method = "odeint::bulirsch_stoer", is_complete_tree = FALSE) {

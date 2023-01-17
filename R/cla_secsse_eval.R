@@ -91,8 +91,7 @@ cla_secsse_eval <- function(parameter,
                                        method,
                                        atol,
                                        rtol,
-                                       num_steps,
-                                       is_complete_tree)
-  
+                                       is_complete_tree,
+                                       num_steps)
   return(calcul)
 }

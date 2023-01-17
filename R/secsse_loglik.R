@@ -228,7 +228,7 @@ secsse_loglik <- function(parameter,
     ancestral_states <- 
       ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states, LL = LL))
+    return(list(ancestral_states = ancestral_states, LL = LL, states = states))
   } else {
     return(LL)
   }

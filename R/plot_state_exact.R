@@ -1,73 +1,164 @@
 #' function to extract local likelihoods along all branches
-#' @param parameters used parameters for the likelihood caluclation
+#' @param parameters used parameters for the likelihood calculation
 #' @param focal_tree used phylogeny
 #' @param traits used traits
 #' @param num_concealed_states number of concealed states
-#' @param states the states matrix returned by cla_secsse_loglik
-#' @param dt chosen time step
-#' @param res resolution of the color scale used.
-#' @return nothing
+#' @param states the states matrix returned by cla_secsse_loglik when 
+#' show_ancestors = TRUE
+#' @param sampling_fraction sampling fraction
+#' @param cond condition on the existence of a node root: 'maddison_cond',
+#' 'proper_cond'(default). For details, see vignette.
+#' @param root_state_weight the method to weigh the states:'maddison_weigh
+#' ,'proper_weights'(default) or 'equal_weights'. It can also be specified the
+#' root state:the vector c(1,0,0) indicates state 1 was the root state.
+#' @param method integration method used, available are: 
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#' @param atol absolute tolerance of integration
+#' @param rtol relative tolerance of integration
+#' @param steps number of substeps evaluated per branch
+#' @param prob_func a function to calculate the probability of interest, see 
+#' description
+#' @param is_complete_tree whether or not a tree with all its extinct species is
+#' provided
+#' @return ggplot2 object
 #' @description this function will evaluate the log likelihood locally along
-#' all branches and plot the result, using the phytools package.
+#' all branches and plot the result.
+#' the function used for prob_func will be highly dependent on your system.
+#' for instance, for a 3 observed, 2 hidden states model, the probability
+#' of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
+#' probfunc will be applied to each row of the 'states' matrix (you can thus
+#' test your function on the states matrix returned when 
+#' 'see_ancestral_states = TRUE'). A typical probfunc function will look like:
+#' my_prob_func <- function(x) {
+#'  return(sum(x[1:3]) / sum(x))
+#' }
 #' @export
 plot_state_exact <- function(parameters,
-                             focal_tree,
-                             traits,
-                             num_concealed_states,
-                             states,
-                             dt,
-                             res) {
+                                 focal_tree,
+                                 traits,
+                                 num_concealed_states,
+                                 states,
+                                 sampling_fraction,
+                                 cond = "proper_cond",
+                                 root_state_weight = "proper_weights",
+                                 is_complete_tree = FALSE,
+                                 method = "odeint::bulirsch_stoer",
+                                 atol = 1e-16,
+                                 rtol = 1e-16,
+                                 steps = 10,
+                                 prob_func = NULL) {
   
-  min_branch_len <- min(focal_tree$edge.length)
-  if (dt > min_branch_len) {
-    warning("dt chosen too large, changed to be 1/100th of the shortest branch length")
-    dt <- min_branch_len / 10
+  if (is.null(prob_func)) {
+    stop("need to set a probability function, check description to how")
   }
+  
   message("collecting branch likelihoods\n")
-  eval_res <- secsse::cla_secsse_eval(parameter = parameters,
-                                      phy = focal_tree,
-                                      traits = traits,
-                                      num_concealed_states = num_concealed_states,
-                                      ancestral_states = states,
-                                      num_steps = 1 / dt,
-                                      sampling_fraction = c(1, 1, 1),
-                                      is_complete_tree = FALSE)
+  eval_res <- secsse::secsse_loglik_eval(parameter = parameters,
+                                          phy = focal_tree,
+                                          traits = traits,
+                                          num_concealed_states = num_concealed_states,
+                                          ancestral_states = states,
+                                          cond = cond,
+                                          root_state_weight = root_state_weight,
+                                          num_steps = steps,
+                                          sampling_fraction = sampling_fraction,
+                                          is_complete_tree = is_complete_tree,
+                                          atol = atol,
+                                          rtol = rtol,
+                                          method = method)
   
-  message("converting collected likelihoods:\n")
+  message("\nconverting collected likelihoods to graph positions:\n")
   
-  local_maps <- list()
-  pb <- txtProgressBar(max = length(focal_tree$edge[, 1]), style = 3)
-  for (i in 1:length(focal_tree$edge[, 1])) {
-    anc <- focal_tree$edge[i, 1]
-    desc <- focal_tree$edge[i, 2]
+  xs <- ape::node.depth.edgelength(focal_tree)
+  ys <- ape::node.height(focal_tree)
+  num_tips <- length(focal_tree$tip.label)
+  num_nodes <- (1 + num_tips):length(ys)
+  
+  nodes <- data.frame(x = xs, y = ys, n = c(1:num_tips, num_nodes))
+  
+  to_plot <- eval_res
+ # to_plot[, c(1, 2)] <- to_plot[, c(1, 2)] + 1
+  
+  
+  num_rows <- length(unique(to_plot[, 1])) * 2 * steps
+  
+  for_plot <- matrix(nrow = num_rows, ncol = 6)
+  for_plot_cnt <- 1
+  pb <- txtProgressBar(max = length(unique(to_plot[, 1])), style = 3)
+  cnt <- 1
+  for (parent in unique(to_plot[, 1])) {
+    setTxtProgressBar(pb, cnt)
+    cnt <- cnt + 1
     
-    # probs are binned in 1/1000 bins
-    # we need stretches of same bins
-    focal_data <- subset(eval_res, 
-                         eval_res[, 1] == anc - 1 & 
-                         eval_res[, 2] == desc - 1)
-    to_add <- diff(focal_data[, 3])
-    used_bins <- floor(focal_data[1:length(to_add), 4] * res)
-    names(to_add) <- used_bins
-    local_maps[[i]] <- to_add
-    setTxtProgressBar(pb, i)
+    to_plot2 <- subset(to_plot, to_plot[, 1] == parent)
+    for (daughter in unique(to_plot2[, 2])) {
+      indices <- which(to_plot2[, 2] == daughter)
+      if (length(indices) > 0) {
+        # we have a branch
+        focal_branch <- to_plot2[indices, ]
+        start_x <- nodes$x[which(nodes$n == parent)]
+        end_x <- nodes$x[which(nodes$n == daughter)]
+        y <- nodes$y[which(nodes$n == daughter)]
+        
+        bl <- end_x - start_x
+        
+        probs <- apply(focal_branch[, 5:length(focal_branch[1, ])], 1, prob_func)
+        
+        for (s in 1:(length(focal_branch[, 1]) - 1)) {
+          x0 <- start_x + bl - focal_branch[s, 3]
+          x1 <- start_x + bl - focal_branch[s + 1, 3]
+          ps <- probs[s]
+          for_plot[for_plot_cnt, ] <- c(x0, x1, y, ps, parent, daughter)
+          for_plot_cnt <- for_plot_cnt + 1
+        }
+      }
+    }  
   }
   
-  tree_to_plot <- focal_tree
-  tree_to_plot$maps <- local_maps
-  class(tree_to_plot) <- c("simmap", setdiff(class(focal_tree), "simmap"))
-  used_cols <- viridis::plasma(n = res, begin = 0, end = 1) 
-  names(used_cols) <- 1:res
+  node_bars <- matrix(nrow = length(unique(to_plot[, 1])), ncol = 4)
+  node_bars_cnt <- 1
+  for (parent in unique(to_plot[, 1])) {
+    focal_data <- subset(to_plot, to_plot[, 1] == parent)
+    daughters <- unique(focal_data[, 2])
+    start_x <- nodes$x[which(nodes$n == parent)]
+    y <- c()
+    for (i in 1:length(daughters)) {
+      y <- c(y, nodes$y[nodes$n == daughters[i]])
+    }
+    y <- sort(y)
+    
+    num_states <- length(states[1, ]) / 2
+    max_row_size <- length(states[1, ])
+    
+    probs <- states[parent, (1 + num_states):max_row_size]
+    rel_prob <- prob_func(probs)
+    # node_bars <- rbind(node_bars, c(start_x, y, rel_prob))
+    node_bars[node_bars_cnt, ] <- c(start_x, y, rel_prob)
+    node_bars_cnt <- node_bars_cnt + 1
+  }
   
-  message("now starting phytools plotting routine\n")
+  colnames(for_plot) <- c("x0", "x1", "y", "prob", "p", "d")
+  for_plot <- tibble::as_tibble(for_plot)
+  colnames(node_bars) <- c("x", "y0", "y1", "prob")
+  node_bars <- tibble::as_tibble(node_bars)
   
-  plot(tree_to_plot, colors = used_cols, lwd = 3)
-  N <- length(focal_tree$tip.label)
-  phytools::add.color.bar(leg = 0.3, 
-                          title = "prob A\n", 
-                          cols = used_cols, 
-                          x = 0.1, 
-                          y = 1 + 0.08*(N - 1),
-                          prompt = FALSE)
-  message("done\n")
+  message("\ngenerating ggplot object\n")
+  
+  px <- ggplot2::ggplot(for_plot, 
+                        ggplot2::aes(x = x0, y = y, xend = x1, yend = y, col = prob)) +
+    ggplot2::geom_segment(linewidth = 2) +
+    ggplot2::geom_segment(data = node_bars, 
+                          ggplot2::aes(x = x, y = y0, yend = y1, xend = x,
+                                       col = prob),
+                          ) +
+    ggplot2::theme_classic() +
+    ggplot2::xlab("") +
+    ggplot2::ylab("") +
+    ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                   axis.ticks.y = ggplot2::element_blank(),
+                   axis.line.y = ggplot2::element_blank())
+  
+  return(px)
 }

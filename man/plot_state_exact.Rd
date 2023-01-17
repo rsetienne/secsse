@@ -10,12 +10,19 @@ plot_state_exact(
   traits,
   num_concealed_states,
   states,
-  dt,
-  res
+  sampling_fraction,
+  cond = "proper_cond",
+  root_state_weight = "proper_weights",
+  is_complete_tree = FALSE,
+  method = "odeint::bulirsch_stoer",
+  atol = 1e-16,
+  rtol = 1e-16,
+  steps = 10,
+  prob_func = NULL
 )
 }
 \arguments{
-\item{parameters}{used parameters for the likelihood caluclation}
+\item{parameters}{used parameters for the likelihood calculation}
 
 \item{focal_tree}{used phylogeny}
 
@@ -23,16 +30,48 @@ plot_state_exact(
 
 \item{num_concealed_states}{number of concealed states}
 
-\item{states}{the states matrix returned by cla_secsse_loglik}
+\item{states}{the states matrix returned by cla_secsse_loglik when 
+show_ancestors = TRUE}
 
-\item{dt}{chosen time step}
+\item{sampling_fraction}{sampling fraction}
 
-\item{res}{resolution of the color scale used.}
+\item{cond}{condition on the existence of a node root: 'maddison_cond',
+'proper_cond'(default). For details, see vignette.}
+
+\item{root_state_weight}{the method to weigh the states:'maddison_weigh
+,'proper_weights'(default) or 'equal_weights'. It can also be specified the
+root state:the vector c(1,0,0) indicates state 1 was the root state.}
+
+\item{is_complete_tree}{whether or not a tree with all its extinct species is
+provided}
+
+\item{method}{integration method used, available are: 
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
+
+\item{atol}{absolute tolerance of integration}
+
+\item{rtol}{relative tolerance of integration}
+
+\item{steps}{number of substeps evaluated per branch}
+
+\item{prob_func}{a function to calculate the probability of interest, see 
+description}
 }
 \value{
-nothing
+ggplot2 object
 }
 \description{
 this function will evaluate the log likelihood locally along
-all branches and plot the result, using the phytools package.
+all branches and plot the result.
+the function used for prob_func will be highly dependent on your system.
+for instance, for a 3 observed, 2 hidden states model, the probability
+of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
+probfunc will be applied to each row of the 'states' matrix (you can thus
+test your function on the states matrix returned when 
+'see_ancestral_states = TRUE'). A typical probfunc function will look like:
+my_prob_func <- function(x) {
+ return(sum(x[1:3]) / sum(x))
+}
 }

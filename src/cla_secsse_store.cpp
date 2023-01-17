@@ -5,50 +5,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-using matrix = std::vector< std::vector< double >>;
-
-
-struct data_storage {
-  std::vector<double> t;
-  std::vector<std::vector<double>> probs;
-  
-  void add_entry(double time, std::vector<double> prob) {
-    t.push_back(time);
-    probs.push_back(prob);
-  }
-};
-
-struct entry {
-  int ances;
-  int focal_node;
-  data_storage probabilities;
-  
-  entry(int a, int fn, const data_storage& probs) : 
-    ances(a), focal_node(fn), probabilities(probs)
-  {};
-};
-
-struct storage {
-  std::vector< entry > data_;
-  
-  void add_entry(int a, int fn, const data_storage& p) {
-    data_.push_back(entry(a, fn, p));
-  }
-};
-
-double calc_prob_a(const std::vector<double>& y) {
-  double sum = y[6] + y[7] + y[8] + y[9] + y[10] + y[11];
-  auto rel_prob =  (y[6] + y[7] + y[8]) / sum;
-  if (rel_prob < 0.0) {
-    std::cerr << rel_prob << " " << "full: ";
-    for (auto i : y) {
-      std::cerr << i << " ";
-    } std::cerr << "\n";
-  }
-  return rel_prob;
-}
-
-
 storage calc_ll_cla_store(const Rcpp::List& ll,
                          const Rcpp::NumericVector& mm,
                          const Rcpp::NumericMatrix& Q,
@@ -82,11 +38,6 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   ode_cla_d od(ll_cpp, mm_cpp, Q_cpp);
   size_t d = od.get_d();
   
-  std::vector<double> mergeBranch(d);
-  std::vector<double> nodeN;
-  std::vector<double> nodeM;
-  
-  std::vector< double > logliks(ances.size());
   std::vector<double> y;
   
   std::vector<int> desNodes;
@@ -98,44 +49,32 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   Rcout << "0--------25--------50--------75--------100\n";
   Rcout << "*";
   
- // std::cerr << "starting ances loop\n"; force_output();
-  
   for (int a = 0; a < ances.size(); ++a) {
     if (a % update_freq == 0) {
       Rcout << "**";
     }
     Rcpp::checkUserInterrupt();
     
-    //Rcpp::Rcout << a << " " << ances.size() << "\n"; force_output();
-    
     int focal = ances[a];
     
     find_desNodes(for_time, focal, desNodes, timeInte);
     
     int focal_node;
-    //  Rcpp::Rcout << a << " ";
     for (int i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
       assert((focal_node) >= 0);
       assert((focal_node) < states.size());
-      
-      // Rcpp::Rcout << focal_node << " " << states.size() << "\n"; force_output();
-      
-      y = states[focal_node];
-    
-      std::vector< double > dxdt(y.size(), 0.0);
-      
-      double t = 0.0;
+     
       data_storage local_storage;
 
       ode_cla_d local_od(ll_cpp, mm_cpp, Q_cpp);
       
-      double dt = timeInte[i] * 1.0 / num_steps;
-      
+      double t = 0.0;
+      y = states[focal_node];
       local_storage.add_entry(t, y);
       
+      double dt = timeInte[i] * 1.0 / num_steps;
       for (int j = 0; j < num_steps; ++j) {
-      
         std::unique_ptr<ode_cla_d> od_ptr = std::make_unique<ode_cla_d>(local_od);
         odeintcpp::integrate(method,
                              std::move(od_ptr), // ode class object
@@ -145,9 +84,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
                              dt * 0.1,
                              atol,
                              rtol); // t1
-
         t += dt;
-       // Rcpp::Rcout << j << " adding\n"; force_output();
         local_storage.add_entry(t, y);
       }
       
@@ -157,17 +94,18 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   return master_storage;
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
-                                      const Rcpp::NumericMatrix& states_R,
-                                      const Rcpp::NumericMatrix& forTime_R,
-                                      const Rcpp::List& lambdas,
-                                      const Rcpp::NumericVector& mus,
-                                      const Rcpp::NumericMatrix& Q,
-                                      std::string method,
-                                      double atol,
-                                      double rtol,
-                                      bool is_complete_tree,
-                                      int num_steps) {
+                                               const Rcpp::NumericMatrix& states_R,
+                                               const Rcpp::NumericMatrix& forTime_R,
+                                               const Rcpp::List& lambdas,
+                                               const Rcpp::NumericVector& mus,
+                                               const Rcpp::NumericMatrix& Q,
+                                               std::string method,
+                                               double atol,
+                                               double rtol,
+                                               bool is_complete_tree,
+                                               int num_steps) {
   
   try {
     std::vector< std::vector< double >> states, forTime;
