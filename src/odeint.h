@@ -406,6 +406,90 @@ private:
 };
 
 
+class ode_standard_store {
+public:
+  
+  ode_standard_store(const std::vector<double>& l,
+               const std::vector<double>& m,
+               const std::vector<std::vector<double>>& q) :
+  l_(l), m_(m), q_(q) {
+    d = l.size();
+  }
+  
+  ode_standard_store(const Rcpp::NumericVector& l,
+                     const Rcpp::NumericVector& m,
+                     const Rcpp::NumericMatrix& q) {
+    
+    l_ = std::vector<double>(l.begin(), l.end());
+    m_ = std::vector<double>(m.begin(), m.end());
+    numericmatrix_to_vector(q, q_);
+    
+    d = l_.size();
+  }
+  
+  void operator()( const std::vector< double > &x ,
+                   std::vector<  double > &dxdt,
+                   const double t /* t */ ) {
+    for (size_t i = 0; i < d; ++i) {
+      
+      if (l_[i] != 0.0) {
+        
+        dxdt[i] = m_[i] - (l_[i] + m_[i]) * x [i]  +
+          l_[i] * x[i] * x[i];
+        
+        long double FF3 = -1.0 * l_[i] - m_[i] + 2 * l_[i] * x[i];
+        dxdt[i + d] = FF3 * x[ i + d];
+      } else {
+        dxdt[i] = - 1.0 * m_[i] * x [i] + m_[i];
+        
+        dxdt[i + d] = -1.0 * m_[i] * x[ i + d];
+      }
+      
+      for (size_t j = 0; j < d; ++j) {
+        long double diff_e = x[j] - x[i];
+        dxdt[i] += diff_e * q_[i][j];
+        
+        long double diff_d = x[j + d] - x[i + d];
+        dxdt[i + d] += diff_d * q_[i][j];
+      }
+    }
+    
+    stored_t.push_back(t);
+    stored_states.push_back(x);
+    
+    return;
+  }
+  
+  
+  double get_l(int index) const {
+    return l_[index];
+  } 
+  
+  size_t get_d() const {
+    return d;
+  }
+  
+  std::vector< std::vector<double >> get_stored_states() {
+    return stored_states;
+  }
+  
+  std::vector<double> get_stored_t() {
+    return stored_t;
+  }
+  
+private:
+  std::vector< double > l_;
+  std::vector< double > m_;
+  std::vector< std::vector< double >> q_;
+  std::vector< std::vector<double >> stored_states;
+  std::vector<double> stored_t;
+  size_t d;
+};
+
+
+
+
+
 namespace odeintcpp {
 
 namespace bno = boost::numeric::odeint;
@@ -430,7 +514,9 @@ template <
   typename STATE,
   typename ODE
 >
-void integrate(const std::string& stepper_name, std::unique_ptr<ODE> ode, STATE& y, double t0, double t1, double dt, double atol, double rtol)
+void integrate(const std::string& stepper_name, 
+               std::unique_ptr<ODE> ode,
+               STATE& y, double t0, double t1, double dt, double atol, double rtol)
 {
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol),
@@ -453,6 +539,44 @@ void integrate(const std::string& stepper_name, std::unique_ptr<ODE> ode, STATE&
     throw std::runtime_error("odeintcpp::integrate: unknown stepper");
   }
 }
+
+template <
+  typename STATE
+>
+void integrate_full(const std::string& stepper_name, 
+                    std::unique_ptr<ode_standard_store> ode,
+                    STATE& y, double t0, double t1, double dt, double atol, double rtol,
+                    std::vector< std::vector<double>>& yvals,
+                    std::vector<double>& tvals)
+{
+  if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol),
+              std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::runge_kutta_dopri5" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::bulirsch_stoer" == stepper_name) {
+    integrate(bno::bulirsch_stoer<STATE>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+  }
+  else if ("odeint::runge_kutta4" == stepper_name) {
+    integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
+  }
+  else {
+    throw std::runtime_error("odeintcpp::integrate: unknown stepper");
+  }
+  
+  yvals = (*ode).get_stored_states();
+  tvals = (*ode).get_stored_t();
+  return;
+}
+
+
+
+
 
 
 template <

@@ -25,17 +25,16 @@
 #' 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species 
 #' is provided
-#' @param num_threads number of threads. Set to -1 to use all available threads. 
-#' Default is one thread.
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
 #' @param method integration method used, available are: 
 #' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
 #' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
-#' @param num_steps number of substeps to show intermediate likelihoods along a branch.
+#' @param num_steps number of substeps to show intermediate likelihoods along a branch,
+#' if left to NULL, the intermediate likelihoods at every integration evaluation are stored, which is more
+#' exact, but can lead to huge datasets.
 #' @return The loglikelihood of the data given the parameters
-#' @note Multithreading might lead to a slightly reduced accuracy (in the order of 1e-10) and is therefore not enabled by default. Please use at your own discretion. 
 #' @examples
 #' rm(list = ls(all = TRUE))
 #' library(secsse)
@@ -77,7 +76,7 @@ secsse_loglik_eval <- function(parameter,
                           atol = 1e-12,
                           rtol = 1e-12,
                           method = "odeint::bulirsch_stoer",
-                          num_steps = 10) {
+                          num_steps = NULL) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -100,8 +99,20 @@ secsse_loglik_eval <- function(parameter,
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
   
-
-  calcul <- calThruNodes_store_cpp(ances,
+  if (is.null(num_steps)) {
+    calcul <- calThruNodes_store_full_cpp(ances,
+                                     ancestral_states,
+                                     forTime,
+                                     lambdas,
+                                     mus,
+                                     Q,
+                                     1,
+                                     atol,
+                                     rtol,
+                                     method,
+                                     is_complete_tree)
+  } else {
+     calcul <- calThruNodes_store_cpp(ances,
                                    ancestral_states,
                                    forTime,
                                    lambdas,
@@ -113,5 +124,6 @@ secsse_loglik_eval <- function(parameter,
                                    method,
                                    is_complete_tree,
                                    num_steps)
+  }
   return(calcul)
 }

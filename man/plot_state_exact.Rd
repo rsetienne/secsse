@@ -9,7 +9,6 @@ plot_state_exact(
   focal_tree,
   traits,
   num_concealed_states,
-  states,
   sampling_fraction,
   cond = "proper_cond",
   root_state_weight = "proper_weights",
@@ -17,7 +16,7 @@ plot_state_exact(
   method = "odeint::bulirsch_stoer",
   atol = 1e-16,
   rtol = 1e-16,
-  steps = 10,
+  steps = NULL,
   prob_func = NULL
 )
 }
@@ -29,9 +28,6 @@ plot_state_exact(
 \item{traits}{used traits}
 
 \item{num_concealed_states}{number of concealed states}
-
-\item{states}{the states matrix returned by cla_secsse_loglik when 
-show_ancestors = TRUE}
 
 \item{sampling_fraction}{sampling fraction}
 
@@ -72,6 +68,6 @@ probfunc will be applied to each row of the 'states' matrix (you can thus
 test your function on the states matrix returned when 
 'see_ancestral_states = TRUE'). A typical probfunc function will look like:
 my_prob_func <- function(x) {
- return(sum(x[1:3]) / sum(x))
+ return(sum(x[5:8]) / sum(x))
 }
 }

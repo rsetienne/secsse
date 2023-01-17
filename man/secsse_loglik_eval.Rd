@@ -19,7 +19,7 @@ secsse_loglik_eval(
   atol = 1e-12,
   rtol = 1e-12,
   method = "odeint::bulirsch_stoer",
-  num_steps = 10
+  num_steps = NULL
 )
 }
 \arguments{
@@ -65,13 +65,12 @@ is provided}
 "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 
-\item{num_steps}{number of substeps to show intermediate likelihoods along a branch.}
+\item{num_steps}{number of substeps to show intermediate likelihoods along a branch,
+if left to NULL, the intermediate likelihoods at every integration evaluation are stored, which is more
+exact, but can lead to huge datasets.}
 
 \item{see_ancestral_states}{should the ancestral states be shown? Default 
 FALSE}
-
-\item{num_threads}{number of threads. Set to -1 to use all available threads. 
-Default is one thread.}
 }
 \value{
 The loglikelihood of the data given the parameters
@@ -79,9 +78,6 @@ The loglikelihood of the data given the parameters
 \description{
 Logikelihood calculation for the SecSSE model given a set of parameters and 
 data
-}
-\note{
-Multithreading might lead to a slightly reduced accuracy (in the order of 1e-10) and is therefore not enabled by default. Please use at your own discretion.
 }
 \examples{
 rm(list = ls(all = TRUE))
