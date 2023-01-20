@@ -10,20 +10,19 @@ get_rates <- function(speciesID,
     species_mus <- c(species_mus,
                      mus[which(states == speciesTraits[i])])
   }
-  
+
   species_lambdas <- NULL
   for (i in seq_along(speciesID)) {
     species_lambdas <- c(species_lambdas,
                          sum(lambdas[[which(states == speciesTraits[i])]]))
-    
   }
-  
+
   shiftprob <- NULL
   for (i in seq_along(speciesID)) {
     shiftprob <- c(shiftprob,
-                   sum(qs[which(speciesTraits[i] == states), ], na.rm = T))
+                   sum(qs[which(speciesTraits[i] == states), ], na.rm = TRUE))
   }
-  
+
   return(list(species_mus = species_mus,
               species_lambdas = species_lambdas,
               shiftprob = shiftprob))
@@ -37,8 +36,8 @@ event_extinction <- function(species_mus,
                              speciesID,
                              mus,
                              timeStep) {
-  dying <- sample(speciesID, 1, prob = species_mus) 
-  Ltable[which(Ltable[,3] == dying), 4] <- timeStep 
+  dying <- sample(speciesID, 1, prob = species_mus)
+  Ltable[which(Ltable[, 3] == dying), 4] <- timeStep
   speciesTraits <- speciesTraits[-which(speciesID == dying)]
   speciesID <- speciesID[-which(speciesID == dying)]
   return(list(speciesID = speciesID,
@@ -60,7 +59,7 @@ event_speciation <- function(species_lambdas,
   } else {
     mother <- sample(speciesID, 1, prob = species_lambdas)  
   }
-  
+
   mother_trait <- speciesTraits[which(mother == speciesID)]
   mother_lambdas <- lambdas[[which(mother_trait == states)]]
   all_lambdas_mother <- as.vector(mother_lambdas)
@@ -70,19 +69,19 @@ event_speciation <- function(species_lambdas,
                           nrow = length(states),
                           byrow = FALSE)
   picked_speciation_cell <- which(matri_positio == picked_speciation, arr.ind = TRUE)
-  
+
   state_to_parent <- picked_speciation_cell[2] # parents are in colums
   state_to_parent <- states[state_to_parent]
   state_to_daugther <- picked_speciation_cell[1]
   state_to_daugther <- states[state_to_daugther]
   speciesTraits[which(mother == speciesID)] <- state_to_parent
   speciesTraits <- c(speciesTraits,state_to_daugther)
-  
+
   newL = nrow(Ltable)
   newL = newL + 1
   Ltable <- rbind(Ltable, matrix(c(timeStep, mother, sign(mother) * newL, -1), ncol = 4)) 
   speciesID <- c(speciesID, sign(mother) * newL)
-  
+
   return(list(Ltable = Ltable,
               speciesTraits = speciesTraits,
               speciesID = speciesID))
@@ -158,10 +157,10 @@ secsse_sim <- function(timeSimul,
       break
     }
     
-    ##Events
-    ## 1=trait shift
-    ## 2=speciation
-    ## 3=extinction
+    # Events
+    # 1 = trait shift
+    # 2 = speciation
+    # 3 = extinction
     event <- sample(c(1, 2, 3), 1,
                     prob = c(sum(shiftprob),
                              sum(species_lambdas),

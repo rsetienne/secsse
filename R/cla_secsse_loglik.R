@@ -202,11 +202,11 @@ cla_secsse_loglik <- function(parameter,
   mergeBranch2 <- mergeBranch # nolint
   lmb <- length(mergeBranch2)
   if (is.numeric(root_state_weight)) {
-    weightStates <- rep(root_state_weight / num_concealed_states, # nolint
+    weight_states <- rep(root_state_weight / num_concealed_states, # nolint
                         num_concealed_states)
   } else {
     if (root_state_weight == "maddison_weights") {
-      weightStates <- mergeBranch / sum(mergeBranch2)
+      weight_states <- mergeBranch / sum(mergeBranch2)
     }
     if (root_state_weight == "proper_weights") {
       numerator <- rep(NA, lmb)
@@ -214,21 +214,21 @@ cla_secsse_loglik <- function(parameter,
         numerator[j] <- mergeBranch2[j] / sum(lambdas[[j]] *
                                   ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
       }
-      weightStates <- numerator / sum(numerator) # nolint
+      weight_states <- numerator / sum(numerator) # nolint
     }
     if (root_state_weight == "equal_weights") {
-      weightStates <- rep(1 / lmb, lmb) # nolint
+      weight_states <- rep(1 / lmb, lmb) # nolint
     }
   }
 
   if (cond == "maddison_cond") {
-    preCond <- rep(NA, lmb) # nolint
+    pre_cond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
-      preCond[j] <- sum(weightStates[j] *
+      pre_cond[j] <- sum(weight_states[j] *
                         lambdas[[j]] *
                         (1 - nodeM[1:d][j]) ^ 2)
      }
-    mergeBranch2 <- mergeBranch2 / sum(preCond) # nolint
+    mergeBranch2 <- mergeBranch2 / sum(pre_cond) # nolint
   }
 
   if (is_complete_tree) {
@@ -247,14 +247,14 @@ cla_secsse_loglik <- function(parameter,
   }
 
   if (cond == "proper_cond") {
-    preCond <- rep(NA, lmb) # nolint
+    pre_cond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
-      preCond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+      pre_cond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
     }
-    mergeBranch2 <- mergeBranch2 / preCond # nolint
+    mergeBranch2 <- mergeBranch2 / pre_cond # nolint
   }
 
-  wholeLike_atRoot <- sum(mergeBranch2 * weightStates) # nolint
+  wholeLike_atRoot <- sum(mergeBranch2 * weight_states) # nolint
   LL <- log(wholeLike_atRoot) + # nolint
         loglik -
         penalty(pars = parameter,

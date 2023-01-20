@@ -70,7 +70,7 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
 #' @examples
 #' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
 #' # For a three-state trait
-#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) 
+#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
 #' diag(masterBlock) <- NA
 #' masterBlock[1,2] <- 6
 #' masterBlock[1,3] <- 7
@@ -86,33 +86,31 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
 #' @export
 q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 
-    if (diff.conceal == TRUE && 
+    if (diff.conceal == TRUE &&
         all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
         integersmasterBlock <- floor(masterBlock)
         factorBlock <- signif(masterBlock - integersmasterBlock, digits = 2)
-        
+
         factorstoExpand <- unique(sort(c(factorBlock)))
         factorstoExpand <- factorstoExpand[factorstoExpand > 0]
-        newshareFac <- 
-            (max(factorstoExpand * 10) + 1):(max(factorstoExpand * 10) + 
+        newshareFac <-
+            (max(factorstoExpand * 10) + 1):(max(factorstoExpand * 10) +
                                                  length(factorstoExpand))
-        newshareFac <- newshareFac/10
-        
+        newshareFac <- newshareFac / 10
+
         for (iii in seq_along(newshareFac)) {
             factorBlock[which(factorBlock == factorstoExpand[iii])] <-
                                                              newshareFac[iii]
-            
         }
 
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(floor(masterBlock))))
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
         concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
-        
+
         for (iii in seq_along(concealnewQ)) {
             integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <-
                                                              concealnewQ[iii]
-            
         }
         concealnewQMatr <- integersmasterBlock + factorBlock
 
@@ -360,7 +358,7 @@ normalize_loglik <- function(probs, loglik) {
 #' @keywords internal
 penalty <- function(pars, loglik_penalty = 0) {
     pars <- unlist(unlist(pars))
-    return(loglik_penalty * sum(pars^2)/(2 * length(pars)))
+    return(loglik_penalty * sum(pars^2) / (2 * length(pars)))
 }
 
 #' @keywords internal

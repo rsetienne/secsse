@@ -167,76 +167,76 @@ cla_secsse_ml_func_def_pars <- function(phy,
     structure_func[[1]] <- idparsfuncdefpar
     structure_func[[2]] <- functions_defining_params
     structure_func[[3]] <- idfactorsopt
-    
+
     see_ancestral_states <- FALSE
     if (is.null(idfactorsopt) == FALSE) {
         if (length(initfactors) != length(idfactorsopt)) {
             stop("idfactorsopt should have the same length than initfactors.")
         }
     }
-    
+
     if (is.list(functions_defining_params) == FALSE) {
         stop("The argument functions_defining_params should be a 
              list of functions. See example and vignette")
     }
-    
+
     if (length(functions_defining_params) != length(idparsfuncdefpar)) {
         stop("the argument functions_defining_params should have 
              the same length as idparsfuncdefpar")
     }
-    
+
     if (is.matrix(traits)) {
         cat("You are setting a model where some species had more 
             than one trait state \n")
     }
-    
+
     if (length(initparsopt) != length(idparsopt)) {
         stop("initparsopt must be the same length as idparsopt. 
              Number of parameters to optimize does not match the number of 
              initial values for the search")
     }
-    
+
     if (length(idparsfix) != length(parsfix)) {
         stop("idparsfix and parsfix must be the same length. 
              Number of fixed elements does not match the fixed figures")
     }
-    
+
     if (anyDuplicated(c(idparsopt, idparsfix, idparsfuncdefpar)) != 0) {
         stop("At least one element was asked to be fixed, estimated or a 
              function at the same time")
     }
-    
+
     if (identical(as.numeric(sort(c(idparsopt, idparsfix, idparsfuncdefpar))),
                   as.numeric(sort(unique(unlist(idparslist))))) ==
         FALSE) {
         stop("All elements in idparslist must be included in either 
              idparsopt or idparsfix or idparsfuncdefpar ")
     }
-    
+
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
         cat("Note: you set some transitions as impossible to happen.", "\n")
     }
-    
+
     see_ancestral_states <- FALSE
-    
+
     cat("Calculating the likelihood for the initial parameters.", "\n")
     utils::flush.console()
-    
+
     initparsopt2 <- c(initparsopt, initfactors)
-    
+
     trparsopt <- initparsopt2 / (1 + initparsopt2)
     trparsopt[which(initparsopt2 == Inf)] <- 1
     trparsfix <- parsfix / (1 + parsfix)
     trparsfix[which(parsfix == Inf)] <- 1
-    
+
     mus <- calc_mus(is_complete_tree,
                     idparslist,
                     idparsfix,
                     parsfix,
                     idparsopt,
                     initparsopt)
-    
+
     optimpars <- c(tol, maxiter)
 
 

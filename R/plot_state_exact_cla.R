@@ -185,7 +185,7 @@ plot_state_exact_cla <- function(parameters,
           for_plot_cnt <- for_plot_cnt + 1
         }
       }
-    }  
+    }
   }
 
   node_bars <- matrix(nrow = length(unique(to_plot[, 1])), ncol = 4)

@@ -49,7 +49,7 @@ cla_secsse_sim <- function(states,
 
   if (length(speciesID) < maxSpec &&
       Ltable[1, 4] == 0 &&
-      Ltable[2, 4] == 0 ) {
+      Ltable[2, 4] == 0) {
     age <- timeSimul
     Ltable[which(Ltable[, 4] == 0), 4] <- -1
     Ltable[, 1] <- age - c(Ltable[, 1])

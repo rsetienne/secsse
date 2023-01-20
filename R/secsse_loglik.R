@@ -186,8 +186,8 @@ secsse_loglik <- function(parameter,
     }
 
     if (root_state_weight == "proper_weights") {
-      weightStates <- (mergeBranch2 / 
-                         (lambdas * (1 - nodeM[1:d]) ^ 2)) / 
+      weightStates <- (mergeBranch2 /
+                         (lambdas * (1 - nodeM[1:d]) ^ 2)) /
                           sum((mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)))
     }
 
@@ -211,7 +211,7 @@ secsse_loglik <- function(parameter,
   }
 
   if (cond == "maddison_cond") {
-    mergeBranch2 <- 
+    mergeBranch2 <-
       mergeBranch2 / sum(weightStates * lambdas * (1 - nodeM[1:d]) ^ 2)
   }
 
@@ -220,14 +220,14 @@ secsse_loglik <- function(parameter,
   }
 
   wholeLike <- sum((mergeBranch2) * (weightStates))
-  LL <- log(wholeLike) + 
-        loglik - 
-        penalty(pars = parameter,loglik_penalty = loglik_penalty)
+  LL <- log(wholeLike) +
+        loglik -
+        penalty(pars = parameter, loglik_penalty = loglik_penalty)
 
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips + 1):(nrow(states) ), ]
-    ancestral_states <- 
+    ancestral_states <- states[(num_tips + 1):(nrow(states)), ]
+    ancestral_states <-
       ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL, states = states))
@@ -269,7 +269,7 @@ check_input <- function(traits,
     stop("The tree needs to be ultrametric.")
   }
   if (any(phy$edge.length == 0)) {
-    stop('The tree must have internode distancs that are all larger than 0.')
+    stop("The tree must have internode distancs that are all larger than 0.")
   }
 
   if (is.matrix(traits)) {
@@ -278,21 +278,21 @@ check_input <- function(traits,
            as the number of traits.")
     }
 
-    if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) == 
+    if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) ==
         FALSE) {
       stop(
         "Check your trait argument; if you have more than one column,
         make sure all your states are included in the first column."
       )
     }
-  } else{
+  } else {
     if (length(sampling_fraction) != length(sort(unique(traits)))) {
       stop("Sampling_fraction must have as many elements as 
            the number of traits.")
     }
   }
 
-  if(length(sort(unique(as.vector(traits)))) < 2) {
+  if (length(sort(unique(as.vector(traits)))) < 2) {
     stop("The trait has only one state.")
   }
 }
@@ -309,7 +309,7 @@ build_states <- function(phy,
   if (length(phy$tip.label) != nrow(traits)) {
     stop("Number of species in the tree must be the same as in the trait file")
   }
-  traitStates <- sort(unique(traits[,1]))
+  traitStates <- sort(unique(traits[, 1]))
 
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
@@ -320,31 +320,31 @@ build_states <- function(phy,
   ##
   ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
   ##                   "D0A","D1A","D2A","D0B","D1B","D2B")
-  states[1:nb_tip,] <- 0
+  states[1:nb_tip, ] <- 0
   ## I repeat the process of state assignment as many times as columns I have
   for (iv in seq_len(ncol(traits))) {
-    usetraits <- traits[,iv]
+    usetraits <- traits[, iv]
     if (anyNA(usetraits)) {
       nas <- which(is.na(traits))
       for (iii in seq_along(nas)) {
-        states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
+        states[nas[iii], ] <- c(1 - rep(sampling_fraction, num_concealed_states),
                                rep(sampling_fraction, num_concealed_states))
       }
     }
 
     for (iii in seq_along(traitStates)) { # Initial state probabilities
       StatesPresents <- d + iii
-      toPlaceOnes <- StatesPresents + 
+      toPlaceOnes <- StatesPresents +
         length(traitStates) * (0:(num_concealed_states - 1))
       tipSampling <- 1 * sampling_fraction
-      states[which(usetraits == 
+      states[which(usetraits ==
                    traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
     }
     if (is_complete_tree) {
       extinct_species <- geiger::is.extinct(phy)
       if (!is.null(extinct_species)) {
         for (i in seq_along(extinct_species)) {
-          states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <- 
+          states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
             mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
         }
       }
@@ -353,7 +353,7 @@ build_states <- function(phy,
       }
     } else {
       for (iii in 1:nb_tip) {
-        states[iii,1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+        states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
       }
     }
   }
@@ -365,8 +365,8 @@ build_initStates_time <- function(phy,
                                   num_concealed_states,
                                   sampling_fraction,
                                   is_complete_tree = FALSE,
-                                  mus = NULL){ 
-  states <- build_states(phy, 
+                                  mus = NULL) {
+  states <- build_states(phy,
                          traits,
                          num_concealed_states,
                          sampling_fraction,
@@ -376,7 +376,7 @@ build_initStates_time <- function(phy,
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
   forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
-  forTime[,1:2] <- phy$edge
+  forTime[, 1:2] <- phy$edge
 
   for (ab in seq_along(ances)) {
     focalTime <- ances[ab]
@@ -391,8 +391,8 @@ build_initStates_time <- function(phy,
         timeInterv <- c(tipward_age, rootward_age)
       } else {
         timeInterv <- c(0, rootward_age)
-      }  
-      forTime[which(forTime[, 2] == 
+      }
+      forTime[which(forTime[, 2] ==
                     desNodes[desIndex]), 3] <- timeInterv[2] - timeInterv[1]
     }
   }
