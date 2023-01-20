@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_state_exact_cla.R
 \name{plot_state_exact_cla}
 \alias{plot_state_exact_cla}
-\title{function to plot the local probability along the tree, 
+\title{function to plot the local probability along the tree,
 including the branches, for the CLA model.}
 \usage{
 plot_state_exact_cla(
@@ -18,7 +18,8 @@ plot_state_exact_cla(
   atol = 1e-16,
   rtol = 1e-16,
   steps = 10,
-  prob_func = NULL
+  prob_func = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -42,9 +43,9 @@ root state:the vector c(1,0,0) indicates state 1 was the root state.}
 \item{is_complete_tree}{whether or not a tree with all its extinct species is
 provided}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 
 \item{atol}{absolute tolerance of integration}
@@ -53,8 +54,10 @@ provided}
 
 \item{steps}{number of substeps evaluated per branch, see description.}
 
-\item{prob_func}{a function to calculate the probability of interest, see 
+\item{prob_func}{a function to calculate the probability of interest, see
 description}
+
+\item{verbose}{return verbose output / progress bars when true.}
 }
 \value{
 ggplot2 object
@@ -65,11 +68,10 @@ all branches and plot the result. When steps is left to NULL, all likelihood
 evaluations during integration are used for plotting. This may work for not
 too large trees, but may become very memory heavy for larger trees. Instead,
 the user can indicate a number of steps, which causes the probabilities to be
-evaluated at a distinct amount of steps along each branch (and the 
-probabilities to be properly integrated in between these steps). This 
+evaluated at a distinct amount of steps along each branch (and the
+probabilities to be properly integrated in between these steps). This
 provides an approximation, but generally results look very similar to using
-the full evaluation.  
-
+the full evaluation.
 The function used for prob_func will be highly dependent on your system.
 for instance, for a 3 observed, 2 hidden states model, the probability
 of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
@@ -110,7 +112,7 @@ masterBlock <- matrix(0.07, ncol = 3, nrow = 3, byrow = TRUE)
 diag(masterBlock) <- NA
 parameter[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
 helper_function <- function(x) {
- return(sum(x[c(10, 13, 16)]) / sum(x)) # normalized by total sum, just in case.
+ return(sum(x[c(10, 13, 16)]) / sum(x))
 }
 plot_state_exact_cla(parameters = parameter,
                             focal_tree = phy,

@@ -2,7 +2,7 @@ Package: secsse
 Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
-Version: 2.3.1
+Version: 2.4.0
 Date: 2022-10-13
 License: GPL-3
 Authors@R: c(
@@ -34,7 +34,9 @@ Imports:
     ape,
     geiger,
     Rcpp,
-    RcppParallel
+    RcppParallel,
+    ggplot2,
+    tibble
 Suggests: diversitree,
  phytools,
  testthat,

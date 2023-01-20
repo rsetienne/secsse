@@ -1,9 +1,9 @@
 #' It sets the parameters (speciation, extinction and transition)
 #' ids. Needed for ML calculation (secsse_ml)
 #' @title Parameter structure setting
-#' @param traits vector with trait states, order of states must be the same as 
+#' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to number of examined states.
 #' @return A list that includes the ids of the parameters for ML analysis.
 #' @examples
@@ -11,20 +11,21 @@
 #' num_concealed_states <- 3
 #' param_posit <- id_paramPos(traits,num_concealed_states)
 #' @export
-id_paramPos <- function(traits, num_concealed_states) {
+id_paramPos <- function(traits, num_concealed_states) { #noLint
     idparslist <- list()
     if (is.matrix(traits)) {
         traits <- traits[, 1]
     }
 
     ly <- length(sort(unique(traits))) * 2 * num_concealed_states
-    d <- ly/2
+    d <- ly / 2
     idparslist[[1]] <- 1:d
     idparslist[[2]] <- (d + 1):ly
     toMatrix <- 1
     matPos <- (ly + 1):(((d^2) - d) + d * 2)
     for (i in 1:d) {
-        toMatrix <- c(toMatrix, matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
+        toMatrix <- c(toMatrix,
+                      matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
     }
     toMatrix <- toMatrix[1:d^2]
     Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = TRUE)
@@ -60,15 +61,16 @@ id_paramPos <- function(traits, num_concealed_states) {
 #' @title Basic Qmatrix
 #' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param masterBlock matrix of transitions among only examined states, NA in 
+#' @param masterBlock matrix of transitions among only examined states, NA in
 #' the main diagonal, used to build the full transition rates matrix.
-#' @param diff.conceal should the concealed states be different? Normally it 
+#' @param diff.conceal should the concealed states be different? Normally it
 #' should be FALSE.
-#' @return Q matrix that includes both examined and concealed states, it should 
+#' @return Q matrix that includes both examined and concealed states, it should
 #' be declared as the third element of idparslist.
 #' @examples
 #' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) # For a three-state trait
+#' # For a three-state trait
+#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) 
 #' diag(masterBlock) <- NA
 #' masterBlock[1,2] <- 6
 #' masterBlock[1,3] <- 7
@@ -97,21 +99,23 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
         newshareFac <- newshareFac/10
         
         for (iii in seq_along(newshareFac)) {
-            factorBlock[which(factorBlock == factorstoExpand[iii])] <- newshareFac[iii]
+            factorBlock[which(factorBlock == factorstoExpand[iii])] <-
+                                                             newshareFac[iii]
             
         }
-        
+
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(floor(masterBlock))))
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
         concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
         
         for (iii in seq_along(concealnewQ)) {
-            integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <- concealnewQ[iii]
+            integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <-
+                                                             concealnewQ[iii]
             
         }
         concealnewQMatr <- integersmasterBlock + factorBlock
-        
+
         Q <- NULL
         for (i in 1:ntraits) {
             Qrow <- NULL
@@ -121,7 +125,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
                     Qrow <- cbind(Qrow, masterBlock)
                 } else {
                     entry <- concealnewQMatr[i, ii]
-                    
+
                     outDiagBlock <- matrix(0, 
                                            ncol = ntraits, 
                                            nrow = ntraits,
@@ -129,12 +133,10 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
                     diag(outDiagBlock) <- entry
                     Qrow <- cbind(Qrow, outDiagBlock)
                 }
-                
             }
             Q <- rbind(Q, Qrow)
         }
     } else {
-        
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(masterBlock)))
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
@@ -144,7 +146,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
             uniqParQ2
             concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
         }
-        
+
         Q <- NULL
         for (i in 1:ntraits) {
             Qrow <- NULL
@@ -163,7 +165,6 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
                     diag(outDiagBlock) <- entry
                     Qrow <- cbind(Qrow, outDiagBlock)
                 }
-                
             }
             Q <- rbind(Q, Qrow)
         }
@@ -192,10 +193,13 @@ sortingtraits <- function(traitinfo, phy) {
         stop("Number of species in the tree must be the same as in the trait file")
     }
 
-    if (identical(as.character(sort(phy$tip.label)), as.character(sort(traitinfo[, 1]))) == FALSE) {
-        mismatch <- match(as.character(sort(traitinfo[, 1])), as.character(sort(phy$tip.label)))
+    if (identical(as.character(sort(phy$tip.label)),
+                  as.character(sort(traitinfo[, 1]))) == FALSE) {
+        mismatch <- match(as.character(sort(traitinfo[, 1])),
+                          as.character(sort(phy$tip.label)))
         mismatched <- (sort(traitinfo[, 1]))[which(is.na(mismatch))]
-        stop(cat("Mismatch on tip labels and taxa names, check the species:", mismatched))
+        stop(cat("Mismatch on tip labels and taxa names, check the species:",
+                 mismatched))
     }
 
     traitinfo <- traitinfo[match(phy$tip.label, traitinfo[, 1]), ]
@@ -239,7 +243,8 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     toMatrix <- 1
     matPos <- (ly + 1):(((d^2) - d) + d * 2)
     for (i in 1:d) {
-        toMatrix <- c(toMatrix, matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
+        toMatrix <- c(toMatrix,
+                      matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
 
     }
     toMatrix <- toMatrix[1:d^2]
@@ -250,20 +255,27 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     lab_conceal <- NULL
     for (i in 1:num_concealed_states) {
 
-        lab_conceal <- c(lab_conceal, rep(LETTERS[i], length(sort(unique(traits)))))
+        lab_conceal <- c(lab_conceal,
+                         rep(LETTERS[i],
+                             length(sort(unique(traits)))))
     }
 
 
     statesCombiNames <- character()
-    for (i in 1:length(lab_states)) {
-        statesCombiNames <- c(statesCombiNames, paste0(lab_states[i], lab_conceal[i]))
+    for (i in seq_along(lab_states)) {
+        statesCombiNames <- c(statesCombiNames,
+                              paste0(lab_states[i],
+                                     lab_conceal[i]))
     }
 
     idparslist[[1]] <- matrix(0, ncol = d, nrow = 4)
     idparslist[[2]] <- (d + 1):ly
     idparslist[[3]] <- Q
 
-    rownames(idparslist[[1]]) <- c("dual_inheritance", "single_inheritance", "dual_symmetric_transition", "dual_asymmetric_transition")
+    rownames(idparslist[[1]]) <- c("dual_inheritance",
+                                   "single_inheritance",
+                                   "dual_symmetric_transition",
+                                   "dual_asymmetric_transition")
 
     colnames(idparslist[[1]]) <- statesCombiNames
     colnames(idparslist[[3]]) <- statesCombiNames
@@ -272,7 +284,6 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     names(idparslist[[2]]) <- statesCombiNames
     return(idparslist)
 }
-
 
 #' It provides the set of matrices containing all the speciation rates
 #' @title Prepares the entire set of lambda matrices for cla_secsse.
@@ -363,7 +374,8 @@ calc_mus <- function(is_complete_tree,
     if (is_complete_tree) {
         mus <- rep(NA, length(idparslist[[2]]))
         for (i in seq_along(idparslist[[2]])) {
-            mus[i] <- c(parsfix[which(idparsfix == idparslist[[2]][i])], initparsopt[which(idparsopt == idparslist[[2]][i])])
+            mus[i] <- c(parsfix[which(idparsfix == idparslist[[2]][i])],
+                        initparsopt[which(idparsopt == idparslist[[2]][i])])
         }
     }
     return(mus)

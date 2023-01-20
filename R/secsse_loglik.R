@@ -1,31 +1,31 @@
 #' Logikelihood calculation for the SecSSE model given a set of parameters and
 #' data
 #' @title Likelihood for SecSSE model
-#' @param parameter list where first vector represents lambdas, the second mus 
+#' @param parameter list where first vector represents lambdas, the second mus
 #' and the third transition rates.
-#' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved, 
+#' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
 #' rooted and with branch lengths.
-#' @param traits vector with trait states, order of states must be the same as 
+#' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to number of examined states.
 #' @param cond condition on the existence of a node root: "maddison_cond",
 #' "proper_cond"(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:
-#' "maddison_weights","proper_weights"(default) or "equal_weights". 
-#' It can also be specified the root state:the vector c(1, 0, 0) 
+#' "maddison_weights","proper_weights"(default) or "equal_weights".
+#' It can also be specified the root state:the vector c(1, 0, 0)
 #' indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per
 #' trait state. It must have as many elements as trait states.
-#' @param setting_calculation argument used internally to speed up calculation. 
+#' @param setting_calculation argument used internally to speed up calculation.
 #' It should be left blank (default : setting_calculation = NULL)
 #' @param see_ancestral_states should the ancestral states be shown? Default
 #' FALSE
-#' @param loglik_penalty the size of the penalty for all parameters; default is 
+#' @param loglik_penalty the size of the penalty for all parameters; default is
 #' 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species
 #' is provided
-#' @param num_threads number of threads. Set to -1 to use all available threads. 
+#' @param num_threads number of threads. Set to -1 to use all available threads.
 #' Default is one thread.
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
@@ -34,9 +34,9 @@
 #' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @return The loglikelihood of the data given the parameter.
-#' @note Multithreading might lead to a slightly reduced accuracy 
-#' (in the order of 1e-10) and is therefore not enabled by default. 
-#' Please use at your own discretion. 
+#' @note Multithreading might lead to a slightly reduced accuracy
+#' (in the order of 1e-10) and is therefore not enabled by default.
+#' Please use at your own discretion.
 #' @examples
 #' rm(list = ls(all = TRUE))
 #' library(secsse)
@@ -83,7 +83,7 @@ secsse_loglik <- function(parameter,
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   q_matrix <- parameter[[3]]
-  
+
   if (is.null(setting_calculation)) {
     check_input(traits,
                 phy,
@@ -97,9 +97,9 @@ secsse_loglik <- function(parameter,
                                                  is_complete_tree,
                                                  mus)
   }
-  
+
   states <- setting_calculation$states
-  
+
   if (is_complete_tree) {
     states <- build_states(phy = phy,
                            traits = traits,
@@ -108,20 +108,18 @@ secsse_loglik <- function(parameter,
                            is_complete_tree = is_complete_tree,
                            mus = mus)
   }
-  
+
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
-  
+
   if (num_concealed_states != round(num_concealed_states)) { # for testing
     d <- ncol(states) / 2
     new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
     new_states <- states[, c(1, 2, 3, 10, 11, 12)]
     states <- new_states
   }
-  
-  ly <- ncol(states)
   d <- ncol(states) / 2
-  
+
   if (see_ancestral_states == TRUE) {
     if (num_threads != 1) {
       warning("see ancestral states only works with one thread, 
@@ -129,9 +127,7 @@ secsse_loglik <- function(parameter,
       num_threads <- 1
     }
   }
-
   calcul <- c()
-
   if (num_threads == 1) {
     calcul <- calThruNodes_cpp(ances,
                                states,
@@ -148,7 +144,7 @@ secsse_loglik <- function(parameter,
     ancescpp <- ances - 1
     forTimecpp <- forTime
     forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
-    
+
     if (num_threads == -2) {
       calcul <- calc_ll_threaded(lambdas,
                                  mus,
@@ -182,11 +178,11 @@ secsse_loglik <- function(parameter,
   ## At the root
   mergeBranch2 <- (mergeBranch)
   if (is.numeric(root_state_weight)) {
-    weightStates <- rep(root_state_weight / num_concealed_states, 
+    weightStates <- rep(root_state_weight / num_concealed_states,
                         num_concealed_states)
   } else {
     if (root_state_weight == "maddison_weights") {
-      weightStates <- (mergeBranch2)/sum((mergeBranch2))
+      weightStates <- (mergeBranch2) / sum((mergeBranch2))
     }
 
     if (root_state_weight == "proper_weights") {
@@ -196,7 +192,7 @@ secsse_loglik <- function(parameter,
     }
 
     if (root_state_weight == "equal_weights") {
-      weightStates <- rep(1/length(mergeBranch2),length(mergeBranch2))
+      weightStates <- rep(1 / length(mergeBranch2), length(mergeBranch2))
     }
   }
 
@@ -208,7 +204,7 @@ secsse_loglik <- function(parameter,
                           time_inte,
                           lambdas,
                           mus,
-                          Q,
+                          q_matrix,
                           method,
                           atol,
                           rtol)
@@ -244,7 +240,7 @@ check_input <- function(traits,
                         phy,
                         sampling_fraction,
                         root_state_weight,
-                        is_complete_tree){
+                        is_complete_tree) {
   if (is.numeric(root_state_weight)) {
     if (length(root_state_weight) != length(sort(unique(traits)))) {
       stop("There need to be as many elements in root_state_weight 
@@ -269,7 +265,7 @@ check_input <- function(traits,
   if (ape::is.binary(phy) == FALSE) {
     stop("The tree needs to be fully resolved.")
   }
-  if (ape::is.ultrametric(phy) == FALSE & is_complete_tree == FALSE) {
+  if (ape::is.ultrametric(phy) == FALSE && is_complete_tree == FALSE) {
     stop("The tree needs to be ultrametric.")
   }
   if (any(phy$edge.length == 0)) {
@@ -283,20 +279,20 @@ check_input <- function(traits,
     }
 
     if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) == 
-        FALSE){
+        FALSE) {
       stop(
-        "Check your trait argument; if you have more than one column, 
+        "Check your trait argument; if you have more than one column,
         make sure all your states are included in the first column."
       )
     }
   } else{
-    if (length(sampling_fraction) != length(sort(unique(traits)))){
-      stop("Sampling_fraction must have as many elements as the number of traits.")
+    if (length(sampling_fraction) != length(sort(unique(traits)))) {
+      stop("Sampling_fraction must have as many elements as 
+           the number of traits.")
     }
   }
 
-  if(length(sort(unique(as.vector(traits)))) < 2)
-  {
+  if(length(sort(unique(as.vector(traits)))) < 2) {
     stop("The trait has only one state.")
   }
 }
@@ -326,7 +322,7 @@ build_states <- function(phy,
   ##                   "D0A","D1A","D2A","D0B","D1B","D2B")
   states[1:nb_tip,] <- 0
   ## I repeat the process of state assignment as many times as columns I have
-  for (iv in 1:ncol(traits)) {
+  for (iv in seq_len(ncol(traits))) {
     usetraits <- traits[,iv]
     if (anyNA(usetraits)) {
       nas <- which(is.na(traits))
@@ -353,7 +349,7 @@ build_states <- function(phy,
         }
       }
       for (iii in 1:nb_tip) {
-        states[iii,1:d] <- 0
+        states[iii, 1:d] <- 0
       }
     } else {
       for (iii in 1:nb_tip) {
@@ -379,7 +375,7 @@ build_initStates_time <- function(phy,
   phy$node.label <- NULL
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
-  forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
+  forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
   forTime[,1:2] <- phy$edge
 
   for (ab in seq_along(ances)) {
@@ -390,14 +386,14 @@ build_initStates_time <- function(phy,
     for (desIndex in 1:2) {
       ## to Find the time which the integration will be done in
       if (any(desNodes[desIndex] == names(split_times))) {
-        tipward_age <- split_times[which(names(split_times) == 
+        tipward_age <- split_times[which(names(split_times) ==
                                          desNodes[desIndex])]
         timeInterv <- c(tipward_age, rootward_age)
       } else {
         timeInterv <- c(0, rootward_age)
       }  
-      forTime[which(forTime[,2] == 
-                    desNodes[desIndex]),3] <- timeInterv[2] - timeInterv[1]
+      forTime[which(forTime[, 2] == 
+                    desNodes[desIndex]), 3] <- timeInterv[2] - timeInterv[1]
     }
   }
   return(list(

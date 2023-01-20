@@ -1,14 +1,17 @@
 ---
-title: "plot demonstration"
+title: "Plotting probabilities"
 author: "Thijs Janzen"
 date: "2023-01-20"
-output: html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{"Plotting probabilities along branches"}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(secsse)
-library(tidyverse)
 ```
 
 ## Plotting ancestral states 
@@ -73,7 +76,6 @@ Using the explicit evaluations is more precies, but might be memory heavy. Usual
 using 10-100 evaluations per branch provides a very accurate approximation:
 
 ```{r exact}
-require(tidyverse)
 secsse::plot_state_exact(parameters = params,
                  focal_tree = focal_tree,
                  traits = traits,

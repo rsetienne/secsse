@@ -20,17 +20,17 @@
 #' description
 #' @param is_complete_tree whether or not a tree with all its extinct species is
 #' provided
+#' @param verbose provides intermediate output (progressbars etc) when TRUE.
 #' @return ggplot2 object
 #' @description this function will evaluate the log likelihood locally along
 #' all branches and plot the result. When steps is left to NULL, all likelihood
 #' evaluations during integration are used for plotting. This may work for not
 #' too large trees, but may become very memory heavy for larger trees. Instead,
 #' the user can indicate a number of steps, which causes the probabilities to be
-#' evaluated at a distinct amount of steps along each branch (and the 
-#' probabilities to be properly integrated in between these steps). This 
+#' evaluated at a distinct amount of steps along each branch (and the
+#' probabilities to be properly integrated in between these steps). This
 #' provides an approximation, but generally results look very similar to using
-#' the full evaluation.  
-#' 
+#' the full evaluation.
 #' The function used for prob_func will be highly dependent on your system.
 #' for instance, for a 3 observed, 2 hidden states model, the probability
 #' of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
@@ -50,12 +50,13 @@
 #' params[[3]][, ] <- 0.1
 #' diag(params[[3]]) <- NA
 #' #  Thus, we have for both, rates
-#' # 0A, 1A, 0B and 1B. If we are interested in the posterior probability of trait 0,
-#' # we have to provide a helper function that sums the probabilities of 0A and 0B, e.g.: 
+#' # 0A, 1A, 0B and 1B. If we are interested in the posterior probability of
+#' # trait 0,we have to provide a helper function that sums the probabilities of
+#' # 0A and 0B, e.g.:
 #' helper_function <- function(x) {
 #'   return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
 #' }
-#' 
+#'
 #' plot_state_exact(parameters = params,
 #'                  focal_tree = focal_tree,
 #'                  traits = traits,
@@ -76,7 +77,8 @@ plot_state_exact <- function(parameters,
                              atol = 1e-16,
                              rtol = 1e-16,
                              steps = NULL,
-                             prob_func = NULL) {
+                             prob_func = NULL,
+                             verbose = FALSE) {
 
   if (is.null(prob_func)) {
     stop("need to set a probability function, check description to how")
@@ -98,7 +100,7 @@ plot_state_exact <- function(parameters,
                                rtol = rtol,
                                method = method)
 
-  message("collecting branch likelihoods\n")
+  if (verbose) message("collecting branch likelihoods\n")
   eval_res <- secsse::secsse_loglik_eval(parameter = parameters,
                                          phy = focal_tree,
                                          traits = traits,
@@ -112,9 +114,11 @@ plot_state_exact <- function(parameters,
                                          atol = atol,
                                          rtol = rtol,
                                          method = method,
-                                         num_steps = steps)
+                                         num_steps = steps,
+                                         verbose = verbose)
 
-  message("\nconverting collected likelihoods to graph positions:\n")
+  if (verbose)
+    message("\nconverting collected likelihoods to graph positions:\n")
 
   xs <- ape::node.depth.edgelength(focal_tree)
   ys <- ape::node.height(focal_tree)
@@ -129,10 +133,11 @@ plot_state_exact <- function(parameters,
 
   for_plot <- matrix(nrow = num_rows, ncol = 6)
   for_plot_cnt <- 1
-  pb <- txtProgressBar(max = length(unique(to_plot[, 1])), style = 3)
+  if (verbose) pb <- utils::txtProgressBar(max = length(unique(to_plot[, 1])),
+                                           style = 3)
   cnt <- 1
   for (parent in unique(to_plot[, 1])) {
-    setTxtProgressBar(pb, cnt)
+    if (verbose) utils::setTxtProgressBar(pb, cnt)
     cnt <- cnt + 1
 
     to_plot2 <- subset(to_plot, to_plot[, 1] == parent)
@@ -185,16 +190,26 @@ plot_state_exact <- function(parameters,
   colnames(node_bars) <- c("x", "y0", "y1", "prob")
   node_bars <- tibble::as_tibble(node_bars)
 
-  message("\ngenerating ggplot object\n")
+  if (verbose) message("\ngenerating ggplot object\n")
+  focal_plot <- make_ggplot(for_plot, node_bars)
+  return(focal_plot)
+}
 
-  px <- ggplot2::ggplot(for_plot,
-                        ggplot2::aes(x = x0, y = y,
-                        xend = x1, yend = y, col = prob)) +
+#' @keywords internal
+make_ggplot <- function(for_plot, node_bars) {
+  ggplot_plot <- ggplot2::ggplot(for_plot,
+                                 ggplot2::aes_string(x = 'x0',
+                                                     y = 'y',
+                                                     xend = 'x1',
+                                                     yend = 'y',
+                                                     col = 'prob')) +
     ggplot2::geom_segment(linewidth = 2) +
     ggplot2::geom_segment(data = node_bars,
-                          ggplot2::aes(x = x, y = y0,
-                                      yend = y1, xend = x,
-                                       col = prob),
+                          ggplot2::aes_string(x = 'x',
+                                              y = 'y0',
+                                              yend = 'y1',
+                                              xend = 'x',
+                                              col = 'prob'),
                           linewidth = 1.5
     ) +
     ggplot2::theme_classic() +
@@ -204,5 +219,5 @@ plot_state_exact <- function(parameters,
                    axis.ticks.y = ggplot2::element_blank(),
                    axis.line.y = ggplot2::element_blank())
 
-  return(px)
+  return(ggplot_plot)
 }

@@ -97,7 +97,7 @@ is provided}
 \item{verbose}{sets verbose output; default is verbose when optimmethod is
 'subplex'}
 
-\item{num_threads}{number of threads. Set to -1 to use all available 
+\item{num_threads}{number of threads. Set to -1 to use all available
 threads. Default is one thread.}
 
 \item{atol}{absolute tolerance of integration}
@@ -130,7 +130,7 @@ phylotree <- ape::rbdtree(0.07,0.001,Tmax=50)
 startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 intGuessLamba <- startingpoint$lambda0
 intGuessMu <- startingpoint$mu0
-traits <-  sample(c(0,1,2), 
+traits <-  sample(c(0,1,2),
                  ape::Ntip(phylotree), replace = TRUE) # get some traits
 num_concealed_states <- 3
 idparslist <- cla_id_paramPos(traits, num_concealed_states)
@@ -186,7 +186,7 @@ num_concealed_states,
 idparslist,
 idparsopt,
 initparsopt,
-idfactorsopt, 
+idfactorsopt,
 initfactors,
 idparsfix,
 parsfix,

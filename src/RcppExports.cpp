@@ -68,8 +68,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // cla_calThruNodes_store_cpp
-Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol, bool is_complete_tree, int num_steps);
-RcppExport SEXP _secsse_cla_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP, SEXP num_stepsSEXP) {
+Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol, bool is_complete_tree, int num_steps, bool verbose);
+RcppExport SEXP _secsse_cla_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP, SEXP num_stepsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -84,7 +84,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
     Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
     Rcpp::traits::input_parameter< int >::type num_steps(num_stepsSEXP);
-    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_store_cpp(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree, num_steps));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_store_cpp(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree, num_steps, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -128,8 +129,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // calThruNodes_store_cpp
-Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas, const NumericVector& mus, const NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree, int num_steps);
-RcppExport SEXP _secsse_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP, SEXP num_stepsSEXP) {
+Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas, const NumericVector& mus, const NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree, int num_steps, bool verbose);
+RcppExport SEXP _secsse_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP, SEXP num_stepsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -145,7 +146,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
     Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
     Rcpp::traits::input_parameter< int >::type num_steps(num_stepsSEXP);
-    rcpp_result_gen = Rcpp::wrap(calThruNodes_store_cpp(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(calThruNodes_store_cpp(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -173,10 +175,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_ct_condition_cla", (DL_FUNC) &_secsse_ct_condition_cla, 8},
     {"_secsse_cla_calThruNodes_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_cpp, 10},
     {"_secsse_calc_cla_ll_threaded", (DL_FUNC) &_secsse_calc_cla_ll_threaded, 9},
-    {"_secsse_cla_calThruNodes_store_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_store_cpp, 11},
+    {"_secsse_cla_calThruNodes_store_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_store_cpp, 12},
     {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 11},
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
-    {"_secsse_calThruNodes_store_cpp", (DL_FUNC) &_secsse_calThruNodes_store_cpp, 12},
+    {"_secsse_calThruNodes_store_cpp", (DL_FUNC) &_secsse_calThruNodes_store_cpp, 13},
     {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 9},
     {NULL, NULL, 0}
 };

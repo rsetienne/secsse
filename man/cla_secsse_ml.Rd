@@ -52,11 +52,11 @@ to the number of examined states in the dataset.}
 'proper_cond'(default). For details, see vignette.}
 
 \item{root_state_weight}{the method to weigh the states:
-'maddison_weights','proper_weights'(default) or 'equal_weights'. 
-It can also be specified the 
+'maddison_weights','proper_weights'(default) or 'equal_weights'.
+It can also be specified the
 root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
-\item{sampling_fraction}{vector that states the sampling proportion per 
+\item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states.}
 
 \item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
@@ -77,16 +77,16 @@ is provided}
 \item{verbose}{sets verbose output; default is verbose when optimmethod is
 'subplex'}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads. 
+\item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
 
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 }
 \value{
@@ -104,16 +104,16 @@ set.seed(13)
 # Check the vignette for a better working exercise.
 # lambdas for 0A and 1A and 2A are the same but need to be estimated
 # (CTD model, see Syst Biol paper)
-# mus are fixed to zero, 
+# mus are fixed to zero,
 # the transition rates are constrained to be equal and fixed 0.01
 phylotree <- ape::rcoal(31, tip.label = 1:31)
 #get some traits
-traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) 
+traits <-  sample(c(0,1,2), ape::Ntip(phylotree), replace = TRUE)
 num_concealed_states <- 3
 idparslist <- cla_id_paramPos(traits,num_concealed_states)
 idparslist$lambdas[1,] <- c(1,1,1,2,2,2,3,3,3)
 idparslist[[2]][] <- 4
-masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE) 
+masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE)
 diag(masterBlock) <- NA
 diff.conceal <- FALSE
 idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
@@ -130,7 +130,7 @@ optimmethod <- 'simplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
-\dontrun{ 
+\dontrun{
 model <- cla_secsse_ml(
  phylotree,
  traits,

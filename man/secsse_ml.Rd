@@ -35,7 +35,7 @@ branch lengths.}
 
 \item{traits}{a vector with trait states for each tip in the phylogeny.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent 
+\item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
@@ -53,40 +53,40 @@ to the number of examined states in the dataset.}
 
 \item{root_state_weight}{the method to weigh the states:
 'maddison_weights','proper_weights'(default) or 'equal_weights'.
-It can also be specified the 
+It can also be specified the
 root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
-\item{sampling_fraction}{vector that states the sampling proportion per 
+\item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states.}
 
 \item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
-\item{maxiter}{max number of iterations. 
+\item{maxiter}{max number of iterations.
 Default is '1000 *round((1.25)^length(idparsopt))'.}
 
 \item{optimmethod}{method used for optimization. Default is 'simplex'.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
-\item{loglik_penalty}{the size of the penalty for all parameters; default 
+\item{loglik_penalty}{the size of the penalty for all parameters; default
 is 0 (no penalty)}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species 
+\item{is_complete_tree}{whether or not a tree with all its extinct species
 is provided}
 
-\item{verbose}{sets verbose output; default is verbose when optimmethod is 
+\item{verbose}{sets verbose output; default is verbose when optimmethod is
 'subplex'}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads. 
+\item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
 
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 }
 \value{
@@ -106,7 +106,7 @@ set.seed(13)
 # mus are fixed to
 # the transition rates are constrained to be equal and fixed 0.01
 phylotree <- ape::rcoal(31, tip.label = 1:31)
-traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
+traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE)#get some traits
 num_concealed_states<-3
 idparslist <- id_paramPos(traits, num_concealed_states)
 idparslist[[1]][c(1,4,7)] <- 1

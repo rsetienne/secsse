@@ -6,20 +6,20 @@ get_rates <- function(speciesID,
                       lambdas,
                       qs) {
   species_mus <- NULL
-  for (i in 1:length(speciesID)) {
+  for (i in seq_along(speciesID)) {
     species_mus <- c(species_mus,
                      mus[which(states == speciesTraits[i])])
   }
   
   species_lambdas <- NULL
-  for (i in 1:length(speciesID)) {
+  for (i in seq_along(speciesID)) {
     species_lambdas <- c(species_lambdas,
                          sum(lambdas[[which(states == speciesTraits[i])]]))
     
   }
   
   shiftprob <- NULL
-  for (i in 1:length(speciesID)) {
+  for (i in seq_along(speciesID)) {
     shiftprob <- c(shiftprob,
                    sum(qs[which(speciesTraits[i] == states), ], na.rm = T))
   }
@@ -145,7 +145,7 @@ secsse_sim <- function(timeSimul,
     species_lambdas <- rates$species_lambdas
     shiftprob <- rates$shiftprob
     totalRate <- sum(species_mus, species_lambdas, shiftprob)
-    timeElapsed <- rexp(1, rate = totalRate)
+    timeElapsed <- stats::rexp(1, rate = totalRate)
     timeStep <- timeStep + timeElapsed
     
     #cat("the simulated time is:", timeStep, "\n")
@@ -221,7 +221,7 @@ secsse_sim <- function(timeSimul,
   
   #getting only examined traits
   examTraits <- c()
-  for (i in 1:length(speciesTraits)) {
+  for (i in seq_along(speciesTraits)) {
     focal_thing <- speciesTraits[i]
     local_num <- substr(focal_thing, 1, 1)
     examTraits[i] <- as.numeric(local_num)

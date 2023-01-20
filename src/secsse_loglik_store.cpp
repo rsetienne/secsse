@@ -18,7 +18,8 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
                      Rcpp::NumericVector& nodeM_out,
                      double absolute_tol,
                      double relative_tol,
-                     std::string method) {
+                     std::string method,
+                     bool verbose) {
   
   
   size_t d = ll.size();
@@ -30,13 +31,13 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
   storage master_storage;
   int update_freq = ances.size() / 20;
   if(update_freq < 1) update_freq = 1;
-  Rcout << "0--------25--------50--------75--------100\n";
-  Rcout << "*";
+  if (verbose) Rcout << "0--------25--------50--------75--------100\n";
+  if (verbose) Rcout << "*";
   
   for (int a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
     
-    if (a % update_freq == 0) {
+    if (a % update_freq == 0 && verbose) {
       Rcout << "**";
     }
     Rcpp::checkUserInterrupt();
@@ -48,11 +49,8 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
     for (int i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
       
-      
-      
       ode_standard_store od(ll, mm, Q);
       
-      double t = 0.0;
       std::vector< double > y = states[focal_node - 1];
       
       std::vector< std::vector< double >> yvecs;
@@ -70,8 +68,6 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
                                         yvecs,
                                         t_vals); // t1
       
-      // auto yvecs = od_ptr->get_stored_states();
-      // auto t_vals = od_ptr->get_stored_t();
       data_storage local_storage;
       for (size_t i = 0; i < yvecs.size(); ++i) {
         local_storage.add_entry(t_vals[i], yvecs[i]);
@@ -97,7 +93,8 @@ storage calc_ll(const Rcpp::NumericVector& ll,
                 double absolute_tol,
                 double relative_tol,
                 std::string method,
-                int num_steps) {
+                int num_steps,
+                bool verbose) {
   
   
   size_t d = ll.size();
@@ -110,14 +107,14 @@ storage calc_ll(const Rcpp::NumericVector& ll,
   storage master_storage;
   int update_freq = ances.size() / 20;
   if(update_freq < 1) update_freq = 1;
-  Rcout << "0--------25--------50--------75--------100\n";
-  Rcout << "*";
+  if (verbose) Rcout << "0--------25--------50--------75--------100\n";
+  if (verbose) Rcout << "*";
   
   
   for (int a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
     
-    if (a % update_freq == 0) {
+    if (a % update_freq == 0 && verbose) {
       Rcout << "**";
     }
     Rcpp::checkUserInterrupt();
@@ -161,7 +158,6 @@ storage calc_ll(const Rcpp::NumericVector& ll,
 }
 
 
-//' @export
 // [[Rcpp::export]]
 Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
                                            const NumericMatrix& states_R,
@@ -174,7 +170,8 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
                                            double reltol,
                                            std::string method,
                                            bool is_complete_tree,
-                                           int num_steps) {
+                                           int num_steps,
+                                           bool verbose) {
   
   std::vector< std::vector< double >> states, forTime;
   
@@ -200,7 +197,8 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
                                                abstol,
                                                reltol,
                                                method,
-                                               num_steps);
+                                               num_steps,
+                                               verbose);
     } else {
       found_results = calc_ll<ode_standard>(lambdas,
                                             mus,
@@ -213,7 +211,8 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
                                             abstol,
                                             reltol,
                                             method,
-                                            num_steps);
+                                            num_steps,
+                                            verbose);
     }
   } else {
     found_results = calc_ll_full(lambdas,
@@ -226,7 +225,8 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
                                  nodeM,
                                  abstol,
                                  reltol,
-                                 method);
+                                 method,
+                                 verbose);
   }
     
   std::vector< std::vector< double >> prep_mat;

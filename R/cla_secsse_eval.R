@@ -1,4 +1,4 @@
-#' function to provide probabilities of observing states along branches.
+#' Evaluation of probabilities of observing states along branches.
 #' @title Likelihood for SecSSE model, using Rcpp
 #' @param parameter list where the first is a table where lambdas across
 #' different modes of speciation are shown, the second mus and the third
@@ -31,6 +31,7 @@
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
+#' @param verbose provide intermediate verbose output if TRUE
 #' @return The loglikelihood of the data given the parameters
 #' @description Using see_ancestral_states = TRUE in the function
 #' cla_secsse_loglik will provide posterior probabilities of the states of the
@@ -49,12 +50,12 @@ cla_secsse_eval <- function(parameter,
                             root_state_weight = "proper_weights",
                             sampling_fraction,
                             setting_calculation = NULL,
-                            see_ancestral_states = FALSE,
                             loglik_penalty = 0,
                             is_complete_tree = FALSE,
                             method = "odeint::bulirsch_stoer",
                             atol = 1e-16,
-                            rtol = 1e-16) {
+                            rtol = 1e-16,
+                            verbose = FALSE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -91,6 +92,7 @@ cla_secsse_eval <- function(parameter,
                                        atol,
                                        rtol,
                                        is_complete_tree,
-                                       num_steps)
+                                       ifelse(is.null(num_steps), 0, num_steps),
+                                       verbose)
   return(calcul)
 }

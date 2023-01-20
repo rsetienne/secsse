@@ -31,7 +31,7 @@ cla_secsse_sim <- function(states,
     stop("Incorrect number of transition rates")
   }
 
-  speciesTraits <- c(1, 2) # to initialize the while loop  
+  speciesTraits <- c(1, 2) # to initialize the while loop
   while (length(unique(speciesTraits)) != length(states)) {
     initialState <- sample(pool_init_states, 1)
     speciesTraits <- c(initialState, initialState)
@@ -46,16 +46,16 @@ cla_secsse_sim <- function(states,
     speciesTraits <- preTree$speciesTraits
     speciesID <- preTree$speciesID
   }
-  
-  if (length(speciesID) < maxSpec &  
-      Ltable[1, 4] == 0 & 
+
+  if (length(speciesID) < maxSpec &&
+      Ltable[1, 4] == 0 &&
       Ltable[2, 4] == 0 ) {
     age <- timeSimul
     Ltable[which(Ltable[, 4] == 0), 4] <- -1
-    Ltable[,1] <- age - c(Ltable[, 1])
-    notmin1 <- which(Ltable[,4] != -1)
-    Ltable[notmin1,4] <- age - c(Ltable[notmin1, 4])
-    Ltable[which(Ltable[,4] == age + 1), 4] <- -1
+    Ltable[, 1] <- age - c(Ltable[, 1])
+    notmin1 <- which(Ltable[, 4] != -1)
+    Ltable[notmin1, 4] <- age - c(Ltable[notmin1, 4])
+    Ltable[which(Ltable[, 4] == age + 1), 4] <- -1
     phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
 
     num_traits <- length(the_traits_to_sim)
@@ -64,16 +64,15 @@ cla_secsse_sim <- function(states,
       toConceal <- NULL
       for (jj in 1:num_traits) {
         toConceal <- c(toConceal,
-                       which(speciesTraits == 
+                       which(speciesTraits ==
                                states[ii + (num_traits * (jj - 1))]))
-
       }
       speciesTraits[toConceal] <- ii
     }
 
     speciesTraits <- as.numeric(speciesTraits)
-    traits <- sortingtraits(data.frame(cbind(paste0("t", speciesID), 
-                                             speciesTraits)), 
+    traits <- sortingtraits(data.frame(cbind(paste0("t", speciesID),
+                                             speciesTraits)),
                             phy)
     return(list(phy = phy,
                 traits = traits,

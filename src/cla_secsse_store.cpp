@@ -14,7 +14,8 @@ storage calc_ll_cla_store_full(const Rcpp::List& ll,
                                const std::vector<std::vector<double>>& states,
                                std::string method,
                                double atol,
-                               double rtol)  {
+                               double rtol,
+                               bool verbose)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
@@ -42,12 +43,12 @@ storage calc_ll_cla_store_full(const Rcpp::List& ll,
   storage master_storage;
   int update_freq = ances.size() / 20;
   if(update_freq < 1) update_freq = 1;
-  Rcout << "0--------25--------50--------75--------100\n";
-  Rcout << "*";
+  if (verbose) Rcout << "0--------25--------50--------75--------100\n";
+  if (verbose) Rcout << "*";
   
   for (int a = 0; a < ances.size(); ++a) {
     if (a % update_freq == 0) {
-      Rcout << "**";
+      if (verbose) Rcout << "**";
     }
     Rcpp::checkUserInterrupt();
     
@@ -100,7 +101,8 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
                           int num_steps,
                           std::string method,
                           double atol,
-                          double rtol)  {
+                          double rtol,
+                          bool verbose = false)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
@@ -131,11 +133,11 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   storage master_storage;
   int update_freq = ances.size() / 20;
   if(update_freq < 1) update_freq = 1;
-  Rcout << "0--------25--------50--------75--------100\n";
-  Rcout << "*";
+  if (verbose) Rcout << "0--------25--------50--------75--------100\n";
+  if (verbose) Rcout << "*";
   
   for (int a = 0; a < ances.size(); ++a) {
-    if (a % update_freq == 0) {
+    if (a % update_freq == 0 && verbose) {
       Rcout << "**";
     }
     Rcpp::checkUserInterrupt();
@@ -190,7 +192,8 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
                                                double atol,
                                                double rtol,
                                                bool is_complete_tree,
-                                               int num_steps) {
+                                               int num_steps,
+                                               bool verbose) {
   
   try {
     std::vector< std::vector< double >> states, forTime;
@@ -209,7 +212,8 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
                                         num_steps,
                                         method,
                                         atol,
-                                        rtol);
+                                        rtol,
+                                        verbose);
     } else {
       found_results = calc_ll_cla_store_full(lambdas,
                                              mus,
@@ -219,7 +223,8 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
                                              states,
                                              method,
                                              atol,
-                                             rtol);
+                                             rtol,
+                                             verbose);
     }
     
     

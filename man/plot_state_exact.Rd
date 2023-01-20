@@ -17,7 +17,8 @@ plot_state_exact(
   atol = 1e-16,
   rtol = 1e-16,
   steps = NULL,
-  prob_func = NULL
+  prob_func = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -54,6 +55,8 @@ provided}
 
 \item{prob_func}{a function to calculate the probability of interest, see
 description}
+
+\item{verbose}{provides intermediate output (progressbars etc) when TRUE.}
 }
 \value{
 ggplot2 object
@@ -64,11 +67,10 @@ all branches and plot the result. When steps is left to NULL, all likelihood
 evaluations during integration are used for plotting. This may work for not
 too large trees, but may become very memory heavy for larger trees. Instead,
 the user can indicate a number of steps, which causes the probabilities to be
-evaluated at a distinct amount of steps along each branch (and the 
-probabilities to be properly integrated in between these steps). This 
+evaluated at a distinct amount of steps along each branch (and the
+probabilities to be properly integrated in between these steps). This
 provides an approximation, but generally results look very similar to using
-the full evaluation.  
-
+the full evaluation.
 The function used for prob_func will be highly dependent on your system.
 for instance, for a 3 observed, 2 hidden states model, the probability
 of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
@@ -89,8 +91,9 @@ params[[2]][] <- 0.0
 params[[3]][, ] <- 0.1
 diag(params[[3]]) <- NA
 #  Thus, we have for both, rates
-# 0A, 1A, 0B and 1B. If we are interested in the posterior probability of trait 0,
-# we have to provide a helper function that sums the probabilities of 0A and 0B, e.g.: 
+# 0A, 1A, 0B and 1B. If we are interested in the posterior probability of
+# trait 0,we have to provide a helper function that sums the probabilities of
+# 0A and 0B, e.g.:
 helper_function <- function(x) {
   return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
 }

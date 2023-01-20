@@ -15,12 +15,12 @@ cla_secsse_eval(
   root_state_weight = "proper_weights",
   sampling_fraction,
   setting_calculation = NULL,
-  see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
   method = "odeint::bulirsch_stoer",
   atol = 1e-16,
-  rtol = 1e-16
+  rtol = 1e-16,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -69,6 +69,8 @@ provided}
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
+
+\item{verbose}{provide intermediate verbose output if TRUE}
 }
 \value{
 The loglikelihood of the data given the parameters
@@ -82,5 +84,5 @@ Because dt is fixed, this may lead to some inaccuracies, and dt is best
 chosen as small as possible.
 }
 \details{
-function to provide probabilities of observing states along branches.
+Evaluation of probabilities of observing states along branches.
 }
