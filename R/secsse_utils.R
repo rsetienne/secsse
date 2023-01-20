@@ -124,8 +124,8 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
                 } else {
                     entry <- concealnewQMatr[i, ii]
 
-                    outDiagBlock <- matrix(0, 
-                                           ncol = ntraits, 
+                    outDiagBlock <- matrix(0,
+                                           ncol = ntraits,
                                            nrow = ntraits,
                                            byrow = TRUE)
                     diag(outDiagBlock) <- entry
@@ -171,12 +171,12 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 }
 
 
-#' In preparation for likelihood calculation, it orders trait data according 
+#' In preparation for likelihood calculation, it orders trait data according
 #' the tree tips
 #' @title Data checking and trait sorting
-#' @param traitinfo data frame where first column has species ids and the second 
+#' @param traitinfo data frame where first column has species ids and the second
 #' one is the trait associated information.
-#' @param phy phy phylogenetic tree of class phylo, ultrametric, fully-resolved, 
+#' @param phy phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
 #' rooted and with branch lengths.
 #' @return Vector of traits
 #' @examples
@@ -188,7 +188,8 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 sortingtraits <- function(traitinfo, phy) {
     traitinfo <- as.matrix(traitinfo)
     if (length(phy$tip.label) != nrow(traitinfo)) {
-        stop("Number of species in the tree must be the same as in the trait file")
+        stop("Number of species in the tree must be the same as
+             in the trait file")
     }
 
     if (identical(as.character(sort(phy$tip.label)),
@@ -219,9 +220,9 @@ sortingtraits <- function(traitinfo, phy) {
 #' It sets the parameters (speciation, extinction and transition)
 #' ids. Needed for ML calculation with cladogenetic options (cla_secsse_ml)
 #' @title Parameter structure setting for cla_secsse
-#' @param traits vector with trait states, order of states must be the same as 
+#' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to number of examined states.
 #' @return A list that includes the ids of the parameters for ML analysis.
 #' @examples
@@ -236,8 +237,7 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     }
 
     ly <- length(sort(unique(traits))) * 2 * num_concealed_states
-    d <- ly/2
-    # idparslist[[1]] <- 1:d
+    d <- ly / 2
     toMatrix <- 1
     matPos <- (ly + 1):(((d^2) - d) + d * 2)
     for (i in 1:d) {
@@ -285,12 +285,12 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
 
 #' It provides the set of matrices containing all the speciation rates
 #' @title Prepares the entire set of lambda matrices for cla_secsse.
-#' @param traits vector with trait states, order of states must be the same as 
+#' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to number of examined states.
 #' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
-#' @return A list of lambdas, its length would be the same than the number of 
+#' @return A list of lambdas, its length would be the same than the number of
 #' trait states * num_concealed_states..
 #' @export
 prepare_full_lambdas <- function(traits,

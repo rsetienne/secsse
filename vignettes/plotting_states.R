@@ -1,39 +1,17 @@
----
-title: "Plotting probabilities"
-author: "Thijs Janzen"
-date: "2023-01-20"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{"Plotting probabilities"}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include=FALSE}
+## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width = 6)
 knitr::opts_chunk$set(fig.height = 6)
 library(secsse)
-```
 
-## Plotting ancestral states 
-
-Here, I want to give you a short (and minimal) demonstration of how to plot
-your ancestral states alongside your tree.
-Let us assume we have a simple tree, with almost trivial traits:
-
-```{r starting_conditions}
+## ----starting_conditions------------------------------------------------------
 set.seed(5)
 focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
 
 plot(focal_tree)
-```
 
-A typical likelihood calculation would look like (assuming 2 observed and 2 
-hidden traits):
-
-```{r simple likelihood}
+## ----simple likelihood--------------------------------------------------------
 params <- secsse::id_paramPos(c(0, 1), 2)
 params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
 params[[2]][] <- 0.0
@@ -48,36 +26,16 @@ ll <- secsse::secsse_loglik(parameter = params,
                              see_ancestral_states = TRUE,
                              sampling_fraction = c(1, 1))
 ll
-```
 
-If we want to visualize the change in trait probabilities across the tree, we
-can use the function 'plot_state_exact'. To use this function, we need to provide
-a helper function that can translate the posterior probabilities into a single
-probability of interest. For instance, for 2 observed and 2 hidden traits,
-we observe the following states reconstructed along the nodes:
-```{r states}
+## ----states-------------------------------------------------------------------
 ll$states
-```
 
-Here, the first four rows indicate the tip states, whilst the later three rows
-indicate the states at the internal nodes (with the last row indicating the root,
-in this case). The columns indicate the four extinction and four speciation rates,
-following the order in params[[1]] and params[[2]]. Thus, we have for both, rates
-0A, 1A, 0B and 1B. If we are interested in the posterior probability of trait 0,
-we have to provide a helper function that sums the probabilities of 0A and 0B, e.g.:
-```{r helper function}
+## ----helper function----------------------------------------------------------
 helper_function <- function(x) {
   return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
 }
-```
 
-We can now use this to plot this probability across the tree. There are two
-options for plotting: using the evaluations along the branches as used by the
-integration method, or evaluating the branch values at a specific number of intervals. 
-Using the explicit evaluations is more precies, but might be memory heavy. Usually,
-using 10-100 evaluations per branch provides a very accurate approximation:
-
-```{r exact}
+## ----exact--------------------------------------------------------------------
 secsse::plot_state_exact(parameters = params,
                  focal_tree = focal_tree,
                  traits = traits,
@@ -100,16 +58,11 @@ secsse::plot_state_exact(parameters = params,
                  sampling_fraction = c(1, 1),
                  steps = 100,
                  prob_func = helper_function)
-```
 
-# Using CLA secsse
-
-For CLA secsse, a similar function is available, which works in the same way. Borrowing from the example for cla_secsse_loglik, we first prepare our parameters:
-```{r cla secsse}
+## ----cla secsse---------------------------------------------------------------
 set.seed(13)
 phylotree <- ape::rcoal(12, tip.label = 1:12)
-traits <- sample(c(0, 1, 2),
-                 ape::Ntip(phylotree), replace = TRUE)
+traits <- sample(c(0, 1, 2), ape::Ntip(phylotree), replace = TRUE)
 num_concealed_states <- 3
 sampling_fraction <- c(1, 1, 1)
 phy <- phylotree
@@ -136,20 +89,13 @@ parameter[[2]] <- rep(0, 9)
 masterBlock <- matrix(0.07, ncol = 3, nrow = 3, byrow = TRUE)
 diag(masterBlock) <- NA
 parameter[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
-```
 
-Here, we have 9 different states (3 observed states, and 3 hidden states), 
-ordered regularly, e.g.: 0A, 1A, 2A, 0B, 1B, 2B, 0C, 1C, 2C. To observe the
-change in state 0, we formulate a helper function, noticing that the first
-9 states are the extinction rates:
-```{r helper function cla}
+## ----helper function cla------------------------------------------------------
 helper_function <- function(x) {
   return(sum(x[c(10, 13, 16)]) / sum(x)) # normalized by total sum, just in case
 }
-```
 
-And then we use these for plotting:
-```{r plot cla}
+## ----plot cla-----------------------------------------------------------------
 secsse::plot_state_exact_cla(parameters = parameter,
                              focal_tree = phy,
                              traits = traits,
@@ -160,5 +106,3 @@ secsse::plot_state_exact_cla(parameters = parameter,
                              is_complete_tree = FALSE,
                              prob_func = helper_function,
                              steps = 10)
-```
-

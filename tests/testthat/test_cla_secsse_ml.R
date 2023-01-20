@@ -6,22 +6,22 @@ test_that("trying a short ML search: cla_secsse", {
   phylotree <- ape::read.tree(file = "", parenthesis)
   traits <- c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
   num_concealed_states <- 3
-  idparslist <- cla_id_paramPos(traits,num_concealed_states)
-  idparslist$lambdas[2,] <- rep(1, 9)
+  idparslist <- cla_id_paramPos(traits, num_concealed_states)
+  idparslist$lambdas[2, ] <- rep(1, 9)
   idparslist[[2]][] <- 4
-  masterBlock <- matrix(5,ncol = 3, nrow = 3, byrow = TRUE)
+  masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
-  idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
+  idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
   testthat::expect_output(
       startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
   intGuessLamba <- startingpoint$lambda0
   intGuessMu <- startingpoint$mu0
   idparsopt <- c(1)
-  initparsopt <- c(rep(intGuessLamba,1))
+  initparsopt <- c(rep(intGuessLamba, 1))
   idparsfix <- c(0, 4, 5)
-  parsfix <- c(0,0, 0.01)
+  parsfix <- c(0, 0, 0.01)
   tol <- c(1e-04, 1e-05, 1e-07)
   maxiter <- 1000 * round((1.25) ^ length(idparsopt))
   optimmethod <- "simplex"

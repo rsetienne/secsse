@@ -198,18 +198,18 @@ plot_state_exact <- function(parameters,
 #' @keywords internal
 make_ggplot <- function(for_plot, node_bars) {
   ggplot_plot <- ggplot2::ggplot(for_plot,
-                                 ggplot2::aes_string(x = 'x0',
-                                                     y = 'y',
-                                                     xend = 'x1',
-                                                     yend = 'y',
-                                                     col = 'prob')) +
+                                 ggplot2::aes_string(x = "x0",
+                                                     y = "y",
+                                                     xend = "x1",
+                                                     yend = "y",
+                                                     col = "prob")) +
     ggplot2::geom_segment() +
     ggplot2::geom_segment(data = node_bars,
-                          ggplot2::aes_string(x = 'x',
-                                              y = 'y0',
-                                              yend = 'y1',
-                                              xend = 'x',
-                                              col = 'prob')
+                          ggplot2::aes_string(x = "x",
+                                              y = "y0",
+                                              yend = "y1",
+                                              xend = "x",
+                                              col = "prob")
     ) +
     ggplot2::theme_classic() +
     ggplot2::xlab("") +

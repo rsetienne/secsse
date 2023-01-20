@@ -15,7 +15,7 @@ secsse_sim(timeSimul, states, lambdas, mus, qs, speciesTraits, maxSpec)
 
 \item{mus}{extinction rates}
 
-\item{qs}{transition rates in the form of a Q matrix (see the output of 
+\item{qs}{transition rates in the form of a Q matrix (see the output of
 q_doubletrans)}
 
 \item{speciesTraits}{initial species' traits.}
