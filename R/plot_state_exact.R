@@ -203,14 +203,13 @@ make_ggplot <- function(for_plot, node_bars) {
                                                      xend = 'x1',
                                                      yend = 'y',
                                                      col = 'prob')) +
-    ggplot2::geom_segment(linewidth = 2) +
+    ggplot2::geom_segment() +
     ggplot2::geom_segment(data = node_bars,
                           ggplot2::aes_string(x = 'x',
                                               y = 'y0',
                                               yend = 'y1',
                                               xend = 'x',
-                                              col = 'prob'),
-                          linewidth = 1.5
+                                              col = 'prob')
     ) +
     ggplot2::theme_classic() +
     ggplot2::xlab("") +
