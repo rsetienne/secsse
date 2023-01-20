@@ -1,4 +1,4 @@
-#' function to extract local likelihoods along all branches
+#' function to plot the local probability along the tree, including the branches
 #' @param parameters used parameters for the likelihood calculation
 #' @param focal_tree used phylogeny
 #' @param traits used traits
@@ -9,29 +9,60 @@
 #' @param root_state_weight the method to weigh the states:'maddison_weigh
 #' ,'proper_weights'(default) or 'equal_weights'. It can also be specified the
 #' root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param method integration method used, available are: 
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' @param method integration method used, available are:
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
-#' @param steps number of substeps evaluated per branch
-#' @param prob_func a function to calculate the probability of interest, see 
+#' @param steps number of substeps evaluated per branch, see description.
+#' @param prob_func a function to calculate the probability of interest, see
 #' description
 #' @param is_complete_tree whether or not a tree with all its extinct species is
 #' provided
 #' @return ggplot2 object
 #' @description this function will evaluate the log likelihood locally along
-#' all branches and plot the result.
-#' the function used for prob_func will be highly dependent on your system.
+#' all branches and plot the result. When steps is left to NULL, all likelihood
+#' evaluations during integration are used for plotting. This may work for not
+#' too large trees, but may become very memory heavy for larger trees. Instead,
+#' the user can indicate a number of steps, which causes the probabilities to be
+#' evaluated at a distinct amount of steps along each branch (and the 
+#' probabilities to be properly integrated in between these steps). This 
+#' provides an approximation, but generally results look very similar to using
+#' the full evaluation.  
+#' 
+#' The function used for prob_func will be highly dependent on your system.
 #' for instance, for a 3 observed, 2 hidden states model, the probability
 #' of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
-#' probfunc will be applied to each row of the 'states' matrix (you can thus
-#' test your function on the states matrix returned when 
+#' prob_func will be applied to each row of the 'states' matrix (you can thus
+#' test your function on the states matrix returned when
 #' 'see_ancestral_states = TRUE'). A typical probfunc function will look like:
 #' my_prob_func <- function(x) {
 #'  return(sum(x[5:8]) / sum(x))
 #' }
+#' @examples
+#' set.seed(5)
+#' focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+#' traits <- c(0, 1, 1, 0)
+#' params <- secsse::id_paramPos(c(0, 1), 2)
+#' params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
+#' params[[2]][] <- 0.0
+#' params[[3]][, ] <- 0.1
+#' diag(params[[3]]) <- NA
+#' #  Thus, we have for both, rates
+#' # 0A, 1A, 0B and 1B. If we are interested in the posterior probability of trait 0,
+#' # we have to provide a helper function that sums the probabilities of 0A and 0B, e.g.: 
+#' helper_function <- function(x) {
+#'   return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
+#' }
+#' 
+#' plot_state_exact(parameters = params,
+#'                  focal_tree = focal_tree,
+#'                  traits = traits,
+#'                  num_concealed_states = 2,
+#'                  sampling_fraction = c(1, 1),
+#'                  steps = 10,
+#'                  prob_func = helper_function)
 #' @export
 plot_state_exact <- function(parameters,
                              focal_tree,
@@ -46,11 +77,11 @@ plot_state_exact <- function(parameters,
                              rtol = 1e-16,
                              steps = NULL,
                              prob_func = NULL) {
-  
+
   if (is.null(prob_func)) {
     stop("need to set a probability function, check description to how")
   }
-  
+
   message("collecting all states on nodes")
   ll1 <- secsse::secsse_loglik(parameter = parameters,
                                phy = focal_tree,
@@ -66,12 +97,13 @@ plot_state_exact <- function(parameters,
                                atol = atol,
                                rtol = rtol,
                                method = method)
-  
+
   message("collecting branch likelihoods\n")
   eval_res <- secsse::secsse_loglik_eval(parameter = parameters,
                                          phy = focal_tree,
                                          traits = traits,
-                                         num_concealed_states = num_concealed_states,
+                                         num_concealed_states =
+                                              num_concealed_states,
                                          ancestral_states = ll1$states,
                                          cond = cond,
                                          root_state_weight = root_state_weight,
@@ -81,22 +113,20 @@ plot_state_exact <- function(parameters,
                                          rtol = rtol,
                                          method = method,
                                          num_steps = steps)
-  
+
   message("\nconverting collected likelihoods to graph positions:\n")
-  
+
   xs <- ape::node.depth.edgelength(focal_tree)
   ys <- ape::node.height(focal_tree)
   num_tips <- length(focal_tree$tip.label)
   num_nodes <- (1 + num_tips):length(ys)
-  
+
   nodes <- data.frame(x = xs, y = ys, n = c(1:num_tips, num_nodes))
-  
+
   to_plot <- eval_res
-  # to_plot[, c(1, 2)] <- to_plot[, c(1, 2)] + 1
-  
-  
-  num_rows <- length(to_plot[, 1])   #length(unique(to_plot[, 1])) * 2 * steps
-  
+
+  num_rows <- length(to_plot[, 1])
+
   for_plot <- matrix(nrow = num_rows, ncol = 6)
   for_plot_cnt <- 1
   pb <- txtProgressBar(max = length(unique(to_plot[, 1])), style = 3)
@@ -104,7 +134,7 @@ plot_state_exact <- function(parameters,
   for (parent in unique(to_plot[, 1])) {
     setTxtProgressBar(pb, cnt)
     cnt <- cnt + 1
-    
+
     to_plot2 <- subset(to_plot, to_plot[, 1] == parent)
     for (daughter in unique(to_plot2[, 2])) {
       indices <- which(to_plot2[, 2] == daughter)
@@ -114,11 +144,13 @@ plot_state_exact <- function(parameters,
         start_x <- nodes$x[which(nodes$n == parent)]
         end_x <- nodes$x[which(nodes$n == daughter)]
         y <- nodes$y[which(nodes$n == daughter)]
-        
+
         bl <- end_x - start_x
-        
-        probs <- apply(focal_branch[, 4:length(focal_branch[1, ])], 1, prob_func)
-        
+
+        probs <- apply(focal_branch[, 4:length(focal_branch[1, ])],
+                       1,
+                       prob_func)
+
         for (s in 1:(length(focal_branch[, 1]) - 1)) {
           x0 <- start_x + bl - focal_branch[s, 3]
           x1 <- start_x + bl - focal_branch[s + 1, 3]
@@ -127,9 +159,9 @@ plot_state_exact <- function(parameters,
           for_plot_cnt <- for_plot_cnt + 1
         }
       }
-    }  
+    }
   }
-  
+
   node_bars <- matrix(nrow = length(unique(to_plot[, 1])), ncol = 4)
   node_bars_cnt <- 1
   for (parent in unique(to_plot[, 1])) {
@@ -137,33 +169,31 @@ plot_state_exact <- function(parameters,
     daughters <- unique(focal_data[, 2])
     start_x <- nodes$x[which(nodes$n == parent)]
     y <- c()
-    for (i in 1:length(daughters)) {
+    for (i in seq_along(daughters)) {
       y <- c(y, nodes$y[nodes$n == daughters[i]])
     }
     y <- sort(y)
-    
-    num_states <- length(ll1$states[1, ]) / 2
-    max_row_size <- length(ll1$states[1, ])
-    
+
     probs <- ll1$states[parent, ]
     rel_prob <- prob_func(probs)
-    # node_bars <- rbind(node_bars, c(start_x, y, rel_prob))
     node_bars[node_bars_cnt, ] <- c(start_x, y, rel_prob)
     node_bars_cnt <- node_bars_cnt + 1
   }
-  
+
   colnames(for_plot) <- c("x0", "x1", "y", "prob", "p", "d")
   for_plot <- tibble::as_tibble(for_plot)
   colnames(node_bars) <- c("x", "y0", "y1", "prob")
   node_bars <- tibble::as_tibble(node_bars)
-  
+
   message("\ngenerating ggplot object\n")
-  
-  px <- ggplot2::ggplot(for_plot, 
-                        ggplot2::aes(x = x0, y = y, xend = x1, yend = y, col = prob)) +
+
+  px <- ggplot2::ggplot(for_plot,
+                        ggplot2::aes(x = x0, y = y,
+                        xend = x1, yend = y, col = prob)) +
     ggplot2::geom_segment(linewidth = 2) +
-    ggplot2::geom_segment(data = node_bars, 
-                          ggplot2::aes(x = x, y = y0, yend = y1, xend = x,
+    ggplot2::geom_segment(data = node_bars,
+                          ggplot2::aes(x = x, y = y0,
+                                      yend = y1, xend = x,
                                        col = prob),
                           linewidth = 1.5
     ) +
@@ -173,6 +203,6 @@ plot_state_exact <- function(parameters,
     ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                    axis.ticks.y = ggplot2::element_blank(),
                    axis.line.y = ggplot2::element_blank())
-  
+
   return(px)
 }

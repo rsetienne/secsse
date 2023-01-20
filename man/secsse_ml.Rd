@@ -30,7 +30,7 @@ secsse_ml(
 )
 }
 \arguments{
-\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with 
+\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with
 branch lengths.}
 
 \item{traits}{a vector with trait states for each tip in the phylogeny.}
@@ -51,7 +51,9 @@ to the number of examined states in the dataset.}
 \item{cond}{condition on the existence of a node root: 'maddison_cond',
 'proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 
+\item{root_state_weight}{the method to weigh the states:
+'maddison_weights','proper_weights'(default) or 'equal_weights'.
+It can also be specified the 
 root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per 
@@ -59,7 +61,8 @@ trait state. It must have as many elements as there are trait states.}
 
 \item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
 
-\item{maxiter}{max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.}
+\item{maxiter}{max number of iterations. 
+Default is '1000 *round((1.25)^length(idparsopt))'.}
 
 \item{optimmethod}{method used for optimization. Default is 'simplex'.}
 

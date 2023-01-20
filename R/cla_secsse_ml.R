@@ -1,10 +1,10 @@
-#' Maximum likehood estimation under Several examined and concealed 
+#' Maximum likehood estimation under Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE) with cladogenetic option
 #' @title Maximum likehood estimation for (SecSSE)
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with 
+#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
 #' branch lengths.
 #' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
 #' @param idparsopt id of parameters to be estimated.
@@ -13,20 +13,22 @@
 #' @param parsfix value of the fixed parameters.
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 
+#' @param root_state_weight the method to weigh the states:
+#' 'maddison_weights','proper_weights'(default) or 'equal_weights'. 
+#' It can also be specified the 
 #' root state:the vector c(1,0,0) indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per 
 #' trait state. It must have as many elements as there are trait states.
 #' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
-#' @param maxiter max number of iterations. Default is 
+#' @param maxiter max number of iterations. Default is
 #' '1000*round((1.25)^length(idparsopt))'.
 #' @param optimmethod method used for optimization. Default is 'simplex'.
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param loglik_penalty the size of the penalty for all parameters; default is
 #'  0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species 
+#' @param is_complete_tree whether or not a tree with all its extinct species
 #' is provided
-#' @param verbose sets verbose output; default is verbose when optimmethod is 
+#' @param verbose sets verbose output; default is verbose when optimmethod is
 #' 'subplex'
 #' @param num_threads number of threads. Set to -1 to use all available threads. 
 #' Default is one thread.
@@ -42,13 +44,14 @@
 #'library(secsse)
 #'library(DDD)
 #'set.seed(13)
-#'# Check the vignette for a better working exercise. 
-#'# lambdas for 0A and 1A and 2A are the same but need to be estimated 
+#'# Check the vignette for a better working exercise.
+#'# lambdas for 0A and 1A and 2A are the same but need to be estimated
 #'# (CTD model, see Syst Biol paper)
 #'# mus are fixed to zero, 
 #'# the transition rates are constrained to be equal and fixed 0.01
 #'phylotree <- ape::rcoal(31, tip.label = 1:31)
-#'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) #get some traits
+#'#get some traits
+#'traits <-  sample(c(0,1,2), ape::Ntip(phylotree),replace=TRUE) 
 #'num_concealed_states <- 3
 #'idparslist <- cla_id_paramPos(traits,num_concealed_states)
 #'idparslist$lambdas[1,] <- c(1,1,1,2,2,2,3,3,3)
@@ -165,22 +168,23 @@ cla_secsse_ml <- function(phy,
                                                  sampling_fraction,
                                                  is_complete_tree, 
                                                  mus)
-    setting_parallel <- NULL
-    
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                           trparsfix = trparsfix,
                                           idparsopt = idparsopt,
-                                          idparsfix = idparsfix, 
+                                          idparsfix = idparsfix,
                                           idparslist = idparslist,
                                           structure_func = structure_func,
                                           phy = phy,
                                           traits = traits,
-                                          num_concealed_states = num_concealed_states,
+                                          num_concealed_states =
+                                              num_concealed_states,
                                           cond = cond,
                                           root_state_weight = root_state_weight,
                                           sampling_fraction = sampling_fraction, 
-                                          setting_calculation = setting_calculation,
-                                          see_ancestral_states = see_ancestral_states, 
+                                          setting_calculation =
+                                              setting_calculation,
+                                          see_ancestral_states =
+                                              see_ancestral_states, 
                                           loglik_penalty = loglik_penalty,
                                           is_complete_tree = is_complete_tree, 
                                           verbose = verbose,
@@ -188,9 +192,12 @@ cla_secsse_ml <- function(phy,
                                           atol = atol,
                                           rtol = rtol,
                                           method = method)
-    cat("The loglikelihood for the initial parameter values is", initloglik, "\n")
+    cat("The loglikelihood for the initial parameter values is", 
+        initloglik, "\n")
     if (initloglik == -Inf) {
-        stop("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.")
+        stop("The initial parameter values have a likelihood that is 
+             equal to 0 or below machine precision. 
+             Try again with different initial values.")
     } else {
         cat("Optimizing the likelihood - this may take a while.", "\n")
         utils::flush.console()
@@ -220,7 +227,8 @@ cla_secsse_ml <- function(phy,
                               rtol = rtol,
                               method = method)
         if (out$conv != 0) {
-            stop("Optimization has not converged. Try again with different initial values.\n")
+            stop("Optimization has not converged. 
+                 Try again with different initial values.\n")
         } else {
             MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)),
                                                    trparsfix,

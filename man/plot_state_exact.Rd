@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_state_exact.R
 \name{plot_state_exact}
 \alias{plot_state_exact}
-\title{function to extract local likelihoods along all branches}
+\title{function to plot the local probability along the tree, including the branches}
 \usage{
 plot_state_exact(
   parameters,
@@ -41,18 +41,18 @@ root state:the vector c(1,0,0) indicates state 1 was the root state.}
 \item{is_complete_tree}{whether or not a tree with all its extinct species is
 provided}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
 
-\item{steps}{number of substeps evaluated per branch}
+\item{steps}{number of substeps evaluated per branch, see description.}
 
-\item{prob_func}{a function to calculate the probability of interest, see 
+\item{prob_func}{a function to calculate the probability of interest, see
 description}
 }
 \value{
@@ -60,14 +60,46 @@ ggplot2 object
 }
 \description{
 this function will evaluate the log likelihood locally along
-all branches and plot the result.
-the function used for prob_func will be highly dependent on your system.
+all branches and plot the result. When steps is left to NULL, all likelihood
+evaluations during integration are used for plotting. This may work for not
+too large trees, but may become very memory heavy for larger trees. Instead,
+the user can indicate a number of steps, which causes the probabilities to be
+evaluated at a distinct amount of steps along each branch (and the 
+probabilities to be properly integrated in between these steps). This 
+provides an approximation, but generally results look very similar to using
+the full evaluation.  
+
+The function used for prob_func will be highly dependent on your system.
 for instance, for a 3 observed, 2 hidden states model, the probability
 of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
-probfunc will be applied to each row of the 'states' matrix (you can thus
-test your function on the states matrix returned when 
+prob_func will be applied to each row of the 'states' matrix (you can thus
+test your function on the states matrix returned when
 'see_ancestral_states = TRUE'). A typical probfunc function will look like:
 my_prob_func <- function(x) {
  return(sum(x[5:8]) / sum(x))
 }
+}
+\examples{
+set.seed(5)
+focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+traits <- c(0, 1, 1, 0)
+params <- secsse::id_paramPos(c(0, 1), 2)
+params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
+params[[2]][] <- 0.0
+params[[3]][, ] <- 0.1
+diag(params[[3]]) <- NA
+#  Thus, we have for both, rates
+# 0A, 1A, 0B and 1B. If we are interested in the posterior probability of trait 0,
+# we have to provide a helper function that sums the probabilities of 0A and 0B, e.g.: 
+helper_function <- function(x) {
+  return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
+}
+
+plot_state_exact(parameters = params,
+                 focal_tree = focal_tree,
+                 traits = traits,
+                 num_concealed_states = 2,
+                 sampling_fraction = c(1, 1),
+                 steps = 10,
+                 prob_func = helper_function)
 }

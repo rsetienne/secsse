@@ -26,10 +26,10 @@
 #' @param is_complete_tree whether or not a tree with all its extinct species is
 #' provided
 #' @param num_threads number of threads to be used, default is 1. Set to -1 to
-#' use all available threads. 
-#' @param method integration method used, available are: 
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' use all available threads.
+#' @param method integration method used, available are:
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
@@ -116,7 +116,7 @@ cla_secsse_loglik <- function(parameter,
   }
 
   states <- setting_calculation$states
-  
+
   if (is_complete_tree) {
     states <- build_states(phy = phy,
                            traits = traits,
@@ -125,7 +125,7 @@ cla_secsse_loglik <- function(parameter,
                            is_complete_tree = is_complete_tree,
                            mus = mus)
   }
-  
+
   forTime <- setting_calculation$forTime  # nolint
   ances <- setting_calculation$ances
 
@@ -142,12 +142,13 @@ cla_secsse_loglik <- function(parameter,
 
   if (see_ancestral_states == TRUE) {
     if (num_threads != 1) {
-      warning("see ancestral states only works with one thread, setting to one thread")
+      warning("see ancestral states only works with one thread, 
+              setting to one thread")
       num_threads <- 1
     }
   }
-  
-  
+
+
   calcul <- c()
   if (num_threads == 1) {
     ancescpp <- ances - 1
@@ -263,7 +264,7 @@ cla_secsse_loglik <- function(parameter,
     num_tips <- ape::Ntip(phy)
     # last row contains safety entry from C++ (all zeros)
     ancestral_states <- states[(num_tips + 1):(nrow(states) - 1), ]
-    ancestral_states <- 
+    ancestral_states <-
         ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL, states = states))

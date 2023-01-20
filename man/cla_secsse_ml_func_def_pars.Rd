@@ -40,7 +40,7 @@ branch lengths.}
 
 \item{traits}{a vector with trait states for each tip in the phylogeny.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent 
+\item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
@@ -97,16 +97,16 @@ is provided}
 \item{verbose}{sets verbose output; default is verbose when optimmethod is
 'subplex'}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads. 
-Default is one thread.}
+\item{num_threads}{number of threads. Set to -1 to use all available 
+threads. Default is one thread.}
 
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 }
 \value{

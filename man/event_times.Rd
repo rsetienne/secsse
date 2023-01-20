@@ -7,7 +7,7 @@
 event_times(phy)
 }
 \arguments{
-\item{phy}{phylogenetic tree of class phylo, without polytomies, rooted and 
+\item{phy}{phylogenetic tree of class phylo, without polytomies, rooted and
 with branch lengths. Need not be ultrametric.}
 }
 \value{
@@ -17,6 +17,6 @@ times at which speciation or extinction happens.
 Times at which speciation or extinction occurs
 }
 \note{
-This script has been modified from BAMMtools' internal function 
+This script has been modified from BAMMtools' internal function
 NU.branching.times
 }

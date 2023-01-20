@@ -5,16 +5,16 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-storage calc_ll_cla_store(const Rcpp::List& ll,
-                         const Rcpp::NumericVector& mm,
-                         const Rcpp::NumericMatrix& Q,
-                         const std::vector<int>& ances,
-                         const std::vector< std::vector< double >>& for_time,
-                         const std::vector<std::vector<double>>& states,
-                         int num_steps,
-                         std::string method,
-                         double atol,
-                         double rtol)  {
+
+storage calc_ll_cla_store_full(const Rcpp::List& ll,
+                               const Rcpp::NumericVector& mm,
+                               const Rcpp::NumericMatrix& Q,
+                               const std::vector<int>& ances,
+                               const std::vector< std::vector< double >>& for_time,
+                               const std::vector<std::vector<double>>& states,
+                               std::string method,
+                               double atol,
+                               double rtol)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
@@ -34,15 +34,11 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   std::vector< std::vector<double >> Q_cpp;
   numericmatrix_to_vector(Q, Q_cpp);
   
-  // temp, not used:
-  ode_cla_d od(ll_cpp, mm_cpp, Q_cpp);
-  size_t d = od.get_d();
-  
   std::vector<double> y;
   
   std::vector<int> desNodes;
   std::vector<double> timeInte;
-
+  
   storage master_storage;
   int update_freq = ances.size() / 20;
   if(update_freq < 1) update_freq = 1;
@@ -64,10 +60,99 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
       focal_node = desNodes[i];
       assert((focal_node) >= 0);
       assert((focal_node) < states.size());
-     
-      data_storage local_storage;
+      
+      ode_cla_store local_od(ll_cpp, mm_cpp, Q_cpp);
+      
+      y = states[focal_node];
+      std::vector< std::vector< double >> yvecs;
+      std::vector<double> t_vals;
+      
+      std::unique_ptr<ode_cla_store> od_ptr = std::make_unique<ode_cla_store>(local_od);
+      odeintcpp::integrate_full(method, 
+                                std::move(od_ptr), // ode class object
+                                y,// state vector
+                                0.0,// t0
+                                timeInte[i], //t1
+                                timeInte[i] * 0.01,
+                                atol,
+                                rtol,
+                                yvecs,
+                                t_vals);
 
-      ode_cla_d local_od(ll_cpp, mm_cpp, Q_cpp);
+      data_storage local_storage;
+      for (size_t i = 0; i < yvecs.size(); ++i) {
+        local_storage.add_entry(t_vals[i], yvecs[i]);
+      }
+      
+      master_storage.add_entry(focal, focal_node, local_storage);
+    }
+  }
+  return master_storage;
+}
+
+
+storage calc_ll_cla_store(const Rcpp::List& ll,
+                          const Rcpp::NumericVector& mm,
+                          const Rcpp::NumericMatrix& Q,
+                          const std::vector<int>& ances,
+                          const std::vector< std::vector< double >>& for_time,
+                          const std::vector<std::vector<double>>& states,
+                          int num_steps,
+                          std::string method,
+                          double atol,
+                          double rtol)  {
+  std::vector< std::vector< std::vector< double > >> ll_cpp;
+  for (size_t i = 0; i < ll.size(); ++i) {
+    Rcpp::NumericMatrix temp = ll[i];
+    std::vector< std::vector< double >> temp2;
+    for (size_t j = 0; j < temp.nrow(); ++j) {
+      std::vector<double> row;
+      for (size_t k = 0; k < temp.ncol(); ++k) {
+        row.push_back(temp(j, k));  
+      }
+      temp2.push_back(row);
+    }
+    ll_cpp.push_back(temp2);
+  }
+  
+  std::vector<double> mm_cpp(mm.begin(), mm.end());
+  
+  std::vector< std::vector<double >> Q_cpp;
+  numericmatrix_to_vector(Q, Q_cpp);
+  
+  // temp, not used:
+  ode_cla od(ll_cpp, mm_cpp, Q_cpp);
+  
+  std::vector<double> y;
+  
+  std::vector<int> desNodes;
+  std::vector<double> timeInte;
+  
+  storage master_storage;
+  int update_freq = ances.size() / 20;
+  if(update_freq < 1) update_freq = 1;
+  Rcout << "0--------25--------50--------75--------100\n";
+  Rcout << "*";
+  
+  for (int a = 0; a < ances.size(); ++a) {
+    if (a % update_freq == 0) {
+      Rcout << "**";
+    }
+    Rcpp::checkUserInterrupt();
+    
+    int focal = ances[a];
+    
+    find_desNodes(for_time, focal, desNodes, timeInte);
+    
+    int focal_node;
+    for (int i = 0; i < desNodes.size(); ++i) {
+      focal_node = desNodes[i];
+      assert((focal_node) >= 0);
+      assert((focal_node) < states.size());
+      
+      data_storage local_storage;
+      
+      ode_cla local_od(ll_cpp, mm_cpp, Q_cpp);
       
       double t = 0.0;
       y = states[focal_node];
@@ -75,7 +160,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
       
       double dt = timeInte[i] * 1.0 / num_steps;
       for (int j = 0; j < num_steps; ++j) {
-        std::unique_ptr<ode_cla_d> od_ptr = std::make_unique<ode_cla_d>(local_od);
+        std::unique_ptr<ode_cla> od_ptr = std::make_unique<ode_cla>(local_od);
         odeintcpp::integrate(method,
                              std::move(od_ptr), // ode class object
                              y, // state vector
@@ -112,39 +197,51 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
     numericmatrix_to_vector(states_R, states);
     numericmatrix_to_vector(forTime_R, forTime);
     
-    NumericVector mergeBranch;
-    NumericVector nodeM;
-    storage found_results = calc_ll_cla_store(lambdas,
-                                 mus,
-                                 Q,
-                                 std::vector<int>(ances.begin(), ances.end()),
-                                 forTime,
-                                 states,
-                                 num_steps,
-                                 method,
-                                 atol,
-                                 rtol);
-     
-     
+    storage found_results;
+    
+    if (num_steps > 0) {
+      found_results = calc_ll_cla_store(lambdas,
+                                        mus,
+                                        Q,
+                                        std::vector<int>(ances.begin(), ances.end()),
+                                        forTime,
+                                        states,
+                                        num_steps,
+                                        method,
+                                        atol,
+                                        rtol);
+    } else {
+      found_results = calc_ll_cla_store_full(lambdas,
+                                             mus,
+                                             Q,
+                                             std::vector<int>(ances.begin(), ances.end()),
+                                             forTime,
+                                             states,
+                                             method,
+                                             atol,
+                                             rtol);
+    }
+    
+    
     std::vector< std::vector< double >> prep_mat;
     for (auto i : found_results.data_) {
       std::vector< double > add;
       for (size_t j = 0; j < i.probabilities.t.size(); ++j) {
-          add = {static_cast<double>(i.ances), 
-                 static_cast<double>(i.focal_node), 
-                 i.probabilities.t[j]};
+        add = {static_cast<double>(i.ances), 
+               static_cast<double>(i.focal_node), 
+               i.probabilities.t[j]};
         
-          for (const auto& k : i.probabilities.probs[j]) {
-            add.push_back(k);
-          }
+        for (const auto& k : i.probabilities.probs[j]) {
+          add.push_back(k);
+        }
         
-          prep_mat.push_back(add);
+        prep_mat.push_back(add);
       }
     }
     
     Rcpp::NumericMatrix output;
     vector_to_numericmatrix(prep_mat, output);
-  
+    
     return output;
   } catch(std::exception &ex) {
     forward_exception_to_r(ex);

@@ -10,7 +10,7 @@ cla_secsse_eval(
   traits,
   num_concealed_states,
   ancestral_states,
-  num_steps = 10,
+  num_steps = NULL,
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   sampling_fraction,
@@ -37,7 +37,7 @@ tree tips, for help, see vignette.}
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to number of examined states.}
 
-\item{ancestral_states}{ancestral states matrix provided by 
+\item{ancestral_states}{ancestral states matrix provided by
 cla_secsse_loglik, this is used as starting points for manual integration}
 
 \item{num_steps}{number of steps to integrate along a branch}
@@ -61,9 +61,9 @@ It should be leave blank (default : setting_calculation = NULL)}
 \item{is_complete_tree}{whether or not a tree with all its extinct species is
 provided}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 
 \item{atol}{absolute tolerance of integration}
@@ -74,11 +74,11 @@ provided}
 The loglikelihood of the data given the parameters
 }
 \description{
-Using see_ancestral_states = TRUE in the function 
-cla_secsse_loglik will provide posterior probabilities of the states of the 
+Using see_ancestral_states = TRUE in the function
+cla_secsse_loglik will provide posterior probabilities of the states of the
 model on the nodes of the tree, but will not give the values on the branches.
-This function evaluates these probabilities at fixed time intervals dt. 
-Because dt is fixed, this may lead to some inaccuracies, and dt is best 
+This function evaluates these probabilities at fixed time intervals dt.
+Because dt is fixed, this may lead to some inaccuracies, and dt is best
 chosen as small as possible.
 }
 \details{

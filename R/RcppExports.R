@@ -42,11 +42,6 @@ calThruNodes_store_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, 
     .Call(`_secsse_calThruNodes_store_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps)
 }
 
-#' @export
-calThruNodes_store_full_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree) {
-    .Call(`_secsse_calThruNodes_store_full_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree)
-}
-
 calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads, method = "odeint::bulirsch_stoer", is_complete_tree = FALSE) {
     .Call(`_secsse_calc_ll_threaded`, ll, mm, Q, ances, for_time, states, num_threads, method, is_complete_tree)
 }

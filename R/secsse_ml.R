@@ -1,7 +1,7 @@
 #' Maximum likehood estimation under Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE)
 #' @title Maximum likehood estimation for (SecSSE)
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with 
+#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
 #' branch lengths.
 #' @param traits a vector with trait states for each tip in the phylogeny.
 #' @param num_concealed_states number of concealed states, generally equivalent 
@@ -13,12 +13,15 @@
 #' @param parsfix value of the fixed parameters.
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weights','proper_weights'(default) or 'equal_weights'. It can also be specified the 
+#' @param root_state_weight the method to weigh the states:
+#' 'maddison_weights','proper_weights'(default) or 'equal_weights'.
+#' It can also be specified the 
 #' root state:the vector c(1,0,0) indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per 
 #' trait state. It must have as many elements as there are trait states.
 #' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
-#' @param maxiter max number of iterations. Default is '1000 *round((1.25)^length(idparsopt))'.
+#' @param maxiter max number of iterations. 
+#' Default is '1000 *round((1.25)^length(idparsopt))'.
 #' @param optimmethod method used for optimization. Default is 'simplex'.
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param loglik_penalty the size of the penalty for all parameters; default 
@@ -122,26 +125,33 @@ secsse_ml <- function(phy,
                 is_complete_tree)
 
     if (is.matrix(traits)) {
-        cat("You are setting a model where some species had more than one trait state \n")
+        cat("You are setting a model where some species had more than 
+            one trait state \n")
     }
 
     if (length(initparsopt) != length(idparsopt)) {
-        stop("initparsopt must be the same length as idparsopt. Number of parameters to optimize does not match the number of initial values for the search")
+        stop("initparsopt must be the same length as idparsopt. 
+             Number of parameters to optimize does not match the number of 
+             initial values for the search")
     }
 
     if (length(idparsfix) != length(parsfix)) {
-        stop("idparsfix and parsfix must be the same length. Number of fixed elements does not match the fixed figures")
+        stop("idparsfix and parsfix must be the same length. 
+             Number of fixed elements does not match the fixed figures")
     }
 
     if (anyDuplicated(c(idparsopt, idparsfix)) != 0) {
         stop("At least one element was asked to be both fixed and estimated ")
     }
 
-    if (identical(as.numeric(sort(c(idparsopt, idparsfix))), as.numeric(sort(unique(unlist(idparslist))))) == FALSE) {
-        stop("All elements in idparslist must be included in either idparsopt or idparsfix ")
+    if (identical(as.numeric(sort(c(idparsopt, idparsfix))), 
+                  as.numeric(sort(unique(unlist(idparslist))))) == FALSE) {
+        stop("All elements in idparslist must be included in either 
+             idparsopt or idparsfix ")
     }
 
-    if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
+    if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), 
+                        idparsfix[which(parsfix == 0)])) != 0) {
         cat("You set some transitions as impossible to happen", "\n")
     }
 
@@ -177,12 +187,15 @@ secsse_ml <- function(phy,
                                           structure_func = structure_func,
                                           phy = phy,
                                           traits = traits,
-                                          num_concealed_states = num_concealed_states,
+                                          num_concealed_states = 
+                                              num_concealed_states,
                                           cond = cond,
                                           root_state_weight = root_state_weight,
                                           sampling_fraction = sampling_fraction,
-                                          setting_calculation = setting_calculation,
-                                          see_ancestral_states = see_ancestral_states,
+                                          setting_calculation =
+                                              setting_calculation,
+                                          see_ancestral_states =
+                                              see_ancestral_states,
                                           loglik_penalty = loglik_penalty,
                                           is_complete_tree = is_complete_tree,
                                           verbose = verbose,
@@ -191,9 +204,12 @@ secsse_ml <- function(phy,
                                           rtol = rtol,
                                           method = method)
     
-    cat("The loglikelihood for the initial parameter values is", initloglik, "\n")
+    cat("The loglikelihood for the initial parameter values is", 
+        initloglik, "\n")
     if (initloglik == -Inf) {
-        stop("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.")
+        stop("The initial parameter values have a likelihood that is 
+             equal to 0 or below machine precision. 
+             Try again with different initial values.")
     } else {
         cat("Optimizing the likelihood - this may take a while.", "\n")
         utils::flush.console()
@@ -226,7 +242,8 @@ secsse_ml <- function(phy,
                               rtol = rtol,
                               method = method)
         if (out$conv != 0) {
-            stop("Optimization has not converged. Try again with different initial values.\n")
+            stop("Optimization has not converged.
+                 Try again with different initial values.\n")
         } else {
             MLpars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)), 
                                                    trparsfix,
@@ -275,7 +292,8 @@ transf_funcdefpar <- function(idparsfuncdefpar,
         list2env(y, envir = a_new_envir)
         
         if (is.numeric(value_func_defining_parm) == FALSE) {
-            stop("Something went wrong with the calculation of parameters in 'functions_param_struct'")
+            stop("Something went wrong with the calculation of 
+                 parameters in 'functions_param_struct'")
         }
         trparfuncdefpar <- c(trparfuncdefpar, value_func_defining_parm)
     }
@@ -305,8 +323,10 @@ secsse_transform_parameters <- function(trparsopt,
             }
         }
         
-        trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar = idparsfuncdefpar,
-                                             functions_defining_params = functions_defining_params,
+        trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar = 
+                                                 idparsfuncdefpar,
+                                             functions_defining_params = 
+                                                 functions_defining_params,
                                              idfactorsopt = idfactorsopt,
                                              trparsfix = trparsfix,
                                              trparsopt = trparsopt,
@@ -452,19 +472,24 @@ secsse_loglik_choosepar <- function(trparsopt,
     if (max(alltrpars) > 1 | min(alltrpars) < 0) {
         loglik <- -Inf
     } else {
-        pars1 <- secsse_transform_parameters(trparsopt, trparsfix, idparsopt, idparsfix, idparslist, structure_func)
+        pars1 <- secsse_transform_parameters(trparsopt, trparsfix,
+                                             idparsopt,idparsfix,
+                                             idparslist, structure_func)
         
         if (is.list(pars1[[1]])) {
             # is the cla_ used?
             loglik <- cla_secsse_loglik(parameter = pars1,
                                         phy = phy,
                                         traits = traits,
-                                        num_concealed_states = num_concealed_states,
+                                        num_concealed_states =
+                                            num_concealed_states,
                                         cond = cond,
                                         root_state_weight = root_state_weight,
                                         sampling_fraction = sampling_fraction,
-                                        setting_calculation = setting_calculation, 
-                                        see_ancestral_states = see_ancestral_states,
+                                        setting_calculation =
+                                            setting_calculation, 
+                                        see_ancestral_states =
+                                            see_ancestral_states,
                                         loglik_penalty = loglik_penalty,
                                         is_complete_tree = is_complete_tree,
                                         num_threads = num_threads,
@@ -489,7 +514,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     method = method)
         }
         if (is.nan(loglik) || is.na(loglik)) {
-            cat("There are parameter values used which cause numerical problems.\n")
+            cat("There are parameter values used which cause
+                numerical problems.\n")
             loglik <- -Inf
         }
     }

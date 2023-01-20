@@ -7,7 +7,7 @@
 #' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
 #' branch lengths.
 #' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
 #' @param idparsopt id of parameters to be estimated.
@@ -44,13 +44,13 @@
 #' is provided
 #' @param verbose sets verbose output; default is verbose when optimmethod is
 #' 'subplex'
-#' @param num_threads number of threads. Set to -1 to use all available threads. 
-#' Default is one thread.
+#' @param num_threads number of threads. Set to -1 to use all available 
+#' threads. Default is one thread.
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
-#' @param method integration method used, available are: 
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' @param method integration method used, available are:
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @return Parameter estimated and maximum likelihood
 #' @return Parameter estimated and maximum likelihood
@@ -152,7 +152,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                         root_state_weight = "proper_weights",
                                         sampling_fraction,
                                         tol = c(1e-04, 1e-05, 1e-07),
-                                        maxiter = 1000 * round((1.25)^length(idparsopt)),
+                                        maxiter = 1000 *
+                                          round((1.25) ^ length(idparsopt)),
                                         optimmethod = "simplex",
                                         num_cycles = 1,
                                         loglik_penalty = 0,
@@ -175,50 +176,60 @@ cla_secsse_ml_func_def_pars <- function(phy,
     }
 
     if (is.list(functions_defining_params) == FALSE) {
-        stop("The argument functions_defining_params should be a list of functions. See example and vignette")
+        stop("The argument functions_defining_params should be a 
+             list of functions. See example and vignette")
     }
 
     if (length(functions_defining_params) != length(idparsfuncdefpar)) {
-        stop("the argument functions_defining_params should have the same length as idparsfuncdefpar")
+        stop("the argument functions_defining_params should have 
+             the same length as idparsfuncdefpar")
     }
 
     if (is.matrix(traits)) {
-        cat("You are setting a model where some species had more than one trait state \n")
+        cat("You are setting a model where some species had more 
+            than one trait state \n")
     }
 
     if (length(initparsopt) != length(idparsopt)) {
-        stop("initparsopt must be the same length as idparsopt. Number of parameters to optimize does not match the number of initial values for the search")
+        stop("initparsopt must be the same length as idparsopt. 
+             Number of parameters to optimize does not match the number of 
+             initial values for the search")
     }
 
     if (length(idparsfix) != length(parsfix)) {
-        stop("idparsfix and parsfix must be the same length.Number of fixed elements does not match the fixed figures")
+        stop("idparsfix and parsfix must be the same length. 
+             Number of fixed elements does not match the fixed figures")
     }
 
     if (anyDuplicated(c(idparsopt, idparsfix, idparsfuncdefpar)) != 0) {
-        stop("At least one element was asked to be fixed, estimated or a function at the same time")
+        stop("At least one element was asked to be fixed, estimated or a 
+             function at the same time")
     }
 
-    if (identical(as.numeric(sort(c(idparsopt, idparsfix, idparsfuncdefpar))), as.numeric(sort(unique(unlist(idparslist))))) ==
+    if (identical(as.numeric(sort(c(idparsopt, idparsfix, idparsfuncdefpar))), 
+                  as.numeric(sort(unique(unlist(idparslist))))) ==
         FALSE) {
-        stop("All elements in idparslist must be included in either idparsopt or idparsfix or idparsfuncdefpar ")
+        stop("All elements in idparslist must be included in either 
+             idparsopt or idparsfix or idparsfuncdefpar ")
     }
 
-    if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
+    if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), 
+                        idparsfix[which(parsfix == 0)])) != 0) {
         cat("Note: you set some transitions as impossible to happen.", "\n")
     }
 
-  #  idparslist[[1]] <- prepare_full_lambdas(traits, num_concealed_states, idparslist[[1]])
+  #  idparslist[[1]] <- prepare_full_lambdas(traits, 
+  #  num_concealed_states, idparslist[[1]])
     see_ancestral_states <- FALSE
 
-    # options(warn = -1)
     cat("Calculating the likelihood for the initial parameters.", "\n")
     utils::flush.console()
 
     initparsopt2 <- c(initparsopt, initfactors)
 
-    trparsopt <- initparsopt2/(1 + initparsopt2)
+    trparsopt <- initparsopt2 / (1 + initparsopt2)
     trparsopt[which(initparsopt2 == Inf)] <- 1
-    trparsfix <- parsfix/(1 + parsfix)
+    trparsfix <- parsfix / (1 + parsfix)
     trparsfix[which(parsfix == Inf)] <- 1
 
     mus <- calc_mus(is_complete_tree,
