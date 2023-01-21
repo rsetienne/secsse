@@ -84,7 +84,7 @@ plot_state_exact <- function(parameters,
     stop("need to set a probability function, check description to how")
   }
 
-  message("collecting all states on nodes")
+  if (verbose) message("collecting all states on nodes")
   ll1 <- secsse::secsse_loglik(parameter = parameters,
                                phy = focal_tree,
                                traits = traits,
@@ -127,8 +127,20 @@ plot_state_exact <- function(parameters,
 
   nodes <- data.frame(x = xs, y = ys, n = c(1:num_tips, num_nodes))
 
-  to_plot <- eval_res
+  for_plot <- collect_branches(eval_res, nodes, prob_func, verbose)
 
+  node_bars <- collect_node_bars(eval_res, nodes, prob_func, ll1)
+
+  if (verbose) message("\ngenerating ggplot object\n")
+  focal_plot <- make_ggplot(for_plot, node_bars)
+  return(focal_plot)
+}
+
+#' @keywords internal
+collect_branches <- function(to_plot,
+                             nodes,
+                             prob_func,
+                             verbose) {
   num_rows <- length(to_plot[, 1])
 
   for_plot <- matrix(nrow = num_rows, ncol = 6)
@@ -166,7 +178,17 @@ plot_state_exact <- function(parameters,
       }
     }
   }
+  colnames(for_plot) <- c("x0", "x1", "y", "prob", "p", "d")
+  for_plot <- tibble::as_tibble(for_plot)
+  
+  return(for_plot)
+}
 
+#' @keywords internal
+collect_node_bars <- function(to_plot,
+                              nodes,
+                              prob_func,
+                              ll) {
   node_bars <- matrix(nrow = length(unique(to_plot[, 1])), ncol = 4)
   node_bars_cnt <- 1
   for (parent in unique(to_plot[, 1])) {
@@ -179,20 +201,15 @@ plot_state_exact <- function(parameters,
     }
     y <- sort(y)
 
-    probs <- ll1$states[parent, ]
+    probs <- ll$states[parent, ]
     rel_prob <- prob_func(probs)
     node_bars[node_bars_cnt, ] <- c(start_x, y, rel_prob)
     node_bars_cnt <- node_bars_cnt + 1
   }
 
-  colnames(for_plot) <- c("x0", "x1", "y", "prob", "p", "d")
-  for_plot <- tibble::as_tibble(for_plot)
   colnames(node_bars) <- c("x", "y0", "y1", "prob")
   node_bars <- tibble::as_tibble(node_bars)
-
-  if (verbose) message("\ngenerating ggplot object\n")
-  focal_plot <- make_ggplot(for_plot, node_bars)
-  return(focal_plot)
+  return(node_bars)
 }
 
 #' @keywords internal

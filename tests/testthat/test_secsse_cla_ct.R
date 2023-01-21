@@ -89,10 +89,10 @@ test_that("the loglik for the complete tree under cla_secsse", {
   parameter[[1]] <- lambdas
   parameter[[2]] <- mus
   parameter[[3]] <- Q
-  
+
   num_concealed_states <- 3
   sampling_fraction <- c(1, 1, 1)
-  
+
   secsse_cla_LL6 <- cla_secsse_loglik(parameter = parameter,
                                       phy = phy,
                                       traits = traits,

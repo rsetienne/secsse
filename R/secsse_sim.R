@@ -212,7 +212,7 @@ secsse_sim <- function(timeSimul,
       speciesTraits <- eventExt$speciesTraits
       Ltable <- eventExt$Ltable
     }
-  } 
+  }
 
   #correcting Ltable to use DDD::L2phylo
   new_Ltable <- Ltable
@@ -236,7 +236,7 @@ secsse_sim <- function(timeSimul,
   if (length(speciesID) != 1) {
     resulting_phylogeny <- DDD::L2phylo(new_Ltable, dropextinct = TRUE)
     examTraits <- secsse::sortingtraits(
-      data.frame(cbind(paste0("t", abs(speciesID)), 
+      data.frame(cbind(paste0("t", abs(speciesID)),
                         examTraits)),
                         phy = resulting_phylogeny)
   }

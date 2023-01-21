@@ -91,7 +91,7 @@ idparslist
 If we would like the speciation rate of states 1B and 2B to be the same, we can do this as follows:
 
 ```{r}
-#idparslist[[1]][c(5,6)] <- 5
+# idparslist[[1]][c(5,6)] <- 5
 ```
 
 Notice that if one were to set extinction parameters to be the same, the numbering used to identify parameters is not the same as that in idparslist, but rather consecutive numbering referring to the elements within the extinction parameters component in idparslist:
@@ -311,7 +311,7 @@ secsse_ml(phylo_Vign,
 We can save output to an R data file, for example, here called output.RDS:
 
 ```{r}
-out<-secsse_ml(phylo_Vign,
+out <- secsse_ml(phylo_Vign,
                traits,
                num_concealed_states = 3,
                idparslist,
@@ -325,7 +325,7 @@ out<-secsse_ml(phylo_Vign,
                tol = c(1e-04, 1e-05, 1e-07),
                optimmethod = "simplex",
                num_cycles = 1)
-saveRDS(out, file="output.RDS")
+saveRDS(out, file = "output.RDS")
 ```
 
 Later on, we can retrieve the data in this file, simply by entering:
@@ -340,12 +340,12 @@ The following is sample output, with two concealed states, notice in this case a
 
 ```{r}
 #$MLpars[[1]]
-#          1A           2A           3A           1B           2B           3B 
-#4.842634e-16 1.080409e-01 7.843821e-02 4.029147e-09 3.018863e-02 3.018863e-02 
+#          1A           2A           3A           1B           2B           3B
+#4.842634e-16 1.080409e-01 7.843821e-02 4.029147e-09 3.018863e-02 3.018863e-02
 
 #$MLpars[[2]]
-#         1A          2A          3A          1B          2B          3B 
-#0.002000000 0.002000109 0.002734071 0.001988593 0.002169052 0.003969142 
+#         1A          2A          3A          1B          2B          3B
+#0.002000000 0.002000109 0.002734071 0.001988593 0.002169052 0.003969142
 
 #$MLpars[[3]]
 #     1A   2A   3A   1B   2B   3B
@@ -370,7 +370,7 @@ The maximum likelihood value at the bottom of the output can be used in model co
 The 'masterBlock' can be declared as follows:
 
 ```{r}
-masterBlock <- matrix(99, ncol = 3, nrow = 3, byrow = TRUE) 
+masterBlock <- matrix(99, ncol = 3, nrow = 3, byrow = TRUE)
 ```
 
 in which '99' is an example value you can use to populate the matrix at first, to be replaced by values you specify. If you make this value conspicuously different from others, you can ensure that you are not skipping the specification of values, as any non-specified rates will take this value. 'Ncol' and 'nrow' will need to reflect the number of states you are analyzing.
@@ -399,7 +399,7 @@ diff.conceal <- FALSE
 Finally, we need to make sure the 'masterBlock' is used as a baseline for building the transition matrix in IDPARSLIST:
 
 ```{r}
-myQ<-q_doubletrans(traits,masterBlock,diff.conceal)
+myQ <- q_doubletrans(traits, masterBlock, diff.conceal)
 idparslist[[3]] <- myQ
 ```
 
@@ -444,10 +444,10 @@ Aside from setting these two parameters, we need to specify in our rate matrix w
 # diag(masterBlock) <- NA
 # masterBlock[1, 2] <- 6
 # masterBlock[1, 3] <- 6.1  #factor 1: lobed to palmate
-# 
+#
 # masterBlock[2, 1] <- 7
 # masterBlock[2, 3] <- 8
-# 
+#
 # masterBlock[3, 1] <- 7.2  #factor 2: palmate to lobed
 # masterBlock[3, 2] <- 9
 ```

@@ -151,65 +151,9 @@ plot_state_exact_cla <- function(parameters,
   to_plot <- eval_res
   to_plot[, c(1, 2)] <- to_plot[, c(1, 2)] + 1
 
-  num_rows <- length(unique(to_plot[, 1])) * 2 * steps
+  for_plot <- collect_branches(to_plot, nodes, prob_func, verbose)
 
-  for_plot <- matrix(nrow = num_rows, ncol = 6)
-  for_plot_cnt <- 1
-  if (verbose)
-    pb <- utils::txtProgressBar(max = length(unique(to_plot[, 1])), style = 3)
-  cnt <- 1
-  for (parent in unique(to_plot[, 1])) {
-    if (verbose) utils::setTxtProgressBar(pb, cnt)
-    cnt <- cnt + 1
-
-    to_plot2 <- subset(to_plot, to_plot[, 1] == parent)
-    for (daughter in unique(to_plot2[, 2])) {
-      indices <- which(to_plot2[, 2] == daughter)
-      if (length(indices) > 0) {
-        # we have a branch
-        focal_branch <- to_plot2[indices, ]
-        start_x <- nodes$x[which(nodes$n == parent)]
-        end_x <- nodes$x[which(nodes$n == daughter)]
-        y <- nodes$y[which(nodes$n == daughter)]
-
-        bl <- end_x - start_x
-
-        probs <- apply(focal_branch[, 4:length(focal_branch[1, ])],
-                       1, prob_func)
-
-        for (s in 1:(length(focal_branch[, 1]) - 1)) {
-          x0 <- start_x + bl - focal_branch[s, 3]
-          x1 <- start_x + bl - focal_branch[s + 1, 3]
-          ps <- probs[s]
-          for_plot[for_plot_cnt, ] <- c(x0, x1, y, ps, parent, daughter)
-          for_plot_cnt <- for_plot_cnt + 1
-        }
-      }
-    }
-  }
-
-  node_bars <- matrix(nrow = length(unique(to_plot[, 1])), ncol = 4)
-  node_bars_cnt <- 1
-  for (parent in unique(to_plot[, 1])) {
-    focal_data <- subset(to_plot, to_plot[, 1] == parent)
-    daughters <- unique(focal_data[, 2])
-    start_x <- nodes$x[which(nodes$n == parent)]
-    y <- c()
-    for (i in seq_along(daughters)) {
-      y <- c(y, nodes$y[nodes$n == daughters[i]])
-    }
-    y <- sort(y)
-
-    probs <- ll1$states[parent, ]
-    rel_prob <- prob_func(probs)
-    node_bars[node_bars_cnt, ] <- c(start_x, y, rel_prob)
-    node_bars_cnt <- node_bars_cnt + 1
-  }
-
-  colnames(for_plot) <- c("x0", "x1", "y", "prob", "p", "d")
-  for_plot <- tibble::as_tibble(for_plot)
-  colnames(node_bars) <- c("x", "y0", "y1", "prob")
-  node_bars <- tibble::as_tibble(node_bars)
+  node_bars <- collect_node_bars(to_plot, nodes, prob_func, ll1)
 
   if (verbose) message("\ngenerating ggplot object\n")
 
