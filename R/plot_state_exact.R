@@ -180,7 +180,7 @@ collect_branches <- function(to_plot,
   }
   colnames(for_plot) <- c("x0", "x1", "y", "prob", "p", "d")
   for_plot <- tibble::as_tibble(for_plot)
-  
+
   return(for_plot)
 }
 

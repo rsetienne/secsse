@@ -100,7 +100,6 @@ cla_secsse_loglik <- function(parameter,
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]  # nolint
 
-
   if (is.null(setting_calculation)) {
     check_input(traits,
                 phy,
@@ -114,7 +113,6 @@ cla_secsse_loglik <- function(parameter,
                                                  is_complete_tree,
                                                  mus)
   }
-
   states <- setting_calculation$states
 
   if (is_complete_tree) {
@@ -148,8 +146,6 @@ cla_secsse_loglik <- function(parameter,
     }
   }
 
-
-  calcul <- c()
   if (num_threads == 1) {
     ancescpp <- ances - 1
     forTimecpp <- forTime # nolint

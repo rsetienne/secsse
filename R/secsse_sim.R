@@ -153,7 +153,6 @@ secsse_sim <- function(timeSimul,
     timeElapsed <- stats::rexp(1, rate = totalRate)
     timeStep <- timeStep + timeElapsed
 
-    #cat("the simulated time is:", timeStep, "\n")
     if (timeStep > timeSimul) {
       break
     }
@@ -175,7 +174,6 @@ secsse_sim <- function(timeSimul,
     if (length(speciesID) == 1 && event == 3) {
       print("Clade Extinction")
       break
-
     }
 
     if (event == 1) {
