@@ -100,6 +100,14 @@ secsse_loglik <- function(parameter,
 
   states <- setting_calculation$states
 
+  if (num_concealed_states != round(num_concealed_states)) { # for test case
+    d <- ncol(states) / 2
+    new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
+    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
+    states <- new_states
+  }
+
+
   if (is_complete_tree) {
     states <- build_states(phy = phy,
                            traits = traits,
@@ -112,12 +120,6 @@ secsse_loglik <- function(parameter,
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
 
-  if (num_concealed_states != round(num_concealed_states)) { # for testing
-    d <- ncol(states) / 2
-    new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
-    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
-    states <- new_states
-  }
   d <- ncol(states) / 2
 
   if (see_ancestral_states == TRUE) {
@@ -177,24 +179,14 @@ secsse_loglik <- function(parameter,
 
   ## At the root
   mergeBranch2 <- (mergeBranch)
-  if (is.numeric(root_state_weight)) {
-    weightStates <- rep(root_state_weight / num_concealed_states,
-                        num_concealed_states)
-  } else {
-    if (root_state_weight == "maddison_weights") {
-      weightStates <- (mergeBranch2) / sum((mergeBranch2))
-    }
 
-    if (root_state_weight == "proper_weights") {
-      weightStates <- (mergeBranch2 /
-                         (lambdas * (1 - nodeM[1:d]) ^ 2)) /
-                          sum((mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)))
-    }
-
-    if (root_state_weight == "equal_weights") {
-      weightStates <- rep(1 / length(mergeBranch2), length(mergeBranch2))
-    }
-  }
+  weightStates <- get_weight_states(root_state_weight,
+                                    num_concealed_states,
+                                    mergeBranch,
+                                    lambdas,
+                                    nodeM,
+                                    d,
+                                    is_cla = FALSE)
 
   if (is_complete_tree) {
     time_inte <- max(abs(ape::branching.times(phy))) # nolint
@@ -306,6 +298,7 @@ build_states <- function(phy,
   if (!is.matrix(traits)) {
     traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
   }
+
   if (length(phy$tip.label) != nrow(traits)) {
     stop("Number of species in the tree must be the same as in the trait file")
   }
@@ -402,4 +395,45 @@ build_initStates_time <- function(phy,
     ances = ances,
     forTime = forTime
   ))
+}
+
+
+get_weight_states <- function(root_state_weight,
+                              num_concealed_states,
+                              mergeBranch,
+                              lambdas,
+                              nodeM,
+                              d,
+                              is_cla = FALSE) {
+
+  if (is.numeric(root_state_weight)) {
+    weight_states <- rep(root_state_weight / num_concealed_states,
+                         num_concealed_states)
+  } else {
+    if (root_state_weight == "maddison_weights") {
+      weight_states <- (mergeBranch) / sum((mergeBranch))
+    }
+
+    if (root_state_weight == "proper_weights") {
+      if (is_cla) {
+        lmb <- length(mergeBranch)
+        numerator <- rep(NA, lmb)
+        for (j in 1:lmb) {
+          numerator[j] <- mergeBranch[j] / sum(lambdas[[j]] *
+                                        ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+        }
+        weight_states <- numerator / sum(numerator) # nolint
+      } else {
+      weight_states <- (mergeBranch /
+                          (lambdas * (1 - nodeM[1:d]) ^ 2)) /
+        sum((mergeBranch / (lambdas * (1 - nodeM[1:d]) ^ 2)))
+      }
+    }
+
+    if (root_state_weight == "equal_weights") {
+      weight_states <- rep(1 / length(mergeBranch), length(mergeBranch))
+    }
+  }
+
+  return(weight_states)
 }

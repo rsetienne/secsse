@@ -57,6 +57,36 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
     return(idparslist)
 }
 
+create_q_matrix <- function(masterBlock,
+                            concealnewQMatr,
+                            ntraits,
+                            diff.conceal) {
+    Q <- NULL
+    for (i in 1:ntraits) {
+        Qrow <- NULL
+        for (ii in 1:ntraits) {
+            entry <- masterBlock[i, ii]
+            if (is.na(entry)) {
+                Qrow <- cbind(Qrow, masterBlock)
+            } else {
+                if (diff.conceal == TRUE) {
+                    entry <- concealnewQMatr[i, ii]
+                }
+
+                outDiagBlock <- matrix(0,
+                                       ncol = ntraits,
+                                       nrow = ntraits,
+                                       byrow = TRUE)
+                diag(outDiagBlock) <- entry
+                Qrow <- cbind(Qrow, outDiagBlock)
+            }
+        }
+        Q <- rbind(Q, Qrow)
+    }
+    return(Q)
+}
+
+
 #' Sets a Q matrix where double transitions are not allowed
 #' @title Basic Qmatrix
 #' @param traits vector with trait states, order of states must be the same as
@@ -114,26 +144,10 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
         }
         concealnewQMatr <- integersmasterBlock + factorBlock
 
-        Q <- NULL
-        for (i in 1:ntraits) {
-            Qrow <- NULL
-            for (ii in 1:ntraits) {
-                entry <- masterBlock[i, ii]
-                if (is.na(entry)) {
-                    Qrow <- cbind(Qrow, masterBlock)
-                } else {
-                    entry <- concealnewQMatr[i, ii]
-
-                    outDiagBlock <- matrix(0,
-                                           ncol = ntraits,
-                                           nrow = ntraits,
-                                           byrow = TRUE)
-                    diag(outDiagBlock) <- entry
-                    Qrow <- cbind(Qrow, outDiagBlock)
-                }
-            }
-            Q <- rbind(Q, Qrow)
-        }
+        Q <- create_q_matrix(masterBlock,
+                             concealnewQMatr,
+                             ntraits,
+                             diff.conceal)
     } else {
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(masterBlock)))
@@ -145,27 +159,10 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
             concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
         }
 
-        Q <- NULL
-        for (i in 1:ntraits) {
-            Qrow <- NULL
-            for (ii in 1:ntraits) {
-                entry <- masterBlock[i, ii]
-                if (is.na(entry)) {
-                    Qrow <- cbind(Qrow, masterBlock)
-                } else {
-                    if (diff.conceal == TRUE) {
-                        entry <- concealnewQMatr[i, ii]
-                    }
-                    outDiagBlock <- matrix(0,
-                                           ncol = ntraits,
-                                           nrow = ntraits,
-                                           byrow = TRUE)
-                    diag(outDiagBlock) <- entry
-                    Qrow <- cbind(Qrow, outDiagBlock)
-                }
-            }
-            Q <- rbind(Q, Qrow)
-        }
+        Q <- create_q_matrix(masterBlock,
+                             concealnewQMatr,
+                             ntraits,
+                             diff.conceal)
     }
     return(Q)
 }

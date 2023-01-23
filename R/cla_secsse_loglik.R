@@ -197,25 +197,14 @@ cla_secsse_loglik <- function(parameter,
   ## At the root
   mergeBranch2 <- mergeBranch # nolint
   lmb <- length(mergeBranch2)
-  if (is.numeric(root_state_weight)) {
-    weight_states <- rep(root_state_weight / num_concealed_states, # nolint
-                        num_concealed_states)
-  } else {
-    if (root_state_weight == "maddison_weights") {
-      weight_states <- mergeBranch / sum(mergeBranch2)
-    }
-    if (root_state_weight == "proper_weights") {
-      numerator <- rep(NA, lmb)
-      for (j in 1:lmb) {
-        numerator[j] <- mergeBranch2[j] / sum(lambdas[[j]] *
-                                  ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
-      }
-      weight_states <- numerator / sum(numerator) # nolint
-    }
-    if (root_state_weight == "equal_weights") {
-      weight_states <- rep(1 / lmb, lmb) # nolint
-    }
-  }
+
+  weight_states <- get_weight_states(root_state_weight,
+                                     num_concealed_states,
+                                     mergeBranch,
+                                     lambdas,
+                                     nodeM,
+                                     d,
+                                     is_cla = TRUE)
 
   if (cond == "maddison_cond") {
     pre_cond <- rep(NA, lmb) # nolint

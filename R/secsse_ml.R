@@ -258,6 +258,7 @@ secsse_ml <- function(phy,
     return(out2)
 }
 
+#' @keywords internal
 transf_funcdefpar <- function(idparsfuncdefpar,
                               functions_defining_params,
                               idfactorsopt,
@@ -302,13 +303,137 @@ transf_funcdefpar <- function(idparsfuncdefpar,
     return(trparfuncdefpar)
 }
 
+#' @keywords internal
+update_values_transform_cla <- function(trpars,
+                              idparslist,
+                              idpars,
+                              parvals) {
+    for (i in seq_along(idpars)) {
+        for (j in seq_len(nrow(trpars[[3]]))) {
+            id <- which(idparslist[[1]][[j]] == idpars[i])
+            trpars[[1]][[j]][id] <- parvals[i]
+        }
+        for (j in 2:3) {
+            id <- which(idparslist[[j]] == idpars[i])
+            trpars[[j]][id] <- parvals[i]
+        }
+    }
+    return(trpars)
+}
+
+#' @keywords internal
+transform_params_cla <- function(idparslist,
+                               idparsfix,
+                               trparsfix,
+                               idparsopt,
+                               trparsopt,
+                               structure_func,
+                               idparsfuncdefpar,
+                               trparfuncdefpar) {
+    trpars1 <- idparslist
+    for (j in seq_len(nrow(trpars1[[3]]))) {
+        trpars1[[1]][[j]][, ] <- NA
+    }
+
+    for (j in 2:3) {
+        trpars1[[j]][] <- NA
+    }
+
+    if (length(idparsfix) != 0) {
+        trpars1 <- update_values_transform_cla(trpars1,
+                                     idparslist,
+                                     idparsfix,
+                                     trparsfix)
+    }
+
+    trpars1 <- update_values_transform_cla(trpars1,
+                                 idparslist,
+                                 idparsopt,
+                                 trparsopt)
+    ## structure_func part
+    if (!is.null(structure_func)) {
+        trpars1 <- update_values_transform_cla(trpars1,
+                                     idparslist,
+                                     idparsfuncdefpar,
+                                     trparfuncdefpar)
+    }
+
+    pre_pars1 <- list()
+    pars1 <- list()
+
+    for (j in seq_len(nrow(trpars1[[3]]))) {
+        pre_pars1[[j]] <- trpars1[[1]][[j]][, ] / (1 - trpars1[[1]][[j]][, ])
+    }
+
+    pars1[[1]] <- pre_pars1
+    for (j in 2:3) {
+        pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
+    }
+
+    return(pars1)
+}
+
+#' @keywords internal
+update_values_transform <- function(trpars,
+                                    idparslist,
+                                    idpars,
+                                    parvals) {
+    for (i in seq_along(idpars)) {
+        for (j in 1:3) {
+            id <- which(idparslist[[j]] == idpars[i])
+            trpars[[j]][id] <- parvals[i]
+        }
+    }
+    return(trpars)
+}
+
+#' @keywords internal
+transform_params_normal <- function(idparslist,
+                                    idparsfix,
+                                    trparsfix,
+                                    idparsopt,
+                                    trparsopt,
+                                    structure_func,
+                                    idparsfuncdefpar,
+                                    trparfuncdefpar) {
+    trpars1 <- idparslist
+    for (j in 1:3) {
+        trpars1[[j]][] <- NA
+    }
+    if (length(idparsfix) != 0) {
+        trpars1 <- update_values_transform(trpars1,
+                                           idparslist,
+                                           idparsfix,
+                                           trparsfix)
+    }
+    
+    trpars1 <- update_values_transform(trpars1,
+                                       idparslist,
+                                       idparsopt,
+                                       trparsopt)
+    
+    ## if structure_func part
+    if (is.null(structure_func) == FALSE) {
+        trpars1 <- update_values_transform(trpars1,
+                                           idparslist,
+                                           idparsfuncdefpar,
+                                           trparfuncdefpar)
+    }
+    pars1 <- list()
+    for (j in 1:3) {
+        pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
+    }
+    return(pars1)
+}
+
+#' @keywords internal
 secsse_transform_parameters <- function(trparsopt,
                                         trparsfix,
                                         idparsopt,
                                         idparsfix,
                                         idparslist,
                                         structure_func) {
-    if (is.null(structure_func) == FALSE) {
+    if (!is.null(structure_func)) {
         idparsfuncdefpar <- structure_func[[1]]
         functions_defining_params <- structure_func[[2]]
 
@@ -335,106 +460,24 @@ secsse_transform_parameters <- function(trparsopt,
 
     if (is.list(idparslist[[1]])) {
         # when the ml function is called from cla_secsse
-        trpars1 <- idparslist
-
-        for (j in seq_len(nrow(trpars1[[3]]))) {
-            trpars1[[1]][[j]][, ] <- NA
-        }
-
-        for (j in 2:3) {
-            trpars1[[j]][] <- NA
-        }
-
-        if (length(idparsfix) != 0) {
-
-            for (i in seq_along(idparsfix)) {
-
-                for (j in seq_len(nrow(trpars1[[3]]))) {
-                    id <- which(idparslist[[1]][[j]] == idparsfix[i])
-                    trpars1[[1]][[j]][id] <- trparsfix[i]
-                }
-                for (j in 2:3) {
-                    id <- which(idparslist[[j]] == idparsfix[i])
-                    trpars1[[j]][id] <- trparsfix[i]
-                }
-            }
-        }
-
-        for (i in seq_along(idparsopt)) {
-            for (j in seq_len(nrow(trpars1[[3]]))) {
-                id <- which(idparslist[[1]][[j]] == idparsopt[i])
-                trpars1[[1]][[j]][id] <- trparsopt[i]
-            }
-
-            for (j in 2:3) {
-                id <- which(idparslist[[j]] == idparsopt[i])
-                trpars1[[j]][id] <- trparsopt[i]
-            }
-        }
-
-        ## structure_func part
-        if (is.null(structure_func) == FALSE) {
-            for (i in seq_along(idparsfuncdefpar)) {
-                for (j in seq_len(nrow(trpars1[[3]]))) {
-                    id <- which(idparslist[[1]][[j]] == idparsfuncdefpar[i])
-                    trpars1[[1]][[j]][id] <- trparfuncdefpar[i]
-                }
-                for (j in 2:3) {
-                    id <- which(idparslist[[j]] == idparsfuncdefpar[i])
-                    trpars1[[j]][id] <- trparfuncdefpar[i]
-                }
-            }
-        }
-
-        pre_pars1 <- list()
-        pars1 <- list()
-
-        for (j in seq_len(nrow(trpars1[[3]]))) {
-            pre_pars1[[j]] <- trpars1[[1]][[j]][, ] /
-                              (1 - trpars1[[1]][[j]][, ])
-        }
-
-        pars1[[1]] <- pre_pars1
-        for (j in 2:3) {
-            pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
-        }
+        pars1 <- transform_params_cla(idparslist,
+                                      idparsfix,
+                                      trparsfix,
+                                      idparsopt,
+                                      trparsopt,
+                                      structure_func,
+                                      idparsfuncdefpar,
+                                      trparfuncdefpar)
     } else {
-        #### when non-cla option is called
-        trpars1 <- idparslist
-        for (j in 1:3) {
-            trpars1[[j]][] <- NA
-        }
-        if (length(idparsfix) != 0) {
-            for (i in seq_along(idparsfix)) {
-                for (j in 1:3) {
-                    id <- which(idparslist[[j]] == idparsfix[i])
-                    trpars1[[j]][id] <- trparsfix[i]
-
-                }
-            }
-        }
-        for (i in seq_along(idparsopt)) {
-            for (j in 1:3) {
-                id <- which(idparslist[[j]] == idparsopt[i])
-                trpars1[[j]][id] <- trparsopt[i]
-
-            }
-        }
-        ## if structure_func part
-        if (is.null(structure_func) == FALSE) {
-            for (i in seq_along(idparsfuncdefpar)) {
-
-                for (j in 1:3) {
-                    id <- which(idparslist[[j]] == idparsfuncdefpar[i])
-                    trpars1[[j]][id] <- trparfuncdefpar[i]
-
-                }
-            }
-        }
-        pars1 <- list()
-        for (j in 1:3) {
-            pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
-        }
+        # when non-cla option is called
+        pars1 <- transform_params_normal(idparslist,
+                                         idparsfix,
+                                         trparsfix,
+                                         idparsopt,
+                                         trparsopt,
+                                         structure_func,
+                                         idparsfuncdefpar,
+                                         trparfuncdefpar)
     }
     return(pars1)
 }
