@@ -41,4 +41,11 @@ void output_vec(const std::vector<double>& v);
 void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
                     std::vector< std::vector< std::vector<double >>>& v);
 
+double get_node_height(const int node,
+                       const std::vector<double>& node_heights);
+
+std::vector<double> make_node_heights(const Rcpp::NumericMatrix& node_heights_R);
+
+int get_time_index(double start_t, const std::vector<double>& crit_t);
+
 #endif /* util_h */

@@ -438,35 +438,6 @@ private:
   std::vector< double > time_;
 };
 
-template <typename ODE_TYPE>
-class ode_transition {
-public:
-  ode_transition(const ODE_TYPE& before,
-                 const ODE_TYPE& after,
-                 double crit_t) : 
-  ode1_(before), ode2_(after), critical_t(crit_t) 
-  {
-  }
-  
-  void operator()(const std::vector< double > &x ,
-                  std::vector< double > &dxdt,
-                  const double t /* t */ ) const {
-    
-    if (t < critical_t) {
-      return ode1_(x, dxdt, t);
-    } else {
-      return ode2_(x, dxdt, t);
-    }
-    
-    return;
-  }
-  
-private:
-  const ODE_TYPE ode1_;
-  const ODE_TYPE ode2_;
-  const double critical_t;
-};
-
 namespace odeintcpp {
 
 namespace bno = boost::numeric::odeint;

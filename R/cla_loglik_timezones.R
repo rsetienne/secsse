@@ -154,6 +154,11 @@ cla_secsse_loglik_timezones <- function(parameter,
   loglik <- 0
   d <- ncol(states) / 2
   
+  node_heights <- ape::branching.times(phy)
+  n <- length(phy$tip.label)
+  node_heights <- cbind((n + 1):(n + phy$Nnode), node_heights)
+  node_heights[, 1] <- node_heights[, 1] - 1 # cpp notation
+
   calcul <- c()
   if (num_threads == 1) {
     ancescpp <- ances - 1
@@ -164,6 +169,7 @@ cla_secsse_loglik_timezones <- function(parameter,
                                                       forTimecpp,
                                                       parameter,
                                                       critical_t,
+                                                      node_heights,
                                                       method,
                                                       atol,
                                                       rtol,

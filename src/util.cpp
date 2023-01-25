@@ -32,6 +32,41 @@ double get_dt(const std::vector< std::vector<double>>& phy_edge,
   return 0.0;
 }
 
+int get_time_index(double start_t, const std::vector<double>& crit_t) {
+  int i = 0;
+  for (; i < crit_t.size(); ++i) {
+    if (start_t < crit_t[i]){
+      break;
+    }
+  }
+  return i;
+}
+
+std::vector<double> make_node_heights(const Rcpp::NumericMatrix& node_heights_R) {
+  // first, we need to now the maximum node number:
+  int max = -1;
+  for (int i = 0; i < node_heights_R.nrow(); ++i) {
+    if (node_heights_R(i, 0) > max) max = node_heights_R(i, 0);
+  }
+  std::vector<double> node_heights(max + 1, 0.0); 
+  for (int i = 0; i < node_heights_R.nrow(); ++i) {
+    int index = node_heights_R(i, 0);
+    if (index < 0) {
+      throw("node heights index below zero");
+    } else {
+      node_heights[index] = node_heights_R(i, 1);
+    }
+  }
+  return node_heights;
+}
+
+double get_node_height(const int node,
+                       const std::vector<double>& node_heights) {
+  // this function is quite redundant, but perhaps at some point we want
+  // to use a map or so instead.
+  return node_heights[node];
+}
+
 void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
                    std::vector<int>& desNodes,

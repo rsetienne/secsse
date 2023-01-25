@@ -39,7 +39,6 @@ test_that("trying a short ML search: cla_secsse", {
       initparsopt,
       idparsfix,
       parsfix,
-      critical_t = NULL,
       cond,
       root_state_weight,
       sampling_fraction,

@@ -228,7 +228,7 @@ cla_secsse_timezones_ml <- function(phy,
                           trparsfix = trparsfix,
                           idparsfix = idparsfix,
                           idparslist = idparslist,
-                          crit_t = critical_t,
+                          critical_t = critical_t,
                           structure_func = structure_func,
                           phy = phy,
                           traits = traits,
@@ -440,6 +440,7 @@ secsse_transform_parameters_timezone <- function(trparsopt,
         pre_pars1[[j]] <- trpars1[[1]][[j]][, ]/(1 - trpars1[[1]][[j]][, ])
       }
       
+      pars1 <- list()
       pars1[[1]] <- pre_pars1
       for (j in 2:3) {
         pars1[[j]] <- trpars1[[j]]/(1 - trpars1[[j]])

@@ -135,23 +135,15 @@ cla_secsse_ml <- function(phy,
         stop("All elements in idparslist must be included in either idparsopt or idparsfix ")
     }
     
-    if (is.null(critical_t)) {
-        if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
-            cat("Note: you set some transitions as impossible to happen.", "\n")
-        }
-    } else {
-        for (j in 1:length(idparslist)) {
-            if (anyDuplicated(c(unique(sort(as.vector(idparslist[[j]][[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
-                cat("Note: you set some transitions as impossible to happen.", "\n")
-            } 
-        }
+    if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))), idparsfix[which(parsfix == 0)])) != 0) {
+        cat("Note: you set some transitions as impossible to happen.", "\n")
     }
-    
+
     if (is.matrix(idparslist[[1]])) {
         ## it is a tailor case otherwise
         idparslist[[1]] <- prepare_full_lambdas(traits, num_concealed_states, idparslist[[1]])
     }
-
+    
     see_ancestral_states <- FALSE
     
     # options(warn=-1)
@@ -162,17 +154,17 @@ cla_secsse_ml <- function(phy,
     trparsfix <- parsfix/(1 + parsfix)
     trparsfix[which(parsfix == Inf)] <- 1
     
-   
+    
     mus <- calc_mus(is_complete_tree,
                     idparslist,
                     idparsfix,
                     parsfix,
                     idparsopt,
                     initparsopt)
-   
+    
     
     optimpars <- c(tol, maxiter)
-
+    
     setting_calculation <- build_initStates_time(phy, 
                                                  traits,
                                                  num_concealed_states,

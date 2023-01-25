@@ -73,7 +73,6 @@ double calc_ll_cla(const Rcpp::List& ll,
       
       y = states[focal_node];
 
-      
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr), // ode class object

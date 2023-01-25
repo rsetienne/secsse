@@ -60,7 +60,7 @@ test_that("trying a short ML search: cla_secsse", {
   critical_t <- c(0.5)
   
   testthat::expect_output(
-    model_R_t <- cla_secsse_timezones_ml(
+    model_R_t <- secsse::cla_secsse_timezones_ml(
       phylotree,
       traits,
       num_concealed_states,

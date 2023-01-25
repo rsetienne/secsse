@@ -116,11 +116,15 @@ secsse_loglik_timezones <- function(parameter,
   
   d <- ncol(states) / 2
   
+  node_heights <- ape::branching.times(phy)
+  node_heights <- cbind(as.numeric(names(node_heights)), node_heights)
+  
   calcul <- calThruNodes_timezones_cpp(ances,
                                        states,
                                        forTime,
                                        parameter,
                                        critical_t,
+                                       node_heights,
                                        1,
                                        atol,
                                        rtol,
