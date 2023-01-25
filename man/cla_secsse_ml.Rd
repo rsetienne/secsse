@@ -86,9 +86,6 @@ Default is one thread.}
 "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
 "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
-
-\item{critical_t}{vector of time points at which a new parameter regime is
-used, if applicable.}
 }
 \value{
 Parameter estimated and maximum likelihood

@@ -151,6 +151,7 @@ double calc_ll_timezone_break(const Rcpp::List& params,
       std::vector< double > y = states[focal_node - 1];
     
       double start_t = get_node_height(focal_node, node_heights);
+      // timeInte[i] = end_t - start_t
       
       // now we need to integrate the branch.
       // First, we have to find the integrator at the start
@@ -170,41 +171,37 @@ double calc_ll_timezone_break(const Rcpp::List& params,
                              absolute_tol,
                              relative_tol); // t1
         
-      } else {
-        // we traverse a transition line, this means we have to break up
-        // the integration into two parts:
+      }  else {
+        // we traverse multiple timezones
+        std::vector< double > time_points;
+        std::vector< int > param_indicators;
+        for (int i = 0; i < crit_t.size(); ++i) {
+          if (crit_t[i] > start_t && crit_t[i] < end_t) {
+            time_points.push_back(crit_t[i]);
+            param_indicators.push_back(i);
+          }
+        }
+        time_points.push_back(end_t);
+        param_indicators.push_back(end_index);
         
         double t0 = start_t;
-        double t1 = crit_t[end_index - 1];
-        double t2 = end_t; 
-        // rescale these so both start at 0:
-        // 
-        double t1_1 = t1 - t0;
-        double t2_1 = t2 - t1;
-         
-        ode_standard od_start = make_ode_standard(params, start_index);
-        std::unique_ptr<ode_standard> od_ptr = std::make_unique<ode_standard>(od_start);
-        odeintcpp::integrate(method, 
-                             std::move(od_ptr), // ode class object
-                             y,// state vector
-                             0.0,         // t0
-                             t1_1, //t1
-                             t1_1 * 0.01,
-                             absolute_tol,
-                             relative_tol);
-        
-        // and now we integrate the other!
-        
-        ode_standard od_end = make_ode_standard(params, end_index);
-        std::unique_ptr<ode_standard> od_ptr2 = std::make_unique<ode_standard>(od_end);
-        odeintcpp::integrate(method, 
-                             std::move(od_ptr2), // ode class object
-                             y,// state vector
-                             0.0,         // t0
-                             t2_1, //t1
-                             t2_1 * 0.01,
-                             absolute_tol,
-                             relative_tol);
+        for (int i = 0; i < time_points.size(); ++i) {
+          
+          double t1 = time_points[i];
+          
+          ode_standard local_od = make_ode_standard(params, param_indicators[i]);
+          
+          std::unique_ptr<ode_standard> od_ptr = std::make_unique<ode_standard>(local_od);
+          odeintcpp::integrate(method,
+                               std::move(od_ptr), // ode class object
+                               y, // state vector
+                               0.0, // t0
+                               t1 - t0, //t1
+                               (t1 - t0) * 0.1,
+                               absolute_tol,
+                               relative_tol);
+          t0 = t1;
+        }
       }
 
       if (i == 0) nodeN = y;

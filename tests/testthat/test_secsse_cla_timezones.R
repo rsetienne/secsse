@@ -80,10 +80,10 @@ test_that("secsse gives the same result as GeoSSE", {
   param_compound[[2]] <- parameter
   
   secsse_cla_timezones_LL <- 
-    secsse::cla_secsse_loglik_timezones(param_compound,
+    cla_secsse_loglik_timezones(param_compound,
                                         phy,
                                         traits,
-                                        critical_t =  c(1.5),
+                                        critical_t =  c(0.4),
                                         num_concealed_states,
                                         cond = "maddison_cond",
                                         root_state_weight = "maddison_weights",

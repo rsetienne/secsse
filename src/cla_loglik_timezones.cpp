@@ -239,7 +239,7 @@ double calc_ll_cla_timezones_break(const Rcpp::List& params,
                                      timeInte[i] * 0.1,
                                      absolute_tol,
                                      relative_tol); // t1
-      } else {
+      } else if (end_index - start_index == 5) {
         // we traverse a transition line, this means we have to break up
         // the integration into two parts:
         
@@ -272,6 +272,37 @@ double calc_ll_cla_timezones_break(const Rcpp::List& params,
                              t2_1 * 0.1,
                              absolute_tol,
                              relative_tol); // t1
+      } else {
+        // we traverse one or more transition lines
+        std::vector< double > time_points;
+        std::vector< int > param_indicators;
+        for (int i = 0; i < crit_t.size(); ++i) {
+          if (crit_t[i] > start_t && crit_t[i] < end_t) {
+            time_points.push_back(crit_t[i]);
+            param_indicators.push_back(i);
+          }
+        }
+        time_points.push_back(end_t);
+        param_indicators.push_back(end_index);
+        
+        double t0 = start_t;
+        for (int i = 0; i < time_points.size(); ++i) {
+          
+          double t1 = time_points[i];
+          
+          ode_cla local_od = get_ode_cla(params, param_indicators[i]);
+
+          std::unique_ptr<ode_cla> od_ptr = std::make_unique<ode_cla>(local_od);
+          odeintcpp::integrate(method,
+                               std::move(od_ptr), // ode class object
+                               y, // state vector
+                               0.0, // t0
+                               t1 - t0, //t1
+                               (t1 - t0) * 0.1,
+                               absolute_tol,
+                               relative_tol);
+          t0 = t1;
+        }
       }
       
       if (i == 0) nodeN = y;
