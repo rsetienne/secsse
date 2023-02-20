@@ -5,25 +5,16 @@ get_rates <- function(speciesID,
                       mus,
                       lambdas,
                       qs) {
-  species_mus <- NULL
-  for (i in 1:length(speciesID)) {
-    species_mus <- c(species_mus,
-                     mus[which(states == speciesTraits[i])])
+  species_mus <- rep(NA, length(speciesID))
+  species_lambdas <- rep(NA, length(speciesID))
+  shiftprob <- rep(NA, length(speciesID))
+  for (i in seq_along(speciesID)) {
+    matches <- which(states == speciesTraits[i])
+    species_mus[i] <- mus[matches]
+    species_lambdas[i] <- sum(lambdas[[matches]])
+    shiftprob[i] <- sum(qs[matches, ], na.rm = TRUE)
   }
-  
-  species_lambdas <- NULL
-  for (i in 1:length(speciesID)) {
-    species_lambdas <- c(species_lambdas,
-                         sum(lambdas[[which(states == speciesTraits[i])]]))
-    
-  }
-  
-  shiftprob <- NULL
-  for (i in 1:length(speciesID)) {
-    shiftprob <- c(shiftprob,
-                   sum(qs[which(speciesTraits[i] == states), ], na.rm = T))
-  }
-  
+
   return(list(species_mus = species_mus,
               species_lambdas = species_lambdas,
               shiftprob = shiftprob))
@@ -69,7 +60,8 @@ event_speciation <- function(species_lambdas,
                           ncol = length(states),
                           nrow = length(states),
                           byrow = FALSE)
-  picked_speciation_cell <- which(matri_positio == picked_speciation, arr.ind = TRUE)
+  picked_speciation_cell <- which(matri_positio == picked_speciation,
+                                  arr.ind = TRUE)
   
   state_to_parent <- picked_speciation_cell[2] # parents are in colums
   state_to_parent <- states[state_to_parent]
@@ -80,7 +72,9 @@ event_speciation <- function(species_lambdas,
   
   newL = nrow(Ltable)
   newL = newL + 1
-  Ltable <- rbind(Ltable, matrix(c(timeStep, mother, sign(mother) * newL, -1), ncol = 4)) 
+  Ltable <- rbind(Ltable,
+                  matrix(c(timeStep, mother, sign(mother) * newL, -1),
+                         ncol = 4)) 
   speciesID <- c(speciesID, sign(mother) * newL)
   
   return(list(Ltable = Ltable,
@@ -130,15 +124,15 @@ secsse_sim <- function(timeSimul,
                        qs,
                        speciesTraits,
                        maxSpec) {
-  
+
   timeStep <- 0
-  Ltable <- matrix(c(0, 0, -1, -1,  
-                     0, -1, 2, -1), 
+  Ltable <- matrix(c(0, 0, -1, -1,
+                     0, -1, 2, -1),
                    ncol = 4,
                    nrow = 2,
                    byrow = TRUE)
   speciesID <- c(-1, 2)
-  
+
   while (length(speciesID != 0) && timeStep <= timeSimul) {
     rates <- get_rates(speciesID, states, speciesTraits, mus, lambdas, qs)
     species_mus <- rates$species_mus
@@ -147,17 +141,16 @@ secsse_sim <- function(timeSimul,
     totalRate <- sum(species_mus, species_lambdas, shiftprob)
     timeElapsed <- rexp(1, rate = totalRate)
     timeStep <- timeStep + timeElapsed
-    
-    #cat("the simulated time is:", timeStep, "\n")
+
     if (timeStep > timeSimul) {
       break 
     }
-    
+
     if (length(speciesID) > maxSpec) {
-      warning("Too many species")
+    #  warning("Too many species")
       break
     }
-    
+
     ##Events
     ## 1=trait shift
     ## 2=speciation
@@ -166,13 +159,12 @@ secsse_sim <- function(timeSimul,
                     prob = c(sum(shiftprob),
                              sum(species_lambdas),
                              sum(species_mus)))
-    
+
     if (length(speciesID) == 1 && event == 3) {
-      print("Clade Extinction")
+     # print("Clade Extinction")
       break
-      
     }
-    
+
     if (event == 1) {
       speciesTraits <- event_traitshift(shiftprob,
                                         speciesTraits,
@@ -180,7 +172,7 @@ secsse_sim <- function(timeSimul,
                                         speciesID,
                                         qs)
     }
-    
+
     if (event == 2) {
       eventSpec <- event_speciation(species_lambdas,
                                     states,
@@ -193,7 +185,7 @@ secsse_sim <- function(timeSimul,
       speciesTraits <- eventSpec$speciesTraits
       speciesID <- eventSpec$speciesID
     }
-    
+
     if (event == 3) {
       eventExt <- event_extinction(species_mus,
                                    speciesTraits,
@@ -202,23 +194,21 @@ secsse_sim <- function(timeSimul,
                                    speciesID,
                                    mus,
                                    timeStep)
-      
+
       speciesID <- eventExt$speciesID
       speciesTraits <- eventExt$speciesTraits
       Ltable <- eventExt$Ltable
     }
-    
   } 
   
   #correcting Ltable to use DDD::L2phylo
   new_Ltable <- Ltable
-  notmin1 = which(Ltable[,4] != -1)
-  Ltable[notmin1, 4] = timeSimul - c(Ltable[notmin1, 4])
-  #Ltable[which(Ltable[,4] == timeSimul + 1), 4] = -1
-  
+  notmin1 <- which(Ltable[,4] != -1)
+  Ltable[notmin1, 4] <- timeSimul - c(Ltable[notmin1, 4])
+
   time_change <- timeSimul - (Ltable[,1])
   new_Ltable <- cbind(time_change, Ltable[,2:4])
-  
+
   #getting only examined traits
   examTraits <- c()
   for (i in 1:length(speciesTraits)) {
@@ -226,20 +216,18 @@ secsse_sim <- function(timeSimul,
     local_num <- substr(focal_thing, 1, 1)
     examTraits[i] <- as.numeric(local_num)
   }
-  
+
   # building phylogeny and matching order of traits and tips
   resulting_phylogeny <- NA
-  #  if (!is.null(dim(new_Ltable))) {
-  #  resulting_phylogeny <- DDD::L2phylo(new_Ltable, dropextinct=T)
-  # examTraits<-secsse::sortingtraits(data.frame(cbind(paste0("t",abs(speciesID)),examTraits)),phy=resulting_phylogeny)
-  #}
   if (length(speciesID) != 1) {
-    resulting_phylogeny <- DDD::L2phylo(new_Ltable, dropextinct = TRUE)
-    examTraits <- secsse::sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)), 
-                                                         examTraits)),
-                                                         phy = resulting_phylogeny)
+    resulting_phylogeny <- DDD::L2phylo(as.matrix(new_Ltable),
+                                        dropextinct = TRUE)
+    examTraits <- secsse::sortingtraits(
+                            data.frame(cbind(paste0("t", abs(speciesID)), 
+                                             examTraits), row.names = NULL),
+                                             phy = resulting_phylogeny)
   }
-  
+
   return(list(phy = resulting_phylogeny,
               new_Ltable = new_Ltable,
               speciesID = speciesID,

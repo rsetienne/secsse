@@ -20,7 +20,7 @@ cla_secsse_sim <- function(states,
                            qs,
                            pool_init_states,
                            maxSpec,
-                           the_traits_to_sim){
+                           the_traits_to_sim) {
   if (length(lambdas) != length(mus) ||
       length(lambdas) != length(states) ||
       length(mus) != length(states) ) {
@@ -31,38 +31,40 @@ cla_secsse_sim <- function(states,
     stop("Incorrect number of transition rates")
   }
   
-  speciesTraits <- c(1, 2) # to initialize the while loop  
-  while (length(unique(speciesTraits)) != length(states)) {
+  speciesTraits <- NULL # to initialize the while loop  
+  while (length(unique(speciesTraits)) != length(states) ||
+         length(speciesID) > maxSpec) {
     initialState <- sample(pool_init_states, 1)
     speciesTraits <- c(initialState, initialState)
-    preTree <- secsse_sim(timeSimul,
-                          states,
-                          mus,
-                          lambdas,
-                          qs,
-                          speciesTraits,
-                          maxSpec)
-    Ltable <- preTree$Ltable
+    preTree <- secsse::secsse_sim(timeSimul = timeSimul,
+                                  states = states,
+                                  lambdas = lambdas,
+                                  mus = mus,
+                                  qs = qs,
+                                  speciesTraits = speciesTraits,
+                                  maxSpec = maxSpec)
+    Ltable <- preTree$new_Ltable
     speciesTraits <- preTree$speciesTraits
     speciesID <- preTree$speciesID
+ #   cat(length(unique(speciesTraits)), "\n")
   }
   
-  if (length(speciesID) < maxSpec &  
-      Ltable[1, 4] == 0 & 
-      Ltable[2, 4] == 0 ) {
-    age <- timeSimul
-    Ltable[which(Ltable[, 4] == 0), 4] <- -1
-    Ltable[,1] = age - c(Ltable[, 1])
-    notmin1 = which(Ltable[,4] != -1)
-    Ltable[notmin1,4] = age - c(Ltable[notmin1, 4])
-    Ltable[which(Ltable[,4] == age + 1), 4] = -1
-    phy <- DDD::L2phylo(Ltable, dropextinct = T)
+  if (length(speciesID) <= maxSpec &&  
+      Ltable[1, 4] == -1 &&
+      Ltable[2, 4] == -1 ) {
+    # age <- timeSimul
+    # Ltable[which(Ltable[, 4] == 0), 4] <- -1
+    # Ltable[, 1] <- age - c(Ltable[, 1])
+    # notmin1 <- which(Ltable[,4] != -1)
+    # Ltable[notmin1, 4] <- age - c(Ltable[notmin1, 4])
+    # Ltable[which(Ltable[,4] == age + 1), 4] <- -1
+    phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
     
     num_traits <- length(the_traits_to_sim)
     
-    for (ii in 1:num_traits) {
+    for (ii in seq_along(the_traits_to_sim)) {
       toConceal <- NULL
-      for (jj in 1:num_traits) {
+      for (jj in seq_along(the_traits_to_sim)) {
         toConceal <- c(toConceal,
                        which(speciesTraits == 
                                states[ii + (num_traits * (jj - 1))]))
@@ -72,8 +74,9 @@ cla_secsse_sim <- function(states,
     }
     
     speciesTraits <- as.numeric(speciesTraits)
-    traits <- sortingtraits(data.frame(cbind(paste0("t", speciesID), 
-                                             speciesTraits)), 
+    traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)), 
+                                             speciesTraits),
+                                       row.names = NULL), 
                             phy)
     return(list(phy = phy,
                 traits = traits,
