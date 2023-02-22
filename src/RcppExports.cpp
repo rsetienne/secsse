@@ -125,6 +125,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// secsse_sim_cpp
+Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species);
+RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type m_R(m_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type lambdas_R(lambdas_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type q_R(q_RSEXP);
+    Rcpp::traits::input_parameter< double >::type max_time(max_timeSEXP);
+    Rcpp::traits::input_parameter< double >::type max_species(max_speciesSEXP);
+    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_secsse_ct_condition_cla", (DL_FUNC) &_secsse_ct_condition_cla, 8},
@@ -133,6 +148,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 11},
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
     {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 9},
+    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 5},
     {NULL, NULL, 0}
 };
 

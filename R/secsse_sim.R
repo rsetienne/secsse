@@ -117,7 +117,7 @@ event_traitshift <- function(shiftprob,
 #' 2) ltable the associated Ltable, 3) speciesID a list of species
 #' labels and 4) speciesTraits a list of species' traits.
 #' @export
-secsse_sim <- function(timeSimul,
+secsse_sim_R <- function(timeSimul,
                        states,
                        lambdas,
                        mus,

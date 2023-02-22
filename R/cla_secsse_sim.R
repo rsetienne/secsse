@@ -1,4 +1,4 @@
-#' Function to simulate a tree under the cla secsse model
+#' Function to simulate a tree, conditional on observing all states.
 #' @param states states
 #' @param lambdas speciation rates
 #' @param mus extinction rates

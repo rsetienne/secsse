@@ -2,7 +2,7 @@
 % Please edit documentation in R/cla_secsse_sim.R
 \name{cla_secsse_sim}
 \alias{cla_secsse_sim}
-\title{Function to simulate a tree under the cla secsse model}
+\title{Function to simulate a tree, conditional on observing all states.}
 \usage{
 cla_secsse_sim(
   states,
@@ -40,5 +40,5 @@ traits: the traits and thirdly: initialState, delineating the
 initial state.
 }
 \description{
-Function to simulate a tree under the cla secsse model
+Function to simulate a tree, conditional on observing all states.
 }
