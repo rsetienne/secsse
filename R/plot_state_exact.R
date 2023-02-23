@@ -215,21 +215,21 @@ collect_node_bars <- function(to_plot,
   return(node_bars)
 }
 
+#' @importFrom rlang .data
 #' @keywords internal
 make_ggplot <- function(for_plot, node_bars) {
-  ggplot_plot <- ggplot2::ggplot(for_plot,
-                                 ggplot2::aes_string(x = "x0",
-                                                     y = "y",
-                                                     xend = "x1",
-                                                     yend = "y",
-                                                     col = "prob")) +
-    ggplot2::geom_segment() +
+  ggplot_plot <- ggplot2::ggplot(for_plot) +
+    ggplot2::geom_segment(ggplot2::aes(x = .data$x0,
+                              y = .data$y,
+                              xend = .data$x1,
+                              yend = .data$y,
+                              col = .data$prob)) +
     ggplot2::geom_segment(data = node_bars,
-                          ggplot2::aes_string(x = "x",
-                                              y = "y0",
-                                              yend = "y1",
-                                              xend = "x",
-                                              col = "prob")
+                          ggplot2::aes(x = .data$x,
+                                       y = .data$y0,
+                                       yend = .data$y1,
+                                       xend = .data$x,
+                                       col = .data$prob)
     ) +
     ggplot2::theme_classic() +
     ggplot2::xlab("") +
