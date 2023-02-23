@@ -4,6 +4,24 @@
 #include "secsse_sim.h"
 #include "util.h"
 
+
+num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
+  
+  num_mat_mat out(lambdas_R.size());
+  for (size_t m = 0; m < lambdas_R.size(); ++m) {
+    Rcpp::NumericMatrix entry_R = lambdas_R[m];
+    num_mat entry_cpp(entry_R.nrow(), std::vector<double>(entry_R.ncol(), 0.0));
+    for(size_t i = 0; i < entry_R.nrow(); ++i) {
+      for (size_t j = 0; j < entry_R.ncol(); ++j) {
+        entry_cpp[i][j] = entry_R(i, j);
+      }
+    }
+    out[m] = entry_cpp;
+  }
+  return out;
+}
+
+
 //' @export
 // [[Rcpp::export]]
 Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
@@ -12,23 +30,24 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           double max_time,
                           double max_species) {
   
+  //std::cerr << "loading data from R\n"; force_output();
   num_mat q; 
   numericmatrix_to_vector(q_R, q);
   
-  num_mat_mat lambdas;
-  list_to_vector(lambdas_R, lambdas);
+  num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
+  //list_to_vector(lambdas_R, lambdas);
   
+ // std::cerr << "preparing simulation object\n"; force_output();
   secsse_sim sim(m_R, 
                  lambdas,
                  q,
                  max_time,
                  max_species);
-  
+  //std::cerr << "starting simulation\n"; force_output();
   while (true) {
       sim.run(-1); // use random trait.
       // check num traits
       int obs_num_traits = sim.get_num_traits();
-      
       if (m_R.size() == obs_num_traits) {
         break;
       }
@@ -45,6 +64,4 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                                           Rcpp::Named("traits") = traits,
                                           Rcpp::Named("initial_state") = init);
   return output;
-  
-  
 }

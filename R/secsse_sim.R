@@ -133,7 +133,7 @@ secsse_sim_R <- function(timeSimul,
                    byrow = TRUE)
   speciesID <- c(-1, 2)
 
-  while (length(speciesID != 0) && timeStep <= timeSimul) {
+  while (length(speciesID) != 0 && timeStep <= timeSimul) {
     rates <- get_rates(speciesID, states, speciesTraits, mus, lambdas, qs)
     species_mus <- rates$species_mus
     species_lambdas <- rates$species_lambdas
