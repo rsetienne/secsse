@@ -27,16 +27,16 @@ secsse_sim <- function(lambdas,
   if (length(lambdas) != length(mus)) {
     stop("Every state must have a single rate of speciation and extinction")
   }
-
+  
   if (nrow(qs) != length(lambdas)) {
     stop("Incorrect number of transition rates")
   }
   diag(qs) <- 0
-
+  
   if (is.null(pool_init_states)) {
     pool_init_states <- -1 + (seq_along(mus))
   }
-
+  
   conditioning_vec <- c(-1)
   if (conditioning == "true_states") {
     conditioning_vec <- -1 + seq_along(mus)
@@ -49,38 +49,38 @@ secsse_sim <- function(lambdas,
     }
     conditioning_vec <- sort(unique(temp_vec))
   }
-
-  res <- secsse::secsse_sim_cpp(mus,
-                                lambdas,
-                                qs,
-                                crown_age,
-                                maxSpec,
-                                pool_init_states,
-                                conditioning_vec)
-
+  
+  res <- secsse_sim_cpp(mus,
+                        lambdas,
+                        qs,
+                        crown_age,
+                        maxSpec,
+                        pool_init_states,
+                        conditioning_vec)
+  
   Ltable <- res$ltable
   speciesTraits <- 1 + res$traits[seq(1, length(res$traits), by = 2)]
   speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
   initialState <- res$initial_state
-
+  
   Ltable[, 1] <- crown_age - Ltable[, 1]
-
+  
   if (length(speciesID) <= maxSpec &&
       Ltable[1, 4] == -1 &&
       Ltable[2, 4] == -1) {
-
+    
     phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
-
+    
     traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
-                                               speciesTraits),
-                                         row.names = NULL),
-                              phy)
+                                             speciesTraits),
+                                       row.names = NULL),
+                            phy)
     return(list(phy = phy,
                 traits = traits,
                 initialState = initialState))
-    } else {
-      warning("crown lineages died out")
-      return(list(phy = "ds",
-                  traits = 0))
-    }
+  } else {
+    warning("crown lineages died out")
+    return(list(phy = "ds",
+                traits = 0))
+  }
 }
