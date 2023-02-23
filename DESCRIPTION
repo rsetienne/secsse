@@ -36,7 +36,8 @@ Imports:
     Rcpp,
     RcppParallel,
     ggplot2,
-    tibble
+    tibble,
+    rlang
 Suggests: diversitree,
  phytools,
  testthat,
