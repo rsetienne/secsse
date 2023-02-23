@@ -474,6 +474,29 @@ struct secsse_sim {
     return cnt;
   }
   
+  bool check_num_traits(std::vector<double> traits) {
+    // check if all focal traits are there
+    if (traits.empty()) return true; // no conditioning
+    
+    for (size_t i = 0; i < pop.size(); ++i) {
+
+      auto trait = pop.get_trait(i);
+      for (size_t j = 0; j < traits.size(); ++j) {
+        if (traits[j] == trait) {
+          traits[j] = traits.back();
+          traits.pop_back();
+          break;
+        }
+      }
+      if (traits.empty()) {
+        break;
+      }
+    }
+    if (traits.empty()) return true;
+    
+    return false;
+  }
+  
   std::vector<int> get_traits() {
     std::vector<int> traits(pop.size() * 2);
     for (size_t i = 0; i < pop.size(); ++i) {

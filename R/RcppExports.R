@@ -26,7 +26,7 @@ calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads, me
 }
 
 #' @export
-secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, init_states) {
-    .Call(`_secsse_secsse_sim_cpp`, m_R, lambdas_R, q_R, max_time, max_species, init_states)
+secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, init_states, conditioning) {
+    .Call(`_secsse_secsse_sim_cpp`, m_R, lambdas_R, q_R, max_time, max_species, init_states, conditioning)
 }
 

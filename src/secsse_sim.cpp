@@ -29,28 +29,28 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::NumericMatrix& q_R,
                           double max_time,
                           double max_species,
-                          const std::vector<double>& init_states) {
+                          const std::vector<double>& init_states,
+                          std::vector<double> conditioning) {
   
   //std::cerr << "loading data from R\n"; force_output();
   num_mat q; 
   numericmatrix_to_vector(q_R, q);
   
   num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
-  //list_to_vector(lambdas_R, lambdas);
   
- // std::cerr << "preparing simulation object\n"; force_output();
+  if (conditioning[0] == -1) conditioning.clear(); // "none"
+  
+  
   secsse_sim sim(m_R, 
                  lambdas,
                  q,
                  max_time,
                  max_species,
                  init_states);
-  //std::cerr << "starting simulation\n"; force_output();
+
   while (true) {
       sim.run(); 
-      // check num traits
-      int obs_num_traits = sim.get_num_traits();
-      if (m_R.size() == obs_num_traits) {
+      if (sim.check_num_traits(conditioning)) {
         break;
       }
   }

@@ -110,6 +110,7 @@ test_that("the loglik for the complete tree", {
   # Parallel code doesn't work on CI 
   
   skip_on_cran()
+  skip_on_ci()
   loglik6 <- as.numeric(secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
