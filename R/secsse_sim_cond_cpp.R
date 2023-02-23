@@ -13,30 +13,31 @@
 #' traits: the traits and thirdly: initialState, delineating the
 #' initial state.
 #' @export
-secsse_sim_cond_cpp <- function(states,
-                            lambdas,
-                            mus,
-                            timeSimul,
-                            qs,
-                            pool_init_states = states,
-                            maxSpec) {
-  if (length(lambdas) != length(mus) ||
-      length(lambdas) != length(states) ||
-      length(mus) != length(states) ) {
+secsse_sim <- function(lambdas,
+                       mus,
+                       timeSimul,
+                       qs,
+                       pool_init_states = NULL,
+                       maxSpec) {
+  if (length(lambdas) != length(mus)) {
     stop("Every state must have a single rate of speciation and extinction")
   }
   
-  if (nrow(qs) != length(states)) {
+  if (nrow(qs) != length(lambdas)) {
     stop("Incorrect number of transition rates")
   }
   diag(qs) <- 0
   
+  if (is.null(pool_init_states)) {
+    pool_init_states <- -1 + (1:length(mus))
+  }
   
   res <- secsse::secsse_sim_cpp(mus,
                                 lambdas,
                                 qs,
                                 timeSimul,
-                                maxSpec)
+                                maxSpec,
+                                pool_init_states)
   
   Ltable <- res$ltable
   speciesTraits <- 1 + res$traits[seq(1, length(res$traits), by = 2)]

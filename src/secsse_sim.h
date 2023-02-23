@@ -12,6 +12,11 @@
 #include <array>
 #include <random>
 
+using num_mat = std::vector< std::vector<double >>;
+using num_mat_mat = std::vector<num_mat>;
+using vec_dist  = std::vector< std::discrete_distribution<> >;
+
+enum event_type {shift, speciation, extinction, max_num};
 
 struct ltab_species {
   ltab_species(double brts, int parent, int ID, double death){
@@ -63,12 +68,6 @@ struct lambda_dist {
   }
 };
 
-
-
-using num_mat = std::vector< std::vector<double >>;
-using num_mat_mat = std::vector<num_mat>;
-
-enum event_type {shift, speciation, extinction, max_num};
 struct species_info {
   species_info() {
     max_la = max_mu = max_qs = 0.0;
@@ -81,11 +80,6 @@ struct species_info {
     max_mu = *std::max_element(trait_mu.begin(), trait_mu.end());
     max_la = *std::max_element(trait_lambda.begin(), trait_lambda.end());
     max_qs = *std::max_element(trait_qs.begin(), trait_qs.end());
-    
-  //  for (const auto& i : trait_lambda) {
-  //    std::cerr << i << " ";
-  //  } std::cerr << "\n";
-    
   }
   
   
@@ -123,6 +117,10 @@ private:
 };
 
 struct species {
+private:
+  size_t trait_;
+
+public:
   int id_;
   double mu_;
   double lambda_;
@@ -145,9 +143,6 @@ struct species {
   size_t get_trait() {
     return trait_;
   }
-  
-private:
-  size_t trait_;
 };
 
 
@@ -208,9 +203,6 @@ struct population {
   }
 };
 
-using vec_dist  = std::vector< std::discrete_distribution<> >;
-
-
 struct secsse_sim {
   
   std::mt19937 rndgen_;
@@ -225,26 +217,24 @@ struct secsse_sim {
   species_info trait_info;
   
   std::vector< lambda_dist > lambda_distributions;
-  // num_mat lambdas_vectorized;
-  // vec_dist lambdas_vectorized_distributions;
   vec_dist qs_dist;
   
   // external data:
   const std::vector<double> mus;
-  //  const num_mat qs;
-  // const num_mat_mat lambdas;
   const size_t num_states;
   const double max_t;
   const size_t max_spec;
-  
-  
+  const std::vector<double> init_states;
+
   secsse_sim(const std::vector<double>& m,
              const num_mat_mat& l,
              const num_mat& q,
              double mt,
-             size_t max_s) : mus(m),
+             size_t max_s,
+             const std::vector<double>& init) : mus(m),
              num_states(m.size()), max_t(mt),
-             max_spec(max_s) {
+             max_spec(max_s),
+             init_states(init) {
     auto l_sums = update_lambdas(l);
     auto q_sums = update_qs_row_sums(q);
     trait_info = species_info(mus, l_sums, q_sums);
@@ -256,30 +246,22 @@ struct secsse_sim {
     extinct = false;
   }
   
-  void run(int initial_trait) {
+  void run() {
    
     t = 0.0;
+  
+    // randomly draw initial trait
+    std::uniform_int_distribution<size_t> d(0, init_states.size() - 1);
+    init_state = init_states[d(rndgen_)];
     
-    if (initial_trait < 0) {
-      // randomly draw initial trait
-      std::uniform_int_distribution<size_t> d(0, mus.size() - 1);
-      initial_trait = d(rndgen_);
-    }
-    
-    init_state = initial_trait;
     extinct = false;
     
     pop.clear();
     L.clear();
-    pop.add(species(initial_trait, -1, trait_info));
-    pop.add(species(initial_trait,  2, trait_info));
+    pop.add(species(init_state, -1, trait_info));
+    pop.add(species(init_state,  2, trait_info));
     L = ltable();
-    // initial rates:
-  //  std::cerr << initial_trait << "\n";
-//    for (const auto& i : pop.pop) {
-//      std::cerr << i.mu_ << " " << i.lambda_ << " " << i.shiftprob_ << " " << i.sum_rate_ << "\n";  
-//    }
-    
+ 
     while(!pop.empty() &&
           t < max_t) { // these conditions are never exceeded, see below:
 
@@ -295,6 +277,7 @@ struct secsse_sim {
   }
   
   void check_rates() {
+    // for debugging
     std::vector<double> check_rates(3);
     check_rates[shift] = std::accumulate(pop.pop.begin(), pop.pop.end(), 0.0,
                                          [](double x, const species& s){return x + s.shiftprob_;});
@@ -309,7 +292,6 @@ struct secsse_sim {
         exit(0);
       }
     }
-    
   }
   
   void apply_event(const event_type event) {
@@ -326,6 +308,7 @@ struct secsse_sim {
       event_extinction();
       break;
     }
+
     default: break;
     }
     return;
@@ -350,7 +333,6 @@ struct secsse_sim {
   }
   
   void event_speciation() {
-    /// this needs some checking with all the indices!
     size_t mother = 0;
     if (pop.size() > 1) {
       // sample one at randomly following lambdas
@@ -384,8 +366,7 @@ struct secsse_sim {
     //return lambdas_vectorized_distributions[index](rndgen_);
     return lambda_distributions[index].draw_from_dist(rndgen_);
   }
-  
-  
+
   void event_traitshift() {
     size_t index_chosen_species = 0;
     if (pop.size() > 1) {
@@ -408,7 +389,6 @@ struct secsse_sim {
     
     // ordering of rates is:
     // {shift, speciation, extinction, max_num};
-    
     if (r < pop.rates[shift]) return shift;
     if (r < pop.rates[shift] + pop.rates[speciation]) return speciation;
     
@@ -426,7 +406,7 @@ struct secsse_sim {
   std::vector<double> update_lambdas(const num_mat_mat& lambdas) {
     std::vector<double> lambda_sums(lambdas.size(), 0.0);
     
-    lambda_distributions.clear(); //reserve(lambdas.size());
+    lambda_distributions.clear();
     std::vector<size_t> indices;
     std::vector<double> probs;
     
@@ -462,8 +442,6 @@ struct secsse_sim {
   }
   
   size_t sample_from_pop(double (*getvalfrom_species)(const species&), double max) {
-    // first we get the max
-    
     std::uniform_int_distribution<> d(0, static_cast<int>(pop.size()) - 1);
     std::uniform_real_distribution<double> r(0.0, 1.0);
     int index;

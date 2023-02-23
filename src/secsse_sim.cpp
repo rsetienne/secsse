@@ -28,7 +28,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::List& lambdas_R,
                           const Rcpp::NumericMatrix& q_R,
                           double max_time,
-                          double max_species) {
+                          double max_species,
+                          const std::vector<double>& init_states) {
   
   //std::cerr << "loading data from R\n"; force_output();
   num_mat q; 
@@ -42,10 +43,11 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  lambdas,
                  q,
                  max_time,
-                 max_species);
+                 max_species,
+                 init_states);
   //std::cerr << "starting simulation\n"; force_output();
   while (true) {
-      sim.run(-1); // use random trait.
+      sim.run(); 
       // check num traits
       int obs_num_traits = sim.get_num_traits();
       if (m_R.size() == obs_num_traits) {
