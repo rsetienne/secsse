@@ -33,12 +33,12 @@ tree is not conditioned on this number, but that this is a safeguard against
 generating extremely large trees).}
 
 \item{conditioning}{can be 'obs_states', 'true_states' or 'none', the tree is
-simulated until one is generated that contains all observed states, all 
+simulated until one is generated that contains all observed states, all
 true states (e.g. obs x hidden states), or is always returned.}
 }
 \value{
 a list with three properties: phy: reconstructed phylogeny,
-traits: the traits in order of tip label and thirdly: 
+traits: the traits in order of tip label and thirdly:
 initialState, delineating the initial state at the root used.
 }
 \description{

@@ -21,8 +21,6 @@ num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   return out;
 }
 
-
-//' @export
 // [[Rcpp::export]]
 Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::List& lambdas_R,
