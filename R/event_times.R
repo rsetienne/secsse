@@ -1,9 +1,9 @@
 #' Times at which speciation or extinction occurs
 #' @title Event times of a (possibly non-ultrametric) phylogenetic tree
-#' @param phy phylogenetic tree of class phylo, without polytomies, rooted and 
+#' @param phy phylogenetic tree of class phylo, without polytomies, rooted and
 #' with branch lengths. Need not be ultrametric.
 #' @return times at which speciation or extinction happens.
-#' @note This script has been modified from BAMMtools' internal function 
+#' @note This script has been modified from BAMMtools' internal function
 #' NU.branching.times
 #' @export
 event_times <- function(phy) {
@@ -16,16 +16,16 @@ event_times <- function(phy) {
         phy$begin <- rep(0, nrow(phy$edge))
         phy$end <- rep(0, nrow(phy$edge))
         fx <- function(phy, node) {
-            cur.time <- 0
+            cur_time <- 0
             root <- length(phy$tip.label) + 1
             if (node > root) {
-                cur.time <- phy$end[which(phy$edge[, 2] == node)]
+                cur_time <- phy$end[which(phy$edge[, 2] == node)]
             }
             dset <- phy$edge[, 2][phy$edge[, 1] == node]
             i1 <- which(phy$edge[, 2] == dset[1])
             i2 <- which(phy$edge[, 2] == dset[2])
-            phy$end[i1] <- cur.time + phy$edge.length[i1]
-            phy$end[i2] <- cur.time + phy$edge.length[i2]
+            phy$end[i1] <- cur_time + phy$edge.length[i1]
+            phy$end[i2] <- cur_time + phy$edge.length[i2]
             if (dset[1] > length(phy$tip.label)) {
                 phy$begin[phy$edge[, 1] == dset[1]] <- phy$end[i1]
                 phy <- fx(phy, node = dset[1])

@@ -41,4 +41,34 @@ void output_vec(const std::vector<double>& v);
 void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
                     std::vector< std::vector< std::vector<double >>>& v);
 
+
+struct data_storage {
+  std::vector<double> t;
+  std::vector<std::vector<double>> probs;
+  
+  void add_entry(double time, std::vector<double> prob) {
+    t.push_back(time);
+    probs.push_back(prob);
+  }
+};
+
+struct entry {
+  int ances;
+  int focal_node;
+  data_storage probabilities;
+  
+  entry(int a, int fn, const data_storage& probs) : 
+    ances(a), focal_node(fn), probabilities(probs)
+  {};
+};
+
+struct storage {
+  std::vector< entry > data_;
+  
+  void add_entry(int a, int fn, const data_storage& p) {
+    data_.push_back(entry(a, fn, p));
+  }
+};
+
+
 #endif /* util_h */

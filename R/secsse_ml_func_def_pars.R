@@ -1,33 +1,53 @@
-#' Maximum likehood estimation under Several examined and concealed States-dependent Speciation and Extinction (SecSSE) where some paramaters are functions of other parameters and/or factors.
-#' @title Maximum likehood estimation for (SecSSE) with parameter as complex functions.
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with branch lengths.
+#' Maximum likehood estimation under Several examined and concealed
+#' States-dependent Speciation and Extinction (SecSSE) where some paramaters
+#' are functions of other parameters and/or factors.
+#' @title Maximum likehood estimation for (SecSSE) with parameter as complex
+#' functions.
+#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
+#' branch lengths.
 #' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent to the number of examined states in the dataset.
+#' @param num_concealed_states number of concealed states, generally equivalent
+#' to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
 #' @param idparsopt id of parameters to be estimated.
 #' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idfactorsopt id of the factors that will be optimized. There are not fixed factors, so use a constant within 'functions_defining_params'.
-#' @param initfactors the initial guess for a factor (it should be set to NULL when no factors).
-#' @param idparsfix id of the fixed parameters (it should be set to NULL when there are no factors).
+#' @param idfactorsopt id of the factors that will be optimized. There are not
+#' fixed factors, so use a constant within 'functions_defining_params'.
+#' @param initfactors the initial guess for a factor (it should be set to NULL
+#' when no factors).
+#' @param idparsfix id of the fixed parameters (it should be set to NULL when
+#' there are no factors).
 #' @param parsfix value of the fixed parameters.
-#' @param idparsfuncdefpar id of the parameters which will be a function of optimized and/or fixed parameters. The order of id should match functions_defining_params
-#' @param functions_defining_params a list of functions. Each element will be a function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example and vigenette
-#' @param cond condition on the existence of a node root: "maddison_cond","proper_cond"(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per trait state. It must have as many elements as there are trait states.
+#' @param idparsfuncdefpar id of the parameters which will be a function of
+#' optimized and/or fixed parameters. The order of id should match
+#' functions_defining_params
+#' @param functions_defining_params a list of functions. Each element will be a
+#' function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example
+#' and vigenette
+#' @param cond condition on the existence of a node root:
+#' "maddison_cond","proper_cond"(default). For details, see vignette.
+#' @param root_state_weight the method to weigh the states:
+#' "maddison_weights","proper_weights"(default) or "equal_weights". It can also
+#' be specified the root state:the vector c(1, 0, 0) indicates state
+#' 1 was the root state.
+#' @param sampling_fraction vector that states the sampling proportion per trait
+#' state. It must have as many elements as there are trait states.
 #' @param tol maximum tolerance. Default is "c(1e-04, 1e-05, 1e-05)".
-#' @param maxiter max number of iterations. Default is "1000 *round((1.25)^length(idparsopt))".
+#' @param maxiter max number of iterations. Default is
+#' "1000 *round((1.25)^length(idparsopt))".
 #' @param optimmethod method used for optimization. Default is "simplex".
 #' @param num_cycles number of cycles of the optimization (default is 1).
-#' @param loglik_penalty the size of the penalty for all parameters; default is 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species is provided
-#' @param num_threads number of threads. Set to -1 to use all available threads. 
+#' @param loglik_penalty the size of the penalty for all parameters;
+#' default is 0 (no penalty)
+#' @param is_complete_tree whether or not a tree with all its extinct species
+#' is provided
+#' @param num_threads number of threads. Set to -1 to use all available threads.
 #' Default is one thread.
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
-#' @param method integration method used, available are: 
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' @param method integration method used, available are:
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @return Parameter estimated and maximum likelihood
 #' @return Parameter estimated and maximum likelihood
@@ -61,15 +81,15 @@
 #'initfactors <- 4
 #'# functions_defining_params is a list of functions. Each function has no
 #'# arguments and to refer
-#'# to parameters ids should be indicated as "par_" i.e. par_3 refers to 
-#'# parameter 3. When a function is defined, be sure that all the parameters 
+#'# to parameters ids should be indicated as "par_" i.e. par_3 refers to
+#'# parameter 3. When a function is defined, be sure that all the parameters
 #'# involved are either estimated, fixed or
 #'# defined by previous functions (i.e, a function that defines parameter in
-#'# 'functions_defining_params'). The user is responsible for this. In this 
-#'# exampl3, par_3 (i.e., parameter 3) is needed to calculate par_6. This is 
+#'# 'functions_defining_params'). The user is responsible for this. In this
+#'# exampl3, par_3 (i.e., parameter 3) is needed to calculate par_6. This is
 #'# correct because par_3 is defined in
 #'# the first function of 'functions_defining_params'. Notice that factor_1
-#'# indicates a value that will be estimated to satisfy the equation. The same 
+#'# indicates a value that will be estimated to satisfy the equation. The same
 #'# factor can be shared to define several parameters.
 #'functions_defining_params <- list()
 #'functions_defining_params[[1]] <- function(){
@@ -127,17 +147,17 @@ secsse_ml_func_def_pars <- function(phy,
                                     root_state_weight = "proper_weights",
                                     sampling_fraction,
                                     tol = c(1E-4, 1E-5, 1E-7),
-                                    maxiter = 1000 * round((1.25) ^ length(idparsopt)),
-                                    optimmethod = 'simplex',
+                                    maxiter = 1000 *
+                                        round((1.25) ^ length(idparsopt)),
+                                    optimmethod = "simplex",
                                     num_cycles = 1,
                                     loglik_penalty = 0,
                                     is_complete_tree = FALSE,
                                     num_threads = 1,
                                     atol = 1e-12,
                                     rtol = 1e-12,
-                                    method = "odeint::bulirsch_stoer")
-{
-    
+                                    method = "odeint::bulirsch_stoer") {
+
     structure_func <- list()
     structure_func[[1]] <- idparsfuncdefpar
     structure_func[[2]] <- functions_defining_params
@@ -153,73 +173,88 @@ secsse_ml_func_def_pars <- function(phy,
             stop("idfactorsopt should have the same length as initfactors.")
         }
     }
-    
+
     if (is.list(functions_defining_params) == FALSE) {
         stop(
-            "The argument functions_defining_params should be a list of functions. See example and vignette"
+            "The argument functions_defining_params should be a list of 
+            functions. See example and vignette"
         )
     }
-    
+
     if (length(functions_defining_params) != length(idparsfuncdefpar)) {
         stop(
-            "The argument functions_defining_params should have the same length than idparsfuncdefpar"
+            "The argument functions_defining_params should have the same 
+            length than idparsfuncdefpar"
         )
     }
-    
+
     if (is.matrix(traits)) {
-        cat("You are setting a model where some species had more than one trait state \n")
+        cat("You are setting a model where some species had more than 
+            one trait state \n")
     }
-    
+
     if (length(initparsopt) != length(idparsopt)) {
         stop(
-            "initparsopt must be the same length as idparsopt. Number of parameters to optimize does not match the number of initial values for the search"
+            "initparsopt must be the same length as idparsopt. 
+            Number of parameters to optimize does not match the number of 
+            initial values for the search"
         )
     }
-    
+
     if (length(idparsfix) != length(parsfix)) {
         stop(
-            "idparsfix and parsfix must be the same length. Number of fixed elements does not match the fixed figures"
+            "idparsfix and parsfix must be the same length. 
+            Number of fixed elements does not match the fixed figures"
         )
     }
-    
+
     if (anyDuplicated(c(idparsopt, idparsfix, idparsfuncdefpar)) != 0) {
-        stop("At least one element was asked to be fixed, estimated or a function at the same time")
+        stop("At least one element was asked to be fixed, 
+             estimated or a function at the same time")
     }
-    
+
     if (identical(as.numeric(sort(
         c(idparsopt, idparsfix, idparsfuncdefpar)
     )), as.numeric(sort(unique(
         unlist(idparslist)
     )))) == FALSE) {
         stop(
-            "All elements in idparslist must be included in either idparsopt or idparsfix or idparsfuncdefpar "
+            "All elements in idparslist must be included in either 
+            idparsopt or idparsfix or idparsfuncdefpar "
         )
     }
-    
+
     if (anyDuplicated(c(unique(sort(
         as.vector(idparslist[[3]])
     )), idparsfix[which(parsfix == 0)])) != 0) {
         cat("You set some transitions as impossible to happen", "\n")
     }
-    
+
     cat("Calculating the likelihood for the initial parameters.", "\n")
     utils::flush.console()
-    
+
     initparsopt2 <- c(initparsopt, initfactors)
-    
+
     trparsopt <- initparsopt2 / (1 + initparsopt2)
     trparsopt[which(initparsopt2 == Inf)] <- 1
     trparsfix <- parsfix / (1 + parsfix)
     trparsfix[which(parsfix == Inf)] <- 1
-    
-    mus <- calc_mus(is_complete_tree, idparslist, idparsfix, parsfix, idparsopt, initparsopt)
-    
+
+    mus <- calc_mus(is_complete_tree, idparslist, idparsfix,
+                    parsfix, idparsopt, initparsopt)
+
     optimpars <- c(tol, maxiter)
-    
+
     setting_calculation <-
-            build_initStates_time(phy, traits, num_concealed_states, sampling_fraction, is_complete_tree, mus)
-    
-    if (optimmethod == 'subplex') {verbose <- TRUE} else {verbose <- FALSE}
+            build_initStates_time(phy, traits, num_concealed_states,
+                                  sampling_fraction, is_complete_tree, mus)
+
+    if (optimmethod == "subplex") {
+      verbose <- TRUE
+    } else {
+      verbose <- FALSE
+    }
+
     initloglik <-
         secsse_loglik_choosepar(
             trparsopt = trparsopt,
@@ -249,11 +284,10 @@ secsse_ml_func_def_pars <- function(phy,
     cat("The loglikelihood for the initial parameter values is",
         initloglik,
         "\n")
-    if (initloglik == -Inf)
-    {
-        stop(
-            "The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values."
-        )
+    if (initloglik == -Inf) {
+      stop("The initial parameter values have a likelihood that is equal to 0 
+           or below machine precision. Try again with different initial values."
+      )
     } else {
         cat("Optimizing the likelihood - this may take a while.", "\n")
         utils::flush.console()
@@ -285,11 +319,11 @@ secsse_ml_func_def_pars <- function(phy,
                 rtol = rtol,
                 method = method
             )
-        if (out$conv != 0)
-        {
-            stop("Optimization has not converged. Try again with different initial values.\n")
+        if (out$conv != 0) {
+            stop("Optimization has not converged.
+                 Try again with different initial values.\n")
         } else {
-            MLpars1 <-
+            ml_pars1 <-
                 secsse_transform_parameters(
                     as.numeric(unlist(out$par)),
                     trparsfix,
@@ -299,7 +333,8 @@ secsse_ml_func_def_pars <- function(phy,
                     structure_func
                 )
             out2 <-
-                list(MLpars = MLpars1, ML = as.numeric(unlist(out$fvalues)),conv = out$conv)
+                list(MLpars = ml_pars1,
+                     ML = as.numeric(unlist(out$fvalues)), conv = out$conv)
         }
     }
     return(out2)

@@ -101,7 +101,6 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
   
   std::vector< std::vector< double >> states, forTime;
  // Rcpp::Rcout << "states to matrix " << states_R.nrow() << " " << states_R.ncol() << "\n"; 
-  force_output();
   
   numericmatrix_to_vector(states_R, states);
  // Rcpp::Rcout << "forTime_R to matrix\n"; force_output();
