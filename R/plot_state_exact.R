@@ -36,7 +36,10 @@
 #' of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
 #' prob_func will be applied to each row of the 'states' matrix (you can thus
 #' test your function on the states matrix returned when
-#' 'see_ancestral_states = TRUE'). A typical probfunc function will look like:
+#' 'see_ancestral_states = TRUE'). Please note that the first N columns of the
+#' states matrix are the extinction rates, and the (N+1):2N columns belong to
+#' the speciation rates, where N = num_obs_states * num_concealed_states. 
+#'  A typical probfunc function will look like:
 #' my_prob_func <- function(x) {
 #'  return(sum(x[5:8]) / sum(x))
 #' }
