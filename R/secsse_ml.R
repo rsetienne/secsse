@@ -406,12 +406,12 @@ transform_params_normal <- function(idparslist,
                                            idparsfix,
                                            trparsfix)
     }
-    
+
     trpars1 <- update_values_transform(trpars1,
                                        idparslist,
                                        idparsopt,
                                        trparsopt)
-    
+
     ## if structure_func part
     if (is.null(structure_func) == FALSE) {
         trpars1 <- update_values_transform(trpars1,

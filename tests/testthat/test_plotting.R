@@ -1,7 +1,7 @@
 context("visualisation")
 
 test_that("normal plotting", {
-  
+
    set.seed(5)
    focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
    traits <- c(0, 1, 1, 0)
@@ -57,7 +57,7 @@ test_that("cla plotting", {
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
-  
+
   testthat::expect_output(
     model_R <- cla_secsse_ml(
       phylotree,
@@ -77,11 +77,11 @@ test_that("cla plotting", {
       num_cycles = 1,
       verbose = FALSE)
   )
-  
+
   helper_function <- function(x) {
     return(sum(x[c(10, 13, 16)]) / sum(x))
   }
-  
+
   testthat::expect_silent(
     px <- secsse::plot_state_exact_cla(parameters = model_R$MLpars,
                                        focal_tree = phylotree,
@@ -93,6 +93,6 @@ test_that("cla plotting", {
                                        root_state_weight = root_state_weight,
                                        prob_func = helper_function)
   )
-  
+
   testthat::expect_true(inherits(px, "ggplot"))
 })
