@@ -51,24 +51,33 @@ secsse_sim <- function(lambdas,
   }
   
   res <- secsse_sim_cpp(mus,
-                        lambdas,
-                        qs,
-                        crown_age,
-                        maxSpec,
-                        pool_init_states,
-                        conditioning_vec)
+                                lambdas,
+                                qs,
+                                crown_age,
+                                maxSpec,
+                                pool_init_states,
+                                conditioning_vec)
   
-  Ltable <- res$ltable
-  speciesTraits <- 1 + res$traits[seq(1, length(res$traits), by = 2)]
-  speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
-  initialState <- res$initial_state
+  if (length(res$traits) < 1) {
+    warning("crown lineages died out")
+    return(list(phy = "ds",
+                traits = 0))
+  }
   
-  Ltable[, 1] <- crown_age - Ltable[, 1]
-  
-  if (length(speciesID) <= maxSpec &&
+  Ltable        <- res$ltable
+
+  num_alive_species <- length(which(Ltable[, 4] == -1))
+
+  if (num_alive_species <= maxSpec &&
       Ltable[1, 4] == -1 &&
       Ltable[2, 4] == -1) {
-    
+
+    speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
+    initialState  <- res$initial_state
+    Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0, not at crown age
+
+    indices       <- seq(1, length(res$traits), by = 2)
+    speciesTraits <- 1 + res$traits[indices]
     phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
     
     traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
@@ -81,6 +90,6 @@ secsse_sim <- function(lambdas,
   } else {
     warning("crown lineages died out")
     return(list(phy = "ds",
-                traits = 0))
+                traits = 1))
   }
 }

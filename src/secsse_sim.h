@@ -19,24 +19,33 @@ using vec_dist  = std::vector< std::discrete_distribution<> >;
 enum event_type {shift, speciation, extinction, max_num};
 
 struct ltab_species {
+
+  enum info_index {time, p_id, self_id, extinct_time};
+
   ltab_species(double brts, int parent, int ID, double death){
-    data_[0] = brts;
-    data_[1] = static_cast<double>(parent);
-    data_[2] = static_cast<double>(ID);
-    data_[3] = death;
+    data_[time] = brts;
+    data_[p_id] = static_cast<double>(parent);
+    data_[self_id] = static_cast<double>(ID);
+    data_[extinct_time] = death;
   }
   
-  double get_id() {
-    return(data_[2]);
+  double get_id() const {
+    return(data_[self_id]);
   }
-  double get_parent() {
-    return(data_[1]);
+  double get_parent() const  {
+    return(data_[p_id]);
   }
   void set_death(double d) {
-    data_[3] = d;
+    data_[extinct_time] = d;
   }
-  
-  
+
+  ltab_species() {
+    data_[time] = -1e6;
+    data_[p_id] = -1e6;
+    data_[self_id] = -1e6;
+    data_[extinct_time] = -1e6;
+  }
+
   std::array<double, 4> data_;
 };
 
@@ -44,8 +53,8 @@ struct ltable {
   std::vector< ltab_species > data_;
   
   ltable() {
-    data_.emplace_back(ltab_species(0.0, 0, -1, -1));
-    data_.emplace_back(ltab_species(0.0, -1, 2, -1));
+    data_.emplace_back(ltab_species(0.0,  0, -1, -1));
+    data_.emplace_back(ltab_species(0.0, -1,  2, -1));
   }
   
   void clear() {
@@ -95,15 +104,15 @@ struct species_info {
     return trait_qs[trait];
   }
   
-  double max_ext() {
+  double max_ext()const  {
     return max_mu;
   }
   
-  double max_spec() {
+  double max_spec() const {
     return max_la;
   }
   
-  double max_shift() {
+  double max_shift() const {
     return max_qs;
   }
   
@@ -140,7 +149,7 @@ public:
     sum_rate_ = mu_ + lambda_ + shiftprob_;
   }
   
-  size_t get_trait() {
+  size_t get_trait() const {
     return trait_;
   }
 };
@@ -155,14 +164,14 @@ struct population {
   }
   
   void add(const species& s) {
-    pop.emplace_back(s);
-    rates[shift] += s.shiftprob_;
+    rates[shift]      += s.shiftprob_;
     rates[extinction] += s.mu_;
     rates[speciation] += s.lambda_;
+    pop.push_back(s);
   }
   
   void remove(size_t index) {
-    rates[shift] -= pop[index].shiftprob_;
+    rates[shift]      -= pop[index].shiftprob_;
     rates[extinction] -= pop[index].mu_;
     rates[speciation] -= pop[index].lambda_;
     
@@ -171,29 +180,29 @@ struct population {
   }
   
   void change_trait(size_t index, size_t new_trait, const species_info& info) {
-    auto old_mu = pop[index].mu_;
-    auto old_la = pop[index].lambda_;
+    auto old_mu    = pop[index].mu_;
+    auto old_la    = pop[index].lambda_;
     auto old_shift = pop[index].shiftprob_;
     pop[index].change_trait(new_trait, info);
     
-    rates[shift] += pop[index].shiftprob_ - old_shift;
+    rates[shift]      += pop[index].shiftprob_ - old_shift;
     rates[extinction] += pop[index].mu_ - old_mu;
     rates[speciation] += pop[index].lambda_ - old_la;
   }
   
-  bool empty() {
+  bool empty() const {
     return pop.empty();
   }
   
-  size_t size() {
+  size_t size() const {
     return pop.size();
   }
   
-  size_t get_trait(size_t index) {
+  size_t get_trait(size_t index) const {
     return pop[index].get_trait();
   }
   
-  int get_id(size_t index) {
+  int get_id(size_t index) const {
     return pop[index].id_;
   }
   
@@ -262,17 +271,18 @@ struct secsse_sim {
     pop.add(species(init_state,  2, trait_info));
     L = ltable();
  
-    while(!pop.empty() &&
-          t < max_t) { // these conditions are never exceeded, see below:
+    while(pop.size() > 1 && t < max_t) {
 
       double dt = draw_dt();
-      if (t + dt > max_t) break;
       t += dt;
       
-      event_type event = draw_event();
-      apply_event(event);
-      
+      if (t > max_t) break;
       if (pop.size() > max_spec) break;
+      
+      event_type event = draw_event();
+      
+
+      apply_event(event);
     }
   }
   
@@ -288,7 +298,7 @@ struct secsse_sim {
     
     for (int i = shift; i != max_num; ++i) {
       if (std::abs(check_rates[i] - pop.rates[i]) > 1e-3) {
-        std::cout << t << " " << i << " " << pop.rates[i] << " " << check_rates[i] << "\n";
+        std::cerr << t << " " << i << " " << pop.rates[i] << " " << check_rates[i] << "\n";
         exit(0);
       }
     }
@@ -296,20 +306,20 @@ struct secsse_sim {
   
   void apply_event(const event_type event) {
     switch(event) {
-    case shift: {
-      event_traitshift();
-      break;
-    }
-    case speciation: {
-      event_speciation();
-      break;
-    }
-    case extinction: {
-      event_extinction();
-      break;
-    }
+      case shift: {
+        event_traitshift();
+        break;
+      }
+      case speciation: {
+        event_speciation();
+        break;
+      }
+      case extinction: {
+        event_extinction();
+        break;
+      }
 
-    default: break;
+      default: break;
     }
     return;
   }
@@ -323,7 +333,7 @@ struct secsse_sim {
     }
     auto dying_id = pop.get_id(dying);
     for (auto& i : L.data_) {
-      if (i.get_id() == dying_id) {
+      if (std::abs(i.get_id()) == std::abs(dying_id)) {
         i.set_death(t);
         break;
       }
@@ -383,16 +393,20 @@ struct secsse_sim {
   }
   
   event_type draw_event() {
-    double total_rate = pop.rates[shift] + pop.rates[extinction] + pop.rates[speciation];
-    std::uniform_real_distribution<double> unif_dist(0.0, total_rate);
-    double r = unif_dist(rndgen_);
+    //double total_rate = pop.rates[shift] + pop.rates[extinction] + pop.rates[speciation];
+    //std::uniform_real_distribution<double> unif_dist(0.0, total_rate);
+    //double r = unif_dist(rndgen_);
     
+    std::discrete_distribution<size_t> d(pop.rates.begin(), pop.rates.end());
+    auto x = d(rndgen_);
+    return static_cast<event_type>(x);
+
     // ordering of rates is:
     // {shift, speciation, extinction, max_num};
-    if (r < pop.rates[shift]) return shift;
-    if (r < pop.rates[shift] + pop.rates[speciation]) return speciation;
+    // if (r < pop.rates[shift]) return shift;
+    // if (r < pop.rates[shift] + pop.rates[speciation]) return speciation;
     
-    return extinction;
+    // return extinction;
   }
   
   
