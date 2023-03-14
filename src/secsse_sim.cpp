@@ -29,7 +29,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           double max_time,
                           double max_species,
                           const std::vector<double>& init_states,
-                          std::vector<double> conditioning) {
+                          std::vector<double> conditioning,
+                          bool non_extinction) {
   
   //std::cerr << "loading data from R\n"; force_output();
   num_mat q; 
@@ -45,10 +46,22 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  q,
                  max_time,
                  max_species,
-                 init_states);
+                 init_states,
+                 non_extinction);
 
   while (true) {
-      sim.run(); 
+      while(true) {
+        sim.run(); 
+        
+        if (non_extinction) {
+          // repeat until the crown is not extinct
+          if (!sim.L.crown_extinct()) break;
+        } else {
+          break;
+        }
+      }
+    
+      // and then, satisfy traits.
       if (sim.check_num_traits(conditioning)) {
         break;
       }

@@ -60,6 +60,14 @@ struct ltable {
   void clear() {
     data_.clear();
   }
+  
+  bool crown_extinct() {
+    if (data_.empty()) return true;
+    if (data_[0].data_[3] >= 0.0) return true;
+    if (data_[1].data_[3] >= 0.0) return true;
+    
+    return false;
+  }
 };
 
 struct lambda_dist {
@@ -234,16 +242,19 @@ struct secsse_sim {
   const double max_t;
   const size_t max_spec;
   const std::vector<double> init_states;
+  const bool non_extinction;
 
   secsse_sim(const std::vector<double>& m,
              const num_mat_mat& l,
              const num_mat& q,
              double mt,
              size_t max_s,
-             const std::vector<double>& init) : mus(m),
+             const std::vector<double>& init,
+             const bool& ne) : mus(m),
              num_states(m.size()), max_t(mt),
              max_spec(max_s),
-             init_states(init) {
+             init_states(init),
+             non_extinction(ne) {
     auto l_sums = update_lambdas(l);
     auto q_sums = update_qs_row_sums(q);
     trait_info = species_info(mus, l_sums, q_sums);
@@ -280,11 +291,16 @@ struct secsse_sim {
       if (pop.size() > max_spec) break;
       
       event_type event = draw_event();
-      
 
       apply_event(event);
+      
+      if (L.crown_extinct()) {
+        extinct = true;
+        break;
+      }
     }
   }
+  
   
   void check_rates() {
     // for debugging
