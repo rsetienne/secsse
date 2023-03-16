@@ -15,8 +15,11 @@
 #' true states (e.g. obs x hidden states), or is always returned.
 #' @param non_extinction should the tree be conditioned on non-extinction of the
 #' crown lineages? Default is TRUE.
-#' @return a list with three properties: phy: reconstructed phylogeny,
-#' traits: the traits in order of tip label and thirdly:
+#' @param verbose provide intermediate output.
+#' @param max_tries maximum number of simulations to try to obtain a tree.
+#' @return a list with four properties: phy: reconstructed phylogeny,
+#' true_traits: the true traits in order of tip label, obs_traits: observed
+#' traits, ignoring hidden traits and lastly:
 #' initialState, delineating the initial state at the root used.
 #' @description By default, secsse_sim assumes CLA-secsse simulation, e.g.
 #' inheritance of traits at speciation need not be symmetrical, and can be
@@ -40,7 +43,9 @@ secsse_sim <- function(lambdas,
                        pool_init_states = NULL,
                        maxSpec = 1e5,
                        conditioning = "none",
-                       non_extinction = TRUE) {
+                       non_extinction = TRUE,
+                       verbose = FALSE,
+                       max_tries = 1e6) {
 
   if (is.matrix(lambdas)) {
     hidden_traits <- unique(gsub("[[:digit:]]+", "", names(mus)))
@@ -69,12 +74,8 @@ secsse_sim <- function(lambdas,
     conditioning_vec <- -1 + seq_along(mus)
   }
   if (conditioning == "obs_states") {
-    temp_vec <- c()
-    for (i in seq_along(names(mus))) {
-      local_num <- substr(names(mus)[[i]], 1, 1)
-      temp_vec[i] <- as.numeric(local_num)
-    }
-    conditioning_vec <- sort(unique(temp_vec))
+    obs_traits <- as.numeric(gsub("[^0-9.-]", "", names(mus)))
+    conditioning_vec <- sort(unique(obs_traits))
   }
 
   res <- secsse_sim_cpp(mus,
@@ -84,12 +85,17 @@ secsse_sim <- function(lambdas,
                         maxSpec,
                         pool_init_states,
                         conditioning_vec,
-                        non_extinction)
+                        non_extinction,
+                        verbose,
+                        max_tries)
 
   if (length(res$traits) < 1) {
     warning("crown lineages died out")
     return(list(phy = "ds",
-                traits = 0))
+                traits = 0,
+                extinct = res$tracker[2],
+                overshoot = res$tracker[3],
+                conditioning = res$tracker[4]))
   }
 
   Ltable        <- res$ltable
@@ -97,7 +103,7 @@ secsse_sim <- function(lambdas,
   num_alive_species <- length(which(Ltable[, 4] == -1))
 
   accept_simulation <- FALSE
-  
+
   if (non_extinction) {
     if (num_alive_species <= maxSpec &&
         Ltable[1, 4] == -1 &&
@@ -118,18 +124,32 @@ secsse_sim <- function(lambdas,
 
     indices       <- seq(1, length(res$traits), by = 2)
     speciesTraits <- 1 + res$traits[indices]
+    if (verbose) {
+    #  cat("making phylogeny\n")
+    }
     phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
 
-    traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
+    true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
                                              speciesTraits),
                                        row.names = NULL),
                             phy)
+    
+    true_traits <- names(mus)[true_traits]
+    obs_traits <- as.numeric(gsub("[^0-9.-]", "", true_traits))
+    
     return(list(phy = phy,
-                traits = traits,
-                initialState = initialState))
+                true_traits = true_traits,
+                obs_traits = obs_traits,
+                initialState = initialState,
+                extinct = res$tracker[2],
+                overshoot = res$tracker[3],
+                conditioning = res$tracker[4]))
   } else {
     warning("simulation did not meet minimal requirements")
     return(list(phy = "ds",
-                traits = 0))
+                traits = 0,
+                extinct = res$tracker[2],
+                overshoot = res$tracker[3],
+                conditioning = res$tracker[4]))
   }
 }

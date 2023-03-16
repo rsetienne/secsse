@@ -29,8 +29,10 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           double max_time,
                           double max_species,
                           const std::vector<double>& init_states,
-                          std::vector<double> conditioning,
-                          bool non_extinction) {
+                          std::vector<double> conditioning_vec,
+                          bool non_extinction,
+                          bool verbose,
+                          int max_tries) {
   
   //std::cerr << "loading data from R\n"; force_output();
   num_mat q; 
@@ -38,7 +40,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   
   num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
   
-  if (conditioning[0] == -1) conditioning.clear(); // "none"
+  if (conditioning_vec[0] == -1) conditioning_vec.clear(); // "none"
   
   
   secsse_sim sim(m_R, 
@@ -48,34 +50,46 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  max_species,
                  init_states,
                  non_extinction);
-
+  std::array<int, 5> tracker = {0, 0, 0, 0, 0};
+  int cnt = 0;
   while (true) {
-      while(true) {
         sim.run(); 
-        
-        if (non_extinction) {
-          // repeat until the crown is not extinct
-          if (!sim.L.crown_extinct()) break;
+        sim.check_num_traits(conditioning_vec);
+          
+        if (sim.run_info != done) {
+          cnt++;
+          tracker[ sim.run_info ]++;
+           if (verbose) {
+             if (cnt % 1000 == 0) {
+              Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
+                          << "large: "   << tracker[overshoot] << " " 
+                          << "cond: "    << tracker[conditioning] << "\n"; 
+            }
+          }
         } else {
           break;
         }
-      }
-    
-      // and then, satisfy traits.
-      if (sim.check_num_traits(conditioning)) {
-        break;
-      }
+
+        if (cnt > max_tries) {
+          break;
+        }
+        Rcpp::checkUserInterrupt();
+        if (!non_extinction && sim.run_info == extinct) break;
   }
   //extract and return
-  
+ // if (verbose) Rcpp::Rcout << "preparing to convert to R output\n";
   Rcpp::NumericMatrix ltable_for_r;
   vector_to_numericmatrix(sim.extract_ltable(), ltable_for_r);
   
   auto traits = sim.get_traits();
   auto init = sim.get_initial_state();
   
+  
+  
   Rcpp::List output = Rcpp::List::create( Rcpp::Named("ltable") = ltable_for_r,
                                           Rcpp::Named("traits") = traits,
-                                          Rcpp::Named("initial_state") = init);
+                                          Rcpp::Named("initial_state") = init,
+                                          Rcpp::Named("tracker") = tracker);
+ // if (verbose) Rcpp::Rcout << "handing over to R\n";
   return output;
 }

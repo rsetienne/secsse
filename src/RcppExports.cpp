@@ -171,8 +171,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // secsse_sim_cpp
-Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, const std::vector<double>& init_states, std::vector<double> conditioning, bool non_extinction);
-RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP init_statesSEXP, SEXP conditioningSEXP, SEXP non_extinctionSEXP) {
+Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, const std::vector<double>& init_states, std::vector<double> conditioning_vec, bool non_extinction, bool verbose, int max_tries);
+RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP init_statesSEXP, SEXP conditioning_vecSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -182,9 +182,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type max_time(max_timeSEXP);
     Rcpp::traits::input_parameter< double >::type max_species(max_speciesSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type init_states(init_statesSEXP);
-    Rcpp::traits::input_parameter< std::vector<double> >::type conditioning(conditioningSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type conditioning_vec(conditioning_vecSEXP);
     Rcpp::traits::input_parameter< bool >::type non_extinction(non_extinctionSEXP);
-    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, init_states, conditioning, non_extinction));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
+    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, init_states, conditioning_vec, non_extinction, verbose, max_tries));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -198,7 +200,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
     {"_secsse_calThruNodes_store_cpp", (DL_FUNC) &_secsse_calThruNodes_store_cpp, 13},
     {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 9},
-    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 8},
+    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 10},
     {NULL, NULL, 0}
 };
 

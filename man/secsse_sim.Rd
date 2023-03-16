@@ -10,8 +10,9 @@ secsse_sim(
   qs,
   crown_age,
   pool_init_states = NULL,
-  maxSpec,
-  conditioning = "none"
+  maxSpec = 1e+05,
+  conditioning = "none",
+  non_extinction = TRUE
 )
 }
 \arguments{
@@ -25,8 +26,8 @@ generally in the form of a matrix.}
 \item{crown_age}{crown age of the tree, tree will be simulated conditional
 on non-extinction and this crown age.}
 
-\item{pool_init_states}{pool of initial states, in case this is different
-from all available states, otherwise leave at NULL}
+\item{pool_init_states}{pool of initial states at the crown, in case this is
+different from all available states, otherwise leave at NULL}
 
 \item{maxSpec}{Maximum number of species in the tree (please note that the
 tree is not conditioned on this number, but that this is a safeguard against
@@ -35,6 +36,9 @@ generating extremely large trees).}
 \item{conditioning}{can be 'obs_states', 'true_states' or 'none', the tree is
 simulated until one is generated that contains all observed states, all
 true states (e.g. obs x hidden states), or is always returned.}
+
+\item{non_extinction}{should the tree be conditioned on non-extinction of the
+crown lineages? Default is TRUE.}
 }
 \value{
 a list with three properties: phy: reconstructed phylogeny,
@@ -42,5 +46,18 @@ traits: the traits in order of tip label and thirdly:
 initialState, delineating the initial state at the root used.
 }
 \description{
-Function to simulate a tree, conditional on observing all states.
+By default, secsse_sim assumes CLA-secsse simulation, e.g.
+inheritance of traits at speciation need not be symmetrical, and can be
+specified through usage of lambda-matrices. Hence, the input for lambdas
+is typically a list of matrices.
+
+Simulation is performed with a randomly
+sampled initial trait at the crown - if you, however - want a specific,
+single, trait used at the crown, you can reduce the possible traits by
+modifying 'pool_init_states'.
+
+By default, the algorithm keeps simulating until it generates a tree where
+both crown lineages survive to the present - this is to ensure that the tree
+has a crown age that matches the used crown age. You can modify
+'non-extinction' to deviate from this behaviour.
 }

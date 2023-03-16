@@ -18,6 +18,8 @@ using vec_dist  = std::vector< std::discrete_distribution<> >;
 
 enum event_type {shift, speciation, extinction, max_num};
 
+enum finish_type {done, extinct, overshoot, conditioning, not_run_yet, max_types};
+
 struct ltab_species {
 
   enum info_index {time, p_id, self_id, extinct_time};
@@ -226,7 +228,9 @@ struct secsse_sim {
   
   ltable L;
   double t;
-  bool extinct;
+  
+  finish_type run_info;
+  
   int init_state;
   
   population pop;
@@ -263,7 +267,7 @@ struct secsse_sim {
     std::random_device rd;
     std::mt19937 rndgen_t(rd());
     rndgen_ = rndgen_t;
-    extinct = false;
+    run_info = not_run_yet;
   }
   
   void run() {
@@ -274,7 +278,7 @@ struct secsse_sim {
     std::uniform_int_distribution<size_t> d(0, init_states.size() - 1);
     init_state = init_states[d(rndgen_)];
     
-    extinct = false;
+    run_info = not_run_yet;
     
     pop.clear();
     L.clear();
@@ -282,21 +286,25 @@ struct secsse_sim {
     pop.add(species(init_state,  2, trait_info));
     L = ltable();
  
-    while(pop.size() > 1 && t < max_t) {
-
+    //while(pop.size() > 1 && t < max_t) {
+    while(true) {
+    
       double dt = draw_dt();
       t += dt;
       
-      if (t > max_t) break;
-      if (pop.size() > max_spec) break;
+      if (t > max_t)  {
+        run_info = done; break;
+      }
       
       event_type event = draw_event();
 
       apply_event(event);
       
       if (L.crown_extinct()) {
-        extinct = true;
-        break;
+        run_info = extinct; break;
+      }
+      if (pop.size() > max_spec) {
+        run_info = overshoot; break;
       }
     }
   }
@@ -413,7 +421,7 @@ struct secsse_sim {
     //std::uniform_real_distribution<double> unif_dist(0.0, total_rate);
     //double r = unif_dist(rndgen_);
     
-    std::discrete_distribution<size_t> d(pop.rates.begin(), pop.rates.end());
+    std::discrete_distribution<int> d(pop.rates.begin(), pop.rates.end());
     auto x = d(rndgen_);
     return static_cast<event_type>(x);
 
@@ -504,10 +512,15 @@ struct secsse_sim {
     return cnt;
   }
   
-  bool check_num_traits(std::vector<double> traits) {
-    // check if all focal traits are there
-    if (traits.empty()) return true; // no conditioning
+  void check_num_traits(std::vector<double> traits) {
     
+    if (run_info != done) return;
+    
+    
+    // check if all focal traits are there
+    if (traits.empty()) return; // no conditioning
+    
+    // now check if each trait to be checked is present:
     for (size_t i = 0; i < pop.size(); ++i) {
 
       auto trait = pop.get_trait(i);
@@ -522,9 +535,13 @@ struct secsse_sim {
         break;
       }
     }
-    if (traits.empty()) return true;
+    // if traits is empty, all traits were found:
+    if (traits.empty()) return;
     
-    return false;
+    // otherwise, conditioning is a reason to reject:
+    run_info = conditioning;
+    
+    return;
   }
   
   std::vector<int> get_traits() {
