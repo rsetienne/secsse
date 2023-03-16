@@ -12,7 +12,9 @@ secsse_sim(
   pool_init_states = NULL,
   maxSpec = 1e+05,
   conditioning = "none",
-  non_extinction = TRUE
+  non_extinction = TRUE,
+  verbose = FALSE,
+  max_tries = 1e+06
 )
 }
 \arguments{
@@ -39,10 +41,15 @@ true states (e.g. obs x hidden states), or is always returned.}
 
 \item{non_extinction}{should the tree be conditioned on non-extinction of the
 crown lineages? Default is TRUE.}
+
+\item{verbose}{provide intermediate output.}
+
+\item{max_tries}{maximum number of simulations to try to obtain a tree.}
 }
 \value{
-a list with three properties: phy: reconstructed phylogeny,
-traits: the traits in order of tip label and thirdly:
+a list with four properties: phy: reconstructed phylogeny,
+true_traits: the true traits in order of tip label, obs_traits: observed
+traits, ignoring hidden traits and lastly:
 initialState, delineating the initial state at the root used.
 }
 \description{

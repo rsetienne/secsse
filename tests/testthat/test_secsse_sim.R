@@ -67,7 +67,7 @@ test_that("test secsse_sim", {
                              maxSpec = maxSpec,
                              conditioning = "obs_states")
 
-  all_obs_present <- c(1, 2, 3) %in% tree1$traits
+  all_obs_present <- c(0, 1, 2) %in% tree1$obs_traits
   testthat::expect_equal(sum(all_obs_present), 3)
 
   tree2 <- secsse::secsse_sim(lambdas = lambdas,
@@ -77,7 +77,7 @@ test_that("test secsse_sim", {
                              maxSpec = maxSpec,
                              conditioning = "true_states")
 
-  all_obs_present <- c(1:9) %in% tree2$traits
+  all_obs_present <- names(mus) %in% tree2$true_traits
   testthat::expect_equal(sum(all_obs_present), 9)
 
   if (requireNamespace("ape")) {
