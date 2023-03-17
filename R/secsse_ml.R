@@ -513,7 +513,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 
         if (is.list(pars1[[1]])) {
             # is the cla_ used?
-            loglik <- cla_secsse_loglik(parameter = pars1,
+            loglik <- secsse::cla_secsse_loglik(parameter = pars1,
                                         phy = phy,
                                         traits = traits,
                                         num_concealed_states =
@@ -528,9 +528,9 @@ secsse_loglik_choosepar <- function(trparsopt,
                                         loglik_penalty = loglik_penalty,
                                         is_complete_tree = is_complete_tree,
                                         num_threads = num_threads,
+                                        method = method,
                                         atol = atol,
-                                        rtol = rtol,
-                                        method = method)
+                                        rtol = rtol)
         } else {
             loglik <- secsse_loglik(parameter = pars1,
                                     phy = phy,

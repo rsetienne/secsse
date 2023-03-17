@@ -153,6 +153,10 @@ cla_secsse_ml <- function(phy,
                                                 num_concealed_states,
                                                 idparslist[[1]])
     }
+    
+    if (min(initparsopt) <= 0.0) {
+        stop("All elements in init_parsopt need to be larger than 0")
+    }
 
     see_ancestral_states <- FALSE
 
