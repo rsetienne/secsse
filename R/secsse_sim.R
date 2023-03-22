@@ -67,6 +67,15 @@ secsse_sim <- function(lambdas,
 
   if (is.null(pool_init_states)) {
     pool_init_states <- -1 + (seq_along(mus))
+  } else {
+    if (is.numeric(pool_init_states)) {
+      stop("pool of initial states needs to be characters, e.g. c('0A', '1B') etc")
+    }
+    
+    # now we have to match the indices
+    all_states <- names(mus)
+    indices <- which(all_states %in% pool_init_states)
+    pool_init_states <- -1 + indices
   }
 
   conditioning_vec <- c(-1)
