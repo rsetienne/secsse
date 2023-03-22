@@ -11,6 +11,7 @@
 #include <vector>
 #include <array>
 #include <random>
+#include <tuple>
 
 using num_mat = std::vector< std::vector<double >>;
 using num_mat_mat = std::vector<num_mat>;
@@ -282,8 +283,12 @@ struct secsse_sim {
     
     pop.clear();
     L.clear();
-    pop.add(species(init_state, -1, trait_info));
-    pop.add(species(init_state,  2, trait_info));
+    
+    auto crown_states = root_speciation(init_state);
+    
+    
+    pop.add(species(std::get<0>(crown_states), -1, trait_info));
+    pop.add(species(std::get<1>(crown_states),  2, trait_info));
     L = ltable();
  
     //while(pop.size() > 1 && t < max_t) {
@@ -386,6 +391,17 @@ struct secsse_sim {
     
     pop.add(species(trait_to_daughter, new_id, trait_info));
     L.data_.emplace_back(ltab_species(t, pop.get_id(mother), new_id, -1));
+  }
+  
+  std::tuple<int, int> root_speciation(int root_state) {
+    // calculate if the other crown lineage is the same trait:
+    auto mother_trait = root_state;
+    
+    auto pick_speciation_cell = pick_speciation_id(mother_trait);
+    auto trait_to_parent      = calc_y(pick_speciation_cell);
+    auto trait_to_daughter    = calc_x(pick_speciation_cell);
+    
+    return {trait_to_parent, trait_to_daughter};
   }
   
   
