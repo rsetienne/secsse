@@ -243,9 +243,6 @@ struct secsse_sim {
   
   std::vector< lambda_dist > lambda_distributions;
   vec_dist qs_dist;
-  
-  std::vector<size_t> cnt_events;
-  std::vector< std::vector< double >> extinct_draw;
 
   std::array<int, 2> track_crowns;
 
@@ -276,7 +273,6 @@ struct secsse_sim {
     std::random_device rd;
     std::mt19937 rndgen_t(rd());
     rndgen_ = rndgen_t;
-    cnt_events = {0, 0, 0};
     run_info = not_run_yet;
   }
   
@@ -294,7 +290,6 @@ struct secsse_sim {
     L.clear();
     
     auto crown_states = root_speciation(init_state);
-    
     
     pop.add(species(std::get<0>(crown_states), -1, trait_info));
     pop.add(species(std::get<1>(crown_states),  2, trait_info));
@@ -314,7 +309,6 @@ struct secsse_sim {
       }
       
       event_type event = draw_event();
-      cnt_events[event]++;
       apply_event(event);
       
       if (track_crowns[0] < 1 || track_crowns[1] < 1) {
@@ -374,11 +368,6 @@ struct secsse_sim {
       dying = sample_from_pop(get_val);
     }
     auto dying_id = pop.get_id(dying);
-    
-    std::vector<double> to_add = {static_cast<double>(pop.size()),
-                                  static_cast<double>(dying),
-                                  static_cast<double>(dying_id)};
-    extinct_draw.push_back(to_add);
     
     for (auto& i : L.data_) {
       if (std::abs(i.get_id()) == std::abs(dying_id)) {
@@ -464,20 +453,20 @@ struct secsse_sim {
   }
   
   event_type draw_event() {
-    //double total_rate = pop.rates[shift] + pop.rates[extinction] + pop.rates[speciation];
-    //std::uniform_real_distribution<double> unif_dist(0.0, total_rate);
-    //double r = unif_dist(rndgen_);
+    double total_rate = pop.rates[shift] + pop.rates[extinction] + pop.rates[speciation];
+    std::uniform_real_distribution<double> unif_dist(0.0, total_rate);
+    double r = unif_dist(rndgen_);
     
-    std::discrete_distribution<int> d(pop.rates.begin(), pop.rates.end());
+    /*std::discrete_distribution<int> d(pop.rates.begin(), pop.rates.end());
     auto x = d(rndgen_);
-    return static_cast<event_type>(x);
+    return static_cast<event_type>(x);*/
 
     // ordering of rates is:
     // {shift, speciation, extinction, max_num};
-    // if (r < pop.rates[shift]) return shift;
-    // if (r < pop.rates[shift] + pop.rates[speciation]) return speciation;
+     if (r < pop.rates[shift]) return shift;
+     if (r < pop.rates[shift] + pop.rates[speciation]) return speciation;
     
-    // return extinction;
+     return extinction;
   }
   
   
@@ -547,6 +536,33 @@ struct secsse_sim {
   }*/
 
   size_t sample_from_pop(double (*getvalfrom_species)(const species&)) {
+    
+    auto max = *std::max_element(pop.pop.begin(), pop.pop.end(),
+                                  [&](const species& a, const species& b) {
+                                    return getvalfrom_species(a) < getvalfrom_species(b);
+                                  });
+    
+    std::uniform_int_distribution<> d(0, static_cast<int>(pop.size()) - 1);
+    std::uniform_real_distribution<double> r(0.0, 1.0);
+    int index;
+    double mult = 1.0 / getvalfrom_species(max);
+    double ulim = 1.0 - 1e-9;
+    while(true) {
+      index = d(rndgen_);
+      double rel_prob = getvalfrom_species(pop.pop[index]) * mult;
+      if (rel_prob > 0.0) {
+        if (rel_prob >= (ulim)) break;
+        
+        if (r(rndgen_) < rel_prob) {
+          break;
+        }
+      }
+    }
+    return index;
+  }
+
+
+  /*size_t sample_from_pop(double (*getvalfrom_species)(const species&)) {
     std::vector<double> vals(pop.pop.size());
     for (int i = 0; i < pop.size(); ++i) {
       // vals.push_back(getvalfrom_species(pop.pop[i]));
@@ -554,7 +570,7 @@ struct secsse_sim {
     }
     std::discrete_distribution<size_t> d(vals.begin(), vals.end());
     return d(rndgen_);
-  }
+  }*/
 
   
   size_t get_num_traits() {
