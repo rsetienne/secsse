@@ -78,6 +78,11 @@ secsse_sim <- function(lambdas,
     pool_init_states <- -1 + indices
   }
 
+  if (!conditioning %in% c("none", "true_states", "obs_states")) {
+    stop("unknown conditioning, please pick from 'none', 'obs_states', 'true_states'")
+  }
+  
+  
   conditioning_vec <- c(-1)
   if (conditioning == "true_states") {
     conditioning_vec <- -1 + seq_along(mus)
@@ -113,52 +118,42 @@ secsse_sim <- function(lambdas,
 
   accept_simulation <- FALSE
 
-  if (non_extinction) {
-    if (num_alive_species <= maxSpec &&
-        Ltable[1, 4] == -1 &&
-        Ltable[2, 4] == -1) {
-      accept_simulation <- TRUE
-    }
-  } else {
-    if (num_alive_species <= maxSpec) {
-      accept_simulation <- TRUE
-    }
-  }
-
-  if (accept_simulation) {
-    speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
-    initialState  <- res$initial_state
-    Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
+  speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
+  initialState  <- res$initial_state
+  Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
                                              # not at crown age
 
-    indices       <- seq(1, length(res$traits), by = 2)
-    speciesTraits <- 1 + res$traits[indices]
-    if (verbose) {
-    #  cat("making phylogeny\n")
-    }
-    phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
+  indices       <- seq(1, length(res$traits), by = 2)
+  speciesTraits <- 1 + res$traits[indices]
+    
+  phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
 
-    true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
+  true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
                                              speciesTraits),
                                        row.names = NULL),
                             phy)
     
-    true_traits <- names(mus)[true_traits]
-    obs_traits <- as.numeric(gsub("[^0-9.-]", "", true_traits))
-    
-    return(list(phy = phy,
+  true_traits <- names(mus)[true_traits]
+  obs_traits <- as.numeric(gsub("[^0-9.-]", "", true_traits))
+  
+  if (sum(Ltable[, 4] < 0)) {
+      return(list(phy = phy,
                 true_traits = true_traits,
                 obs_traits = obs_traits,
                 initialState = initialState,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
-                conditioning = res$tracker[4]))
+                conditioning = res$tracker[4],
+                event_counter = res$event_counter,
+                extinct_draw = res$extinct_draw))
   } else {
     warning("simulation did not meet minimal requirements")
     return(list(phy = "ds",
                 traits = 0,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
-                conditioning = res$tracker[4]))
+                conditioning = res$tracker[4],
+                event_counter = res$event_counter,
+                extinct_draw = res$extinct_draw))
   }
 }

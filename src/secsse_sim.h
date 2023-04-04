@@ -41,6 +41,12 @@ struct ltab_species {
   void set_death(double d) {
     data_[extinct_time] = d;
   }
+  
+  bool is_dead() {
+    if (data_[extinct_time] > -1) return true;
+    
+    return false;
+  }
 
   ltab_species() {
     data_[time] = -1e6;
@@ -49,6 +55,11 @@ struct ltab_species {
     data_[extinct_time] = -1e6;
   }
 
+  std::array<double, 4>& get_data() {
+    return data_;
+  }
+
+private: 
   std::array<double, 4> data_;
 };
 
@@ -62,14 +73,6 @@ struct ltable {
   
   void clear() {
     data_.clear();
-  }
-  
-  bool crown_extinct() {
-    if (data_.empty()) return true;
-    if (data_[0].data_[3] >= 0.0) return true;
-    if (data_[1].data_[3] >= 0.0) return true;
-    
-    return false;
   }
 };
 
@@ -241,6 +244,11 @@ struct secsse_sim {
   std::vector< lambda_dist > lambda_distributions;
   vec_dist qs_dist;
   
+  std::vector<size_t> cnt_events;
+  std::vector< std::vector< double >> extinct_draw;
+
+  std::array<int, 2> track_crowns;
+
   // external data:
   const std::vector<double> mus;
   const size_t num_states;
@@ -268,11 +276,12 @@ struct secsse_sim {
     std::random_device rd;
     std::mt19937 rndgen_t(rd());
     rndgen_ = rndgen_t;
+    cnt_events = {0, 0, 0};
     run_info = not_run_yet;
   }
   
   void run() {
-   
+    
     t = 0.0;
   
     // randomly draw initial trait
@@ -289,6 +298,9 @@ struct secsse_sim {
     
     pop.add(species(std::get<0>(crown_states), -1, trait_info));
     pop.add(species(std::get<1>(crown_states),  2, trait_info));
+    
+    track_crowns = {1, 1};
+    
     L = ltable();
  
     //while(pop.size() > 1 && t < max_t) {
@@ -302,11 +314,12 @@ struct secsse_sim {
       }
       
       event_type event = draw_event();
-
+      cnt_events[event]++;
       apply_event(event);
       
-      if (L.crown_extinct()) {
-        run_info = extinct; break;
+      if (track_crowns[0] < 1 || track_crowns[1] < 1) {
+        run_info = extinct; 
+        break;
       }
       if (pop.size() > max_spec) {
         run_info = overshoot; break;
@@ -358,11 +371,24 @@ struct secsse_sim {
     if (pop.size() > 1) {
       // sample one at randomly following mus
       auto get_val = [](const species& s) { return s.mu_;};
-      dying = sample_from_pop(get_val, trait_info.max_ext());
+      dying = sample_from_pop(get_val);
     }
     auto dying_id = pop.get_id(dying);
+    
+    std::vector<double> to_add = {static_cast<double>(pop.size()),
+                                  static_cast<double>(dying),
+                                  static_cast<double>(dying_id)};
+    extinct_draw.push_back(to_add);
+    
     for (auto& i : L.data_) {
       if (std::abs(i.get_id()) == std::abs(dying_id)) {
+        
+        if (i.get_id() < 0) {
+          track_crowns[0]--;
+        } else {
+          track_crowns[1]--;
+        }
+        
         i.set_death(t);
         break;
       }
@@ -376,7 +402,7 @@ struct secsse_sim {
     if (pop.size() > 1) {
       // sample one at randomly following lambdas
       auto get_val = [](const species& s) { return s.lambda_;};
-      mother = sample_from_pop(get_val, trait_info.max_spec());
+      mother = sample_from_pop(get_val);
     }
     auto mother_trait = pop.get_trait(mother);
     
@@ -387,7 +413,12 @@ struct secsse_sim {
     pop.change_trait(mother, trait_to_parent, trait_info);
     
     int new_id = static_cast<int>(L.data_.size()) + 1;
-    if (pop.get_id(mother) < 0) new_id *= -1;
+    if (pop.get_id(mother) < 0) {
+      track_crowns[0]++;
+      new_id *= -1;
+    } else {
+      track_crowns[1]++;
+    }
     
     pop.add(species(trait_to_daughter, new_id, trait_info));
     L.data_.emplace_back(ltab_species(t, pop.get_id(mother), new_id, -1));
@@ -422,7 +453,7 @@ struct secsse_sim {
     if (pop.size() > 1) {
       // sample one at randomly following shiftprob
       auto get_val = [](const species& s) { return s.shiftprob_;};
-      index_chosen_species = sample_from_pop(get_val, trait_info.max_spec());
+      index_chosen_species = sample_from_pop(get_val);
     }
     
     auto trait_chosen_species = pop.get_trait(index_chosen_species);
@@ -495,7 +526,7 @@ struct secsse_sim {
     return qs_row_sums;
   }
   
-  size_t sample_from_pop(double (*getvalfrom_species)(const species&), double max) {
+/*  size_t sample_from_pop(double (*getvalfrom_species)(const species&), double max) {
     std::uniform_int_distribution<> d(0, static_cast<int>(pop.size()) - 1);
     std::uniform_real_distribution<double> r(0.0, 1.0);
     int index;
@@ -513,7 +544,18 @@ struct secsse_sim {
       }
     }
     return index;
+  }*/
+
+  size_t sample_from_pop(double (*getvalfrom_species)(const species&)) {
+    std::vector<double> vals(pop.pop.size());
+    for (int i = 0; i < pop.size(); ++i) {
+      // vals.push_back(getvalfrom_species(pop.pop[i]));
+      vals[i] = getvalfrom_species(pop.pop[i]);
+    }
+    std::discrete_distribution<size_t> d(vals.begin(), vals.end());
+    return d(rndgen_);
   }
+
   
   size_t get_num_traits() {
     std::vector<int> hist(mus.size(), 0);
@@ -577,10 +619,9 @@ struct secsse_sim {
   num_mat extract_ltable() {
     num_mat extracted_ltable(L.data_.size(), std::vector<double>(4));
     for (int i = 0; i < L.data_.size(); ++i) {
-      std::vector<double> row(L.data_[i].data_.size());
-      for (int j = 0; j < L.data_[i].data_.size(); ++j) {
-        row[j] = L.data_[i].data_[j];
-      }
+
+      auto temp = L.data_[i].get_data();
+      std::vector<double> row(temp.begin(), temp.end()); 
       extracted_ltable[i] = row;
     }
     return extracted_ltable;

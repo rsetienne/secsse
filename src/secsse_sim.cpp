@@ -84,12 +84,18 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   auto traits = sim.get_traits();
   auto init = sim.get_initial_state();
   
-  
+  Rcpp::NumericVector event_cnt(sim.cnt_events.begin(), sim.cnt_events.end());
+  Rcpp::NumericMatrix extinct_draw_r;
+  if (!sim.extinct_draw.empty()) {
+    vector_to_numericmatrix(sim.extinct_draw, extinct_draw_r);
+  }
   
   Rcpp::List output = Rcpp::List::create( Rcpp::Named("ltable") = ltable_for_r,
                                           Rcpp::Named("traits") = traits,
                                           Rcpp::Named("initial_state") = init,
-                                          Rcpp::Named("tracker") = tracker);
+                                          Rcpp::Named("tracker") = tracker,
+                                          Rcpp::Named("event_counter") = event_cnt,
+                                          Rcpp::Named("extinct_draw") = extinct_draw_r);
  // if (verbose) Rcpp::Rcout << "handing over to R\n";
   return output;
 }

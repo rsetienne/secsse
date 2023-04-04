@@ -33,6 +33,8 @@
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
+#' @param see_survival_prob returns survival probability of the crown, instead
+#' of the likelihood
 #' @return The loglikelihood of the data given the parameters
 #' @note Multithreading might lead to a slightly reduced accuracy
 #' (in the order of 1e-8) and is therefore not enabled by default.
@@ -94,7 +96,8 @@ cla_secsse_loglik <- function(parameter,
                                           "odeint::bulirsch_stoer",
                                           "odeint::runge_kutta_fehlberg78"),
                               atol = 1e-16,
-                              rtol = 1e-16) {
+                              rtol = 1e-16,
+                              see_survival_prob = FALSE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -231,11 +234,17 @@ cla_secsse_loglik <- function(parameter,
     nodeM <- c(nodeM, y) # nolint
   }
 
+  surv_prob <- 0
+  surv_prob2 <- 0
+  
   if (cond == "proper_cond") {
     pre_cond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
       pre_cond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+      surv_prob[j] <- pre_cond[j] / sum(lambdas[[j]])
     }
+    surv_prob2 <- nodeM[1:d]
+    
     mergeBranch2 <- mergeBranch2 / pre_cond # nolint
   }
 
@@ -245,6 +254,11 @@ cla_secsse_loglik <- function(parameter,
         penalty(pars = parameter,
                 loglik_penalty = loglik_penalty)
 
+  if (see_survival_prob == TRUE) {
+    return(list(surv_prob = surv_prob,
+                nodeM = surv_prob2))
+  }
+  
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     # last row contains safety entry from C++ (all zeros)

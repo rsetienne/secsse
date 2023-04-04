@@ -20,7 +20,8 @@ cla_secsse_loglik(
   method = ifelse(num_threads == 1, "odeint::bulirsch_stoer",
     "odeint::runge_kutta_fehlberg78"),
   atol = 1e-16,
-  rtol = 1e-16
+  rtol = 1e-16,
+  see_survival_prob = FALSE
 )
 }
 \arguments{
@@ -70,6 +71,9 @@ use all available threads.}
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
+
+\item{see_survival_prob}{returns survival probability of the crown, instead
+of the likelihood}
 }
 \value{
 The loglikelihood of the data given the parameters
