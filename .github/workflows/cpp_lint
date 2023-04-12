@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - master
       - develop
 
 name: Cpp-lint-check
