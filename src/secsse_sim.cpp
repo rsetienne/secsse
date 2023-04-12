@@ -12,15 +12,15 @@
 //
 #include <Rcpp.h>
 
-#include "secsse_sim.h"
-#include "util.h"
+#include "secsse_sim.h"   // NOLINT [build/include_subdir]
+#include "util.h"         // NOLINT [build/include_subdir]
 
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
   for (size_t m = 0; m < lambdas_R.size(); ++m) {
     Rcpp::NumericMatrix entry_R = lambdas_R[m];
     num_mat entry_cpp(entry_R.nrow(), std::vector<double>(entry_R.ncol(), 0.0));
-    for(size_t i = 0; i < entry_R.nrow(); ++i) {
+    for (size_t i = 0; i < entry_R.nrow(); ++i) {
       for (size_t j = 0; j < entry_R.ncol(); ++j) {
         entry_cpp[i][j] = entry_R(i, j);
       }
@@ -43,10 +43,10 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           int max_tries) {
   num_mat q; 
   numericmatrix_to_vector(q_R, &q);
-  
+
   num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
-  
-  if (conditioning_vec[0] == -1) conditioning_vec.clear(); // "none"
+
+  if (conditioning_vec[0] == -1) conditioning_vec.clear();   // "none"
 
   secsse_sim sim(m_R, 
                  lambdas,
@@ -60,7 +60,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   while (true) {
         sim.run(); 
         sim.check_num_traits(conditioning_vec);
-          
+
         if (sim.run_info != done) {
           cnt++;
           tracker[ sim.run_info ]++;
@@ -81,16 +81,16 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
         Rcpp::checkUserInterrupt();
         if (!non_extinction && sim.run_info == extinct) break;
   }
-  //extract and return
+  // extract and return
   Rcpp::NumericMatrix ltable_for_r;
   vector_to_numericmatrix(sim.extract_ltable(), &ltable_for_r);
-  
+
   auto traits = sim.get_traits();
   auto init = sim.get_initial_state();
-  
-  Rcpp::List output = Rcpp::List::create( Rcpp::Named("ltable") = ltable_for_r,
-                                          Rcpp::Named("traits") = traits,
-                                          Rcpp::Named("initial_state") = init,
-                                          Rcpp::Named("tracker") = tracker);
+
+  Rcpp::List output = Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
+                                         Rcpp::Named("traits") = traits,
+                                         Rcpp::Named("initial_state") = init,
+                                         Rcpp::Named("tracker") = tracker);
   return output;
 }

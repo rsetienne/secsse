@@ -11,10 +11,10 @@
 //
 //
 
-#include <thread>
-#include <chrono>
+#include <thread>   // NOLINT [build/c++11]
+#include <chrono>   // NOLINT [build/c++11]
 
-#include "util.h"
+#include "util.h"   // NOLINT [build/include_subdir]
 
 void force_output() {
   std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -23,13 +23,13 @@ void force_output() {
   R_CheckUserInterrupt();
 }
 
-
-std::vector<int> find_desNodes(const std::vector< std::vector<double>>& phy_edge,
-                               int focal) {
+std::vector<int> find_desNodes(
+    const std::vector< std::vector<double>>& phy_edge,
+    int focal) {
   std::vector<int> output;
-  for(int i = 0; i < phy_edge.size(); ++i) {
+  for (int i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
-      output.push_back( phy_edge[i][1]);
+      output.push_back(phy_edge[i][1]);
     }
   }
   return(output);
@@ -37,9 +37,9 @@ std::vector<int> find_desNodes(const std::vector< std::vector<double>>& phy_edge
 
 double get_dt(const std::vector< std::vector<double>>& phy_edge,
               int focal) {
-  for(int i = 0; i < phy_edge.size(); ++i) {
+  for (int i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][1] == focal) {
-      return phy_edge[i][2];  
+      return phy_edge[i][2];
     }
   }
   return 0.0;
@@ -47,24 +47,25 @@ double get_dt(const std::vector< std::vector<double>>& phy_edge,
 
 void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
-                   std::vector<int>& desNodes,
-                   std::vector<double>& timeInte) {
-  desNodes.clear();
-  timeInte.clear();
+                   std::vector<int>* desNodes,
+                   std::vector<double>* timeInte) {
+  (*desNodes).clear();
+  (*timeInte).clear();
   std::vector<int> output;
-  for(int i = 0; i < phy_edge.size(); ++i) {
+  for (int i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
-      desNodes.push_back( phy_edge[i][1]);
-      timeInte.push_back( phy_edge[i][2]);
+      (*desNodes).push_back(phy_edge[i][1]);
+      (*timeInte).push_back(phy_edge[i][2]);
     }
   }
 }
 
-std::vector<int> find_connections(const std::vector< std::vector<double>>& phy_edge,
-                                  int focal) {
+std::vector<int> find_connections(
+    const std::vector< std::vector<double>>& phy_edge,
+    int focal) {
   std::vector<int> output(2);
   int cnt = 0;
-  for(int i = 0; i < phy_edge.size(); ++i) {
+  for (int i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
      output[cnt] = phy_edge[i][1];
      cnt++;
@@ -72,7 +73,6 @@ std::vector<int> find_connections(const std::vector< std::vector<double>>& phy_e
     if (cnt >= 2) break;
   }
   return output;
-  
 }
 
 
@@ -90,12 +90,12 @@ double get_time_inte(const std::vector< std::vector<double>>& forTime,
 void normalize_loglik_node(std::vector<double>* probvec,
                            long double* loglik) {
   size_t d = (*probvec).size() / 2;
-  
+
   double sumabsprobs(0.0);
-  for(size_t i = d; i < (d + d); ++i) {
+  for (size_t i = d; i < (d + d); ++i) {
     sumabsprobs += std::abs((*probvec)[i]);
   }
-  for(size_t i = d; i < (d + d); ++i) {
+  for (size_t i = d; i < (d + d); ++i) {
     (*probvec)[i] *= 1.0 / sumabsprobs;
   }
   (*loglik) += log(sumabsprobs);
@@ -105,10 +105,11 @@ void normalize_loglik_node(std::vector<double>* probvec,
 void normalize_loglik(std::vector<double>* probvec,
                       long double* loglik) {
   static const auto abssum = [] (auto x, auto y) {return x + std::abs(y);};
-  
-  double sumabsprobs = std::accumulate((*probvec).begin(), (*probvec).end(), 0.0,
+
+  double sumabsprobs = std::accumulate((*probvec).begin(), (*probvec).end(), 
+                                       0.0,
                                        abssum);
-  
+
   for (auto& i : (*probvec)) {
     i *= 1.0 / sumabsprobs;
   }
@@ -118,7 +119,8 @@ void normalize_loglik(std::vector<double>* probvec,
 
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v) {
-  (*v) = std::vector< std::vector< double> >(m.nrow(), std::vector<double>(m.ncol(), 0.0));
+  (*v) = std::vector< std::vector< double> >(m.nrow(), 
+            std::vector<double>(m.ncol(), 0.0));
   for (size_t i = 0; i < m.nrow(); ++i) {
     std::vector<double> row(m.ncol(), 0.0);
     for (size_t j = 0; j < m.ncol(); ++j) {
@@ -132,7 +134,7 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
 void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
                     std::vector< std::vector< std::vector<double >>>* v) {
   int n = l.size();
-  
+
   (*v) = std::vector< std::vector< std::vector<double>>>(n);
   for (size_t i = 0; i < n; ++i) {
     std::vector< std::vector< double >> entry;

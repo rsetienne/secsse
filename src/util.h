@@ -30,8 +30,8 @@ double get_dt(const std::vector< std::vector<double>>& phy_edge,
 
 void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
-                   std::vector<int>& desNodes,
-                   std::vector<double>& timeInte);
+                   std::vector<int>* desNodes,
+                   std::vector<double>* timeInte);
 
 double get_time_inte(const std::vector< std::vector<double>>& forTime,
                      int focal_node);
@@ -69,7 +69,7 @@ struct entry {
   int focal_node;
   data_storage probabilities;
 
-  entry(int a, int fn, const data_storage& probs) : 
+  entry(int a, int fn, const data_storage& probs) :
     ances(a), focal_node(fn), probabilities(probs)
   {};
 };

@@ -90,17 +90,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // calThruNodes_cpp
-Rcpp::List calThruNodes_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas, const NumericVector& mus, const NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree);
+Rcpp::List calThruNodes_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::NumericVector& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree);
 RcppExport SEXP _secsse_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector& >::type ances(ancesSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type states_R(states_RSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type forTime_R(forTime_RSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type lambdas(lambdasSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type mus(musSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ances(ancesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type states_R(states_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type forTime_R(forTime_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type lambdas(lambdasSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
     Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
     Rcpp::traits::input_parameter< double >::type abstol(abstolSEXP);
     Rcpp::traits::input_parameter< double >::type reltol(reltolSEXP);
@@ -129,17 +129,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // calThruNodes_store_cpp
-Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances, const NumericMatrix& states_R, const NumericMatrix& forTime_R, const NumericVector& lambdas, const NumericVector& mus, const NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree, int num_steps, bool verbose);
+Rcpp::NumericMatrix calThruNodes_store_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::NumericVector& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, int num_threads, double abstol, double reltol, std::string method, bool is_complete_tree, int num_steps, bool verbose);
 RcppExport SEXP _secsse_calThruNodes_store_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP num_threadsSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP, SEXP num_stepsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector& >::type ances(ancesSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type states_R(states_RSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type forTime_R(forTime_RSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type lambdas(lambdasSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type mus(musSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ances(ancesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type states_R(states_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type forTime_R(forTime_RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type lambdas(lambdasSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
     Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
     Rcpp::traits::input_parameter< double >::type abstol(abstolSEXP);
     Rcpp::traits::input_parameter< double >::type reltol(reltolSEXP);
