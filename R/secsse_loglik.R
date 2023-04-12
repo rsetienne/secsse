@@ -303,6 +303,7 @@ check_input <- function(traits,
 }
 
 create_states <- function(usetraits,
+                          traits,
                           states,
                           sampling_fraction,
                           num_concealed_states,
@@ -380,6 +381,7 @@ build_states <- function(phy,
   ## I repeat the process of state assignment as many times as columns I have
   for (iv in seq_len(ncol(traits))) {
     states <- create_states(traits[, iv],
+                            traits,
                             states,
                             sampling_fraction,
                             num_concealed_states,
