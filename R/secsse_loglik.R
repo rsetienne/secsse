@@ -228,28 +228,8 @@ secsse_loglik <- function(parameter,
   }
 }
 
-check_input <- function(traits,
-                        phy,
-                        sampling_fraction,
-                        root_state_weight,
-                        is_complete_tree) {
-  if (is.numeric(root_state_weight)) {
-    if (length(root_state_weight) != length(sort(unique(traits)))) {
-      stop("There need to be as many elements in root_state_weight 
-           as there are traits.")
-    }
-    if (length(which(root_state_weight == 1)) != 1) {
-      stop("The root_state_weight needs only one 1.")
-    }
-  } else {
-    if (any(root_state_weight == "maddison_weights" |
-           root_state_weight == "equal_weights" |
-           root_state_weight == "proper_weights") == FALSE) {
-      stop("The root_state_weight must be any of 
-           maddison_weights, equal_weights, or proper_weights.")
-    }
-  }
-
+#' @keywords internal
+check_tree <- function(phy, is_complete_tree) {
   if (ape::is.rooted(phy) == FALSE) {
     stop("The tree needs to be rooted.")
   }
@@ -263,7 +243,9 @@ check_input <- function(traits,
   if (any(phy$edge.length == 0)) {
     stop("The tree must have internode distancs that are all larger than 0.")
   }
+}
 
+check_traits <- function(traits, sampling_fraction) {
   if (is.matrix(traits)) {
     if (length(sampling_fraction) != length(sort(unique(traits[, 1])))) {
       stop("Sampling_fraction must have as many elements 
@@ -288,6 +270,87 @@ check_input <- function(traits,
     stop("The trait has only one state.")
   }
 }
+
+check_root_state_weight <- function(root_state_weight, traits) {
+  if (is.numeric(root_state_weight)) {
+    if (length(root_state_weight) != length(sort(unique(traits)))) {
+      stop("There need to be as many elements in root_state_weight 
+           as there are traits.")
+    }
+    if (length(which(root_state_weight == 1)) != 1) {
+      stop("The root_state_weight needs only one 1.")
+    }
+  } else {
+    if (any(root_state_weight == "maddison_weights" |
+            root_state_weight == "equal_weights" |
+            root_state_weight == "proper_weights") == FALSE) {
+      stop("The root_state_weight must be any of 
+           maddison_weights, equal_weights, or proper_weights.")
+    }
+  }
+}
+
+check_input <- function(traits,
+                        phy,
+                        sampling_fraction,
+                        root_state_weight,
+                        is_complete_tree) {
+  check_root_state_weight(root_state_weight, sampling_fraction)
+
+  check_tree(phy, is_complete_tree)
+
+  check_traits(traits, sampling_fraction)
+}
+
+create_states <- function(usetraits,
+                          states,
+                          sampling_fraction,
+                          num_concealed_states,
+                          d,
+                          traitStates,
+                          is_complete_tree,
+                          phy,
+                          ly,
+                          mus,
+                          nb_tip) {
+  if (anyNA(usetraits)) {
+    nas <- which(is.na(traits))
+    for (iii in seq_along(nas)) {
+      states[nas[iii], ] <- c(1 - rep(sampling_fraction,
+                                      num_concealed_states),
+                              rep(sampling_fraction, num_concealed_states))
+    }
+  }
+
+  for (iii in seq_along(traitStates)) { # Initial state probabilities
+    StatesPresents <- d + iii
+    toPlaceOnes <- StatesPresents +
+      length(traitStates) * (0:(num_concealed_states - 1))
+    tipSampling <- 1 * sampling_fraction
+    states[which(usetraits ==
+                   traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
+  }
+
+  if (is_complete_tree) {
+    extinct_species <- geiger::is.extinct(phy)
+    if (!is.null(extinct_species)) {
+      for (i in seq_along(extinct_species)) {
+        states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
+          mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+      }
+    }
+    for (iii in 1:nb_tip) {
+      states[iii, 1:d] <- 0
+    }
+  } else {
+    for (iii in 1:nb_tip) {
+      states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+    }
+  }
+
+  return(states)
+}
+
 
 build_states <- function(phy,
                          traits,
@@ -316,40 +379,17 @@ build_states <- function(phy,
   states[1:nb_tip, ] <- 0
   ## I repeat the process of state assignment as many times as columns I have
   for (iv in seq_len(ncol(traits))) {
-    usetraits <- traits[, iv]
-    if (anyNA(usetraits)) {
-      nas <- which(is.na(traits))
-      for (iii in seq_along(nas)) {
-        states[nas[iii], ] <- c(1 - rep(sampling_fraction,
-                                        num_concealed_states),
-                               rep(sampling_fraction, num_concealed_states))
-      }
-    }
-
-    for (iii in seq_along(traitStates)) { # Initial state probabilities
-      StatesPresents <- d + iii
-      toPlaceOnes <- StatesPresents +
-        length(traitStates) * (0:(num_concealed_states - 1))
-      tipSampling <- 1 * sampling_fraction
-      states[which(usetraits ==
-                   traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
-    }
-    if (is_complete_tree) {
-      extinct_species <- geiger::is.extinct(phy)
-      if (!is.null(extinct_species)) {
-        for (i in seq_along(extinct_species)) {
-          states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
-            mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
-        }
-      }
-      for (iii in 1:nb_tip) {
-        states[iii, 1:d] <- 0
-      }
-    } else {
-      for (iii in 1:nb_tip) {
-        states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
-      }
-    }
+    states <- create_states(traits[, iv],
+                            states,
+                            sampling_fraction,
+                            num_concealed_states,
+                            d,
+                            traitStates,
+                            is_complete_tree,
+                            phy,
+                            ly,
+                            mus,
+                            nb_tip)
   }
   return(states)
 }

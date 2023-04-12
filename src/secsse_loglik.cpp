@@ -137,7 +137,7 @@ Rcpp::List calThruNodes_cpp(const Rcpp::NumericVector& ances,
 
   Rcpp::List output = Rcpp::List::create(Rcpp::Named("states") = states_out,
                                          Rcpp::Named("loglik") = loglik,
-                                         Rcpp::Named("mergeBranch") = 
+                                         Rcpp::Named("mergeBranch") =
                                                       mergeBranch,
                                          Rcpp::Named("nodeM") = nodeM);
   return output;

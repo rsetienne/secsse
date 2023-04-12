@@ -38,7 +38,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     for (size_t j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
       for (size_t k = 0; k < temp.ncol(); ++k) {
-        row.push_back(temp(j, k));  
+        row.push_back(temp(j, k));
       }
       temp2.push_back(row);
     }
@@ -248,7 +248,7 @@ try {
 
   Rcpp::List output = Rcpp::List::create(Rcpp::Named("states") = states_out,
                                          Rcpp::Named("loglik") = loglik,
-                                         Rcpp::Named("mergeBranch") = 
+                                         Rcpp::Named("mergeBranch") =
                                            mergeBranch,
                                          Rcpp::Named("nodeM") = nodeM);
   return output;

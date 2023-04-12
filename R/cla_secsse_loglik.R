@@ -33,8 +33,6 @@
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
-#' @param see_survival_prob returns survival probability of the crown, instead
-#' of the likelihood
 #' @return The loglikelihood of the data given the parameters
 #' @note Multithreading might lead to a slightly reduced accuracy
 #' (in the order of 1e-8) and is therefore not enabled by default.
@@ -96,8 +94,7 @@ cla_secsse_loglik <- function(parameter,
                                           "odeint::bulirsch_stoer",
                                           "odeint::runge_kutta_fehlberg78"),
                               atol = 1e-16,
-                              rtol = 1e-16,
-                              see_survival_prob = FALSE) {
+                              rtol = 1e-16) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -141,56 +138,14 @@ cla_secsse_loglik <- function(parameter,
   loglik <- 0
   d <- ncol(states) / 2
 
-  if (see_ancestral_states == TRUE) {
-    if (num_threads != 1) {
+  if (see_ancestral_states == TRUE && num_threads != 1) {
       warning("see ancestral states only works with one thread, 
               setting to one thread")
       num_threads <- 1
-    }
   }
 
-  if (num_threads == 1) {
-    ancescpp <- ances - 1
-    forTimecpp <- forTime # nolint
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
-      calcul <- cla_calThruNodes_cpp(ancescpp,
-                                     states,
-                                     forTimecpp,
-                                     lambdas,
-                                     mus,
-                                     Q,
-                                     method,
-                                     atol,
-                                     rtol,
-                                     is_complete_tree)
-  } else {
-    # because C++ indexes from 0, we need to adjust the indexing:
-    ancescpp <- ances - 1
-    forTimecpp <- forTime # nolint
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
-
-    if (num_threads == -2) {
-      calcul <- calc_cla_ll_threaded(ancescpp,
-                                     states,
-                                     forTimecpp,
-                                     lambdas,
-                                     mus,
-                                     Q,
-                                     1,
-                                     method,
-                                     is_complete_tree)
-    } else {
-      calcul <- calc_cla_ll_threaded(ancescpp,
-                                     states,
-                                     forTimecpp,
-                                     lambdas,
-                                     mus,
-                                     Q,
-                                     num_threads,
-                                     method,
-                                     is_complete_tree)
-    }
-  }
+  calcul <- update_using_cpp(ances, states, forTime, lambdas, mus, Q, method,
+                             atol, rtol, is_complete_tree, num_threads)
 
   mergeBranch <- calcul$mergeBranch # nolint
   nodeM <- calcul$nodeM  # nolint
@@ -234,17 +189,11 @@ cla_secsse_loglik <- function(parameter,
     nodeM <- c(nodeM, y) # nolint
   }
 
-  surv_prob <- 0
-  surv_prob2 <- 0
-  
   if (cond == "proper_cond") {
     pre_cond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
       pre_cond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
-      surv_prob[j] <- pre_cond[j] / sum(lambdas[[j]])
     }
-    surv_prob2 <- nodeM[1:d]
-    
     mergeBranch2 <- mergeBranch2 / pre_cond # nolint
   }
 
@@ -254,11 +203,6 @@ cla_secsse_loglik <- function(parameter,
         penalty(pars = parameter,
                 loglik_penalty = loglik_penalty)
 
-  if (see_survival_prob == TRUE) {
-    return(list(surv_prob = surv_prob,
-                nodeM = surv_prob2))
-  }
-  
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     # last row contains safety entry from C++ (all zeros)
@@ -270,4 +214,50 @@ cla_secsse_loglik <- function(parameter,
     } else {
     return(LL)
   }
+}
+
+#' @keywords internal
+update_using_cpp <- function(ances, states, forTime, lambdas, mus, Q, method,
+                             atol, rtol, is_complete_tree, num_threads) {
+  calcul <- c()
+
+  ancescpp <- ances - 1
+  forTimecpp <- forTime # nolint
+  forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
+
+  if (num_threads == 1) {
+    calcul <- cla_calThruNodes_cpp(ancescpp,
+                                   states,
+                                   forTimecpp,
+                                   lambdas,
+                                   mus,
+                                   Q,
+                                   method,
+                                   atol,
+                                   rtol,
+                                   is_complete_tree)
+  } else {
+    if (num_threads == -2) {
+      calcul <- calc_cla_ll_threaded(ancescpp,
+                                     states,
+                                     forTimecpp,
+                                     lambdas,
+                                     mus,
+                                     Q,
+                                     1,
+                                     method,
+                                     is_complete_tree)
+    } else {
+      calcul <- calc_cla_ll_threaded(ancescpp,
+                                     states,
+                                     forTimecpp,
+                                     lambdas,
+                                     mus,
+                                     Q,
+                                     num_threads,
+                                     method,
+                                     is_complete_tree)
+    }
+  }
+  return(calcul)
 }
