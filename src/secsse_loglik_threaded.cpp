@@ -1,3 +1,15 @@
+// Copyright 2022 - 2023 Thijs Janzen
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+//
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -16,7 +28,6 @@ using namespace Rcpp;
 
 template<typename OD_TYPE>
 struct combine_states {
-  
   combine_states(int d, const OD_TYPE& od) : d_(d), od_(od) {}
   
   state_vec operator()(const std::tuple< state_vec, state_vec >& input_states) {
@@ -32,7 +43,7 @@ struct combine_states {
     }
     
     long double loglik = ll1 + ll2;
-    normalize_loglik(mergeBranch, loglik);
+    normalize_loglik(&mergeBranch, &loglik);
     
     state_vec newstate(d_);
     for (int i = 0; i < d_; ++i) {
@@ -48,8 +59,6 @@ struct combine_states {
   OD_TYPE od_;
 };
 
-
-
 // [[Rcpp::export]]
 Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
                             const Rcpp::NumericVector& mm,
@@ -64,10 +73,10 @@ Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
     std::vector< int > ances_cpp(ances.begin(), ances.end());
     
     std::vector< std::vector< double >> for_time_cpp;
-    numericmatrix_to_vector(for_time, for_time_cpp);
+    numericmatrix_to_vector(for_time, &for_time_cpp);
     
     std::vector< std::vector< double >> states_cpp;
-    numericmatrix_to_vector(states, states_cpp);
+    numericmatrix_to_vector(states, &states_cpp);
     
     if (is_complete_tree) {
       ode_standard_ct od_(ll, mm, Q);
@@ -77,7 +86,6 @@ Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
                 for_time_cpp, states_cpp, 
                 num_threads, method);
       return ll_calc.calc_ll();
-    
     } else {
       ode_standard od_(ll, mm, Q);
       threaded_ll<ode_standard, combine_states< ode_standard>> 

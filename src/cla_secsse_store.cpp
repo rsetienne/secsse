@@ -1,3 +1,16 @@
+// Copyright 2023 Thijs Janzen
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+//
+
 #include <vector>
 #include "odeint.h"
 #include "util.h"
@@ -5,17 +18,17 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-
-storage calc_ll_cla_store_full(const Rcpp::List& ll,
-                               const Rcpp::NumericVector& mm,
-                               const Rcpp::NumericMatrix& Q,
-                               const std::vector<int>& ances,
-                               const std::vector< std::vector< double >>& for_time,
-                               const std::vector<std::vector<double>>& states,
-                               std::string method,
-                               double atol,
-                               double rtol,
-                               bool verbose)  {
+storage calc_ll_cla_store_full(
+    const Rcpp::List& ll,
+    const Rcpp::NumericVector& mm,
+    const Rcpp::NumericMatrix& Q,
+    const std::vector<int>& ances,
+    const std::vector< std::vector< double >>& for_time,
+    const std::vector<std::vector<double>>& states,
+    std::string method,
+    double atol,
+    double rtol,
+    bool verbose)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
@@ -33,7 +46,7 @@ storage calc_ll_cla_store_full(const Rcpp::List& ll,
   std::vector<double> mm_cpp(mm.begin(), mm.end());
   
   std::vector< std::vector<double >> Q_cpp;
-  numericmatrix_to_vector(Q, Q_cpp);
+  numericmatrix_to_vector(Q, &Q_cpp);
   
   std::vector<double> y;
   
@@ -68,7 +81,8 @@ storage calc_ll_cla_store_full(const Rcpp::List& ll,
       std::vector< std::vector< double >> yvecs;
       std::vector<double> t_vals;
       
-      std::unique_ptr<ode_cla_store> od_ptr = std::make_unique<ode_cla_store>(local_od);
+      std::unique_ptr<ode_cla_store> od_ptr = 
+           std::make_unique<ode_cla_store>(local_od);
       odeintcpp::integrate_full(method, 
                                 std::move(od_ptr), // ode class object
                                 y,// state vector
@@ -120,7 +134,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   std::vector<double> mm_cpp(mm.begin(), mm.end());
   
   std::vector< std::vector<double >> Q_cpp;
-  numericmatrix_to_vector(Q, Q_cpp);
+  numericmatrix_to_vector(Q, &Q_cpp);
   
   // temp, not used:
   ode_cla od(ll_cpp, mm_cpp, Q_cpp);
@@ -182,23 +196,23 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
-                                               const Rcpp::NumericMatrix& states_R,
-                                               const Rcpp::NumericMatrix& forTime_R,
-                                               const Rcpp::List& lambdas,
-                                               const Rcpp::NumericVector& mus,
-                                               const Rcpp::NumericMatrix& Q,
-                                               std::string method,
-                                               double atol,
-                                               double rtol,
-                                               bool is_complete_tree,
-                                               int num_steps,
-                                               bool verbose) {
-  
+Rcpp::NumericMatrix cla_calThruNodes_store_cpp(
+    const Rcpp::NumericVector& ances,
+    const Rcpp::NumericMatrix& states_R,
+    const Rcpp::NumericMatrix& forTime_R,
+    const Rcpp::List& lambdas,
+    const Rcpp::NumericVector& mus,
+    const Rcpp::NumericMatrix& Q,
+    std::string method,
+    double atol,
+    double rtol,
+    bool is_complete_tree,
+    int num_steps,
+    bool verbose) {
   try {
     std::vector< std::vector< double >> states, forTime;
-    numericmatrix_to_vector(states_R, states);
-    numericmatrix_to_vector(forTime_R, forTime);
+    numericmatrix_to_vector(states_R, &states);
+    numericmatrix_to_vector(forTime_R, &forTime);
     
     storage found_results;
     
@@ -206,7 +220,8 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
       found_results = calc_ll_cla_store(lambdas,
                                         mus,
                                         Q,
-                                        std::vector<int>(ances.begin(), ances.end()),
+                                        std::vector<int>(ances.begin(),
+                                                         ances.end()),
                                         forTime,
                                         states,
                                         num_steps,
@@ -218,7 +233,8 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
       found_results = calc_ll_cla_store_full(lambdas,
                                              mus,
                                              Q,
-                                             std::vector<int>(ances.begin(), ances.end()),
+                                             std::vector<int>(ances.begin(),
+                                                              ances.end()),
                                              forTime,
                                              states,
                                              method,
@@ -245,7 +261,7 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
     }
     
     Rcpp::NumericMatrix output;
-    vector_to_numericmatrix(prep_mat, output);
+    vector_to_numericmatrix(prep_mat, &output);
     
     return output;
   } catch(std::exception &ex) {

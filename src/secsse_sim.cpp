@@ -1,12 +1,21 @@
-#include <Rcpp.h>
+// Copyright 2022 - 2023 Thijs Janzen
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+//
+#include <Rcpp.h>
 
 #include "secsse_sim.h"
 #include "util.h"
 
-
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
-  
   num_mat_mat out(lambdas_R.size());
   for (size_t m = 0; m < lambdas_R.size(); ++m) {
     Rcpp::NumericMatrix entry_R = lambdas_R[m];
@@ -21,7 +30,6 @@ num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   return out;
 }
 
-
 // [[Rcpp::export]]
 Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::List& lambdas_R,
@@ -33,16 +41,13 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           bool non_extinction,
                           bool verbose,
                           int max_tries) {
-  
-  //std::cerr << "loading data from R\n"; force_output();
   num_mat q; 
-  numericmatrix_to_vector(q_R, q);
+  numericmatrix_to_vector(q_R, &q);
   
   num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
   
   if (conditioning_vec[0] == -1) conditioning_vec.clear(); // "none"
-  
-  
+
   secsse_sim sim(m_R, 
                  lambdas,
                  q,
@@ -77,9 +82,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
         if (!non_extinction && sim.run_info == extinct) break;
   }
   //extract and return
- // if (verbose) Rcpp::Rcout << "preparing to convert to R output\n";
   Rcpp::NumericMatrix ltable_for_r;
-  vector_to_numericmatrix(sim.extract_ltable(), ltable_for_r);
+  vector_to_numericmatrix(sim.extract_ltable(), &ltable_for_r);
   
   auto traits = sim.get_traits();
   auto init = sim.get_initial_state();
@@ -88,6 +92,5 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                                           Rcpp::Named("traits") = traits,
                                           Rcpp::Named("initial_state") = init,
                                           Rcpp::Named("tracker") = tracker);
- // if (verbose) Rcpp::Rcout << "handing over to R\n";
   return output;
 }

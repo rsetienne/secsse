@@ -1,3 +1,15 @@
+// Copyright 2022 - 2023 Thijs Janzen
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+//
 #include <vector>
 
 #include <Rcpp.h>
@@ -5,7 +17,6 @@ using namespace Rcpp;
 
 #include "odeint.h"
 #include "util.h"
-
 
 //// continuous storage
 storage calc_ll_full(const Rcpp::NumericVector& ll,
@@ -20,8 +31,6 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
                      double relative_tol,
                      std::string method,
                      bool verbose) {
-  
-  
   size_t d = ll.size();
   
   std::vector< double > mergeBranch(d);
@@ -56,17 +65,18 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
       std::vector< std::vector< double >> yvecs;
       std::vector<double> t_vals;
       
-      std::unique_ptr<ode_standard_store> od_ptr = std::make_unique<ode_standard_store>(od);
+      std::unique_ptr<ode_standard_store> od_ptr = 
+        std::make_unique<ode_standard_store>(od);
       odeintcpp::integrate_full(method, 
                                 std::move(od_ptr), // ode class object
                                 y,// state vector
                                 0.0,// t0
                                 timeInte[i], //t1
-                                        timeInte[i] * 0.01,
-                                        absolute_tol,
-                                        relative_tol,
-                                        yvecs,
-                                        t_vals); // t1
+                                timeInte[i] * 0.01,
+                                absolute_tol,
+                                relative_tol,
+                                yvecs,
+                                t_vals); // t1
       
       data_storage local_storage;
       for (size_t i = 0; i < yvecs.size(); ++i) {
@@ -79,7 +89,6 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
   
   return master_storage;
 }
-
 
 template <typename OD_TYPE>
 storage calc_ll(const Rcpp::NumericVector& ll,
@@ -95,8 +104,6 @@ storage calc_ll(const Rcpp::NumericVector& ll,
                 std::string method,
                 int num_steps,
                 bool verbose) {
-  
-  
   size_t d = ll.size();
   
   std::vector< double > mergeBranch(d);
@@ -172,11 +179,10 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
                                            bool is_complete_tree,
                                            int num_steps,
                                            bool verbose) {
-  
   std::vector< std::vector< double >> states, forTime;
   
-  numericmatrix_to_vector(states_R, states);
-  numericmatrix_to_vector(forTime_R, forTime);
+  numericmatrix_to_vector(states_R, &states);
+  numericmatrix_to_vector(forTime_R, &forTime);
   
   NumericVector mergeBranch;
   NumericVector nodeM;
@@ -189,7 +195,8 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
       found_results = calc_ll<ode_standard_ct>(lambdas,
                                                mus,
                                                Q,
-                                               std::vector<int>(ances.begin(), ances.end()),
+                                               std::vector<int>(ances.begin(), 
+                                                                ances.end()),
                                                forTime,
                                                states,
                                                mergeBranch,
@@ -203,7 +210,8 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
       found_results = calc_ll<ode_standard>(lambdas,
                                             mus,
                                             Q,
-                                            std::vector<int>(ances.begin(), ances.end()),
+                                            std::vector<int>(ances.begin(),
+                                                             ances.end()),
                                             forTime,
                                             states,
                                             mergeBranch,
@@ -228,7 +236,6 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
                                  method,
                                  verbose);
   }
-    
   std::vector< std::vector< double >> prep_mat;
   for (auto i : found_results.data_) {
     std::vector< double > add;
@@ -246,7 +253,7 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const NumericVector& ances,
   }
   
   Rcpp::NumericMatrix output;
-  vector_to_numericmatrix(prep_mat, output);
+  vector_to_numericmatrix(prep_mat, &output);
   
   return output;
 }

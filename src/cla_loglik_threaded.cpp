@@ -1,3 +1,16 @@
+// Copyright 2022 - 2023 Thijs Janzen
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+//
+
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -19,7 +32,6 @@ using namespace Rcpp;
 
 template< typename OD_TYPE>
 struct combine_states_cla {
-  
   combine_states_cla(int d, const OD_TYPE& od) : d_(d), od_(od) {}
   
   state_vec operator()(const std::tuple< state_vec, state_vec >& input_states) {
@@ -51,7 +63,7 @@ struct combine_states_cla {
     
     long double loglik = ll1 + ll2;
     
-    normalize_loglik(mergeBranch, loglik);
+    normalize_loglik(&mergeBranch, &loglik);
 
     state_vec newstate(d_);
     for (int i = 0; i < d_; ++i) {
@@ -78,11 +90,10 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
                                 std::string method = "odeint::bulirsch_stoer",
                                 bool is_complete_tree = false) {
   try {
-    
     std::vector< std::vector< double >> states_cpp, for_time_cpp, Q_cpp;
-    numericmatrix_to_vector(states_R, states_cpp);
-    numericmatrix_to_vector(forTime_R, for_time_cpp);
-    numericmatrix_to_vector(Q, Q_cpp);
+    numericmatrix_to_vector(states_R, &states_cpp);
+    numericmatrix_to_vector(forTime_R, &for_time_cpp);
+    numericmatrix_to_vector(Q, &Q_cpp);
     
     std::vector< int > ances_cpp(ances.begin(), ances.end());
     

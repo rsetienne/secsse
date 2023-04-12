@@ -1,8 +1,14 @@
+// Copyright 2022 - 2023 Thijs Janzen
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-//  naive.h
-//  secsse_sim
-//
-//  Created by thijsjanzen on 21/02/2023.
 //
 
 #pragma once
@@ -274,6 +280,8 @@ struct secsse_sim {
     std::mt19937 rndgen_t(rd());
     rndgen_ = rndgen_t;
     run_info = not_run_yet;
+    t = 0.0;
+    init_state = 0;
   }
   
   void run() {

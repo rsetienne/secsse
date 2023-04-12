@@ -1,24 +1,26 @@
+// Copyright 2021 - 2023 Thijs Janzen & Hanno Hildenbrandt
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-//  odeint.h
-//  calc_ll_secsse
-//
-//  Created by Thijs Janzen on 08/03/2021.
-//  Copyright © 2021 Thijs Janzen. All rights reserved.
 //
 
-#ifndef odeint_h
-#define odeint_h
-
+#pragma once
 #include <iostream>
 
 // [[Rcpp::depends(BH)]]
 #include "Rcpp.h"
 #include "boost/numeric/odeint.hpp"
-
 #include "util.h"
 
 class ode_standard {
-public:
+ public:
   
   ode_standard(const std::vector<double>& l,
                       const std::vector<double>& m,
@@ -30,10 +32,9 @@ public:
   ode_standard(const Rcpp::NumericVector& l,
                const Rcpp::NumericVector& m,
                const Rcpp::NumericMatrix& q) {
-    
     l_ = std::vector<double>(l.begin(), l.end());
     m_ = std::vector<double>(m.begin(), m.end());
-    numericmatrix_to_vector(q, q_);
+    numericmatrix_to_vector(q, &q_);
     
     d = l_.size();
   }
@@ -42,7 +43,6 @@ public:
                 std::vector<  double > &dxdt,
                 const double /* t */ ) {
     for (size_t i = 0; i < d; ++i) {
-      
       if (l_[i] != 0.0) {
       
         dxdt[i] = m_[i] - (l_[i] + m_[i]) * x [i]  +
@@ -67,7 +67,6 @@ public:
     return;
   }
   
-  
   double get_l(int index) const {
     return l_[index];
   } 
@@ -76,7 +75,7 @@ public:
     return d;
   }
   
-private:
+ private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
@@ -84,7 +83,7 @@ private:
 };
 
 class ode_standard_ct {
-public:
+ public:
   
   ode_standard_ct(const std::vector<double>& l,
                const std::vector<double>& m,
@@ -99,7 +98,7 @@ public:
     
     l_ = std::vector<double>(l.begin(), l.end());
     m_ = std::vector<double>(m.begin(), m.end());
-    numericmatrix_to_vector(q, q_);
+    numericmatrix_to_vector(q, &q_);
     
     d = l_.size();
   }
@@ -107,7 +106,6 @@ public:
   void operator()( const std::vector< double > &x ,
                 std::vector<  double > &dxdt,
                 const double /* t */ ) {
-    
     for (int i = 0; i < d; ++i) {
       long double diff_1 = (m_[i] - (l_[i] * x[i]));
       dxdt[i] =  diff_1 * (1 - x[i]);
@@ -128,34 +126,29 @@ public:
     
     return;
   }
-  
-  
+
   double get_l(int index) const {
     return l_[index];
   } 
-  
+
   size_t get_d() const {
     return d;
   }
-  
-private:
+
+ private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
   size_t d;
 };
 
-
-
 class ode_cla {
   // used for normal tree
-public:
-  
+ public:
   ode_cla(const std::vector<std::vector<std::vector<double>>>& l,
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
-    
     lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
       for (int j = 0; j < d; ++j) {
@@ -166,11 +159,11 @@ public:
     }
   }
   
-  // rename to operator() to use this version of the operator, withouth kahan sum.
+  // rename to operator() to use this version of the operator, 
+  // without kahan sum.
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,
                 const double /* t */ ) const {
-    
     for (int i = 0; i < d; ++i) {
       double Df = 0.0;
       double Ef = 0.0;
@@ -187,9 +180,6 @@ public:
         }
       }
 
-    //  dxdt[i]     = Ef + m_[i] + x[i] * (m_[i] - lambda_sum[i]);
-    //  dxdt[i + d] = Df - x[i + d] * (lambda_sum[i] + m_[i]); //remaining: Q_ds - x[i+d] * Q_one
-      
       dxdt[i]     = Ef + m_[i] - (lambda_sum[i] + m_[i]) * x[i];
       dxdt[i + d] = Df + (-lambda_sum[i] - m_[i]) * x[i + d];
       
@@ -222,8 +212,7 @@ private:
 };
 
 class ode_cla_backup {
-public:
-  
+ public:
   ode_cla_backup(const std::vector<std::vector<std::vector<double>>>& l,
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
@@ -288,7 +277,7 @@ public:
     return d;
   }
   
-private:
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -297,8 +286,8 @@ private:
 };
 
 class ode_cla_d {
-  // used for complete tree
-public:
+  // used for complete tree including extinct branches
+ public:
   
   ode_cla_d(const std::vector<std::vector<std::vector<double>>>& l,
           const std::vector<double>& m,
@@ -326,7 +315,6 @@ public:
       }
     }
   }
-  
 
   void operator()(const std::vector< double > &x ,
                   std::vector< double > &dxdt,
@@ -350,7 +338,7 @@ public:
     return d;
   }
   
-private:
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -360,8 +348,7 @@ private:
 
 class ode_cla_e {
   // used for ct conditioning.
-public:
-  
+ public:
   ode_cla_e(const std::vector<std::vector<std::vector<double>>>& l,
             const std::vector<double>& m,
             const std::vector<std::vector<double>>& q) :
@@ -371,8 +358,6 @@ public:
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,
                 const double /* t */ ) const {
-    
-    
     for (int i = 0; i < d; ++i) {
       dxdt[i] = 0.0;
       if (m_[i] != 0.0) {
@@ -408,13 +393,11 @@ private:
   const size_t d;
 };
 
-
-//////// STORAGE section
+//////// STORAGE section - these are used for plotting
 //////// these versions also store intermediate results!
 
 class ode_standard_store {
-public:
-  
+ public:
   ode_standard_store(const std::vector<double>& l,
                const std::vector<double>& m,
                const std::vector<std::vector<double>>& q) :
@@ -428,7 +411,7 @@ public:
     
     l_ = std::vector<double>(l.begin(), l.end());
     m_ = std::vector<double>(m.begin(), m.end());
-    numericmatrix_to_vector(q, q_);
+    numericmatrix_to_vector(q, &q_);
     
     d = l_.size();
   }
@@ -437,9 +420,7 @@ public:
                    std::vector<  double > &dxdt,
                    const double t /* t */ ) {
     for (size_t i = 0; i < d; ++i) {
-      
       if (l_[i] != 0.0) {
-        
         dxdt[i] = m_[i] - (l_[i] + m_[i]) * x [i]  +
           l_[i] * x[i] * x[i];
         
@@ -462,10 +443,8 @@ public:
     
     stored_t.push_back(t);
     stored_states.push_back(x);
-    
     return;
   }
-  
   
   double get_l(int index) const {
     return l_[index];
@@ -494,13 +473,11 @@ private:
 
 class ode_cla_store {
   // used for normal tree
-public:
-  
+ public:
   ode_cla_store(const std::vector<std::vector<std::vector<double>>>& l,
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
-    
     lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
       for (int j = 0; j < d; ++j) {
@@ -546,8 +523,6 @@ public:
         dxdt[i + d] += q_[i][j] * temp2;
       }
     }
-
-    
     return;
   }
   
@@ -567,7 +542,7 @@ public:
     return stored_t;
   }
   
-private:
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -576,10 +551,6 @@ private:
   std::vector< std::vector<double >> stored_states;
   std::vector<double> stored_t;
 };
-
-
-
-
 
 namespace odeintcpp {
 
@@ -595,11 +566,10 @@ template <
   typename STATE,
   typename ODE
 >
-void integrate(STEPPER stepper, ODE ode, STATE& y, double t0, double t1, double dt)
-{
+void integrate(STEPPER stepper, ODE ode, STATE& y,
+               double t0, double t1, double dt) {
   bno::integrate_adaptive(stepper, ode, y, t0, t1, dt);
 }
-
 
 template <
   typename STATE,
@@ -607,26 +577,24 @@ template <
 >
 void integrate(const std::string& stepper_name, 
                std::unique_ptr<ODE> ode,
-               STATE& y, double t0, double t1, double dt, double atol, double rtol)
-{
+               STATE& y, double t0, double t1,
+               double dt, double atol, double rtol) {
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol),
+    integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol,
+                                                                        rtol),
               std::ref(*ode), y, t0, t1, dt);
-  }
-  else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
-  }
-  else if ("odeint::runge_kutta_dopri5" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
-  }
-  else if ("odeint::bulirsch_stoer" == stepper_name) {
-    integrate(bno::bulirsch_stoer<STATE>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
-  }
-  else if ("odeint::runge_kutta4" == stepper_name) {
+  } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(
+        atol, rtol), std::ref(*ode), y,t0, t1, dt);
+  } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
+    integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), 
+              std::ref(*ode), y, t0, t1, dt);
+  } else if ("odeint::bulirsch_stoer" == stepper_name) {
+    integrate(bno::bulirsch_stoer<STATE>(atol, rtol), 
+              std::ref(*ode), y, t0, t1, dt);
+  } else if ("odeint::runge_kutta4" == stepper_name) {
     integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
-  }
- 
-  else {
+  } else {
     throw std::runtime_error("odeintcpp::integrate: unknown stepper");
   }
 }
@@ -637,22 +605,28 @@ template <
 >
 void integrate_full(const std::string& stepper_name, 
                     std::unique_ptr<ODE> ode,
-                    STATE& y, double t0, double t1, double dt, double atol, double rtol,
+                    STATE& y, double t0, double t1, double dt, 
+                    double atol, double rtol,
                     std::vector< std::vector<double>>& yvals,
                     std::vector<double>& tvals)
 {
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol),
+    integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, 
+                                                                        rtol),
               std::ref(*ode), y, t0, t1, dt);
   }
   else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+    integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol,
+                                                                       rtol), 
+                                                std::ref(*ode), y, t0, t1, dt);
   }
   else if ("odeint::runge_kutta_dopri5" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+    integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol),
+              std::ref(*ode), y, t0, t1, dt);
   }
   else if ("odeint::bulirsch_stoer" == stepper_name) {
-    integrate(bno::bulirsch_stoer<STATE>(atol, rtol), std::ref(*ode), y, t0, t1, dt);
+    integrate(bno::bulirsch_stoer<STATE>(atol, rtol), std::ref(*ode), y, 
+              t0, t1, dt);
   }
   else if ("odeint::runge_kutta4" == stepper_name) {
     integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
@@ -671,9 +645,10 @@ template <
   typename STATE,
   typename ODE
 >
-void integrate(const std::string& stepper_name, std::unique_ptr<ODE> ode, STATE& y, double t0, double t1)
-{
-  integrate(stepper_name, std::move(ode), y, t0, t1, (t1 - t0) / default_init_steps, default_atol, default_rtol);
+void integrate(const std::string& stepper_name,
+               std::unique_ptr<ODE> ode, STATE& y, double t0, double t1) {
+  integrate(stepper_name, std::move(ode), y, t0, t1, 
+            (t1 - t0) / default_init_steps, default_atol, default_rtol);
 }
 
 
@@ -681,8 +656,8 @@ template <
   typename STATE,
   typename ODE
 >
-void integrate(std::unique_ptr<ODE> ode, STATE& y, double t0, double t1, double dt, double atol, double rtol)
-{
+void integrate(std::unique_ptr<ODE> ode, STATE& y,
+               double t0, double t1, double dt, double atol, double rtol) {
   integrate(default_stepper_name, std::move(ode), y, t0, t1, dt, atol, rtol);
 }
 
@@ -691,10 +666,7 @@ template <
   typename STATE,
   typename ODE
 >
-void integrate(std::unique_ptr<ODE> ode, STATE& y, double t0, double t1)
-{
+void integrate(std::unique_ptr<ODE> ode, STATE& y, double t0, double t1) {
   integrate(default_stepper_name, std::move(ode), y, t0, t1);
 }
 }
-
-#endif /* odeint_h */

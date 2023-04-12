@@ -1,3 +1,15 @@
+// Copyright 2022 - 2023 Thijs Janzen
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+//
 #include <vector>
 
 #include <Rcpp.h>
@@ -18,7 +30,6 @@ double calc_ll(const Rcpp::NumericVector& ll,
                double absolute_tol,
                double relative_tol,
                std::string method) {
-
   OD_TYPE od(ll, mm, Q);
   size_t d = ll.size();
 
@@ -34,16 +45,12 @@ double calc_ll(const Rcpp::NumericVector& ll,
     std::vector<double> timeInte;
     find_desNodes(for_time, focal, desNodes, timeInte);
 
-  //  std::cerr << focal << " ";
     for (int i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
-    //  Rcpp::Rcout << focal_node << " " << states.size() << "\n";
       std::vector< double > y = states[focal_node - 1];
       
       std::unique_ptr<OD_TYPE> od_ptr = std::make_unique<OD_TYPE>(od);
-     
-   //   std::cerr << focal << " " << timeInte[i] << " "; 
-     
+
       odeintcpp::integrate(method, 
                            std::move(od_ptr), // ode class object
                            y,// state vector
@@ -52,30 +59,24 @@ double calc_ll(const Rcpp::NumericVector& ll,
                            timeInte[i] * 0.01,
                            absolute_tol,
                            relative_tol); // t1
-     
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
-      
-  /*    for (auto x : y) {
-        std::cerr << x << " ";
-  } std::cerr << "\n";*/
     }
   
-    normalize_loglik_node(nodeM, loglik);
-    normalize_loglik_node(nodeN, loglik);
+    normalize_loglik_node(&nodeM, &loglik);
+    normalize_loglik_node(&nodeN, &loglik);
 
     // code correct up till here.
     for (int i = 0; i < d; ++i) {
       mergeBranch[i] = nodeM[i + d] * nodeN[i + d] * ll[i];
     }
-    normalize_loglik(mergeBranch, loglik);
+    normalize_loglik(&mergeBranch, &loglik);
 
     std::vector< double > newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
     states[focal - 1] = newstate; // -1 because of R conversion to C++ indexing
-  //  std::cerr << std::setprecision(20) << loglik << "\n"; 
   }
 
   merge_branch_out = NumericVector(mergeBranch.begin(), mergeBranch.end());
@@ -96,23 +97,16 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
                             double reltol,
                             std::string method,
                             bool is_complete_tree) {
-
- // Rcpp::Rcout << "welcome!\n"; force_output();
-  
   std::vector< std::vector< double >> states, forTime;
- // Rcpp::Rcout << "states to matrix " << states_R.nrow() << " " << states_R.ncol() << "\n"; 
-  
-  numericmatrix_to_vector(states_R, states);
- // Rcpp::Rcout << "forTime_R to matrix\n"; force_output();
-  numericmatrix_to_vector(forTime_R, forTime);
+
+  numericmatrix_to_vector(states_R, &states);
+  numericmatrix_to_vector(forTime_R, &forTime);
 
   NumericVector mergeBranch;
   NumericVector nodeM;
   
   double loglik;
- // Rcpp::Rcout << "starting calc\n"; force_output();
   if (is_complete_tree) {
-    
     loglik = calc_ll<ode_standard_ct>(lambdas,
                                    mus,
                                    Q,
@@ -125,7 +119,6 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
                                    reltol,
                                    method);
   } else {
-    
     loglik = calc_ll<ode_standard>(lambdas,
                                    mus,
                                    Q,
@@ -138,9 +131,8 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
                                    reltol,
                                    method);
   }
-  
   NumericMatrix states_out;
-  vector_to_numericmatrix(states, states_out);
+  vector_to_numericmatrix(states, &states_out);
 
   Rcpp::List output = Rcpp::List::create( Named("states") = states_out,
                                           Named("loglik") = loglik,
@@ -148,7 +140,6 @@ Rcpp::List calThruNodes_cpp(const NumericVector& ances,
                                           Named("nodeM") = nodeM);
   return output;
 }
-
 
 // [[Rcpp::export]]
 Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
@@ -159,15 +150,13 @@ Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
                                  const std::string& method,
                                  double atol,
                                  double rtol) {
-  
   ode_standard_ct od(ll, mm, Q);
   
   std::vector<double> init_state(y.begin(), y.end());
   
-  std::unique_ptr<ode_standard_ct> od_ptr = std::make_unique<ode_standard_ct>(od);
-  
-//  Rcpp::Rcout << "ct_correction for: " << t << "\n"; force_output();
-  
+  std::unique_ptr<ode_standard_ct> od_ptr =
+     std::make_unique<ode_standard_ct>(od);
+
   odeintcpp::integrate(method,
                        std::move(od_ptr), // ode class object
                        init_state,// state vector
