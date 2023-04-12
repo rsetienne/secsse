@@ -11,12 +11,9 @@
 //
 //
 #include <Rcpp.h>
-using namespace Rcpp;
 
 #include <vector>
 #include <tuple>
-
-#include <thread>
 
 #include "odeint.h"   // NOLINT [build/include_subdir]
 #include "util.h"     // NOLINT [build/include_subdir]
@@ -79,7 +76,7 @@ Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll,
     if (is_complete_tree) {
       ode_standard_ct od_(ll, mm, Q);
 
-      threaded_ll<ode_standard_ct, combine_states<ode_standard_ct>> 
+      threaded_ll<ode_standard_ct, combine_states<ode_standard_ct>>
         ll_calc(od_, ances_cpp,
                 for_time_cpp, states_cpp,
                 num_threads, method);

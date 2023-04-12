@@ -25,7 +25,7 @@ using vec_dist  = std::vector< std::discrete_distribution<> >;
 
 enum event_type {shift, speciation, extinction, max_num};
 
-enum finish_type {done, extinct, overshoot, conditioning, not_run_yet, 
+enum finish_type {done, extinct, overshoot, conditioning, not_run_yet,
                   max_types};
 
 struct ltab_species {
@@ -88,8 +88,8 @@ struct lambda_dist {
   std::vector<double> probs;
   std::discrete_distribution<size_t> d;
 
-  size_t draw_from_dist(std::mt19937& rndgen) {
-    return indices[ d(rndgen) ];
+  size_t draw_from_dist(std::mt19937* rndgen) {
+    return indices[d(*rndgen)];
   }
 
   lambda_dist(const std::vector<size_t>& i,
@@ -105,7 +105,7 @@ struct species_info {
 
   species_info(const std::vector<double>& m,
                const std::vector<double>& l,
-               const std::vector<double>& s) : 
+               const std::vector<double>& s) :
     trait_mu(m), trait_lambda(l), trait_qs(s) {
     max_mu = *std::max_element(trait_mu.begin(), trait_mu.end());
     max_la = *std::max_element(trait_lambda.begin(), trait_lambda.end());
@@ -157,7 +157,7 @@ struct species {
   double sum_rate_;
 
   species(size_t trait, int ID, const species_info& info) :
-    trait_(trait),  id_(ID), mu_(info.mu(trait)), lambda_(info.lambda(trait)), 
+    trait_(trait),  id_(ID), mu_(info.mu(trait)), lambda_(info.lambda(trait)),
     shiftprob_(info.shift(trait)) {
     sum_rate_ = mu_ + lambda_ + shiftprob_;
   }
@@ -332,16 +332,16 @@ struct secsse_sim {
     check_rates[shift] = std::accumulate(pop.pop.begin(), pop.pop.end(),
                     0.0,
                     [](double x, const species& s){return x + s.shiftprob_;});
-    check_rates[extinction] = std::accumulate(pop.pop.begin(), pop.pop.end(), 
+    check_rates[extinction] = std::accumulate(pop.pop.begin(), pop.pop.end(),
                     0.0,
                     [](double x, const species& s){return x + s.mu_;});
-    check_rates[speciation] = std::accumulate(pop.pop.begin(), pop.pop.end(), 
+    check_rates[speciation] = std::accumulate(pop.pop.begin(), pop.pop.end(),
                     0.0,
                     [](double x, const species& s){return x + s.lambda_;});
-    
+
     for (int i = shift; i != max_num; ++i) {
       if (std::abs(check_rates[i] - pop.rates[i]) > 1e-3) {
-        std::cerr << t << " " << i << " " << 
+        std::cerr << t << " " << i << " " <<
                      pop.rates[i] << " " << check_rates[i] << "\n";
         exit(0);
       }
@@ -438,7 +438,7 @@ struct secsse_sim {
   }
 
   int pick_speciation_id(const size_t& index) {
-    return lambda_distributions[index].draw_from_dist(rndgen_);
+    return lambda_distributions[index].draw_from_dist(&rndgen_);
   }
 
   void event_traitshift() {
@@ -457,8 +457,8 @@ struct secsse_sim {
   }
 
   event_type draw_event() {
-    double total_rate = pop.rates[shift] + 
-                        pop.rates[extinction] + 
+    double total_rate = pop.rates[shift] +
+                        pop.rates[extinction] +
                         pop.rates[speciation];
     std::uniform_real_distribution<double> unif_dist(0.0, total_rate);
     double r = unif_dist(rndgen_);
@@ -472,8 +472,8 @@ struct secsse_sim {
   }
 
   double draw_dt() {
-    double total_rate = pop.rates[shift] + 
-                        pop.rates[extinction] + 
+    double total_rate = pop.rates[shift] +
+                        pop.rates[extinction] +
                         pop.rates[speciation];
 
     std::exponential_distribution<double> exp_dist(total_rate);
@@ -597,11 +597,10 @@ struct secsse_sim {
   size_t get_initial_state() {
     return init_state;
   }
-  
+
   num_mat extract_ltable() {
     num_mat extracted_ltable(L.data_.size(), std::vector<double>(4));
     for (int i = 0; i < L.data_.size(); ++i) {
-
       auto temp = L.data_[i].get_data();
       std::vector<double> row(temp.begin(), temp.end());
       extracted_ltable[i] = row;

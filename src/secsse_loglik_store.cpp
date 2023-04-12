@@ -35,7 +35,7 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
 
   storage master_storage;
   int update_freq = ances.size() / 20;
-  if(update_freq < 1) update_freq = 1;
+  if (update_freq < 1) update_freq = 1;
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
@@ -61,18 +61,18 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
       std::vector< std::vector< double >> yvecs;
       std::vector<double> t_vals;
 
-      std::unique_ptr<ode_standard_store> od_ptr = 
+      std::unique_ptr<ode_standard_store> od_ptr =
                          std::make_unique<ode_standard_store>(od);
-      odeintcpp::integrate_full(method, 
+      odeintcpp::integrate_full(method,
                                 std::move(od_ptr),    // ode class object
-                                &y,                    // state vector
+                                &y,                   // state vector
                                 0.0,                  // t0
-                                timeInte[i],          //t1
+                                timeInte[i],          // t1
                                 timeInte[i] * 0.01,
                                 absolute_tol,
                                 relative_tol,
                                 &yvecs,
-                                &t_vals); // t1
+                                &t_vals);
 
       data_storage local_storage;
       for (size_t i = 0; i < yvecs.size(); ++i) {
@@ -116,15 +116,14 @@ storage calc_ll(const Rcpp::NumericVector& ll,
       Rcpp::Rcout << "**";
     }
     Rcpp::checkUserInterrupt();
-    
+
     std::vector<int> desNodes;
     std::vector<double> timeInte;
     find_desNodes(for_time, focal, &desNodes, &timeInte);
-    
-    
+
     for (int i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
-      
+
       data_storage local_storage;
 
       OD_TYPE od(ll, mm, Q);
@@ -136,14 +135,14 @@ storage calc_ll(const Rcpp::NumericVector& ll,
 
       for (int j = 0; j < num_steps; ++j) {
         std::unique_ptr<OD_TYPE> od_ptr = std::make_unique<OD_TYPE>(od);
-        odeintcpp::integrate(method, 
+        odeintcpp::integrate(method,
                              std::move(od_ptr),  // ode class object
                              &y,                 // state vector
                              t,                  // t0
-                             t + dt,             //t1
+                             t + dt,             // t1
                              timeInte[i] * 0.01,
                              absolute_tol,
-                             relative_tol);      
+                             relative_tol);
         t += dt;
         local_storage.add_entry(t, y);
       }
@@ -181,7 +180,7 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
       found_results = calc_ll<ode_standard_ct>(lambdas,
                                                mus,
                                                Q,
-                                               std::vector<int>(ances.begin(), 
+                                               std::vector<int>(ances.begin(),
                                                                 ances.end()),
                                                forTime,
                                                states,
@@ -220,8 +219,8 @@ Rcpp::NumericMatrix calThruNodes_store_cpp(const Rcpp::NumericVector& ances,
   for (auto i : found_results.data_) {
     std::vector< double > add;
     for (size_t j = 0; j < i.probabilities.t.size(); ++j) {
-      add = {static_cast<double>(i.ances), 
-             static_cast<double>(i.focal_node), 
+      add = {static_cast<double>(i.ances),
+             static_cast<double>(i.focal_node),
              i.probabilities.t[j]};
 
       for (const auto& k : i.probabilities.probs[j]) {

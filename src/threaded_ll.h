@@ -10,11 +10,9 @@
 // GNU General Public License for more details.
 //
 //
-
 #pragma once
 
 #include <Rcpp.h>
-using namespace Rcpp;
 
 #include <vector>
 #include <tuple>
@@ -23,16 +21,16 @@ using namespace Rcpp;
 #include <string>
 #include <memory>
 
+#include <RcppParallel.h>
+
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
 
-#include <RcppParallel.h>
-
-using state_vec  = std::vector<double>; 
+using state_vec  = std::vector<double>;
 using state_node = tbb::flow::function_node< state_vec, state_vec>;
-using merge_node = tbb::flow::function_node< std::tuple<state_vec, 
+using merge_node = tbb::flow::function_node< std::tuple<state_vec,
                                                         state_vec>, state_vec>;
-using join_node  = tbb::flow::join_node< std::tuple<state_vec, state_vec>, 
+using join_node  = tbb::flow::join_node< std::tuple<state_vec, state_vec>,
                                          tbb::flow::queueing >;
 
 template<typename OD_OBJECT>
@@ -48,14 +46,14 @@ struct update_state {
 
     std::unique_ptr<OD_OBJECT> od_ptr = std::make_unique<OD_OBJECT>(od_);
 
-    odeintcpp::integrate(method, 
+    odeintcpp::integrate(method,
                          std::move(od_ptr),  // ode class object
-                         &current_state,  // state vector
-                         0.0,  // t0
-                         dt_,  // t1
-                         dt_ * 0.1,  // dt
-                         1e-10,   // atol
-                         1e-10);  // rtol
+                         &current_state,     // state vector
+                         0.0,                // t0
+                         dt_,                // t1
+                         dt_ * 0.1,          // dt
+                         1e-10,              // atol
+                         1e-10);             // rtol
     normalize_loglik_node(&current_state, &loglik);
     current_state.push_back(loglik);
     return current_state;
@@ -79,7 +77,7 @@ struct collect_ll {
 
 template <typename OD_OBJECT, typename MERGE_STATE>
 struct threaded_ll {
- private:  
+ private:
   std::vector< state_node* > state_nodes;
   std::vector< merge_node* > merge_nodes;
   std::vector< join_node*  > join_nodes;
@@ -92,7 +90,7 @@ struct threaded_ll {
   int num_threads;
   const int d;
   const std::string method;
-  
+
  public:
   threaded_ll(const OD_OBJECT& od_in,
               const std::vector<int>& ances_in,
@@ -100,7 +98,7 @@ struct threaded_ll {
               const std::vector< std::vector< double >>& states_in,
               int n_threads,
               std::string m) :
-  od(od_in), ances(ances_in), for_time(for_time_in), 
+  od(od_in), ances(ances_in), for_time(for_time_in),
   states(states_in), num_threads(n_threads), d(od_in.get_d()), method(m) {
     if (num_threads < 0) {
       num_threads = tbb::task_scheduler_init::default_num_threads();
@@ -118,8 +116,8 @@ struct threaded_ll {
   }
 
   Rcpp::List calc_ll() {
-    tbb::task_scheduler_init _tbb((num_threads > 0) ? 
-                                    num_threads : 
+    tbb::task_scheduler_init _tbb((num_threads > 0) ?
+                                    num_threads :
                                     tbb::task_scheduler_init::automatic);
     int num_tips = ances.size() + 1;
 
@@ -127,8 +125,8 @@ struct threaded_ll {
     tbb::flow::broadcast_node<double> start(g);
 
     for (size_t i = 0; i < states.size() + 1; ++i) {
-      double dt = get_dt(for_time, i); 
-      auto new_node = new state_node(g, tbb::flow::unlimited, 
+      double dt = get_dt(for_time, i);
+      auto new_node = new state_node(g, tbb::flow::unlimited,
                                     update_state<OD_OBJECT>(dt, i, od, method));
       state_nodes.push_back(new_node);
     }
@@ -139,12 +137,12 @@ struct threaded_ll {
 
       auto new_join = new join_node(g);
       join_nodes.push_back(new_join);
-      tbb::flow::make_edge(*state_nodes[connections[0]], 
+      tbb::flow::make_edge(*state_nodes[connections[0]],
                            std::get<0>(join_nodes.back()->input_ports()));
-      tbb::flow::make_edge(*state_nodes[connections[1]], 
+      tbb::flow::make_edge(*state_nodes[connections[1]],
                            std::get<1>(join_nodes.back()->input_ports()));
 
-      auto new_merge_node = new merge_node(g, 
+      auto new_merge_node = new merge_node(g,
                                            tbb::flow::unlimited,
                                            MERGE_STATE(d, od));
       merge_nodes.push_back(new_merge_node);
@@ -155,8 +153,8 @@ struct threaded_ll {
 
     state_vec output;
     tbb::flow::function_node< state_vec, state_vec> collect(
-        g, 
-        tbb::flow::serial, 
+        g,
+        tbb::flow::serial,
         collect_ll(output) );
     tbb::flow::make_edge(*merge_nodes.back(), collect);
 
@@ -174,13 +172,13 @@ struct threaded_ll {
       startvec.push_back(0.0);
 
       input.try_put(startvec);
-    }  
+    }
 
     g.wait_for_all();
 
     double loglikelihood = output.back();
-    
-    NumericVector mergeBranch;
+
+    Rcpp::NumericVector mergeBranch;
     for (int i = 0; i < d; ++i) {
       mergeBranch.push_back(output[d + i]);
     }

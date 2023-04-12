@@ -41,14 +41,14 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           bool non_extinction,
                           bool verbose,
                           int max_tries) {
-  num_mat q; 
+  num_mat q;
   numericmatrix_to_vector(q_R, &q);
 
   num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
 
   if (conditioning_vec[0] == -1) conditioning_vec.clear();   // "none"
 
-  secsse_sim sim(m_R, 
+  secsse_sim sim(m_R,
                  lambdas,
                  q,
                  max_time,
@@ -58,7 +58,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   std::array<int, 5> tracker = {0, 0, 0, 0, 0};
   int cnt = 0;
   while (true) {
-        sim.run(); 
+        sim.run();
         sim.check_num_traits(conditioning_vec);
 
         if (sim.run_info != done) {
@@ -67,8 +67,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
            if (verbose) {
              if (cnt % 1000 == 0) {
               Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
-                          << "large: "   << tracker[overshoot] << " " 
-                          << "cond: "    << tracker[conditioning] << "\n"; 
+                          << "large: "   << tracker[overshoot] << " "
+                          << "cond: "    << tracker[conditioning] << "\n";
             }
           }
         } else {

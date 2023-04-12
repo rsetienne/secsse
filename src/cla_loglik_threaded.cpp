@@ -12,7 +12,6 @@
 //
 
 #include <Rcpp.h>
-using namespace Rcpp;
 
 #include <vector>
 #include <tuple>
@@ -97,7 +96,7 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
       for (size_t j = 0; j < temp.nrow(); ++j) {
         std::vector<double> row;
         for (size_t k = 0; k < temp.ncol(); ++k) {
-          row.push_back(temp(j, k));  
+          row.push_back(temp(j, k));
         }
         temp2.push_back(row);
       }
@@ -106,10 +105,10 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
 
     if (is_complete_tree) {
       ode_cla_d od_(ll_cpp, mus_cpp, Q_cpp);
-      
+
       threaded_ll<ode_cla_d,
                   combine_states_cla<ode_cla_d> > ll_calc(od_,
-                                                          ances_cpp, 
+                                                          ances_cpp,
                                                           for_time_cpp,
                                                           states_cpp,
                                                           num_threads,
@@ -119,13 +118,13 @@ Rcpp::List calc_cla_ll_threaded(const Rcpp::NumericVector& ances,
       ode_cla od_(ll_cpp, mus_cpp, Q_cpp);
 
       threaded_ll<ode_cla, combine_states_cla<ode_cla> > ll_calc(od_,
-                                                                 ances_cpp, 
+                                                                 ances_cpp,
                                                                  for_time_cpp,
-                                                                 states_cpp, 
+                                                                 states_cpp,
                                                                  num_threads,
                                                                  method);
       return ll_calc.calc_ll();
-    } 
+    }
   } catch(std::exception &ex) {
     forward_exception_to_r(ex);
   } catch(...) {

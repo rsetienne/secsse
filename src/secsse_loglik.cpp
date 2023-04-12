@@ -50,14 +50,14 @@ double calc_ll(const Rcpp::NumericVector& ll,
 
       std::unique_ptr<OD_TYPE> od_ptr = std::make_unique<OD_TYPE>(od);
 
-      odeintcpp::integrate(method, 
+      odeintcpp::integrate(method,
                            std::move(od_ptr),       // ode class object
                            &y,                      // state vector
                            0.0,                     // t0
                            timeInte[i],             // t1
                            timeInte[i] * 0.01,
                            absolute_tol,
-                           relative_tol); // t1
+                           relative_tol);
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
@@ -75,7 +75,8 @@ double calc_ll(const Rcpp::NumericVector& ll,
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
-    (*states)[focal - 1] = newstate; // -1 because of R conversion to C++ indexing
+    // -1 because of R conversion to C++ indexing
+    (*states)[focal - 1] = newstate;
   }
 
   (*merge_branch_out) = Rcpp::NumericVector(mergeBranch.begin(),
@@ -134,11 +135,11 @@ Rcpp::List calThruNodes_cpp(const Rcpp::NumericVector& ances,
   Rcpp::NumericMatrix states_out;
   vector_to_numericmatrix(states, &states_out);
 
-  Rcpp::List output = Rcpp::List::create( Rcpp::Named("states") = states_out,
-                                          Rcpp::Named("loglik") = loglik,
-                                          Rcpp::Named("mergeBranch") =
-                                             mergeBranch,
-                                          Rcpp::Named("nodeM") = nodeM);
+  Rcpp::List output = Rcpp::List::create(Rcpp::Named("states") = states_out,
+                                         Rcpp::Named("loglik") = loglik,
+                                         Rcpp::Named("mergeBranch") = 
+                                                      mergeBranch,
+                                         Rcpp::Named("nodeM") = nodeM);
   return output;
 }
 
@@ -165,7 +166,7 @@ Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
                        t,                   // t1
                        t * 0.01,
                        atol,
-                       rtol); 
+                       rtol);
 
   Rcpp::NumericVector out;
   for (int i = 0; i < init_state.size(); ++i) {

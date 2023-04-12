@@ -35,7 +35,7 @@ storage calc_ll_cla_store_full(
     for (size_t j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
       for (size_t k = 0; k < temp.ncol(); ++k) {
-        row.push_back(temp(j, k));  
+        row.push_back(temp(j, k));
       }
       temp2.push_back(row);
     }
@@ -80,9 +80,9 @@ storage calc_ll_cla_store_full(
       std::vector< std::vector< double >> yvecs;
       std::vector<double> t_vals;
 
-      std::unique_ptr<ode_cla_store> od_ptr = 
+      std::unique_ptr<ode_cla_store> od_ptr =
            std::make_unique<ode_cla_store>(local_od);
-      odeintcpp::integrate_full(method, 
+      odeintcpp::integrate_full(method,
                                 std::move(od_ptr),  // ode class object
                                 &y,                 // state vector
                                 0.0,                // t0
@@ -122,7 +122,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
     for (size_t j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
       for (size_t k = 0; k < temp.ncol(); ++k) {
-        row.push_back(temp(j, k));  
+        row.push_back(temp(j, k));
       }
       temp2.push_back(row);
     }
@@ -182,7 +182,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
                              t + dt,             // t1
                              dt * 0.1,
                              atol,
-                             rtol);   
+                             rtol);
         t += dt;
         local_storage.add_entry(t, y);
       }
@@ -245,8 +245,8 @@ Rcpp::NumericMatrix cla_calThruNodes_store_cpp(
     for (auto i : found_results.data_) {
       std::vector< double > add;
       for (size_t j = 0; j < i.probabilities.t.size(); ++j) {
-        add = {static_cast<double>(i.ances), 
-               static_cast<double>(i.focal_node), 
+        add = {static_cast<double>(i.ances),
+               static_cast<double>(i.focal_node),
                i.probabilities.t[j]};
 
         for (const auto& k : i.probabilities.probs[j]) {

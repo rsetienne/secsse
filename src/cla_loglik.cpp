@@ -93,13 +93,13 @@ double calc_ll_cla(const Rcpp::List& ll,
                            timeInte[i],           // t1
                            timeInte[i] * 0.1,
                            absolute_tol,
-                           relative_tol); // t1
-      
+                           relative_tol);
+
       if (i == 0) nodeN = y;
       if (i == 1) nodeM = y;
     }
 
-    normalize_loglik_node(&nodeM, &loglik); 
+    normalize_loglik_node(&nodeM, &loglik);
     normalize_loglik_node(&nodeN, &loglik);
 
     mergeBranch = std::vector<double>(d, 0.0);
@@ -154,7 +154,7 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
     for (size_t j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
       for (size_t k = 0; k < temp.ncol(); ++k) {
-        row.push_back(temp(j, k));  
+        row.push_back(temp(j, k));
       }
       temp2.push_back(row);
     }
@@ -178,7 +178,7 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
                        t,                    // t1
                        t * 0.01,
                        atol,
-                       rtol); 
+                       rtol);
 
   Rcpp::NumericVector out;
   for (int i = 0; i < init_state.size(); ++i) {
@@ -215,13 +215,13 @@ try {
   std::vector< std::vector< double >> states, forTime;
   numericmatrix_to_vector(states_R, &states);
   numericmatrix_to_vector(forTime_R, &forTime);
-  
+
   Rcpp::NumericVector mergeBranch;
   Rcpp::NumericVector nodeM;
-  
+
   double loglik = 0.0;
   if (is_complete_tree) {
-    loglik = calc_ll_cla< ode_cla_d >(lambdas, 
+    loglik = calc_ll_cla< ode_cla_d >(lambdas,
                                       mus,
                                       Q,
                                       std::vector<int>(ances.begin(),
@@ -245,10 +245,11 @@ try {
   }
   Rcpp::NumericMatrix states_out;
   vector_to_numericmatrix(states, &states_out);
-  
+
   Rcpp::List output = Rcpp::List::create(Rcpp::Named("states") = states_out,
                                          Rcpp::Named("loglik") = loglik,
-                                         Rcpp::Named("mergeBranch") = mergeBranch,
+                                         Rcpp::Named("mergeBranch") = 
+                                           mergeBranch,
                                          Rcpp::Named("nodeM") = nodeM);
   return output;
 } catch(std::exception &ex) {

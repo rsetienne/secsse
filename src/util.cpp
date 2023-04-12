@@ -106,7 +106,7 @@ void normalize_loglik(std::vector<double>* probvec,
                       long double* loglik) {
   static const auto abssum = [] (auto x, auto y) {return x + std::abs(y);};
 
-  double sumabsprobs = std::accumulate((*probvec).begin(), (*probvec).end(), 
+  double sumabsprobs = std::accumulate((*probvec).begin(), (*probvec).end(),
                                        0.0,
                                        abssum);
 
@@ -119,7 +119,7 @@ void normalize_loglik(std::vector<double>* probvec,
 
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v) {
-  (*v) = std::vector< std::vector< double> >(m.nrow(), 
+  (*v) = std::vector< std::vector< double> >(m.nrow(),
             std::vector<double>(m.ncol(), 0.0));
   for (size_t i = 0; i < m.nrow(); ++i) {
     std::vector<double> row(m.ncol(), 0.0);
