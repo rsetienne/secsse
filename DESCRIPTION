@@ -3,7 +3,7 @@ Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
 Version: 2.5.0
-Date: 2022-10-13
+Date: 2023-04-19
 License: GPL-3
 Authors@R: c(
  person(given = "Leonel",
