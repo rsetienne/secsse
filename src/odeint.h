@@ -12,6 +12,22 @@
 //
 #pragma once
 
+#ifdef USE_BULRISCH_STOER_PATCH
+
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/dimensionless.hpp>
+
+using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
+
+#else // USE_BULRISCH_STOER_PATCH
+
+// The default. Causes unitialized member m_last_dt in
+// boost::odeint::bulrisch_stoer<>, declared in
+// boost/numreic/odeint/stepper/bulrisch_stoer.hpp
+using bstime_t = double;
+
+#endif // USE_BULRISCH_STOER_PATCH
+
 #include <iostream>
 #include <utility>   // std::move
 #include <memory>    // std::unique_ptr
@@ -19,9 +35,11 @@
 #include <vector>
 
 // [[Rcpp::depends(BH)]]
+#include "config.h"
 #include "Rcpp.h"                     // NOLINT [build/include_subdir]
 #include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
 #include "util.h"                     // NOLINT [build/include_subdir]
+
 
 class ode_standard {
  public:
@@ -563,7 +581,7 @@ void integrate(const std::string& stepper_name,
               std::ref(*ode), y, t0, t1, dt);
   } else if ("odeint::bulirsch_stoer" == stepper_name) {
     integrate(bno::bulirsch_stoer<STATE>(atol, rtol),
-              std::ref(*ode), y, t0, t1, dt);
+              std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, dt);
   } else if ("odeint::runge_kutta4" == stepper_name) {
     integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
   } else {
