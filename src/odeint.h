@@ -17,16 +17,16 @@
 #include <boost/units/quantity.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 
-using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
+using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;  // NOLINT [whitespace/line_length]
 
-#else // USE_BULRISCH_STOER_PATCH
+#else  // USE_BULRISCH_STOER_PATCH
 
 // The default. Causes unitialized member m_last_dt in
 // boost::odeint::bulrisch_stoer<>, declared in
 // boost/numreic/odeint/stepper/bulrisch_stoer.hpp
 using bstime_t = double;
 
-#endif // USE_BULRISCH_STOER_PATCH
+#endif  // USE_BULRISCH_STOER_PATCH
 
 #include <iostream>
 #include <utility>   // std::move
@@ -35,7 +35,7 @@ using bstime_t = double;
 #include <vector>
 
 // [[Rcpp::depends(BH)]]
-#include "config.h"
+#include "config.h"                   // NOLINT [build/include_subdir]
 #include "Rcpp.h"                     // NOLINT [build/include_subdir]
 #include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
 #include "util.h"                     // NOLINT [build/include_subdir]

@@ -5,8 +5,8 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ODEINT_CONFIG_H_INCLUDED
-#define ODEINT_CONFIG_H_INCLUDED
+#ifndef SRC_CONFIG_H_
+#define SRC_CONFIG_H_
 
 // Special case to make use of some steppers that would include
 // boost/get_pointer.hpp
@@ -23,4 +23,4 @@
 // is fixed in boost (BH):
 #define USE_BULRISCH_STOER_PATCH
 
-#endif
+#endif  // SRC_CONFIG_H_
