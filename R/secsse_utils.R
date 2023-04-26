@@ -1,9 +1,9 @@
 #' It sets the parameters (speciation, extinction and transition)
 #' ids. Needed for ML calculation (secsse_ml)
 #' @title Parameter structure setting
-#' @param traits vector with trait states, order of states must be the same as 
+#' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to number of examined states.
 #' @return A list that includes the ids of the parameters for ML analysis.
 #' @examples
@@ -11,20 +11,21 @@
 #' num_concealed_states <- 3
 #' param_posit <- id_paramPos(traits,num_concealed_states)
 #' @export
-id_paramPos <- function(traits, num_concealed_states) {
+id_paramPos <- function(traits, num_concealed_states) { #noLint
     idparslist <- list()
     if (is.matrix(traits)) {
         traits <- traits[, 1]
     }
 
     ly <- length(sort(unique(traits))) * 2 * num_concealed_states
-    d <- ly/2
+    d <- ly / 2
     idparslist[[1]] <- 1:d
     idparslist[[2]] <- (d + 1):ly
     toMatrix <- 1
     matPos <- (ly + 1):(((d^2) - d) + d * 2)
     for (i in 1:d) {
-        toMatrix <- c(toMatrix, matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
+        toMatrix <- c(toMatrix,
+                      matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
     }
     toMatrix <- toMatrix[1:d^2]
     Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = TRUE)
@@ -56,19 +57,50 @@ id_paramPos <- function(traits, num_concealed_states) {
     return(idparslist)
 }
 
+create_q_matrix <- function(masterBlock,
+                            concealnewQMatr,
+                            ntraits,
+                            diff.conceal) {
+    Q <- NULL
+    for (i in 1:ntraits) {
+        Qrow <- NULL
+        for (ii in 1:ntraits) {
+            entry <- masterBlock[i, ii]
+            if (is.na(entry)) {
+                Qrow <- cbind(Qrow, masterBlock)
+            } else {
+                if (diff.conceal == TRUE) {
+                    entry <- concealnewQMatr[i, ii]
+                }
+
+                outDiagBlock <- matrix(0,
+                                       ncol = ntraits,
+                                       nrow = ntraits,
+                                       byrow = TRUE)
+                diag(outDiagBlock) <- entry
+                Qrow <- cbind(Qrow, outDiagBlock)
+            }
+        }
+        Q <- rbind(Q, Qrow)
+    }
+    return(Q)
+}
+
+
 #' Sets a Q matrix where double transitions are not allowed
 #' @title Basic Qmatrix
 #' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param masterBlock matrix of transitions among only examined states, NA in 
+#' @param masterBlock matrix of transitions among only examined states, NA in
 #' the main diagonal, used to build the full transition rates matrix.
-#' @param diff.conceal should the concealed states be different? Normally it 
+#' @param diff.conceal should the concealed states be different? Normally it
 #' should be FALSE.
-#' @return Q matrix that includes both examined and concealed states, it should 
+#' @return Q matrix that includes both examined and concealed states, it should
 #' be declared as the third element of idparslist.
 #' @examples
 #' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) # For a three-state trait
+#' # For a three-state trait
+#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
 #' diag(masterBlock) <- NA
 #' masterBlock[1,2] <- 6
 #' masterBlock[1,3] <- 7
@@ -84,57 +116,39 @@ id_paramPos <- function(traits, num_concealed_states) {
 #' @export
 q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 
-    if (diff.conceal == TRUE && 
+    if (diff.conceal == TRUE &&
         all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
         integersmasterBlock <- floor(masterBlock)
         factorBlock <- signif(masterBlock - integersmasterBlock, digits = 2)
-        
+
         factorstoExpand <- unique(sort(c(factorBlock)))
         factorstoExpand <- factorstoExpand[factorstoExpand > 0]
-        newshareFac <- 
-            (max(factorstoExpand * 10) + 1):(max(factorstoExpand * 10) + 
+        newshareFac <-
+            (max(factorstoExpand * 10) + 1):(max(factorstoExpand * 10) +
                                                  length(factorstoExpand))
-        newshareFac <- newshareFac/10
-        
+        newshareFac <- newshareFac / 10
+
         for (iii in seq_along(newshareFac)) {
-            factorBlock[which(factorBlock == factorstoExpand[iii])] <- newshareFac[iii]
-            
+            factorBlock[which(factorBlock == factorstoExpand[iii])] <-
+                                                             newshareFac[iii]
         }
-        
+
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(floor(masterBlock))))
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
         concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
-        
+
         for (iii in seq_along(concealnewQ)) {
-            integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <- concealnewQ[iii]
-            
+            integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <-
+                                                             concealnewQ[iii]
         }
         concealnewQMatr <- integersmasterBlock + factorBlock
-        
-        Q <- NULL
-        for (i in 1:ntraits) {
-            Qrow <- NULL
-            for (ii in 1:ntraits) {
-                entry <- masterBlock[i, ii]
-                if (is.na(entry)) {
-                    Qrow <- cbind(Qrow, masterBlock)
-                } else {
-                    entry <- concealnewQMatr[i, ii]
-                    
-                    outDiagBlock <- matrix(0, 
-                                           ncol = ntraits, 
-                                           nrow = ntraits,
-                                           byrow = TRUE)
-                    diag(outDiagBlock) <- entry
-                    Qrow <- cbind(Qrow, outDiagBlock)
-                }
-                
-            }
-            Q <- rbind(Q, Qrow)
-        }
+
+        Q <- create_q_matrix(masterBlock,
+                             concealnewQMatr,
+                             ntraits,
+                             diff.conceal)
     } else {
-        
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(masterBlock)))
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
@@ -144,40 +158,22 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
             uniqParQ2
             concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
         }
-        
-        Q <- NULL
-        for (i in 1:ntraits) {
-            Qrow <- NULL
-            for (ii in 1:ntraits) {
-                entry <- masterBlock[i, ii]
-                if (is.na(entry)) {
-                    Qrow <- cbind(Qrow, masterBlock)
-                } else {
-                    if (diff.conceal == TRUE) {
-                        entry <- concealnewQMatr[i, ii]
-                    }
-                    outDiagBlock <- matrix(0,
-                                           ncol = ntraits,
-                                           nrow = ntraits,
-                                           byrow = TRUE)
-                    diag(outDiagBlock) <- entry
-                    Qrow <- cbind(Qrow, outDiagBlock)
-                }
-                
-            }
-            Q <- rbind(Q, Qrow)
-        }
+
+        Q <- create_q_matrix(masterBlock,
+                             concealnewQMatr,
+                             ntraits,
+                             diff.conceal)
     }
     return(Q)
 }
 
 
-#' In preparation for likelihood calculation, it orders trait data according 
+#' In preparation for likelihood calculation, it orders trait data according
 #' the tree tips
 #' @title Data checking and trait sorting
-#' @param traitinfo data frame where first column has species ids and the second 
+#' @param traitinfo data frame where first column has species ids and the second
 #' one is the trait associated information.
-#' @param phy phy phylogenetic tree of class phylo, ultrametric, fully-resolved, 
+#' @param phy phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
 #' rooted and with branch lengths.
 #' @return Vector of traits
 #' @examples
@@ -189,13 +185,17 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 sortingtraits <- function(traitinfo, phy) {
     traitinfo <- as.matrix(traitinfo)
     if (length(phy$tip.label) != nrow(traitinfo)) {
-        stop("Number of species in the tree must be the same as in the trait file")
+        stop("Number of species in the tree must be the same as
+             in the trait file")
     }
 
-    if (identical(as.character(sort(phy$tip.label)), as.character(sort(traitinfo[, 1]))) == FALSE) {
-        mismatch <- match(as.character(sort(traitinfo[, 1])), as.character(sort(phy$tip.label)))
+    if (identical(as.character(sort(phy$tip.label)),
+                  as.character(sort(traitinfo[, 1]))) == FALSE) {
+        mismatch <- match(as.character(sort(traitinfo[, 1])),
+                          as.character(sort(phy$tip.label)))
         mismatched <- (sort(traitinfo[, 1]))[which(is.na(mismatch))]
-        stop(cat("Mismatch on tip labels and taxa names, check the species:", mismatched))
+        stop(cat("Mismatch on tip labels and taxa names, check the species:",
+                 mismatched))
     }
 
     traitinfo <- traitinfo[match(phy$tip.label, traitinfo[, 1]), ]
@@ -217,9 +217,9 @@ sortingtraits <- function(traitinfo, phy) {
 #' It sets the parameters (speciation, extinction and transition)
 #' ids. Needed for ML calculation with cladogenetic options (cla_secsse_ml)
 #' @title Parameter structure setting for cla_secsse
-#' @param traits vector with trait states, order of states must be the same as 
+#' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to number of examined states.
 #' @return A list that includes the ids of the parameters for ML analysis.
 #' @examples
@@ -234,12 +234,12 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     }
 
     ly <- length(sort(unique(traits))) * 2 * num_concealed_states
-    d <- ly/2
-    # idparslist[[1]] <- 1:d
+    d <- ly / 2
     toMatrix <- 1
     matPos <- (ly + 1):(((d^2) - d) + d * 2)
     for (i in 1:d) {
-        toMatrix <- c(toMatrix, matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
+        toMatrix <- c(toMatrix,
+                      matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
 
     }
     toMatrix <- toMatrix[1:d^2]
@@ -250,20 +250,27 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     lab_conceal <- NULL
     for (i in 1:num_concealed_states) {
 
-        lab_conceal <- c(lab_conceal, rep(LETTERS[i], length(sort(unique(traits)))))
+        lab_conceal <- c(lab_conceal,
+                         rep(LETTERS[i],
+                             length(sort(unique(traits)))))
     }
 
 
     statesCombiNames <- character()
-    for (i in 1:length(lab_states)) {
-        statesCombiNames <- c(statesCombiNames, paste0(lab_states[i], lab_conceal[i]))
+    for (i in seq_along(lab_states)) {
+        statesCombiNames <- c(statesCombiNames,
+                              paste0(lab_states[i],
+                                     lab_conceal[i]))
     }
 
     idparslist[[1]] <- matrix(0, ncol = d, nrow = 4)
     idparslist[[2]] <- (d + 1):ly
     idparslist[[3]] <- Q
 
-    rownames(idparslist[[1]]) <- c("dual_inheritance", "single_inheritance", "dual_symmetric_transition", "dual_asymmetric_transition")
+    rownames(idparslist[[1]]) <- c("dual_inheritance",
+                                   "single_inheritance",
+                                   "dual_symmetric_transition",
+                                   "dual_asymmetric_transition")
 
     colnames(idparslist[[1]]) <- statesCombiNames
     colnames(idparslist[[3]]) <- statesCombiNames
@@ -273,15 +280,14 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     return(idparslist)
 }
 
-
 #' It provides the set of matrices containing all the speciation rates
 #' @title Prepares the entire set of lambda matrices for cla_secsse.
-#' @param traits vector with trait states, order of states must be the same as 
+#' @param traits vector with trait states, order of states must be the same as
 #' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent 
+#' @param num_concealed_states number of concealed states, generally equivalent
 #' to number of examined states.
 #' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
-#' @return A list of lambdas, its length would be the same than the number of 
+#' @return A list of lambdas, its length would be the same than the number of
 #' trait states * num_concealed_states..
 #' @export
 prepare_full_lambdas <- function(traits,
@@ -346,11 +352,13 @@ normalize_loglik <- function(probs, loglik) {
     return(list(probs = probs, loglik = loglik))
 }
 
+#' @keywords internal
 penalty <- function(pars, loglik_penalty = 0) {
     pars <- unlist(unlist(pars))
-    return(loglik_penalty * sum(pars^2)/(2 * length(pars)))
+    return(loglik_penalty * sum(pars^2) / (2 * length(pars)))
 }
 
+#' @keywords internal
 calc_mus <- function(is_complete_tree,
                      idparslist,
                      idparsfix,
@@ -361,7 +369,8 @@ calc_mus <- function(is_complete_tree,
     if (is_complete_tree) {
         mus <- rep(NA, length(idparslist[[2]]))
         for (i in seq_along(idparslist[[2]])) {
-            mus[i] <- c(parsfix[which(idparsfix == idparslist[[2]][i])], initparsopt[which(idparsopt == idparslist[[2]][i])])
+            mus[i] <- c(parsfix[which(idparsfix == idparslist[[2]][i])],
+                        initparsopt[which(idparsopt == idparslist[[2]][i])])
         }
     }
     return(mus)

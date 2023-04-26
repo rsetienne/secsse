@@ -10,14 +10,14 @@ q_doubletrans(traits, masterBlock, diff.conceal)
 \item{traits}{vector with trait states, order of states must be the same as
 tree tips, for help, see vignette.}
 
-\item{masterBlock}{matrix of transitions among only examined states, NA in 
+\item{masterBlock}{matrix of transitions among only examined states, NA in
 the main diagonal, used to build the full transition rates matrix.}
 
-\item{diff.conceal}{should the concealed states be different? Normally it 
+\item{diff.conceal}{should the concealed states be different? Normally it
 should be FALSE.}
 }
 \value{
-Q matrix that includes both examined and concealed states, it should 
+Q matrix that includes both examined and concealed states, it should
 be declared as the third element of idparslist.
 }
 \description{
@@ -25,7 +25,8 @@ Sets a Q matrix where double transitions are not allowed
 }
 \examples{
 traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE) # For a three-state trait
+# For a three-state trait
+masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
 diag(masterBlock) <- NA
 masterBlock[1,2] <- 6
 masterBlock[1,3] <- 7

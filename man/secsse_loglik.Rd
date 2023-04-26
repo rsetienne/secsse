@@ -23,60 +23,64 @@ secsse_loglik(
 )
 }
 \arguments{
-\item{parameter}{list where first vector represents lambdas, the second mus 
+\item{parameter}{list where first vector represents lambdas, the second mus
 and the third transition rates.}
 
-\item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved, 
+\item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved,
 rooted and with branch lengths.}
 
-\item{traits}{vector with trait states, order of states must be the same as 
+\item{traits}{vector with trait states, order of states must be the same as
 tree tips, for help, see vignette.}
 
-\item{num_concealed_states}{number of concealed states, generally equivalent 
+\item{num_concealed_states}{number of concealed states, generally equivalent
 to number of examined states.}
 
 \item{cond}{condition on the existence of a node root: "maddison_cond",
 "proper_cond"(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:"maddison_weights","proper_weights"(default) or "equal_weights". It can also be specified the 
-root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:
+"maddison_weights","proper_weights"(default) or "equal_weights".
+It can also be specified the root state:the vector c(1, 0, 0)
+indicates state 1 was the root state.}
 
-\item{sampling_fraction}{vector that states the sampling proportion per 
+\item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as trait states.}
 
-\item{setting_calculation}{argument used internally to speed up calculation. 
+\item{setting_calculation}{argument used internally to speed up calculation.
 It should be left blank (default : setting_calculation = NULL)}
 
-\item{see_ancestral_states}{should the ancestral states be shown? Default 
+\item{see_ancestral_states}{should the ancestral states be shown? Default
 FALSE}
 
-\item{loglik_penalty}{the size of the penalty for all parameters; default is 
+\item{loglik_penalty}{the size of the penalty for all parameters; default is
 0 (no penalty)}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species 
+\item{is_complete_tree}{whether or not a tree with all its extinct species
 is provided}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads. 
+\item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
 
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 }
 \value{
-The loglikelihood of the data given the parameters
+The loglikelihood of the data given the parameter.
 }
 \description{
-Logikelihood calculation for the SecSSE model given a set of parameters and 
+Logikelihood calculation for the SecSSE model given a set of parameters and
 data
 }
 \note{
-Multithreading might lead to a slightly reduced accuracy (in the order of 1e-10) and is therefore not enabled by default. Please use at your own discretion.
+Multithreading might lead to a slightly reduced accuracy
+(in the order of 1e-10) and is therefore not enabled by default.
+Please use at your own discretion.
 }
 \examples{
 rm(list = ls(all = TRUE))

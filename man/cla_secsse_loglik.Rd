@@ -62,9 +62,9 @@ provided}
 \item{num_threads}{number of threads to be used, default is 1. Set to -1 to
 use all available threads.}
 
-\item{method}{integration method used, available are: 
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+\item{method}{integration method used, available are:
+"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 
 \item{atol}{absolute tolerance of integration}
@@ -75,7 +75,7 @@ use all available threads.}
 The loglikelihood of the data given the parameters
 }
 \description{
-Logikelihood calculation for the cla_SecSSE model given a set of parameters
+Loglikelihood calculation for the cla_SecSSE model given a set of parameters
 and data using Rcpp
 }
 \note{

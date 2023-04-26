@@ -1,4 +1,4 @@
-#' Logikelihood calculation for the cla_SecSSE model given a set of parameters
+#' Loglikelihood calculation for the cla_SecSSE model given a set of parameters
 #' and data using Rcpp
 #' @title Likelihood for SecSSE model, using Rcpp
 #' @param parameter list where the first is a table where lambdas across
@@ -26,10 +26,10 @@
 #' @param is_complete_tree whether or not a tree with all its extinct species is
 #' provided
 #' @param num_threads number of threads to be used, default is 1. Set to -1 to
-#' use all available threads. 
-#' @param method integration method used, available are: 
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78", 
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and 
+#' use all available threads.
+#' @param method integration method used, available are:
+#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
+#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
@@ -100,7 +100,6 @@ cla_secsse_loglik <- function(parameter,
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]  # nolint
 
-
   if (is.null(setting_calculation)) {
     check_input(traits,
                 phy,
@@ -114,9 +113,8 @@ cla_secsse_loglik <- function(parameter,
                                                  is_complete_tree,
                                                  mus)
   }
-
   states <- setting_calculation$states
-  
+
   if (is_complete_tree) {
     states <- build_states(phy = phy,
                            traits = traits,
@@ -125,7 +123,7 @@ cla_secsse_loglik <- function(parameter,
                            is_complete_tree = is_complete_tree,
                            mus = mus)
   }
-  
+
   forTime <- setting_calculation$forTime  # nolint
   ances <- setting_calculation$ances
 
@@ -140,27 +138,105 @@ cla_secsse_loglik <- function(parameter,
   loglik <- 0
   d <- ncol(states) / 2
 
-  calcul <- c()
-  if (num_threads == 1) {
-    ancescpp <- ances - 1
-    forTimecpp <- forTime # nolint
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
-      calcul <- cla_calThruNodes_cpp(ancescpp,
-                                     states,
-                                     forTimecpp,
-                                     lambdas,
-                                     mus,
-                                     Q,
-                                     method,
-                                     atol,
-                                     rtol,
-                                     is_complete_tree)
-  } else {
-    # because C++ indexes from 0, we need to adjust the indexing:
-    ancescpp <- ances - 1
-    forTimecpp <- forTime # nolint
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
+  if (see_ancestral_states == TRUE && num_threads != 1) {
+      warning("see ancestral states only works with one thread, 
+              setting to one thread")
+      num_threads <- 1
+  }
 
+  calcul <- update_using_cpp(ances, states, forTime, lambdas, mus, Q, method,
+                             atol, rtol, is_complete_tree, num_threads)
+
+  mergeBranch <- calcul$mergeBranch # nolint
+  nodeM <- calcul$nodeM  # nolint
+  loglik <- calcul$loglik
+  states <- calcul$states
+
+  ## At the root
+  mergeBranch2 <- mergeBranch # nolint
+  lmb <- length(mergeBranch2)
+
+  weight_states <- get_weight_states(root_state_weight,
+                                     num_concealed_states,
+                                     mergeBranch,
+                                     lambdas,
+                                     nodeM,
+                                     d,
+                                     is_cla = TRUE)
+
+  if (cond == "maddison_cond") {
+    pre_cond <- rep(NA, lmb) # nolint
+    for (j in 1:lmb) {
+      pre_cond[j] <- sum(weight_states[j] *
+                        lambdas[[j]] *
+                        (1 - nodeM[1:d][j]) ^ 2)
+     }
+    mergeBranch2 <- mergeBranch2 / sum(pre_cond) # nolint
+  }
+
+  if (is_complete_tree) {
+    timeInte <- max(abs(ape::branching.times(phy))) # nolint
+    y <- rep(0, lmb)
+
+    nodeM <- ct_condition_cla(y, # nolint
+                              timeInte,
+                              lambdas,
+                              mus,
+                              Q,
+                              "odeint::bulirsch_stoer",
+                              1e-16,
+                              1e-12)
+    nodeM <- c(nodeM, y) # nolint
+  }
+
+  if (cond == "proper_cond") {
+    pre_cond <- rep(NA, lmb) # nolint
+    for (j in 1:lmb) {
+      pre_cond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+    }
+    mergeBranch2 <- mergeBranch2 / pre_cond # nolint
+  }
+
+  wholeLike_atRoot <- sum(mergeBranch2 * weight_states) # nolint
+  LL <- log(wholeLike_atRoot) + # nolint
+        loglik -
+        penalty(pars = parameter,
+                loglik_penalty = loglik_penalty)
+
+  if (see_ancestral_states == TRUE) {
+    num_tips <- ape::Ntip(phy)
+    # last row contains safety entry from C++ (all zeros)
+    ancestral_states <- states[(num_tips + 1):(nrow(states) - 1), ]
+    ancestral_states <-
+        ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
+    rownames(ancestral_states) <- ances
+    return(list(ancestral_states = ancestral_states, LL = LL, states = states))
+    } else {
+    return(LL)
+  }
+}
+
+#' @keywords internal
+update_using_cpp <- function(ances, states, forTime, lambdas, mus, Q, method,
+                             atol, rtol, is_complete_tree, num_threads) {
+  calcul <- c()
+
+  ancescpp <- ances - 1
+  forTimecpp <- forTime # nolint
+  forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
+
+  if (num_threads == 1) {
+    calcul <- cla_calThruNodes_cpp(ancescpp,
+                                   states,
+                                   forTimecpp,
+                                   lambdas,
+                                   mus,
+                                   Q,
+                                   method,
+                                   atol,
+                                   rtol,
+                                   is_complete_tree)
+  } else {
     if (num_threads == -2) {
       calcul <- calc_cla_ll_threaded(ancescpp,
                                      states,
@@ -183,81 +259,5 @@ cla_secsse_loglik <- function(parameter,
                                      is_complete_tree)
     }
   }
-
-  mergeBranch <- calcul$mergeBranch # nolint
-  nodeM <- calcul$nodeM  # nolint
-  loglik <- calcul$loglik
-
-  ## At the root
-  mergeBranch2 <- mergeBranch # nolint
-  lmb <- length(mergeBranch2)
-  if (is.numeric(root_state_weight)) {
-    weightStates <- rep(root_state_weight / num_concealed_states, # nolint
-                        num_concealed_states)
-  } else {
-    if (root_state_weight == "maddison_weights") {
-      weightStates <- mergeBranch / sum(mergeBranch2)
-    }
-    if (root_state_weight == "proper_weights") {
-      numerator <- rep(NA, lmb)
-      for (j in 1:lmb) {
-        numerator[j] <- mergeBranch2[j] / sum(lambdas[[j]] *
-                                  ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
-      }
-      weightStates <- numerator / sum(numerator) # nolint
-    }
-    if (root_state_weight == "equal_weights") {
-      weightStates <- rep(1 / lmb, lmb) # nolint
-    }
-  }
-
-  if (cond == "maddison_cond") {
-    preCond <- rep(NA, lmb) # nolint
-    for (j in 1:lmb) {
-      preCond[j] <- sum(weightStates[j] *
-                        lambdas[[j]] *
-                        (1 - nodeM[1:d][j]) ^ 2)
-     }
-    mergeBranch2 <- mergeBranch2 / sum(preCond) # nolint
-  }
-
-  if (is_complete_tree) {
-    timeInte <- max(abs(ape::branching.times(phy))) # nolint
-    y <- rep(0, lmb)
-
-    nodeM <- ct_condition_cla(y, # nolint
-                              timeInte,
-                              lambdas,
-                              mus,
-                              Q,
-                              "odeint::bulirsch_stoer",
-                              1e-16,
-                              1e-12)
-    nodeM <- c(nodeM, y) # nolint
-  }
-
-  if (cond == "proper_cond") {
-    preCond <- rep(NA, lmb) # nolint
-    for (j in 1:lmb) {
-      preCond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
-    }
-    mergeBranch2 <- mergeBranch2 / preCond # nolint
-  }
-
-  wholeLike_atRoot <- sum(mergeBranch2 * weightStates) # nolint
-  LL <- log(wholeLike_atRoot) + # nolint
-        loglik -
-        penalty(pars = parameter,
-                loglik_penalty = loglik_penalty)
-
-  if (see_ancestral_states == TRUE) {
-    num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips + 1):nrow(states), ]
-    ancestral_states <- 
-        ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
-    rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states, LL = LL))
-    } else {
-    return(LL)
-  }
+  return(calcul)
 }

@@ -11,3 +11,7 @@ src-x64
 *.tmp
 *.json
 *.txt
+.vscode/.env
+.vscode/genenv.R
+test.R
+test2.R
