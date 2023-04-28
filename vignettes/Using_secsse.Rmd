@@ -1,10 +1,10 @@
 ---
-title: "Using SecSSE"
+title: "Using SecSSE ML search"
 author: "Leonel Herrera-Alsina, Paul van Els & Rampal S. Etienne"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{"Using SecSSE ML search"}
+  %\VignetteIndexEntry{Using SecSSE ML search}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -60,7 +60,9 @@ mismat <- name.check(phylo_Vign, trait)
 
 If you have taxa in your tree file that do not appear in your trait file, it is worth adding them with value 'NA' for trait state. After you are done properly setting up your data, you can proceed to setting parameters and constraints.
 
-##Parameter settings and constraints SecSSE allows for the implementation of different models of evolution, and just as in 'diversitree' and 'hisse', parameters can be fixed at certain values (if prior information is known on particular values) or made to be equal to each other. Initial parameter values can also be supplied, to start off the maximum likelihood search with. The main function in the SecSSE package is secsse_ml, which performs a maximum likelihood search and uses as input a set of speciation rate parameters (lambda), a set of extinction rate parameters (mu), and a matrix composed of transition rates (q) between the various states. The identifiers of the parameters are broadly the same as those used in 'hisse', and numbers indicate examined state, whereas letters denote concealed state, 2A for example being in examined state 2, and concealed state A.
+## Parameter settings and constraints
+
+SecSSE allows for the implementation of different models of evolution, and just as in 'diversitree' and 'hisse', parameters can be fixed at certain values (if prior information is known on particular values) or made to be equal to each other. Initial parameter values can also be supplied, to start off the maximum likelihood search with. The main function in the SecSSE package is secsse_ml, which performs a maximum likelihood search and uses as input a set of speciation rate parameters (lambda), a set of extinction rate parameters (mu), and a matrix composed of transition rates (q) between the various states. The identifiers of the parameters are broadly the same as those used in 'hisse', and numbers indicate examined state, whereas letters denote concealed state, 2A for example being in examined state 2, and concealed state A.
 
 Both the speciation and extinction parameters are supplied as vectors, and the transition rates are supplied as a matrix, joined in a list.
 
@@ -287,44 +289,26 @@ OPTIMMETHOD: optimization method, generally we recommend "simplex".
 
 RUN_PARALLEL: this specifies whether or not to use the SecSSE tree-breaking function. If you have a large tree, this tree can be broken into two pieces so that computation of likelihood along branches can take place simultaneously on the two pieces, yielding a gain in computation time. The size of the two pieces is established by SecSSE, and depends on how balanced the tree is; a better-balanced tree yields two pieces of relatively equal size and results in relatively larger gain in computation time. With large trees (say, n\>1000), it is our experience that even two chunks of tree of unequal size yield a time advantage. Needless to say, your computational setup needs to be able to accommodate parallel computation (multiple cores, nodes).
 
-##Running the likelihood function
+## Running the likelihood function
 
-After we have defined all of the necessary parameters for running secsse_ml, we can start running our analysis:
+After we have defined all of the necessary parameters for running secsse_ml, we can start running our analysis and saving them to an R data file, for example, here called output.RDS.
+Note that this may take a while and procude a lot of console output.
 
-```{r}
-secsse_ml(phylo_Vign,
-          traits,
-          num_concealed_states = 3,
-          idparslist,
-          idparsopt,
-          initparsopt,
-          idparsfix,
-          parsfix,
-          cond = "maddison_cond",
-          root_state_weight = "maddison_weights",
-          tol = c(1e-04, 1e-05, 1e-07),
-          sampling_fraction = c(1, 1, 1),
-          optimmethod = "simplex",
-          num_cycles = 1)
 ```
-
-We can save output to an R data file, for example, here called output.RDS:
-
-```{r}
 out <- secsse_ml(phylo_Vign,
-               traits,
-               num_concealed_states = 3,
-               idparslist,
-               idparsopt,
-               initparsopt,
-               idparsfix,
-               parsfix,
-               cond = "maddison_cond",
-               root_state_weight = "maddison_weights",
-               sampling_fraction = c(1, 1, 1),
-               tol = c(1e-04, 1e-05, 1e-07),
-               optimmethod = "simplex",
-               num_cycles = 1)
+                 traits,
+                 num_concealed_states = 3,
+                 idparslist,
+                 idparsopt,
+                 initparsopt,
+                 idparsfix,
+                 parsfix,
+                 cond = "maddison_cond",
+                 root_state_weight = "maddison_weights",
+                 tol = c(1e-04, 1e-05, 1e-07),
+                 sampling_fraction = c(1, 1, 1),
+                 optimmethod = "simplex",
+                 num_cycles = 1)
 saveRDS(out, file = "output.RDS")
 ```
 
@@ -365,7 +349,9 @@ The following is sample output, with two concealed states, notice in this case a
 
 The maximum likelihood value at the bottom of the output can be used in model comparison.
 
-##SecSSE tool to facilitate composition of q matrices Often, q matrices can get quite large and complicated, the more states you are analyzing. We have devised a tool to more easily put together q matrices. This tool starts from the so-called 'masterBlock', the basic matrix in which we only find information on transitions between examined states. The information contained in this 'masterBlock' is then automatically mimicked for inclusion in the full matrix, to ensure that the same complexity in examined state transitions is also found in concealed states. The use of the 'masterBlock' implies that you are using the same number of concealed as examined states. Here, we are generating a 'masterBlock' that yields a 3-state q matrix.
+## SecSSE tool to facilitate composition of q matrices
+
+Often, q matrices can get quite large and complicated, the more states you are analyzing. We have devised a tool to more easily put together q matrices. This tool starts from the so-called 'masterBlock', the basic matrix in which we only find information on transitions between examined states. The information contained in this 'masterBlock' is then automatically mimicked for inclusion in the full matrix, to ensure that the same complexity in examined state transitions is also found in concealed states. The use of the 'masterBlock' implies that you are using the same number of concealed as examined states. Here, we are generating a 'masterBlock' that yields a 3-state q matrix.
 
 The 'masterBlock' can be declared as follows:
 
@@ -418,9 +404,9 @@ idparslist[[3]] <- myQ
 idparslist[[3]]
 ```
 
-Note that in this case, the number of transition rate parameters doubles compared to the previous example, a change that will need to be applied also to IDPARSOPT and IDPARSFIX.
+## SecSSE function to reduce number of transition rate parameters by including multiplicative factors
 
-##SecSSE function to reduce number of transition rate parameters by including multiplicative factors SecSSE has the capability of reducing computational burden by decreasing the number of transition rate parameters through the inclusion of multiplicative factors. Factors can also be used to disentangle complex patterns of trait-dependent diversification when multiple traits are included.
+SecSSE has the capability of reducing computational burden by decreasing the number of transition rate parameters through the inclusion of multiplicative factors. Factors can also be used to disentangle complex patterns of trait-dependent diversification when multiple traits are included.
 
 Suppose you are running an analysis with a large number of transition rate parameters, but you suspect there are linear relationships between some of them. If the transition between lobed (L) and palmate (P) feet is twice as infrequent as that between palmate and semi-palmate (S) feet, and could say that P-\>L is 2(P-\>S). The reverse would also be true: L-\>P is 2(S-\>P). By applying these factors, we are reducing the transition matrix from a 6 parameters to 4, and in models where transitions between concealed states are allowed, we are reducing our parameters from 12 to 8. Of course, the inclusion of these factors comes with a loss of resolution, and is therefore best done with parameters where exact estimation is not essential.
 
@@ -460,7 +446,9 @@ Finally, we run the function secsse_ml_struc instead of secsse_ml, and make sure
 
 Multiplicative factors can also be used in connection with lambdas or mus, in the same way as they are used for transition rates. Note that in such case the factors will need to be unique across the entire dataset, so that both speciation- and transition-related factors have unique values for shareFactors. They can also be used to disentangle complex patterns of diversification when multiple traits are taken into account. Assume that aside from foot shape (the above example), we are also looking at the presence or absence of a spur, and we would like to know how the two traits interact to influence diversification. In such a case, presence or absence of spur can be used as a multiplicative factor, and models can be run where presence or absence is coded as the same multiplicative factor (.1), and where presence or absence are coded as two different factors (.1,.2).
 
-##Note on assigning ambiguity to taxon trait states If the user wishes to assign a taxon to multiple trait states, because he/she is unsure which state best describes the taxon, he/she can use 'NA'. 'NA' is used when there is no information on possible state at all; for example when a state was not measured or a taxon is unavailable for inspection. 'NA' means a taxon is equally likely to pertain to any state. In case the user does have some information, for example if a taxon can pertain to multiple states, or if there is uncertainty regarding state but one or multiple states can with certainty be excluded, SecSSE offers flexibility to handle ambiguity. In this case, the user only needs to supply a trait file, with at least four columns, one for the taxon name, and three for trait state. Below, we show an example of what the trait info should be like (the column with species' names has been removed).If a taxon may pertain to trait state 1 or 3, but not to 2, the three columns should have at least the values 1 and a 3, but never 2 (species in the third row). On the other hand, the species in the fifth row can pertain to all states: the first column would have a 1, the second a 2, the third a 3 (although if you only have this type of ambiguity, it is easier to assign 'NA' and use a single-column data file).
+## Note on assigning ambiguity to taxon trait states
+
+If the user wishes to assign a taxon to multiple trait states, because he/she is unsure which state best describes the taxon, he/she can use 'NA'. 'NA' is used when there is no information on possible state at all; for example when a state was not measured or a taxon is unavailable for inspection. 'NA' means a taxon is equally likely to pertain to any state. In case the user does have some information, for example if a taxon can pertain to multiple states, or if there is uncertainty regarding state but one or multiple states can with certainty be excluded, SecSSE offers flexibility to handle ambiguity. In this case, the user only needs to supply a trait file, with at least four columns, one for the taxon name, and three for trait state. Below, we show an example of what the trait info should be like (the column with species' names has been removed).If a taxon may pertain to trait state 1 or 3, but not to 2, the three columns should have at least the values 1 and a 3, but never 2 (species in the third row). On the other hand, the species in the fifth row can pertain to all states: the first column would have a 1, the second a 2, the third a 3 (although if you only have this type of ambiguity, it is easier to assign 'NA' and use a single-column data file).
 
 ```{r}
 #       traits traits traits
@@ -471,9 +459,11 @@ Multiplicative factors can also be used in connection with lambdas or mus, in th
 # [5,]      1      2      3
 ```
 
-##Do you feel SecSSE? If not, please feel free to e-mail the authors. For help with this R package only.
+## Do you feel SecSSE? If not, please feel free to e-mail the authors. For help with this R package only.
 
-##References Beaulieu, J. M., O'meara, B. C., & Donoghue, M. J. (2013). Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.
+## References 
+
+Beaulieu, J. M., O'meara, B. C., & Donoghue, M. J. (2013). Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.
 
 Beaulieu, J. M., & O'Meara, B. C. (2016). Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Systematic biology, 65(4), 583-601.
 
