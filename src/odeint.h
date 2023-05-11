@@ -12,21 +12,6 @@
 //
 #pragma once
 
-#ifdef USE_BULRISCH_STOER_PATCH
-
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/dimensionless.hpp>
-
-using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;  // NOLINT [whitespace/line_length]
-
-#else  // USE_BULRISCH_STOER_PATCH
-
-// The default. Causes unitialized member m_last_dt in
-// boost::odeint::bulrisch_stoer<>, declared in
-// boost/numreic/odeint/stepper/bulrisch_stoer.hpp
-using bstime_t = double;
-
-#endif  // USE_BULRISCH_STOER_PATCH
 
 #include <iostream>
 #include <utility>   // std::move
@@ -35,21 +20,36 @@ using bstime_t = double;
 #include <vector>
 
 // [[Rcpp::depends(BH)]]
-#include "config.h"                   // NOLINT [build/include_subdir]
+#include "config.h"
 #include "Rcpp.h"                     // NOLINT [build/include_subdir]
 #include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
 #include "util.h"                     // NOLINT [build/include_subdir]
 
+#ifdef USE_BULRISCH_STOER_PATCH
+
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/dimensionless.hpp>
+
+using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
+
+#else // USE_BULRISCH_STOER_PATCH
+
+// The default. Causes unitialized member m_last_dt in
+// boost::odeint::bulrisch_stoer<>, declared in
+// boost/numreic/odeint/stepper/bulrisch_stoer.hpp
+using bstime_t = double;
+
+#endif // USE_BULRISCH_STOER_PATCH
 
 class ode_standard {
- public:
+public:
   ode_standard(const std::vector<double>& l,
-                      const std::vector<double>& m,
-                      const std::vector<std::vector<double>>& q) :
+               const std::vector<double>& m,
+               const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
-
+  
   ode_standard(const Rcpp::NumericVector& l,
                const Rcpp::NumericVector& m,
                const Rcpp::NumericMatrix& q) {
@@ -58,41 +58,41 @@ class ode_standard {
     numericmatrix_to_vector(q, &q_);
     d = l_.size();
   }
-
+  
   void operator()(const std::vector< double > &x,
-                  std::vector<  double > &dxdt,   // NOLINT [runtime/references]
-                  const double /* t */) {
+                std::vector<  double > &dxdt,   // NOLINT [runtime/references]
+                const double /* t */) {
     for (size_t i = 0; i < d; ++i) {
       if (l_[i] != 0.0) {
         dxdt[i] = m_[i] - (l_[i] + m_[i]) * x[i] +
-                  l_[i] * x[i] * x[i];
+          l_[i] * x[i] * x[i];
         long double FF3 = -1.0 * l_[i] - m_[i] + 2 * l_[i] * x[i];
         dxdt[i + d] = FF3 * x[i + d];
       } else {
         dxdt[i] = - 1.0 * m_[i] * x[i] + m_[i];
         dxdt[i + d] = -1.0 * m_[i] * x[i + d];
       }
-
+      
       for (size_t j = 0; j < d; ++j) {
         long double diff_e = x[j] - x[i];
         dxdt[i] += diff_e * q_[i][j];
-
+        
         long double diff_d = x[j + d] - x[i + d];
         dxdt[i + d] += diff_d * q_[i][j];
       }
     }
     return;
   }
-
+  
   double get_l(int index) const {
     return l_[index];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
- private:
+  
+private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
@@ -100,14 +100,14 @@ class ode_standard {
 };
 
 class ode_standard_ct {
- public:
+public:
   ode_standard_ct(const std::vector<double>& l,
-               const std::vector<double>& m,
-               const std::vector<std::vector<double>>& q) :
+                  const std::vector<double>& m,
+                  const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
-
+  
   ode_standard_ct(const Rcpp::NumericVector& l,
                   const Rcpp::NumericVector& m,
                   const Rcpp::NumericMatrix& q) {
@@ -116,38 +116,38 @@ class ode_standard_ct {
     numericmatrix_to_vector(q, &q_);
     d = l_.size();
   }
-
+  
   void operator()(const std::vector< double > &x ,
-                  std::vector<  double > &dxdt,   // NOLINT [runtime/references]
-                  const double /* t */) {
+                std::vector<  double > &dxdt,   // NOLINT [runtime/references]
+                const double /* t */) {
     for (int i = 0; i < d; ++i) {
       long double diff_1 = (m_[i] - (l_[i] * x[i]));
       dxdt[i] =  diff_1 * (1 - x[i]);
       dxdt[i + d] = -1.0 * (l_[i] + m_[i]) * x[i + d];
     }
-
+    
     for (int j = 0; j < d; ++j) {
       for (int k = 0; k < d; ++k) {
         long double diff_e = x[k] - x[j];
         dxdt[j] +=  q_[j][k] * diff_e;
-
+        
         long double diff_d = x[k + d] - x[j + d];
         dxdt[j + d] += q_[j][k] * diff_d;
       }
     }
-
+    
     return;
   }
-
+  
   double get_l(int index) const {
     return l_[index];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
- private:
+  
+private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
@@ -156,7 +156,7 @@ class ode_standard_ct {
 
 class ode_cla {
   // used for normal tree
- public:
+public:
   ode_cla(const std::vector<std::vector<std::vector<double>>>& l,
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
@@ -170,10 +170,10 @@ class ode_cla {
       }
     }
   }
-
+  
   void operator()(const std::vector< double > &x ,
-                  std::vector< double > &dxdt,    // NOLINT [runtime/references]
-                  const double /* t */) const {
+                std::vector< double > &dxdt,    // NOLINT [runtime/references]
+                const double /* t */) const {
     for (int i = 0; i < d; ++i) {
       double Df = 0.0;
       double Ef = 0.0;
@@ -182,16 +182,16 @@ class ode_cla {
           if (l_[i][j][k] != 0.0) {    // slightly safer.
             long double ff1 = (x[j] * x[k + d] + x[j + d] * x[k]);
             long double ff2 = (x[j] * x[k]);
-
+            
             Df += l_[i][j][k] * ff1;
             Ef += l_[i][j][k] * ff2;
           }
         }
       }
-
+      
       dxdt[i]     = Ef + m_[i] - (lambda_sum[i] + m_[i]) * x[i];
       dxdt[i + d] = Df + (-lambda_sum[i] - m_[i]) * x[i + d];
-
+      
       for (size_t j = 0; j < d; ++j) {
         // q_[i][j] is always non-zero.
         long double temp1 = (x[j]     - x[i]);
@@ -202,16 +202,16 @@ class ode_cla {
     }
     return;
   }
-
+  
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
- private:
+  
+private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -220,10 +220,10 @@ class ode_cla {
 };
 
 class ode_cla_backup {
- public:
+public:
   ode_cla_backup(const std::vector<std::vector<std::vector<double>>>& l,
-          const std::vector<double>& m,
-          const std::vector<std::vector<double>>& q) :
+                 const std::vector<double>& m,
+                 const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
     lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
@@ -234,53 +234,53 @@ class ode_cla_backup {
       }
     }
   }
-
+  
   void operator()(const std::vector< double > &x,
-                  std::vector< double > &dxdt,   // NOLINT [runtime/references]
-                  const double /* t */) const {
+                std::vector< double > &dxdt,   // NOLINT [runtime/references]
+                const double /* t */) const {
     for (int i = 0; i < d; ++i) {
       long double lamEE = 0.0;
       long double lamDE = 0.0;
-
+      
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0) {
             long double FF1 = x[j] * x[k];
             lamEE += l_[i][j][k] * FF1;
-
+            
             long double FF3 = x[d + j] * x[k];
             long double FF2 = x[d + k] * x[k];
             lamDE += l_[i][j][k] * (FF3 + FF2);
           }
         }
       }
-
+      
       long double FF1 = m_[i] - (lambda_sum[i] + m_[i]) * x[i];
       dxdt[i] = FF1 + lamEE;
-
+      
       long double FF2 = (-lambda_sum[i] - m_[i]) * x[i + d];
       dxdt[i + d] = FF2 + lamDE;
-
+      
       for (int j = 0; j < d; ++j) {
         long double diff = x[j] - x[i];
         dxdt[i] += diff * q_[i][j];
-
+        
         long double diff2 = x[j + d] - x[i + d];
         dxdt[i + d] += diff2 * q_[i][j];
       }
     }
     return;
   }
-
+  
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
- private:
+  
+private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -290,10 +290,10 @@ class ode_cla_backup {
 
 class ode_cla_d {
   // used for complete tree including extinct branches
- public:
+public:
   ode_cla_d(const std::vector<std::vector<std::vector<double>>>& l,
-          const std::vector<double>& m,
-          const std::vector<std::vector<double>>& q) :
+            const std::vector<double>& m,
+            const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
     lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
@@ -304,9 +304,9 @@ class ode_cla_d {
       }
     }
   }
-
+  
   void single_step(const std::vector< double > &x ,
-                  std::vector< double > &dxdt) {  // NOLINT [runtime/references]
+                   std::vector< double > &dxdt) {  // NOLINT [runtime/references]
     for (int i = 0; i < d; ++i) {
       dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];
       for (int j = 0; j < d; ++j) {
@@ -316,8 +316,8 @@ class ode_cla_d {
     }
   }
   void operator()(const std::vector< double > &x ,
-                  std::vector< double > &dxdt,    // NOLINT [runtime/references]
-                  const double /* t */) const {
+                std::vector< double > &dxdt,    // NOLINT [runtime/references]
+                const double /* t */) const {
     for (int i = 0; i < d; ++i) {
       dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];
       for (int j = 0; j < d; ++j) {
@@ -326,16 +326,16 @@ class ode_cla_d {
       }
     }
   }
-
+  
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
- private:
+  
+private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -345,13 +345,13 @@ class ode_cla_d {
 
 class ode_cla_e {
   // used for ct conditioning.
- public:
+public:
   ode_cla_e(const std::vector<std::vector<std::vector<double>>>& l,
             const std::vector<double>& m,
             const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
   }
-
+  
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt, // NOLINT [runtime/references]
                 const double /* t */) const {
@@ -372,16 +372,16 @@ class ode_cla_e {
       }
     }
   }
-
+  
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
- private:
+  
+private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -392,14 +392,14 @@ class ode_cla_e {
 //////// these versions also store intermediate results!
 
 class ode_standard_store {
- public:
+public:
   ode_standard_store(const std::vector<double>& l,
-               const std::vector<double>& m,
-               const std::vector<std::vector<double>>& q) :
+                     const std::vector<double>& m,
+                     const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
-
+  
   ode_standard_store(const Rcpp::NumericVector& l,
                      const Rcpp::NumericVector& m,
                      const Rcpp::NumericMatrix& q) {
@@ -408,10 +408,10 @@ class ode_standard_store {
     numericmatrix_to_vector(q, &q_);
     d = l_.size();
   }
-
+  
   void operator()(const std::vector< double > &x ,
-                  std::vector<  double > &dxdt,  // NOLINT [runtime/references]
-                  const double t) {
+                std::vector<  double > &dxdt,  // NOLINT [runtime/references]
+                const double t) {
     for (size_t i = 0; i < d; ++i) {
       if (l_[i] != 0.0) {
         dxdt[i] = m_[i] - (l_[i] + m_[i]) * x[i]  +
@@ -422,38 +422,38 @@ class ode_standard_store {
         dxdt[i] = - 1.0 * m_[i] * x[i] + m_[i];
         dxdt[i + d] = -1.0 * m_[i] * x[i + d];
       }
-
+      
       for (size_t j = 0; j < d; ++j) {
         long double diff_e = x[j] - x[i];
         dxdt[i] += diff_e * q_[i][j];
-
+        
         long double diff_d = x[j + d] - x[i + d];
         dxdt[i + d] += diff_d * q_[i][j];
       }
     }
-
+    
     stored_t.push_back(t);
     stored_states.push_back(x);
     return;
   }
-
+  
   double get_l(int index) const {
     return l_[index];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
+  
   std::vector< std::vector<double >> get_stored_states() {
     return stored_states;
   }
-
+  
   std::vector<double> get_stored_t() {
     return stored_t;
   }
-
- private:
+  
+private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
@@ -464,10 +464,10 @@ class ode_standard_store {
 
 class ode_cla_store {
   // used for normal tree
- public:
+public:
   ode_cla_store(const std::vector<std::vector<std::vector<double>>>& l,
-          const std::vector<double>& m,
-          const std::vector<std::vector<double>>& q) :
+                const std::vector<double>& m,
+                const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
     lambda_sum = std::vector<long double>(d, 0.0);
     for (int i = 0; i < d; ++i) {
@@ -478,13 +478,13 @@ class ode_cla_store {
       }
     }
   }
-
+  
   void operator()(const std::vector< double > &x ,
-                  std::vector< double > &dxdt,    // NOLINT [runtime/references]
-                  const double t /* t */ )  {
+                std::vector< double > &dxdt,    // NOLINT [runtime/references]
+                const double t /* t */ )  {
     stored_t.push_back(t);
     stored_states.push_back(x);
-
+    
     for (int i = 0; i < d; ++i) {
       double Df = 0.0;
       double Ef = 0.0;
@@ -493,45 +493,45 @@ class ode_cla_store {
           if (l_[i][j][k] != 0.0) {   // slightly safer.
             long double ff1 = (x[j] * x[k + d] + x[j + d] * x[k]);
             long double ff2 = (x[j] * x[k]);
-
+            
             Df += l_[i][j][k] * ff1;
             Ef += l_[i][j][k] * ff2;
           }
         }
       }
-
+      
       dxdt[i]     = Ef + m_[i] - (lambda_sum[i] + m_[i]) * x[i];
       dxdt[i + d] = Df + (-lambda_sum[i] - m_[i]) * x[i + d];
-
+      
       for (size_t j = 0; j < d; ++j) {
         // q_[i][j] is always non-zero.
         long double temp1 = (x[j]     - x[i]);
         dxdt[i]     += q_[i][j] * temp1;
-
+        
         long double temp2 = (x[j + d] - x[i + d]);
         dxdt[i + d] += q_[i][j] * temp2;
       }
     }
     return;
   }
-
+  
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-
+  
   size_t get_d() const {
     return d;
   }
-
+  
   std::vector< std::vector<double >> get_stored_states() const {
     return stored_states;
   }
-
+  
   std::vector<double> get_stored_t() const {
     return stored_t;
   }
-
- private:
+  
+private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -572,7 +572,7 @@ void integrate(const std::string& stepper_name,
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol,
                                                                         rtol),
-              std::ref(*ode), y, t0, t1, dt);
+                                                                        std::ref(*ode), y, t0, t1, dt);
   } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(
         atol, rtol), std::ref(*ode), y, t0, t1, dt);
@@ -603,11 +603,11 @@ void integrate_full(const std::string& stepper_name,
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol,
                                                                         rtol),
-              std::ref(*ode), y, t0, t1, dt);
+                                                                        std::ref(*ode), y, t0, t1, dt);
   } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol,
                                                                        rtol),
-                                                std::ref(*ode), y, t0, t1, dt);
+                                                                       std::ref(*ode), y, t0, t1, dt);
   } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol),
               std::ref(*ode), y, t0, t1, dt);
@@ -619,7 +619,7 @@ void integrate_full(const std::string& stepper_name,
   } else {
     throw std::runtime_error("odeintcpp::integrate: unknown stepper");
   }
-
+  
   (*yvals) = (*ode).get_stored_states();
   (*tvals) = (*ode).get_stored_t();
   return;
