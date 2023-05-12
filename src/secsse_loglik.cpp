@@ -12,8 +12,8 @@
 //
 #include <vector>
 
-#include <Rcpp.h>
 #include "config.h"    // NOLINT [build/include_subdir]
+#include <Rcpp.h>
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
 
