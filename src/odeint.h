@@ -581,7 +581,7 @@ void integrate(const std::string& stepper_name,
               std::ref(*ode), y, t0, t1, dt);
   } else if ("odeint::bulirsch_stoer" == stepper_name) {
     integrate(bno::bulirsch_stoer<STATE>(atol, rtol),
-              std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, dt);
+              std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta4" == stepper_name) {
     integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
   } else {
@@ -613,7 +613,7 @@ void integrate_full(const std::string& stepper_name,
               std::ref(*ode), y, t0, t1, dt);
   } else if ("odeint::bulirsch_stoer" == stepper_name) {
     integrate(bno::bulirsch_stoer<STATE>(atol, rtol), std::ref(*ode), y,
-              bstime_t{t0}, bstime_t{t1}, dt);
+              bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta4" == stepper_name) {
     integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
   } else {
