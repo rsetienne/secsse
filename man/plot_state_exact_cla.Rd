@@ -15,8 +15,8 @@ plot_state_exact_cla(
   root_state_weight = "proper_weights",
   is_complete_tree = FALSE,
   method = "odeint::bulirsch_stoer",
-  atol = 1e-16,
-  rtol = 1e-16,
+  atol = 1.00000000000000e-16,
+  rtol = 1.00000000000000e-16,
   steps = 10,
   prob_func = NULL,
   verbose = FALSE

@@ -90,9 +90,9 @@ double calc_ll_cla(const Rcpp::List& ll,
       odeintcpp::integrate(method,
                            std::move(od_ptr),     // ode class object
                            &y,                    // state vector
-                           0.0,                   // t0
-                           timeInte[i],           // t1
-                           timeInte[i] * 0.1,
+                           bstime_t{0.0},                   // t0
+                           bstime_t{timeInte[i]},           // t1
+                           bstime_t{timeInte[i] * 0.1},
                            absolute_tol,
                            relative_tol);
 

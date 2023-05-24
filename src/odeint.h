@@ -22,8 +22,8 @@
 // [[Rcpp::depends(BH)]]
 #include "config.h"
 #include "Rcpp.h"                     // NOLINT [build/include_subdir]
-#include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
 #include "util.h"                     // NOLINT [build/include_subdir]
+#include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
 
 #ifdef USE_BULRISCH_STOER_PATCH
 
