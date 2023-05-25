@@ -12,10 +12,10 @@
 //
 #include "config.h"    // NOLINT [build/include_subdir]
 #include <vector>
-
-#include <Rcpp.h>
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
+
+#include <Rcpp.h>
 
 template <typename OD_TYPE>
 double calc_ll(const Rcpp::NumericVector& ll,

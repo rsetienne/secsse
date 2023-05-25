@@ -18,8 +18,8 @@ cla_secsse_eval(
   loglik_penalty = 0,
   is_complete_tree = FALSE,
   method = "odeint::bulirsch_stoer",
-  atol = 1.00000000000000e-16,
-  rtol = 1.00000000000000e-16,
+  atol = 1e-16,
+  rtol = 1e-16,
   verbose = FALSE
 )
 }

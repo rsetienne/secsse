@@ -19,8 +19,8 @@ cla_secsse_loglik(
   num_threads = 1,
   method = ifelse(num_threads == 1, "odeint::bulirsch_stoer",
     "odeint::runge_kutta_fehlberg78"),
-  atol = 1.00000000000000e-16,
-  rtol = 1.00000000000000e-16
+  atol = 1e-16,
+  rtol = 1e-16
 )
 }
 \arguments{
