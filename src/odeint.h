@@ -555,7 +555,7 @@ template <
 >
 void integrate(STEPPER stepper, ODE ode, STATE* y,
                double t0, double t1, double dt) {
-  bno::integrate_adaptive(stepper, ode, (*y), t0, t1, dt);
+  bno::integrate_adaptive(stepper, ode, (*y), bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
 }
 
 template <
