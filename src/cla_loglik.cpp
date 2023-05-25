@@ -177,7 +177,7 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
                        &init_state,          // state vector
                        bstime_t{0.0},                  // t0
                        bstime_t{t},                    // t1
-                       bstime_{t * 0.01},
+                       bstime_t{t * 0.01},
                        atol,
                        rtol);
 
