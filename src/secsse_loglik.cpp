@@ -10,9 +10,9 @@
 // GNU General Public License for more details.
 //
 //
+#include "config.h"    // NOLINT [build/include_subdir]
 #include <vector>
 
-#include "config.h"    // NOLINT [build/include_subdir]
 #include <Rcpp.h>
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
