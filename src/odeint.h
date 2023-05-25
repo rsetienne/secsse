@@ -13,23 +13,21 @@
 #pragma once
 
 
+// [[Rcpp::depends(BH)]]
+#include "config.h"
+#include "util.h"                     // NOLINT [build/include_subdir]
+#include "Rcpp.h"                     // NOLINT [build/include_subdir]
+#include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
 #include <iostream>
 #include <utility>   // std::move
 #include <memory>    // std::unique_ptr
 #include <string>
 #include <vector>
-
-// [[Rcpp::depends(BH)]]
-#include "config.h"
-#include "Rcpp.h"                     // NOLINT [build/include_subdir]
-#include "util.h"                     // NOLINT [build/include_subdir]
-#include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
-
-#ifdef USE_BULRISCH_STOER_PATCH
-
 #include <boost/units/quantity.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 
+
+#ifdef USE_BULRISCH_STOER_PATCH
 using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
 
 #else // USE_BULRISCH_STOER_PATCH

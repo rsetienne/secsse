@@ -175,9 +175,9 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
   odeintcpp::integrate(method,
                        std::move(od_ptr),    // ode class object
                        &init_state,          // state vector
-                       0.0,                  // t0
-                       t,                    // t1
-                       t * 0.01,
+                       bstime_t{0.0},                  // t0
+                       bstime_t{t},                    // t1
+                       bstime_{t * 0.01},
                        atol,
                        rtol);
 
