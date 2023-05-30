@@ -1,5 +1,18 @@
 The secsse package as a whole is distributed under >= GPL-3, the license of which can be found in the distributed file LICENSE. The secsse package includes code written by one of the package contributors that is distributed under BSL-1.0:
   
 * src/config.h
+* src/rhs.h
+* src/odeint.h
+* src/secsse_sim.h
+* src/threaded_ll.h
+* src/util.h
+* src/secsse_sim.cpp
+* src/util.cpp
+* src/secsse_loglik.cpp
+* src/cla_loglik.cpp
+* src/cla_loglik_threaded.cpp
+* src/cla_secsse_store.cpp
+* src/secsse_loglik_store.cpp
+* src/secsse_loglik_threaded.cpp
 
 Full copies of the BSL-1.0 license used by these files is included in `inst/LICENSE_1_0.txt`, as is a license and copyright notice on said files, while details are also in `inst/COPYRIGHTS`.
