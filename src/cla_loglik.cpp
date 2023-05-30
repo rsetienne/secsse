@@ -16,6 +16,7 @@
 
 #include "config.h"       // NOLINT [build/include_subdir]
 #include "odeint.h"       // NOLINT [build/include_subdir]
+#include "rhs.h"       // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
 
 

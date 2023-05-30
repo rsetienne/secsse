@@ -15,6 +15,7 @@
 #include <Rcpp.h>
 #include "config.h"    // NOLINT [build/include_subdir]
 #include "odeint.h"    // NOLINT [build/include_subdir]
+#include "rhs.h"       // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
 
 template <typename OD_TYPE>
