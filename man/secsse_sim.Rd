@@ -14,7 +14,8 @@ secsse_sim(
   conditioning = "none",
   non_extinction = TRUE,
   verbose = FALSE,
-  max_tries = 1e+06
+  max_tries = 1e+06,
+  drop_extinct = TRUE
 )
 }
 \arguments{
@@ -45,6 +46,9 @@ crown lineages? Default is TRUE.}
 \item{verbose}{provide intermediate output.}
 
 \item{max_tries}{maximum number of simulations to try to obtain a tree.}
+
+\item{drop_extinct}{should extinct species be dropped from the tree? default
+is TRUE.}
 }
 \value{
 a list with four properties: phy: reconstructed phylogeny,

@@ -14,7 +14,8 @@ tree tips, for help, see vignette.}
 the main diagonal, used to build the full transition rates matrix.}
 
 \item{diff.conceal}{should the concealed states be different? Normally it
-should be FALSE.}
+should be FALSE. E.g. that the transition rates for the concealed states
+are different from the transition rates for the examined states.}
 }
 \value{
 Q matrix that includes both examined and concealed states, it should

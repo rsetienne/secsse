@@ -94,7 +94,8 @@ create_q_matrix <- function(masterBlock,
 #' @param masterBlock matrix of transitions among only examined states, NA in
 #' the main diagonal, used to build the full transition rates matrix.
 #' @param diff.conceal should the concealed states be different? Normally it
-#' should be FALSE.
+#' should be FALSE. E.g. that the transition rates for the concealed states
+#' are different from the transition rates for the examined states.
 #' @return Q matrix that includes both examined and concealed states, it should
 #' be declared as the third element of idparslist.
 #' @examples

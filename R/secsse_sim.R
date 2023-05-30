@@ -17,6 +17,8 @@
 #' crown lineages? Default is TRUE.
 #' @param verbose provide intermediate output.
 #' @param max_tries maximum number of simulations to try to obtain a tree.
+#' @param drop_extinct should extinct species be dropped from the tree? default
+#' is TRUE.
 #' @return a list with four properties: phy: reconstructed phylogeny,
 #' true_traits: the true traits in order of tip label, obs_traits: observed
 #' traits, ignoring hidden traits and lastly:
@@ -45,7 +47,8 @@ secsse_sim <- function(lambdas,
                        conditioning = "none",
                        non_extinction = TRUE,
                        verbose = FALSE,
-                       max_tries = 1e6) {
+                       max_tries = 1e6,
+                       drop_extinct = TRUE) {
 
   if (is.matrix(lambdas)) {
     hidden_traits <- unique(gsub("[[:digit:]]+", "", names(mus)))
@@ -118,12 +121,15 @@ secsse_sim <- function(lambdas,
   speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
   initialState  <- res$initial_state
   Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
-                                             # not at crown age
+                                           # not at crown age
+  notmin1 = which(Ltable[, 4] != -1)
+  Ltable[notmin1, 4] = crown_age - c(Ltable[notmin1, 4])
+  Ltable[which(Ltable[, 4] == crown_age + 1), 4] = -1          
 
   indices       <- seq(1, length(res$traits), by = 2)
   speciesTraits <- 1 + res$traits[indices]
 
-  phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
+  phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
 
   true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
                                              speciesTraits),
