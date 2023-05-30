@@ -4,7 +4,13 @@
 \alias{create_lambda_matrices}
 \title{helper function to automatically create lambda matrices, based on input}
 \usage{
-create_lambda_matrices(state_names, num_concealed_states, transition_list)
+create_lambda_matrices(
+  state_names,
+  num_concealed_states,
+  transition_list,
+  model = "ETD",
+  concealed_spec_rates = NULL
+)
 }
 \arguments{
 \item{state_names}{vector of names of all observed states}
@@ -17,6 +23,14 @@ third column indicate the two daughter states, and the fourth column gives
 the rate indicator used. E.g.: ["SA", "S", "A", 1] for a trait state "SA"
 which upon speciation generates two daughter species with traits "S" and "A",
 where the number 1 is used as indicator for optimization of the likelihood.}
+
+\item{model}{used model, choice of "ETD" (Examined Traits Diversification) or
+"CTD" (Concealed Traits Diversification).}
+
+\item{concealed_spec_rates}{vector specifying the rate indicators for each
+concealed state, length should be identical to num_concealed_states. If left
+empty when using the CTD model, it is assumed that all available speciation
+rates are distributed uniformly over the concealed states.}
 }
 \description{
 helper function to automatically create lambda matrices, based on input
