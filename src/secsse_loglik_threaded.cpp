@@ -10,14 +10,15 @@
 // GNU General Public License for more details.
 //
 //
-#include <Rcpp.h>
-
-#include <vector>
-#include <tuple>
-
+#include "config.h"
 #include "odeint.h"   // NOLINT [build/include_subdir]
 #include "util.h"     // NOLINT [build/include_subdir]
 #include "threaded_ll.h"   // NOLINT [build/include_subdir]
+
+#include <Rcpp.h>
+#include <vector>
+#include <tuple>
+
 
 #include <RcppParallel.h>
 

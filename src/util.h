@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include <vector>
+#include "config.h"
 #include "Rcpp.h"
+#include <vector>
 
 void force_output();
 

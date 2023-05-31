@@ -11,10 +11,12 @@
 //
 //
 
+#include "config.h"    // NOLINT [build/include_subdir]
+#include "util.h"   // NOLINT [build/include_subdir]
+
 #include <thread>   // NOLINT [build/c++11]
 #include <chrono>   // NOLINT [build/c++11]
 
-#include "util.h"   // NOLINT [build/include_subdir]
 
 void force_output() {
   std::this_thread::sleep_for(std::chrono::milliseconds(30));

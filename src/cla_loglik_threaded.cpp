@@ -11,6 +11,11 @@
 //
 //
 
+#include "config.h"       // NOLINT [build/include_subdir]
+#include "odeint.h"       // NOLINT [build/include_subdir]
+#include "util.h"         // NOLINT [build/include_subdir]
+#include "threaded_ll.h"  // NOLINT [build/include_subdir]
+
 #include <Rcpp.h>
 
 #include <vector>
@@ -19,11 +24,6 @@
 #include <cmath>
 
 #include <RcppParallel.h>
-
-#include "config.h"       // NOLINT [build/include_subdir]
-#include "odeint.h"       // NOLINT [build/include_subdir]
-#include "util.h"         // NOLINT [build/include_subdir]
-#include "threaded_ll.h"  // NOLINT [build/include_subdir]
 
 template< typename OD_TYPE>
 struct combine_states_cla {

@@ -10,11 +10,12 @@
 // GNU General Public License for more details.
 //
 //
-#include <vector>
-#include <Rcpp.h>
-
+#include "config.h"
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
+
+#include <vector>
+#include <Rcpp.h>
 
 //// continuous storage
 storage calc_ll_full(const Rcpp::NumericVector& ll,

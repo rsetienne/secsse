@@ -11,12 +11,12 @@
 //
 //
 
-#include <vector>
-#include <Rcpp.h>
-
 #include "config.h"       // NOLINT [build/include_subdir]
 #include "odeint.h"       // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
+
+#include <vector>
+#include <Rcpp.h>
 
 
 
@@ -90,9 +90,9 @@ double calc_ll_cla(const Rcpp::List& ll,
       odeintcpp::integrate(method,
                            std::move(od_ptr),     // ode class object
                            &y,                    // state vector
-                           0.0,                   // t0
-                           timeInte[i],           // t1
-                           timeInte[i] * 0.1,
+                           bstime_t{0.0},                   // t0
+                           bstime_t{timeInte[i]},           // t1
+                           bstime_t{timeInte[i] * 0.1},
                            absolute_tol,
                            relative_tol);
 
@@ -175,9 +175,9 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
   odeintcpp::integrate(method,
                        std::move(od_ptr),    // ode class object
                        &init_state,          // state vector
-                       0.0,                  // t0
-                       t,                    // t1
-                       t * 0.01,
+                       bstime_t{0.0},                  // t0
+                       bstime_t{t},                    // t1
+                       bstime_t{t * 0.01},
                        atol,
                        rtol);
 
