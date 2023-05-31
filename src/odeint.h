@@ -28,7 +28,6 @@ using bstime_t = double;
 
 #endif  // USE_BULRISCH_STOER_PATCH
 
-#include <iostream>
 #include <utility>   // std::move
 #include <memory>    // std::unique_ptr
 #include <string>

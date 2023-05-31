@@ -3,6 +3,7 @@
 #' @param mus extinction rates, in the form of a vector
 #' @param qs The Q matrix, for example the result of function q_doubletrans, but
 #' generally in the form of a matrix.
+#' @param num_concealed_states number of concealed states
 #' @param crown_age crown age of the tree, tree will be simulated conditional
 #' on non-extinction and this crown age.
 #' @param pool_init_states pool of initial states at the crown, in case this is
@@ -42,6 +43,7 @@ secsse_sim <- function(lambdas,
                        mus,
                        qs,
                        crown_age,
+                       num_concealed_states,
                        pool_init_states = NULL,
                        maxSpec = 1e5,
                        conditioning = "none",
@@ -51,12 +53,10 @@ secsse_sim <- function(lambdas,
                        drop_extinct = TRUE) {
 
   if (is.matrix(lambdas)) {
-    hidden_traits <- unique(gsub("[[:digit:]]+", "", names(mus)))
     # need to be converted
-    lambdas <- prepare_full_lambdas(
-                                names(mus),
-                                num_concealed_states = length(hidden_traits),
-                                lambdas)
+    lambdas <- prepare_full_lambdas(names(mus),
+                                   num_concealed_states = num_concealed_states,
+                                   lambdas)
   }
 
   if (length(lambdas) != length(mus)) {
@@ -87,22 +87,14 @@ secsse_sim <- function(lambdas,
          'none', 'obs_states', 'true_states'")
   }
 
-  conditioning_vec <- c(-1)
-  if (conditioning == "true_states") {
-    conditioning_vec <- -1 + seq_along(mus)
-  }
-  if (conditioning == "obs_states") {
-    obs_traits <- as.numeric(gsub("[^0-9.-]", "", names(mus)))
-    conditioning_vec <- sort(unique(obs_traits))
-  }
-
   res <- secsse_sim_cpp(mus,
                         lambdas,
                         qs,
                         crown_age,
                         maxSpec,
                         pool_init_states,
-                        conditioning_vec,
+                        conditioning,
+                        num_concealed_states,
                         non_extinction,
                         verbose,
                         max_tries)
@@ -137,7 +129,11 @@ secsse_sim <- function(lambdas,
                             phy)
 
   true_traits <- names(mus)[true_traits]
-  obs_traits <- as.numeric(gsub("[^0-9.-]", "", true_traits))
+  obs_traits <- c()
+  for (i in 1:length(true_traits)) {
+    obs_traits[i] <- stringr::str_sub(true_traits[i], 1, -2)
+  }
+  #obs_traits <- as.numeric(gsub("[^0-9.-]", "", true_traits))
 
   if (sum(Ltable[, 4] < 0)) {
       return(list(phy = phy,
