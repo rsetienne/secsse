@@ -147,20 +147,39 @@ create_transition_matrix <- function(state_names,
 
 #' helper function to create a default q_matrix list
 #' @param state_names names of the observed states
+#' @param num_concealed_states number of concealed states
+#' @param mus previously defined mus - used to choose indicator number
 #' @description
 #' This function generates a generic transition list
 #' @export
 create_default_q_list <- function(state_names = c("0", "1"),
                                   num_concealed_states,
-                                  lambda_matrices = NULL) {
+                                  mus = NULL) {
   
-  lm <- unlist(lambda_matrices)
+  lm <- unlist(mus)
   focal_rate <- max(lm) + 1
   
   num_obs_states <- length(state_names)
   concealed_state_names <- LETTERS[1:num_concealed_states]
   
   transition_list <- c()
+  # now we need to find those entries that signify changes between 
+  # observed states
+  for (j in 1:num_obs_states) {
+    for (k in 1:num_obs_states) {    
+      if (j != k) {
+        # transition of concealed state j -> k
+        for (i in 1:num_concealed_states) {
+          start_state <- paste0(state_names[j], concealed_state_names[i])
+          end_state   <- paste0(state_names[k], concealed_state_names[i])
+          to_add <- c(start_state, end_state, focal_rate)
+          transition_list <- rbind(transition_list, to_add)
+        }
+        focal_rate <- focal_rate + 1
+      }
+    }
+  }
+  
   # now, we need to find those entries with rate A->B, or rate B->A
   for (j in 1:num_concealed_states) {
       for (k in 1:num_concealed_states) {    
@@ -176,6 +195,38 @@ create_default_q_list <- function(state_names = c("0", "1"),
         }
       }
   }
+  
+ 
+  
+  
+  
+  add_later <- FALSE
+  if (add_later == TRUE) {
+    # extinction related transitions
+    for (i in 1:state_names) {
+      state_len <- stringr::str_length(state_names[i])
+      if (state_len > 1) {
+        start_state <- state_names[i]
+        end_state1  <- stringr::str_sub(state_names[i], start = 1, end = 1)
+        end_state2  <- stringr::str_sub(state_names[i], start = 2)
+        
+        focal_rate1 <- mus[which(names(mus) == end_state2)] # we end up in 0 if 1 goes extinct
+        focal_rate2 <- mus[which(names(mus) == end_state1)] # and vice versa
+        
+        for (j in 1:num_concealed_states) {
+          focal_start <- paste0(start_state, concealed_state_names[j])
+          focal_end_1 <- paste0(end_state1,  concealed_state_names[j])
+          focal_end_2 <- paste0(end_state2,  concealed_state_names[j])
+          
+          to_add1 <- c(focal_start, focal_end_1, focal_rate1)
+          to_add2 <- c(focal_start, focal_end_2, focal_rate2)
+          transition_list <- rbind(transition_list, to_add1, to_add2)
+        }
+      }
+    }
+ }
+  
+  rownames(transition_list) <- rep("", nrow(transition_list))
   
   return(transition_list)
 }
@@ -203,15 +254,19 @@ create_default_transition_list <- function(state_names = c("0", "1"),
   }
   cnt <- length(state_names)
   if (consider_combinations) {
+    # TODO: write for triple states, e.g. if there are more than 2 single states
     for (i in 1:length(state_names)) {
       for (j in i:length(state_names)) {
-        focal_state_name <- paste0(state_names[i], state_names[j])
-        to_add <- c(focal_state_name, state_names[i], state_names[j], cnt + 1)
-        cnt <- cnt + 1
-        transition_list <- rbind(transition_list, to_add)
+        if (state_names[i] != state_names[j]) {
+          focal_state_name <- paste0(state_names[i], state_names[j])
+          to_add <- c(focal_state_name, state_names[i], state_names[j], cnt + 1)
+          cnt <- cnt + 1
+          transition_list <- rbind(transition_list, to_add)
+        }
       }
     }
   }
+  rownames(transition_list) <- rep("", nrow(transition_list))
   
   return(transition_list)
 }
@@ -228,8 +283,9 @@ create_default_transition_list <- function(state_names = c("0", "1"),
 create_mus <- function(state_names, 
                        num_concealed_states,
                        model = "CR",
-                       q_matrix) {
-  focal_rate <- 1 + max(q_matrix, na.rm = TRUE)
+                       lambdas) {
+  focal_rate <- 1 + max(unlist(lambdas), na.rm = TRUE)
+  
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")
   }
@@ -271,8 +327,6 @@ replace_matrix <- function(focal_matrix,
   return(focal_matrix)
 }
 
-
-
 #' helper function to enter parameter value on their right place
 #' @param object lambda matrices, q_matrix or mu vector
 #' @param params parameters in order, where each value reflects the value
@@ -299,3 +353,55 @@ fill_in <- function(object,
   }
   return(object)
 }
+
+#' @keywords internal
+extract_answ <- function(indic_mat,
+                         param_mat,
+                         answ) {
+  for (i in 1:nrow(indic_mat)) {
+    for (j in 1:ncol(param_mat)) {
+      if (indic_mat[i, j] > 0 && !is.na(indic_mat[i, j])) {
+        index <- indic_mat[i, j]
+        answ[index] <- param_mat[i, j]
+      }
+    }
+  }
+  return(answ)
+}
+
+
+#' function to extract parameter values out of the result of a maximum
+#' likelihood inference run. 
+#' @param param_posit initial parameter structure, consisting of a list with 
+#' three entries: 1) lambda matrices, 2) mus and 3) Q matrix. In each entry,
+#' integers numbers (1-n) indicate the parameter to be optimized
+#' @param ml_pars resulting parameter estimates as returned by for instance 
+#' cla_secsse_ml, having the same structure as param_post
+#' @return vector of parameter estimates
+#' @export
+extract_par_vals <- function(param_posit,
+                             ml_pars) {
+  if (length(param_posit) != length(ml_pars)) {
+    stop("param posit doesn't match ml_pars in structure")
+  }
+  
+  answ <- c()
+  for (i in 1:length(param_posit[[1]])) {
+    answ <- extract_answ(param_posit[[1]][[i]],
+                         ml_pars[[1]][[i]],
+                         answ)
+  }
+  
+  answ <- extract_answ(param_posit[[3]], # Q matrix
+                       ml_pars[[3]],
+                       answ)
+  
+  for (i in 1:length(param_posit[[2]])) {
+    if (param_posit[[2]][i] > 0 && !is.na(param_posit[[2]][i])) {
+      answ[param_posit[[2]][i]] <- ml_pars[[2]][i]
+    }
+  }
+  return(answ)
+}
+
+

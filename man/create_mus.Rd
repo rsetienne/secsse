@@ -4,7 +4,7 @@
 \alias{create_mus}
 \title{function to generate generic mus vector}
 \usage{
-create_mus(state_names, num_concealed_states, model = "CR", q_matrix)
+create_mus(state_names, num_concealed_states, model = "CR", lambdas)
 }
 \arguments{
 \item{state_names}{full state names, including concealed states, for example

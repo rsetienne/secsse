@@ -7,11 +7,15 @@
 create_default_q_list(
   state_names = c("0", "1"),
   num_concealed_states,
-  lambda_matrices = NULL
+  mus = NULL
 )
 }
 \arguments{
 \item{state_names}{names of the observed states}
+
+\item{num_concealed_states}{number of concealed states}
+
+\item{mus}{previously defined mus - used to choose indicator number}
 }
 \description{
 This function generates a generic transition list
