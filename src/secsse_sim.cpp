@@ -31,7 +31,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           double max_time,
                           double max_species,
                           const std::vector<double>& init_states,
-                          std::vector<double> conditioning_vec,
+                          std::string condition,
+                          int num_concealed_states,
                           bool non_extinction,
                           bool verbose,
                           int max_tries) {
@@ -40,7 +41,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
 
   num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
 
-  if (conditioning_vec[0] == -1) conditioning_vec.clear();   // "none"
+  // if (conditioning_vec[0] == -1) conditioning_vec.clear();   // "none"
 
   secsse_sim sim(m_R,
                  lambdas,
@@ -53,7 +54,10 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   int cnt = 0;
   while (true) {
         sim.run();
-        sim.check_num_traits(conditioning_vec);
+        // sim.check_num_traits(conditioning_vec);
+        sim.check_conditioning(condition,
+                               num_concealed_states,
+                               m_R.size());
 
         if (sim.run_info != done) {
           cnt++;
