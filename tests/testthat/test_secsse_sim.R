@@ -63,6 +63,7 @@ test_that("test secsse_sim", {
   tree1 <- secsse::secsse_sim(lambdas = lambdas,
                              mus = mus,
                              qs = qs,
+                             num_concealed_states = num_concealed_states,
                              crown_age = max_time,
                              maxSpec = maxSpec,
                              conditioning = "obs_states")
@@ -73,6 +74,7 @@ test_that("test secsse_sim", {
   tree2 <- secsse::secsse_sim(lambdas = lambdas,
                              mus = mus,
                              qs = qs,
+                             num_concealed_states = num_concealed_states,
                              crown_age = max_time,
                              maxSpec = maxSpec,
                              conditioning = "true_states")

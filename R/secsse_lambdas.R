@@ -276,7 +276,7 @@ create_default_transition_list <- function(state_names = c("0", "1"),
 #' c("0A", "1A", "0B", "1B")
 #' @param num_concealed_states number of concealed states
 #' @param model model replicated, available are "CR", "ETD" and "CTD"
-#' @param q_matrix previously generated q_matrix, used to infer the rate
+#' @param lambdas previously generated lambda matrices, used to infer the rate
 #' number to start with
 #' @return mu vector
 #' @export

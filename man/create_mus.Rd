@@ -14,7 +14,7 @@ c("0A", "1A", "0B", "1B")}
 
 \item{model}{model replicated, available are "CR", "ETD" and "CTD"}
 
-\item{q_matrix}{previously generated q_matrix, used to infer the rate
+\item{lambdas}{previously generated lambda matrices, used to infer the rate
 number to start with}
 }
 \value{

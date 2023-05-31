@@ -45,7 +45,8 @@ Imports:
  RcppParallel,
  ggplot2,
  tibble,
- rlang
+ rlang,
+ stringr
 Suggests: 
  diversitree,
  phytools,
