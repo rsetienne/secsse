@@ -6,6 +6,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "config.h"       // NOLINT [build/include_subdir]
+#include "rhs.h"
 #include "odeint.h"       // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
 #include "threaded_ll.h"  // NOLINT [build/include_subdir]
