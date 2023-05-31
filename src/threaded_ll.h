@@ -12,6 +12,10 @@
 //
 #pragma once
 
+#include "config.h"    // NOLINT [build/include_subdir]
+#include "odeint.h"    // NOLINT [build/include_subdir]
+#include "util.h"      // NOLINT [build/include_subdir]
+
 #include <Rcpp.h>
 
 #include <vector>
@@ -23,9 +27,6 @@
 
 #include <RcppParallel.h>
 
-#include "config.h"    // NOLINT [build/include_subdir]
-#include "odeint.h"    // NOLINT [build/include_subdir]
-#include "util.h"      // NOLINT [build/include_subdir]
 
 using state_vec  = std::vector<double>;
 using state_node = tbb::flow::function_node< state_vec, state_vec>;

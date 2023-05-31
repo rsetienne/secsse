@@ -10,12 +10,12 @@
 // GNU General Public License for more details.
 //
 //
-#include <vector>
-
-#include <Rcpp.h>
 #include "config.h"    // NOLINT [build/include_subdir]
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
+
+#include <vector>
+#include <Rcpp.h>
 
 template <typename OD_TYPE>
 double calc_ll(const Rcpp::NumericVector& ll,
@@ -54,8 +54,8 @@ double calc_ll(const Rcpp::NumericVector& ll,
                            std::move(od_ptr),       // ode class object
                            &y,                      // state vector
                            0.0,                     // t0
-                           timeInte[i],             // t1
-                           timeInte[i] * 0.01,
+                           bstime_t{timeInte[i]},             // t1
+                           bstime_t{timeInte[i] * 0.01},
                            absolute_tol,
                            relative_tol);
       if (i == 0) nodeN = y;
