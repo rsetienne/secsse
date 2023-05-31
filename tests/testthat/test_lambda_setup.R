@@ -6,6 +6,8 @@ test_that("lambda setup", {
   
   for (i in 1:6) {
     full_lambdas[[i]] <- matrix(0, 6, 6)
+    colnames(full_lambdas[[i]]) <- c("MA", "IA", "CA", "MB", "IB", "CB")
+    rownames(full_lambdas[[i]]) <- c("MA", "IA", "CA", "MB", "IB", "CB")
   }
   
   full_lambdas[[1]][1, 1] <- 1  # MA, lambda_Mainland_sympatric
@@ -20,14 +22,15 @@ test_that("lambda setup", {
   
   states <- c("M", "I", "C")
   
+  
   transition_matrix <- c()
   transition_matrix <- rbind(transition_matrix, c("M", "M", "M", 1))
   transition_matrix <- rbind(transition_matrix, c("I", "I", "I", 2))
   transition_matrix <- rbind(transition_matrix, c("C", "M", "I", 3))
   
   lambdas <- secsse::create_lambda_matrices(state_names = states,
-                                    num_concealed_states = 2,
-                                    transition_list = transition_matrix)
+                                            num_concealed_states = 2,
+                                            transition_list = transition_matrix)
   
   testthat::expect_equal(length(lambdas), length(full_lambdas))
   for (i in seq_along(lambdas)) {
