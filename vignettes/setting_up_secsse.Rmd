@@ -46,7 +46,7 @@ We see that there are four lambda matrices, one for each of the combined states 
 We also need to specify an extinction rate:
 
 ```{r adding extinction}
-mus <- secsse::create_mus(state_names = colnames(trans_matrix),
+mus <- secsse::create_mus(state_names = colnames(lambda_matrices[[1]]),
                           num_concealed_states = 2,
                           model = "CR",
                           lambdas = lambda_matrices)
