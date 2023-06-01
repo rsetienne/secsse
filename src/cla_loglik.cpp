@@ -76,8 +76,8 @@ double calc_ll_cla(const Rcpp::List& ll,
     int focal_node;
     for (int i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
-      assert((focal_node) >= 0);
-      assert((focal_node) < states->size());
+      if (focal_node < 0) throw "focal_node < 0";
+      if (focal_node >= states->size()) throw "focal_node > states.size";
 
       y = (*states)[focal_node];
 
@@ -118,8 +118,8 @@ double calc_ll_cla(const Rcpp::List& ll,
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
-    assert((focal) >= 0);
-    assert((focal) < states->size());
+    if (focal_node < 0) throw "focal_node < 0";
+    if (focal_node >= states->size()) throw "focal_node > states.size";
 
     (*states)[focal] = newstate;
   }
