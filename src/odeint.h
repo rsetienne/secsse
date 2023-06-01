@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2021 - 2023, Thijs Janzen
+//  Copyright (c) 2021 - 2023, Hanno Hildenbrandt
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -13,6 +13,7 @@
 #include "util.h"                     // NOLINT [build/include_subdir]
 #include "Rcpp.h"                     // NOLINT [build/include_subdir]
 #include "boost/numeric/odeint.hpp"   // NOLINT [build/include_subdir]
+
 #include <utility>   // std::move
 #include <memory>    // std::unique_ptr
 #include <string>
@@ -26,14 +27,14 @@
 
 using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
 
-#else // USE_BULRISCH_STOER_PATCH
+#else   // USE_BULRISCH_STOER_PATCH
 
 // The default. Causes unitialized member m_last_dt in
 // boost::odeint::bulrisch_stoer<>, declared in
 // boost/numreic/odeint/stepper/bulrisch_stoer.hpp
 using bstime_t = double;
 
-#endif // USE_BULRISCH_STOER_PATCH
+#endif   // USE_BULRISCH_STOER_PATCH
 
 namespace odeintcpp {
 

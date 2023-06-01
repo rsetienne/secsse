@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2021 - 2023, Hanno Hildenbrandt
+//  Copyright (c) 2021 - 2023, Thijs Janzen
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -8,17 +8,18 @@
 #pragma once
 #include "Rcpp.h"                     // NOLINT [build/include_subdir]
 #include "util.h"                     // NOLINT [build/include_subdir]
+#include <vector>
 
 
 class ode_standard {
-public:
+ public:
   ode_standard(const std::vector<double>& l,
                const std::vector<double>& m,
                const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
-  
+
   ode_standard(const Rcpp::NumericVector& l,
                const Rcpp::NumericVector& m,
                const Rcpp::NumericMatrix& q) {
@@ -27,7 +28,7 @@ public:
     numericmatrix_to_vector(q, &q_);
     d = l_.size();
   }
-  
+
   void operator()(const std::vector< double > &x,
                 std::vector<  double > &dxdt,   // NOLINT [runtime/references]
                 const double /* t */) {
@@ -41,7 +42,7 @@ public:
         dxdt[i] = - 1.0 * m_[i] * x[i] + m_[i];
         dxdt[i + d] = -1.0 * m_[i] * x[i + d];
       }
-      
+
       for (size_t j = 0; j < d; ++j) {
         long double diff_e = x[j] - x[i];
         dxdt[i] += diff_e * q_[i][j];
@@ -52,16 +53,16 @@ public:
     }
     return;
   }
-  
+
   double get_l(int index) const {
     return l_[index];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
-private:
+
+ private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
@@ -69,14 +70,14 @@ private:
 };
 
 class ode_standard_ct {
-public:
+ public:
   ode_standard_ct(const std::vector<double>& l,
                   const std::vector<double>& m,
                   const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
-  
+
   ode_standard_ct(const Rcpp::NumericVector& l,
                   const Rcpp::NumericVector& m,
                   const Rcpp::NumericMatrix& q) {
@@ -85,7 +86,7 @@ public:
     numericmatrix_to_vector(q, &q_);
     d = l_.size();
   }
-  
+
   void operator()(const std::vector< double > &x ,
                 std::vector<  double > &dxdt,   // NOLINT [runtime/references]
                 const double /* t */) {
@@ -94,7 +95,7 @@ public:
       dxdt[i] =  diff_1 * (1 - x[i]);
       dxdt[i + d] = -1.0 * (l_[i] + m_[i]) * x[i + d];
     }
-    
+
     for (int j = 0; j < d; ++j) {
       for (int k = 0; k < d; ++k) {
         long double diff_e = x[k] - x[j];
@@ -104,19 +105,19 @@ public:
         dxdt[j + d] += q_[j][k] * diff_d;
       }
     }
-    
+
     return;
   }
-  
+
   double get_l(int index) const {
     return l_[index];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
-private:
+
+ private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
@@ -139,7 +140,7 @@ public:
       }
     }
   }
-  
+
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,    // NOLINT [runtime/references]
                 const double /* t */) const {
@@ -157,10 +158,10 @@ public:
           }
         }
       }
-      
+
       dxdt[i]     = Ef + m_[i] - (lambda_sum[i] + m_[i]) * x[i];
       dxdt[i + d] = Df + (-lambda_sum[i] - m_[i]) * x[i + d];
-      
+
       for (size_t j = 0; j < d; ++j) {
         // q_[i][j] is always non-zero.
         long double temp1 = (x[j]     - x[i]);
@@ -171,16 +172,16 @@ public:
     }
     return;
   }
-  
+
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
-private:
+
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -203,53 +204,53 @@ public:
       }
     }
   }
-  
+
   void operator()(const std::vector< double > &x,
                 std::vector< double > &dxdt,   // NOLINT [runtime/references]
                 const double /* t */) const {
     for (int i = 0; i < d; ++i) {
       long double lamEE = 0.0;
       long double lamDE = 0.0;
-      
+
       for (int j = 0; j < d; ++j) {
         for (int k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0) {
             long double FF1 = x[j] * x[k];
             lamEE += l_[i][j][k] * FF1;
-            
+
             long double FF3 = x[d + j] * x[k];
             long double FF2 = x[d + k] * x[k];
             lamDE += l_[i][j][k] * (FF3 + FF2);
           }
         }
       }
-      
+
       long double FF1 = m_[i] - (lambda_sum[i] + m_[i]) * x[i];
       dxdt[i] = FF1 + lamEE;
-      
+
       long double FF2 = (-lambda_sum[i] - m_[i]) * x[i + d];
       dxdt[i + d] = FF2 + lamDE;
-      
+
       for (int j = 0; j < d; ++j) {
         long double diff = x[j] - x[i];
         dxdt[i] += diff * q_[i][j];
-        
+
         long double diff2 = x[j + d] - x[i + d];
         dxdt[i + d] += diff2 * q_[i][j];
       }
     }
     return;
   }
-  
+
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
-private:
+
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -273,7 +274,7 @@ public:
       }
     }
   }
-  
+
   void single_step(const std::vector< double > &x ,
                    std::vector< double > &dxdt) {  // NOLINT [runtime/references]
     for (int i = 0; i < d; ++i) {
@@ -284,6 +285,7 @@ public:
       }
     }
   }
+
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,    // NOLINT [runtime/references]
                 const double /* t */) const {
@@ -295,16 +297,16 @@ public:
       }
     }
   }
-  
+
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
-private:
+
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -320,7 +322,7 @@ public:
             const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
   }
-  
+
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt, // NOLINT [runtime/references]
                 const double /* t */) const {
@@ -341,16 +343,16 @@ public:
       }
     }
   }
-  
+
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
-private:
+
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;
@@ -368,7 +370,7 @@ public:
   l_(l), m_(m), q_(q) {
     d = l.size();
   }
-  
+
   ode_standard_store(const Rcpp::NumericVector& l,
                      const Rcpp::NumericVector& m,
                      const Rcpp::NumericMatrix& q) {
@@ -377,7 +379,7 @@ public:
     numericmatrix_to_vector(q, &q_);
     d = l_.size();
   }
-  
+
   void operator()(const std::vector< double > &x ,
                 std::vector<  double > &dxdt,  // NOLINT [runtime/references]
                 const double t) {
@@ -400,29 +402,29 @@ public:
         dxdt[i + d] += diff_d * q_[i][j];
       }
     }
-    
+
     stored_t.push_back(t);
     stored_states.push_back(x);
     return;
   }
-  
+
   double get_l(int index) const {
     return l_[index];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
+
   std::vector< std::vector<double >> get_stored_states() {
     return stored_states;
   }
-  
+
   std::vector<double> get_stored_t() {
     return stored_t;
   }
-  
-private:
+
+ private:
   std::vector< double > l_;
   std::vector< double > m_;
   std::vector< std::vector< double >> q_;
@@ -447,13 +449,13 @@ public:
       }
     }
   }
-  
+
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,    // NOLINT [runtime/references]
                 const double t /* t */ )  {
     stored_t.push_back(t);
     stored_states.push_back(x);
-    
+
     for (int i = 0; i < d; ++i) {
       double Df = 0.0;
       double Ef = 0.0;
@@ -468,38 +470,38 @@ public:
           }
         }
       }
-      
+
       dxdt[i]     = Ef + m_[i] - (lambda_sum[i] + m_[i]) * x[i];
       dxdt[i + d] = Df + (-lambda_sum[i] - m_[i]) * x[i + d];
-      
+
       for (size_t j = 0; j < d; ++j) {
         // q_[i][j] is always non-zero.
         long double temp1 = (x[j]     - x[i]);
         dxdt[i]     += q_[i][j] * temp1;
-        
+
         long double temp2 = (x[j + d] - x[i + d]);
         dxdt[i + d] += q_[i][j] * temp2;
       }
     }
     return;
   }
-  
+
   double get_l(size_t i, size_t j, size_t k) const {
     return l_[i][j][k];
   }
-  
+
   size_t get_d() const {
     return d;
   }
-  
+
   std::vector< std::vector<double >> get_stored_states() const {
     return stored_states;
   }
-  
+
   std::vector<double> get_stored_t() const {
     return stored_t;
   }
-  
+
 private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;

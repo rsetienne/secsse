@@ -9,6 +9,8 @@
 #include "secsse_sim.h"   // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
 
+#include <string>
+
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
   for (size_t m = 0; m < lambdas_R.size(); ++m) {
