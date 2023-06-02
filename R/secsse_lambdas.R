@@ -135,7 +135,7 @@ create_transition_matrix <- function(state_names,
     parent_state <- transition_list[i, 1]
     daughter_state <- transition_list[i, 2]
     focal_rate <- transition_list[i, 3]
-    trans_matrix[daughter_state, parent_state] <- focal_rate
+    trans_matrix[parent_state, daughter_state] <- focal_rate
   }
   
   colnames(trans_matrix) <- state_names
