@@ -61,6 +61,8 @@ test_that("qmat setup", {
   colnames(q_mat) <- namez
   rownames(q_mat) <- namez
   
+  q_mat <- t(q_mat)
+  
   trans_list <- c()
   trans_list <- rbind(trans_list, c("CA", "MA", 5))
   trans_list <- rbind(trans_list, c("CA", "IA", 4))
