@@ -309,7 +309,7 @@ update_values_transform_cla <- function(trpars,
                               idpars,
                               parvals) {
     for (i in seq_along(idpars)) {
-        for (j in seq_len(nrow(trpars[[3]]))) {
+        for (j in seq_along(trpars[[1]])) {
             id <- which(idparslist[[1]][[j]] == idpars[i])
             trpars[[1]][[j]][id] <- parvals[i]
         }
@@ -323,15 +323,15 @@ update_values_transform_cla <- function(trpars,
 
 #' @keywords internal
 transform_params_cla <- function(idparslist,
-                               idparsfix,
-                               trparsfix,
-                               idparsopt,
-                               trparsopt,
-                               structure_func,
-                               idparsfuncdefpar,
-                               trparfuncdefpar) {
+                                 idparsfix,
+                                 trparsfix,
+                                 idparsopt,
+                                 trparsopt,
+                                 structure_func,
+                                 idparsfuncdefpar,
+                                 trparfuncdefpar) {
     trpars1 <- idparslist
-    for (j in seq_len(nrow(trpars1[[3]]))) {
+    for (j in seq_along(trpars1[[1]])) {
         trpars1[[1]][[j]][, ] <- NA
     }
 
@@ -340,22 +340,22 @@ transform_params_cla <- function(idparslist,
     }
 
     if (length(idparsfix) != 0) {
-        trpars1 <- update_values_transform_cla(trpars1,
-                                     idparslist,
-                                     idparsfix,
-                                     trparsfix)
+        trpars1 <- update_values_transform_cla(trpars = trpars1,
+                                               idparslist = idparslist,
+                                               idpars = idparsfix,
+                                               parvals = trparsfix)
     }
-
-    trpars1 <- update_values_transform_cla(trpars1,
-                                 idparslist,
-                                 idparsopt,
-                                 trparsopt)
+    
+    trpars1 <- update_values_transform_cla(trpars = trpars1,
+                                           idparslist = idparslist,
+                                           idpars = idparsopt,
+                                           parvals = trparsopt)
     ## structure_func part
     if (!is.null(structure_func)) {
-        trpars1 <- update_values_transform_cla(trpars1,
-                                     idparslist,
-                                     idparsfuncdefpar,
-                                     trparfuncdefpar)
+        trpars1 <- update_values_transform_cla(trpars = trpars1,
+                                               idparslist = idparslist,
+                                               idpars = idparsfuncdefpar,
+                                               parvals = trparfuncdefpar)
     }
 
     pre_pars1 <- list()

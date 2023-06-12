@@ -180,6 +180,7 @@ cla_secsse_ml <- function(phy,
                                                  sampling_fraction,
                                                  is_complete_tree,
                                                  mus)
+    
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                           trparsfix = trparsfix,
                                           idparsopt = idparsopt,

@@ -116,7 +116,8 @@ create_q_matrix <- function(masterBlock,
 #' param_posit[[3]] <- myQ
 #' @export
 q_doubletrans <- function(traits, masterBlock, diff.conceal) {
-
+    warning("q_doubletrans assumes that the number of 
+            concealed traits is equal to the number of examined traits")
     if (diff.conceal == TRUE &&
         all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
         integersmasterBlock <- floor(masterBlock)

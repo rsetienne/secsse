@@ -94,7 +94,8 @@ secsse_loglik <- function(parameter,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus)
+                                                 mus,
+                                                 num_traits = ncol(q_matrix))
   }
 
   states <- setting_calculation$states
@@ -366,10 +367,15 @@ build_states <- function(phy,
     stop("Number of species in the tree must be the same as in the trait file")
   }
   traitStates <- sort(unique(traits[, 1]))
+  
+  num_traits <- length(mus) / num_concealed_states
+  if (is.null(num_traits)) num_traits <- length(traitStates)
+  
+  #if (is.null(num_traits)) num_traits <- length(traitStates)
 
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
-  ly <- length(traitStates) * 2 * num_concealed_states
+  ly <- num_traits * 2 * num_concealed_states
   states <- matrix(ncol = ly, nrow = nb_tip + nb_node)
   d <- ly / 2
   ## In a example of 3 states, the names of the colums would be like:

@@ -2,7 +2,8 @@
 % Please edit documentation in R/secsse_lambdas.R
 \name{create_transition_matrix}
 \alias{create_transition_matrix}
-\title{helper function to neatly setup a transition matrix}
+\title{helper function to neatly setup a Q matrix, without transitions to 
+concealed states (only observed transitions shown)}
 \usage{
 create_transition_matrix(state_names, transition_list)
 }
@@ -18,5 +19,6 @@ indicator}
 transition matrix
 }
 \description{
-helper function to neatly setup a transition matrix
+helper function to neatly setup a Q matrix, without transitions to 
+concealed states (only observed transitions shown)
 }

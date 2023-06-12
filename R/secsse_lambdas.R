@@ -101,7 +101,7 @@ create_lambda_matrices <- function(state_names,
       incr <- (j - 1) * num_obs_states
       focal_rate <- target_rate
       if (model == "CTD") focal_rate <- concealed_spec_rates[j]
-      if (model == "CR") focal_rate <- 1
+      # if (model == "CR") focal_rate <- 1
       
       lambdas[[focal_state + incr]][daughter1 + incr,
                                     daughter2 + incr] <- focal_rate
@@ -114,7 +114,8 @@ create_lambda_matrices <- function(state_names,
 }
 
 
-#' helper function to neatly setup a transition matrix
+#' helper function to neatly setup a Q matrix, without transitions to 
+#' concealed states (only observed transitions shown)
 #' @param state_names names of observed states
 #' @param transition_list matrix of transitions, indicating in order: 1) 
 #' starting state (typically the column in the transition matrix), 2) ending 
@@ -142,6 +143,87 @@ create_transition_matrix <- function(state_names,
   rownames(trans_matrix) <- state_names
   diag(trans_matrix) <- NA
   return(trans_matrix)
+}
+
+#' function to expand an existing q_matrix to a number of 
+#' concealed states
+#' @param q_matrix q_matrix with only transitions between observed states
+#' @param num_concealed_states number of concealed states
+#' @param diff.conceal should we use the same number of rates for the
+#' concealed state transitions, or should all concealed state transitions
+#' have separate rates? Typically, FALSE is fine and should be used in order
+#' to avoid having a huge number of parameters.
+#' @return updated q matrix
+#' @export
+expand_q_matrix <- function(q_matrix,
+                            num_concealed_states,
+                            diff.conceal = FALSE) {
+
+  num_traits <- ncol(q_matrix)
+  total_num_states <- ncol(q_matrix) * num_concealed_states
+  
+  new_q_matrix <- matrix(0, nrow = total_num_states, ncol = total_num_states)
+  diag(new_q_matrix) <- NA
+  
+  # we first fill in the existing q matrix 
+  for (x in 1:ncol(q_matrix)) {
+    for (y in 1:nrow(q_matrix)) {
+      for (i in 1:num_concealed_states) {
+        incr <- (i - 1) * num_traits
+        new_q_matrix[x + incr, y + incr] <- q_matrix[x, y]
+      }
+    }
+  }
+  
+  # and now we add all forward and reverse transitions
+  # we need all combinations!
+  if (diff.conceal == TRUE) {
+    rate_indic <- max(new_q_matrix, na.rm = TRUE) + 1
+  
+    for (i in 1:num_concealed_states) {
+      for (j in 1:num_concealed_states) {
+        if (i != j) {
+          for (k in 1:num_traits) {
+             start <- (i - 1) * num_traits + k
+             end <- (j - 1) * num_traits + k
+             new_q_matrix[start, end] <- rate_indic
+          }
+          rate_indic <- rate_indic + 1
+        }
+      }
+    }  
+  } else {
+    # we now re-use the existing rates
+    existing_rates <- unique(as.vector(q_matrix))
+    existing_rates <- existing_rates[existing_rates > 0]
+    existing_rates <- existing_rates[!is.na(existing_rates)]
+    existing_rates <- sort(existing_rates)
+    
+    num_transitions <- num_concealed_states * (num_concealed_states - 1)
+    chosen_rates <- existing_rates
+    if (num_transitions > length(existing_rates)) {
+      remain <- num_transitions - length(existing_rates)
+      to_add <- sample(existing_rates, size = remain, replace = FALSE)
+      chosen_rates <- c(chosen_rates, to_add)
+    }
+    
+    rate_indic <- 1
+    
+    for (i in 1:num_concealed_states) {
+      for (j in i:num_concealed_states) {
+        if (i != j) {
+          for (k in 1:num_traits) {
+              start <- (i - 1) * num_traits + k
+              end <- (j - 1) * num_traits + k
+              new_q_matrix[start, end] <- chosen_rates[rate_indic]
+              new_q_matrix[end, start] <- chosen_rates[rate_indic + 1]
+          }
+          rate_indic <- rate_indic + 2
+        }
+      }
+    }  
+  }
+  return(new_q_matrix)
 }
 
 
@@ -195,10 +277,6 @@ create_default_q_list <- function(state_names = c("0", "1"),
         }
       }
   }
-  
- 
-  
-  
   
   add_later <- FALSE
   if (add_later == TRUE) {

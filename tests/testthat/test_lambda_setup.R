@@ -88,3 +88,22 @@ test_that("qmat setup", {
   testthat::expect_equal(nrow(q_mat), nrow(q_mat2))
   testthat::expect_true(all.equal(q_mat, q_mat2))
 })
+
+test_that("q_matrix", {
+  
+  q_mat <- matrix(data = NA, nrow = 2, ncol = 2)
+  q_mat[1, 2] <- 1
+  q_mat[2, 1] <- 2
+  
+  # first, we test on a 2x2 matrix
+  for (dd in c(TRUE, FALSE)) {
+    testthat::expect_output(
+    q1 <- secsse::q_doubletrans(traits = c(1, 2),
+                                masterBlock = q_mat,
+                                diff.conceal = dd))
+    q2 <- secsse::expand_q_matrix(q_matrix = q_mat,
+                                  num_concealed_states = 2,
+                                  diff.conceal = dd)
+    testthat::expect_true(all.equal(q1, q2))
+  }
+})
