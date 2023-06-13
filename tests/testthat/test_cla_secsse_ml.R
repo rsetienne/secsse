@@ -12,7 +12,9 @@ test_that("trying a short ML search: cla_secsse", {
   masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
+  testthat::expect_warning(
   idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
+  )
   testthat::expect_output(
       startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
@@ -29,6 +31,7 @@ test_that("trying a short ML search: cla_secsse", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
+  testthat::expect_warning(
   testthat::expect_output(
     model_R <- cla_secsse_ml(
       phylotree,
@@ -47,7 +50,7 @@ test_that("trying a short ML search: cla_secsse", {
       optimmethod,
       num_cycles = 1,
       verbose = FALSE)
-  )
+  ))
 
   testthat::expect_equal(model_R$ML, -16.1342246206186)
 })

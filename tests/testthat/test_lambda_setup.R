@@ -97,10 +97,11 @@ test_that("q_matrix", {
   
   # first, we test on a 2x2 matrix
   for (dd in c(TRUE, FALSE)) {
-    testthat::expect_output(
+    testthat::expect_warning(
     q1 <- secsse::q_doubletrans(traits = c(1, 2),
                                 masterBlock = q_mat,
-                                diff.conceal = dd))
+                                diff.conceal = dd)
+    )
     q2 <- secsse::expand_q_matrix(q_matrix = q_mat,
                                   num_concealed_states = 2,
                                   diff.conceal = dd)
