@@ -81,14 +81,18 @@ To do so, we first need to specify our focal rates, and then fill them in.
 
 ```{r fill in parameters}
 
-speciation <- 0.5
+speciation_S <- 0.5
+speciation_N <- 0.3
 extinction <- 0.0
 q_ab <- 0.5
 q_ba <- 0.5
 sp_ns <- 0.2
 sp_sn <- 0.2
 
-params <- c(speciation, extinction, sp_ns, sp_sn, q_ab, q_ba)
+params <- c(speciation_S, 
+            speciation_N,
+            extinction, 
+            sp_ns, sp_sn, q_ab, q_ba)
 
 lambda_matrices_p <- secsse::fill_in(lambda_matrices,
                                      params)
@@ -131,7 +135,7 @@ answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               traits = sim_traits,
                               num_concealed_states = 2,
                               idparslist = param_posit,
-                              idparsopt = c(1, 2, 3, 4, 5, 6),
+                              idparsopt = c(1, 2, 3, 4, 5, 6, 7),
                               initparsopt = initpars,
                               idparsfix = c(0),
                               parsfix = c(0.0),

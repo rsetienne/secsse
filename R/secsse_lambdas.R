@@ -201,9 +201,10 @@ expand_q_matrix <- function(q_matrix,
     
     num_transitions <- num_concealed_states * (num_concealed_states - 1)
     chosen_rates <- existing_rates
-    if (num_transitions > length(existing_rates)) {
+    while (num_transitions > length(chosen_rates)) {
+
       remain <- num_transitions - length(existing_rates)
-      to_add <- sample(existing_rates, size = remain, replace = FALSE)
+      to_add <- sample(existing_rates, size = min(remain, length(existing_rates)), replace = FALSE)
       chosen_rates <- c(chosen_rates, to_add)
     }
     
