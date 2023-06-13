@@ -587,11 +587,11 @@ struct secsse_sim {
 
   void check_obs_states(size_t num_concealed_states,
                         size_t num_observed_states) {
-      std::vector<int> focal_traits;  //(num_observed_states);
+      std::vector<int> focal_traits;    //(num_observed_states);
       for (size_t i = 0; i < num_observed_states; ++i)  {
         focal_traits.push_back(i);
       }
- 
+
       for (size_t i = 0; i < pop.size(); ++i) {
         auto trait = pop.get_trait(i) % num_concealed_states;
         for (size_t j = 0; j < focal_traits.size(); ++j) {
@@ -629,8 +629,8 @@ struct secsse_sim {
     }
 
     if (conditioning_type == "obs_states") {
-      check_obs_states(num_concealed_states, 
-                       num_states / num_concealed_states); 
+      check_obs_states(num_concealed_states,
+                       num_states / num_concealed_states);
     }
 
     return;
@@ -661,7 +661,7 @@ struct secsse_sim {
     if (focal_traits.empty()) {
       run_info = done;
       return;
-    } 
+    }
 
     // otherwise, conditioning is a reason to reject:
     run_info = conditioning;

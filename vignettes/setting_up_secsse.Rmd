@@ -4,7 +4,7 @@ author: "Thijs Janzen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{"Setting up a secsse analysis"}
+  %\VignetteIndexEntry{Setting up a secsse analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

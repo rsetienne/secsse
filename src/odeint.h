@@ -25,7 +25,8 @@
 #include <boost/units/quantity.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 
-using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
+using bstime_t = 
+                boost::units::quantity<boost::units::si::dimensionless, double>;
 
 #else   // USE_BULRISCH_STOER_PATCH
 

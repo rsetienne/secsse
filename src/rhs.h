@@ -46,7 +46,7 @@ class ode_standard {
       for (size_t j = 0; j < d; ++j) {
         long double diff_e = x[j] - x[i];
         dxdt[i] += diff_e * q_[i][j];
-        
+
         long double diff_d = x[j + d] - x[i + d];
         dxdt[i + d] += diff_d * q_[i][j];
       }
@@ -100,7 +100,7 @@ class ode_standard_ct {
       for (int k = 0; k < d; ++k) {
         long double diff_e = x[k] - x[j];
         dxdt[j] +=  q_[j][k] * diff_e;
-        
+
         long double diff_d = x[k + d] - x[j + d];
         dxdt[j + d] += q_[j][k] * diff_d;
       }
@@ -126,7 +126,7 @@ class ode_standard_ct {
 
 class ode_cla {
   // used for normal tree
-public:
+ public:
   ode_cla(const std::vector<std::vector<std::vector<double>>>& l,
           const std::vector<double>& m,
           const std::vector<std::vector<double>>& q) :
@@ -260,7 +260,7 @@ public:
 
 class ode_cla_d {
   // used for complete tree including extinct branches
-public:
+ public:
   ode_cla_d(const std::vector<std::vector<std::vector<double>>>& l,
             const std::vector<double>& m,
             const std::vector<std::vector<double>>& q) :
@@ -316,7 +316,7 @@ public:
 
 class ode_cla_e {
   // used for ct conditioning.
-public:
+ public:
   ode_cla_e(const std::vector<std::vector<std::vector<double>>>& l,
             const std::vector<double>& m,
             const std::vector<std::vector<double>>& q) :
@@ -363,7 +363,7 @@ public:
 //////// these versions also store intermediate results!
 
 class ode_standard_store {
-public:
+ public:
   ode_standard_store(const std::vector<double>& l,
                      const std::vector<double>& m,
                      const std::vector<std::vector<double>>& q) :
@@ -393,11 +393,11 @@ public:
         dxdt[i] = - 1.0 * m_[i] * x[i] + m_[i];
         dxdt[i + d] = -1.0 * m_[i] * x[i + d];
       }
-      
+
       for (size_t j = 0; j < d; ++j) {
         long double diff_e = x[j] - x[i];
         dxdt[i] += diff_e * q_[i][j];
-        
+
         long double diff_d = x[j + d] - x[i + d];
         dxdt[i + d] += diff_d * q_[i][j];
       }
@@ -435,7 +435,7 @@ public:
 
 class ode_cla_store {
   // used for normal tree
-public:
+ public:
   ode_cla_store(const std::vector<std::vector<std::vector<double>>>& l,
                 const std::vector<double>& m,
                 const std::vector<std::vector<double>>& q) :
@@ -464,7 +464,7 @@ public:
           if (l_[i][j][k] != 0.0) {   // slightly safer.
             long double ff1 = (x[j] * x[k + d] + x[j + d] * x[k]);
             long double ff2 = (x[j] * x[k]);
-            
+
             Df += l_[i][j][k] * ff1;
             Ef += l_[i][j][k] * ff2;
           }
@@ -502,7 +502,7 @@ public:
     return stored_t;
   }
 
-private:
+ private:
   const std::vector< std::vector< std::vector< double > > > l_;
   const std::vector< double > m_;
   const std::vector< std::vector< double >> q_;

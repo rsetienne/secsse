@@ -74,7 +74,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
     int focal_node;
-    for (int i = 0; i < desNodes.size(); ++i) {
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
       if (focal_node < 0) throw "focal_node < 0";
       if (focal_node >= states->size()) throw "focal_node > states.size";
