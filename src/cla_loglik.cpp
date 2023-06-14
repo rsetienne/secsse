@@ -67,10 +67,9 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector<int> desNodes;
   std::vector<double> timeInte;
   long double loglik = 0;
-
   for (int a = 0; a < ances.size(); ++a) {
+   
     int focal = ances[a];
-
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
     int focal_node;
@@ -80,6 +79,8 @@ double calc_ll_cla(const Rcpp::List& ll,
       if (focal_node >= states->size()) throw "focal_node > states.size";
 
       y = (*states)[focal_node];
+      
+  //    std::cerr << focal << " " << focal_node << " " << timeInte[i] << "\n";
 
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
@@ -98,6 +99,8 @@ double calc_ll_cla(const Rcpp::List& ll,
     normalize_loglik_node(&nodeM, &loglik);
     normalize_loglik_node(&nodeN, &loglik);
 
+  //  std::cerr << loglik << " ";
+    
     mergeBranch = std::vector<double>(d, 0.0);
 
     for (size_t i = 0; i < d; ++i) {
@@ -114,6 +117,8 @@ double calc_ll_cla(const Rcpp::List& ll,
 
     normalize_loglik(&mergeBranch, &loglik);
 
+  //  std::cerr << loglik << "\n";
+    
     std::vector<double> newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
@@ -130,7 +135,7 @@ double calc_ll_cla(const Rcpp::List& ll,
   for (int i = 0; i < nodeM.size(); ++i) {
     (*nodeM_out).push_back(nodeM[i]);
   }
-
+   
   return loglik;
 }
 
@@ -241,7 +246,6 @@ try {
   }
   Rcpp::NumericMatrix states_out;
   vector_to_numericmatrix(states, &states_out);
-
   Rcpp::List output = Rcpp::List::create(Rcpp::Named("states") = states_out,
                                          Rcpp::Named("loglik") = loglik,
                                          Rcpp::Named("mergeBranch") =

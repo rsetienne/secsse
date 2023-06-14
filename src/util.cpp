@@ -106,10 +106,13 @@ void normalize_loglik(std::vector<double>* probvec,
                                        0.0,
                                        abssum);
 
-  for (auto& i : (*probvec)) {
-    i *= 1.0 / sumabsprobs;
+  if (sumabsprobs > 0.0) {
+
+      for (auto& i : (*probvec)) {
+        i *= 1.0 / sumabsprobs;
+      }
+      (*loglik) += log(sumabsprobs);
   }
-  (*loglik) += log(sumabsprobs);
   return;
 }
 

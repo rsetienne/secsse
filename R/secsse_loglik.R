@@ -357,7 +357,9 @@ build_states <- function(phy,
                          num_concealed_states,
                          sampling_fraction,
                          is_complete_tree = FALSE,
-                         mus = NULL) {
+                         mus = NULL,
+                         num_unique_traits = NULL,
+                         first_time = FALSE) {
   if (!is.matrix(traits)) {
     traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
   }
@@ -365,7 +367,18 @@ build_states <- function(phy,
   if (length(phy$tip.label) != nrow(traits)) {
     stop("Number of species in the tree must be the same as in the trait file")
   }
+  # if there are traits that are not in the observed tree, 
+  # the user passes these themselves.
+  # yes, this is a weird use-case
+  
   traitStates <- sort(unique(traits[, 1]))
+  
+  if (!is.null(num_unique_traits)) {
+    if (num_unique_traits > length(traitStates)) {
+      if (first_time) message("found un-observed traits, expanding state space")
+       traitStates <- 1:num_unique_traits
+    }
+  }
   
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
@@ -400,13 +413,17 @@ build_initStates_time <- function(phy,
                                   num_concealed_states,
                                   sampling_fraction,
                                   is_complete_tree = FALSE,
-                                  mus = NULL) {
+                                  mus = NULL,
+                                  num_unique_traits = NULL,
+                                  first_time = FALSE) {
   states <- build_states(phy,
                          traits,
                          num_concealed_states,
                          sampling_fraction,
                          is_complete_tree,
-                         mus)
+                         mus,
+                         num_unique_traits,
+                         first_time)
   phy$node.label <- NULL
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
@@ -458,10 +475,12 @@ get_weight_states <- function(root_state_weight,
     if (root_state_weight == "proper_weights") {
       if (is_cla) {
         lmb <- length(mergeBranch)
-        numerator <- rep(NA, lmb)
+        numerator <- rep(0, lmb)
         for (j in 1:lmb) {
-          numerator[j] <- mergeBranch[j] / sum(lambdas[[j]] *
-                                                 ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+          if (sum(lambdas[[j]]) > 0) {
+           numerator[j] <- mergeBranch[j] / sum(lambdas[[j]] *
+                                        ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+          }
         }
         weight_states <- numerator / sum(numerator) # nolint
       } else {

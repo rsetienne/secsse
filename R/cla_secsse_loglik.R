@@ -100,6 +100,8 @@ cla_secsse_loglik <- function(parameter,
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]  # nolint
 
+  num_modeled_traits <- ncol(Q) / floor(num_concealed_states)
+  
   if (is.null(setting_calculation)) {
     check_input(traits,
                 phy,
@@ -111,7 +113,9 @@ cla_secsse_loglik <- function(parameter,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus)
+                                                 mus,
+                                                 num_modeled_traits,
+                                                 first_time = TRUE)
   }
   states <- setting_calculation$states
 
@@ -121,7 +125,9 @@ cla_secsse_loglik <- function(parameter,
                            num_concealed_states = num_concealed_states,
                            sampling_fraction = sampling_fraction,
                            is_complete_tree = is_complete_tree,
-                           mus = mus)
+                           mus = mus,
+                           num_unique_traits = num_modeled_traits,
+                           first_time = FALSE)
   }
 
   forTime <- setting_calculation$forTime  # nolint
@@ -197,7 +203,7 @@ cla_secsse_loglik <- function(parameter,
     mergeBranch2 <- mergeBranch2 / pre_cond # nolint
   }
 
-  wholeLike_atRoot <- sum(mergeBranch2 * weight_states) # nolint
+  wholeLike_atRoot <- sum(mergeBranch2 * weight_states, na.rm = TRUE) # nolint
   LL <- log(wholeLike_atRoot) + # nolint
         loglik -
         penalty(pars = parameter,

@@ -174,12 +174,16 @@ cla_secsse_ml <- function(phy,
                     initparsopt)
     optimpars <- c(tol, maxiter)
 
+    
+    num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
+    
     setting_calculation <- build_initStates_time(phy,
                                                  traits,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus)
+                                                 mus,
+                                                 num_modeled_traits)
     
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                           trparsfix = trparsfix,
