@@ -475,12 +475,10 @@ get_weight_states <- function(root_state_weight,
     if (root_state_weight == "proper_weights") {
       if (is_cla) {
         lmb <- length(mergeBranch)
-        numerator <- rep(0, lmb)
+        numerator <- rep(NA, lmb)
         for (j in 1:lmb) {
-          if (sum(lambdas[[j]]) > 0) {
            numerator[j] <- mergeBranch[j] / sum(lambdas[[j]] *
                                         ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
-          }
         }
         weight_states <- numerator / sum(numerator) # nolint
       } else {
