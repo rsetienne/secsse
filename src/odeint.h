@@ -52,7 +52,7 @@ template <
   typename ODE
 >
 void integrate(STEPPER stepper, ODE ode, STATE* y,
-               double t0, double t1, double dt) {
+               bstime_t t0, bstime_t t1, bstime_t dt) {
   bno::integrate_adaptive(stepper, ode, (*y), t0, t1, dt);
 }
 
@@ -68,18 +68,18 @@ void integrate(const std::string& stepper_name,
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol,
                                                                         rtol),
-                                                                        std::ref(*ode), y, t0, t1, dt);
+                                                                        std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(
-        atol, rtol), std::ref(*ode), y, t0, t1, dt);
+        atol, rtol), std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol),
-              std::ref(*ode), y, t0, t1, dt);
+              std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::bulirsch_stoer" == stepper_name) {
     integrate(bno::bulirsch_stoer<STATE>(atol, rtol),
               std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta4" == stepper_name) {
-    integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
+    integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else {
     throw std::runtime_error("odeintcpp::integrate: unknown stepper");
   }
@@ -99,19 +99,19 @@ void integrate_full(const std::string& stepper_name,
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol,
                                                                         rtol),
-                                                                        std::ref(*ode), y, t0, t1, dt);
+                                                                        std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol,
                                                                        rtol),
-                                                                       std::ref(*ode), y, t0, t1, dt);
+                                                                       std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
     integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol),
-              std::ref(*ode), y, t0, t1, dt);
+              std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::bulirsch_stoer" == stepper_name) {
     integrate(bno::bulirsch_stoer<STATE>(atol, rtol), std::ref(*ode), y,
               bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else if ("odeint::runge_kutta4" == stepper_name) {
-    integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, t0, t1, dt);
+    integrate(bno::runge_kutta4<STATE>(), std::ref(*ode), y, bstime_t{t0}, bstime_t{t1}, bstime_t{dt});
   } else {
     throw std::runtime_error("odeintcpp::integrate: unknown stepper");
   }
