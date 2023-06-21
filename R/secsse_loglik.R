@@ -427,27 +427,46 @@ build_initStates_time <- function(phy,
   phy$node.label <- NULL
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
-  forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
-  forTime[, 1:2] <- phy$edge
   
-  for (ab in seq_along(ances)) {
-    focalTime <- ances[ab]
-    desRows <- which(phy$edge[, 1] == focalTime)
-    desNodes <- phy$edge[desRows, 2]
-    rootward_age <- split_times[which(names(split_times) == focalTime)]
-    for (desIndex in 1:2) {
-      ## to Find the time which the integration will be done in
-      if (any(desNodes[desIndex] == names(split_times))) {
-        tipward_age <- split_times[which(names(split_times) ==
-                                           desNodes[desIndex])]
-        timeInterv <- c(tipward_age, rootward_age)
-      } else {
-        timeInterv <- c(0, rootward_age)
+  use_old <- FALSE
+  
+  forTime <- cbind(phy$edge, phy$edge.length)
+  if (is_complete_tree) {
+   extinct_tips <- geiger::is.extinct(phy) 
+   for (i in seq_along(extinct_tips)) {
+     focal_number <- which(phy$tip.label == extinct_tips[i])
+     index <- which(forTime[, 2] == focal_number)
+     parent <- forTime[index, 1]
+     rootward_age <- split_times[which(names(split_times) == parent)]
+     forTime[index, 3] <- rootward_age
+   }
+  }
+  
+  if (use_old) {
+    
+    forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
+    forTime[, 1:2] <- phy$edge
+    
+    for (ab in seq_along(ances)) {
+      focalTime <- ances[ab]
+      desRows <- which(phy$edge[, 1] == focalTime)
+      desNodes <- phy$edge[desRows, 2]
+      rootward_age <- split_times[which(names(split_times) == focalTime)]
+      for (desIndex in 1:2) {
+        ## to Find the time which the integration will be done in
+        if (any(desNodes[desIndex] == names(split_times))) {
+          tipward_age <- split_times[which(names(split_times) ==
+                                             desNodes[desIndex])]
+          timeInterv <- c(tipward_age, rootward_age)
+        } else {
+          timeInterv <- c(0, rootward_age)
+        }
+        forTime[which(forTime[, 2] ==
+                        desNodes[desIndex]), 3] <- timeInterv[2] - timeInterv[1]
       }
-      forTime[which(forTime[, 2] ==
-                      desNodes[desIndex]), 3] <- timeInterv[2] - timeInterv[1]
     }
   }
+  
   return(list(
     states = states,
     ances = ances,
