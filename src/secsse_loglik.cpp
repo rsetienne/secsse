@@ -267,13 +267,14 @@ double calc_ll(const Rcpp::NumericVector& ll,
         mergebranch[i] =y[1][i];
         mergebranch[i + d] = y[1][i + d] * y[0][i + d] * ll[i];
       }
+      loglik[0] += normalize_loglik(std::begin(mergebranch) + d, std::end(mergebranch));
 #ifdef __cpp_lib_atomic_float
       global_loglik.fetch_add(inode.desc[0].time_ll + inode.desc[1].time_ll);
 #else               
-{
-  std::lock_guard<std::mutex> _{mutex};
-  global_loglik += loglik[0] + loglik[1];
-}
+      {
+        std::lock_guard<std::mutex> _{mutex};
+        global_loglik += loglik[0] + loglik[1];
+      }
 #endif        
     });
     first = last;
