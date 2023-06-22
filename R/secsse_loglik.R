@@ -174,6 +174,11 @@ secsse_loglik <- function(parameter,
   mergeBranch <- calcul$mergeBranch
   states <- calcul$states
   
+  output_loglik <- loglik
+  output_nodeM <- nodeM
+  output_mergeBranch <- mergeBranch
+  output_states <- states
+  
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
   
   ## At the root
@@ -223,7 +228,12 @@ secsse_loglik <- function(parameter,
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL, states = states))
   } else {
-    return(LL)
+    #return(LL)
+    return(list("LL" = LL,
+                "loglik" = output_loglik,
+                "nodeM" = output_nodeM,
+                "mergeBranch" = output_mergeBranch,
+                "states" = output_states))
   }
 }
 
