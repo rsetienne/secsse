@@ -154,7 +154,6 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
     }
     inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2], (*it0)[1] };
     inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2], (*it1)[1] };
-    int dummy = 0;
   };
   return res;
 }
@@ -165,6 +164,7 @@ double normalize_loglik(RaIt first, RaIt last) {
   const auto sabs = std::accumulate(first, last, 0.0, [](const auto& s, const auto& x) {
     return s + std::abs(x); 
   });
+  if (sabs <= 0.0) [[unlikely]] return 0.0;
   const auto fact = 1.0 / sabs;
   for (; first != last; ++first) *first *= fact;
   return std::log(sabs);
