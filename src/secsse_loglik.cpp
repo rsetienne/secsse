@@ -129,7 +129,7 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
   });
   auto comp = [](auto& edge, int val) { return edge[0] < val; };
   auto res = inte_nodes_t{ances.size()};
-  for (size_t i = 0; i < ances.size(); ++i) { //tbb::parallel_for<size_t>(0, ances.size(), 1, [&](size_t i) {
+  tbb::parallel_for<size_t>(0, ances.size(), 1, [&](size_t i) {
     const auto focal = ances[i];
     auto& inode = res[i];
     inode.ances_state = &(*states)[focal - 1];
@@ -146,7 +146,7 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
     }
     inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2] };
     inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2] };
-  };
+  });
   return res;
 }
 
