@@ -1,3 +1,8 @@
+library(secsse)
+library(RcppParallel)
+
+RcppParallel::setThreadOptions(numThreads = 1)
+
   ## Test to check that our approach reaches the same likelihood than HiSSE.
   # to calculate likelihood of a trait with 2 states using Hisse
   # pars <- c(0.1, 0.2, 0.03, 0.03, 0.01, 0.01)

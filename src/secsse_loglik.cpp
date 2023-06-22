@@ -26,73 +26,73 @@
 
 namespace orig {
 
-template <typename OD_TYPE>
-double calc_ll(const Rcpp::NumericVector& ll,
-               const Rcpp::NumericVector& mm,
-               const Rcpp::NumericMatrix& Q,
-               const std::vector<int>& ances,
-               const std::vector< std::vector< double >>& for_time,
-               std::vector<std::vector<double>>* states,
-               Rcpp::NumericVector* merge_branch_out,
-               Rcpp::NumericVector* nodeM_out,
-               double absolute_tol,
-               double relative_tol,
-               std::string method) {
-  OD_TYPE od(ll, mm, Q);
-  size_t d = ll.size();
-  
-  long double loglik = 0.0;
-  
-  std::vector< double > mergeBranch(d);
-  std::vector< double  > nodeN;
-  std::vector< double  > nodeM;
-  
-  for (int a = 0; a < ances.size(); ++a) {
-    int focal = ances[a];
-    std::vector<int> desNodes;
-    std::vector<double> timeInte;
-    find_desNodes(for_time, focal, &desNodes, &timeInte);
+  template <typename OD_TYPE>
+  double calc_ll(const Rcpp::NumericVector& ll,
+                const Rcpp::NumericVector& mm,
+                const Rcpp::NumericMatrix& Q,
+                const std::vector<int>& ances,
+                const std::vector< std::vector< double >>& for_time,
+                std::vector<std::vector<double>>* states,
+                Rcpp::NumericVector* merge_branch_out,
+                Rcpp::NumericVector* nodeM_out,
+                double absolute_tol,
+                double relative_tol,
+                std::string method) {
+    OD_TYPE od(ll, mm, Q);
+    size_t d = ll.size();
     
-    for (int i = 0; i < desNodes.size(); ++i) {
-      int focal_node = desNodes[i];
-      std::vector< double > y = (*states)[focal_node - 1];
+    long double loglik = 0.0;
+    
+    std::vector< double > mergeBranch(d);
+    std::vector< double  > nodeN;
+    std::vector< double  > nodeM;
+    
+    for (int a = 0; a < ances.size(); ++a) {
+      int focal = ances[a];
+      std::vector<int> desNodes;
+      std::vector<double> timeInte;
+      find_desNodes(for_time, focal, &desNodes, &timeInte);
       
-      std::unique_ptr<OD_TYPE> od_ptr = std::make_unique<OD_TYPE>(od);
+      for (int i = 0; i < desNodes.size(); ++i) {
+        int focal_node = desNodes[i];
+        std::vector< double > y = (*states)[focal_node - 1];
+        
+        std::unique_ptr<OD_TYPE> od_ptr = std::make_unique<OD_TYPE>(od);
+        
+        odeintcpp::integrate(method,
+                            std::move(od_ptr),       // ode class object
+                            &y,                      // state vector
+                            0.0,                     // t0
+                            timeInte[i],             // t1
+                                    timeInte[i] * 0.01,
+                                    absolute_tol,
+                                    relative_tol);
+        if (i == 0) nodeN = y;
+        if (i == 1) nodeM = y;
+      }
+      normalize_loglik_node(&nodeM, &loglik);
+      normalize_loglik_node(&nodeN, &loglik);
+
+      // code correct up till here.
+      for (int i = 0; i < d; ++i) {
+        mergeBranch[i] = nodeM[i + d] * nodeN[i + d] * ll[i];
+      }
+      normalize_loglik(&mergeBranch, &loglik);
       
-      odeintcpp::integrate(method,
-                           std::move(od_ptr),       // ode class object
-                           &y,                      // state vector
-                           0.0,                     // t0
-                           timeInte[i],             // t1
-                                   timeInte[i] * 0.01,
-                                   absolute_tol,
-                                   relative_tol);
-      if (i == 0) nodeN = y;
-      if (i == 1) nodeM = y;
+      std::vector< double > newstate(d);
+      for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
+      newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
+      
+      // -1 because of R conversion to C++ indexing
+      (*states)[focal - 1] = newstate;
     }
-    normalize_loglik_node(&nodeM, &loglik);
-    normalize_loglik_node(&nodeN, &loglik);
     
-    // code correct up till here.
-    for (int i = 0; i < d; ++i) {
-      mergeBranch[i] = nodeM[i + d] * nodeN[i + d] * ll[i];
-    }
-    normalize_loglik(&mergeBranch, &loglik);
+    (*merge_branch_out) = Rcpp::NumericVector(mergeBranch.begin(),
+    mergeBranch.end());
+    (*nodeM_out) = Rcpp::NumericVector(nodeM.begin(), nodeM.end());
     
-    std::vector< double > newstate(d);
-    for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
-    newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
-    
-    // -1 because of R conversion to C++ indexing
-    (*states)[focal - 1] = newstate;
+    return loglik;
   }
-  
-  (*merge_branch_out) = Rcpp::NumericVector(mergeBranch.begin(),
-   mergeBranch.end());
-  (*nodeM_out) = Rcpp::NumericVector(nodeM.begin(), nodeM.end());
-  
-  return loglik;
-}
 
 }
 
@@ -114,11 +114,13 @@ using state_ptr = std::vector<double>*;
 struct des_node_t {
   state_ptr state = nullptr;
   double time = 0;   // branch length to ancestor
+  int ridx = 0;
 };
 
 struct inte_node_t {
   state_ptr ances_state = nullptr;
   des_node_t desc[2];
+  int ridx = 0;
 };
 using inte_nodes_t = std::vector<inte_node_t>;
 
@@ -129,7 +131,7 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
   });
   auto comp = [](auto& edge, int val) { return edge[0] < val; };
   auto res = inte_nodes_t{ances.size()};
-  tbb::parallel_for<size_t>(0, ances.size(), 1, [&](size_t i) {
+  for (size_t i = 0; i < ances.size(); ++i) { //tbb::parallel_for<size_t>(0, ances.size(), 1, [&](size_t i) {
     const auto focal = ances[i];
     auto& inode = res[i];
     inode.ances_state = &(*states)[focal - 1];
@@ -143,10 +145,17 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
     
     // easy to overlook: the sequence matters for creating the 'merged' branch.
     // imposes some pre-condition that is nowere to find :(
-    if ((*it0)[1] > (*it1)[1]) std::iter_swap(it0, it1);
-    inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2] };
-    inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2] };
-  });
+    inode.ridx = focal;
+    inode.desc[0].ridx = (*it0)[1];
+    inode.desc[1].ridx = (*it1)[1];
+    
+    if ((*it0)[1] > (*it1)[1]) {
+      std::swap(*it0, *it1);
+    }
+    inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2], (*it0)[1] };
+    inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2], (*it1)[1] };
+    int dummy = 0;
+  };
   return res;
 }
 
@@ -167,57 +176,57 @@ double normalize_loglik(RaIt first, RaIt last) {
 template <typename, template <typename> class, typename = std::void_t<>>
 struct detect : std::false_type {};
               
-              // Specialization recognizes/validates only types supporting the archetype.
-              template <typename T, template <typename> class Op>
-              struct detect<T, Op, std::void_t<Op<T>>> : std::true_type {};
-              
-              template <typename OD_TYPE>
-              using const_ode_callop = decltype(static_cast<void(OD_TYPE::*)(const std::vector<double>&, std::vector<double>&, const double) const>(&OD_TYPE::operator()));
-              
-              
-              template <typename OD_TYPE>
-              class Integrator {
-              public:
-                Integrator(std::unique_ptr<OD_TYPE>&& od, const std::string& method, double atol, double rtol) : 
-                od_(std::move(od)),
-                method_(method),
-                atol_(atol),
-                rtol_(rtol)
-                {}
-                
-                auto operator()(std::vector<double>& state, double time) const {
-                  if constexpr (detect<OD_TYPE, const_ode_callop>::value) {
-                    // ode rhs is const - we can reuse
-                    odeintcpp::integrate(method_,
-                                         od_.get(),                  // ode class object
-                                         &state,
-                                         0.0,                         // t0
-                                         time,                        // t1
-                                         time * 0.01,                 // initial dt
-                                         atol_,
-                                         rtol_);
-                  }
-                  else {
-                    // ode rhs is mutable - we must create a fresh copy
-                    auto od = std::make_unique<OD_TYPE>(*od_.get());  // copy
-                    odeintcpp::integrate(method_,
-                                         std::move(od),               // ode class object
-                                         &state,
-                                         0.0,                         // t0
-                                         time,                        // t1
-                                         time * 0.01,                 // initial dt
-                                         atol_,
-                                         rtol_);
-                  }
-                }
-                
-              private:
-                std::unique_ptr<OD_TYPE> od_;
-                const std::string method_;
-                const double atol_;
-                const double rtol_;
-              };
-              
+  // Specialization recognizes/validates only types supporting the archetype.
+  template <typename T, template <typename> class Op>
+  struct detect<T, Op, std::void_t<Op<T>>> : std::true_type {};
+  
+  template <typename OD_TYPE>
+  using const_ode_callop = decltype(static_cast<void(OD_TYPE::*)(const std::vector<double>&, std::vector<double>&, const double) const>(&OD_TYPE::operator()));
+  
+  
+  template <typename OD_TYPE>
+  class Integrator {
+  public:
+    Integrator(std::unique_ptr<OD_TYPE>&& od, const std::string& method, double atol, double rtol) : 
+    od_(std::move(od)),
+    method_(method),
+    atol_(atol),
+    rtol_(rtol)
+    {}
+    
+    auto operator()(std::vector<double>& state, double time) const {
+      if constexpr (detect<OD_TYPE, const_ode_callop>::value) {
+        // ode rhs is const - we can reuse
+        odeintcpp::integrate(method_,
+                              od_.get(),                  // ode class object
+                              &state,
+                              0.0,                         // t0
+                              time,                        // t1
+                              time * 0.01,                 // initial dt
+                              atol_,
+                              rtol_);
+      }
+      else {
+        // ode rhs is mutable - we must create a fresh copy
+        auto od = std::make_unique<OD_TYPE>(*od_.get());  // copy
+        odeintcpp::integrate(method_,
+                              std::move(od),               // ode class object
+                              &state,
+                              0.0,                         // t0
+                              time,                        // t1
+                              time * 0.01,                 // initial dt
+                              atol_,
+                              rtol_);
+      }
+    }
+    
+  private:
+    std::unique_ptr<OD_TYPE> od_;
+    const std::string method_;
+    const double atol_;
+    const double rtol_;
+  };
+  
 }
 
 
@@ -259,7 +268,7 @@ double calc_ll(const Rcpp::NumericVector& ll,
         auto& dnode = inode.desc[i];
         y[i] = *dnode.state;    // copy of state vector
         integrator(y[i], dnode.time);
-        loglik[i] = normalize_loglik(std::begin(y[i]), std::end(y[i]));
+        loglik[i] = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
       });
       auto& mergebranch = *inode.ances_state;
       mergebranch.resize(2 * d);
@@ -285,7 +294,7 @@ double calc_ll(const Rcpp::NumericVector& ll,
   (*merge_branch_out) = Rcpp::NumericVector(std::begin(last_merge) + d, std::end(last_merge));
   std::vector<double> last_M{ *root_node.desc[1].state };
   integrator(last_M, root_node.desc[1].time);
-  normalize_loglik(std::begin(last_M), std::end(last_M));
+  normalize_loglik(std::begin(last_M) + d, std::end(last_M));
   (*nodeM_out) = Rcpp::NumericVector(std::begin(last_M), std::end(last_M));
   return global_loglik;
 }
