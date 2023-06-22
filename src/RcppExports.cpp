@@ -151,25 +151,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// calc_ll_threaded
-Rcpp::List calc_ll_threaded(const Rcpp::NumericVector& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& for_time, const Rcpp::NumericMatrix& states, int num_threads, std::string method, bool is_complete_tree);
-RcppExport SEXP _secsse_calc_ll_threaded(SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP ancesSEXP, SEXP for_timeSEXP, SEXP statesSEXP, SEXP num_threadsSEXP, SEXP methodSEXP, SEXP is_complete_treeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ll(llSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mm(mmSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ances(ancesSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type for_time(for_timeSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type states(statesSEXP);
-    Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_ll_threaded(ll, mm, Q, ances, for_time, states, num_threads, method, is_complete_tree));
-    return rcpp_result_gen;
-END_RCPP
-}
 // secsse_sim_cpp
 Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, const std::vector<double>& init_states, std::string condition, int num_concealed_states, bool non_extinction, bool verbose, int max_tries);
 RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP init_statesSEXP, SEXP conditionSEXP, SEXP num_concealed_statesSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP) {
@@ -200,7 +181,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 11},
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
     {"_secsse_calThruNodes_store_cpp", (DL_FUNC) &_secsse_calThruNodes_store_cpp, 13},
-    {"_secsse_calc_ll_threaded", (DL_FUNC) &_secsse_calc_ll_threaded, 9},
     {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 11},
     {NULL, NULL, 0}
 };
