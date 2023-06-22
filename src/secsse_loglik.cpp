@@ -292,7 +292,7 @@ namespace fiddled {
 
 }
 
-using namespace fiddled;
+using namespace orig;
 
 
 // [[Rcpp::export]]
