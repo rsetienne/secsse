@@ -174,9 +174,9 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
         odeintcpp::integrate(method,
                              std::move(od_ptr),  // ode class object
                              &y,                 // state vector
-                             t,                  // t0
-                             t + dt,             // t1/
-                             dt * 0.1,
+                             bstime_t{t},                  // t0
+                             bstime_t{t + dt},             // t1/
+                             bstime_t{dt * 0.1},
                              atol,
                              rtol);
         t += dt;
