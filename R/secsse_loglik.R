@@ -128,46 +128,21 @@ secsse_loglik <- function(parameter,
       num_threads <- 1
     }
   }
-  calcul <- c()
-  if (num_threads == 1) {
-    calcul <- calThruNodes_cpp(ances,
-                               states,
-                               forTime,
-                               lambdas,
-                               mus,
-                               q_matrix,
-                               1,
-                               atol,
-                               rtol,
-                               method,
-                               is_complete_tree)
-  } else {
-    ancescpp <- ances - 1
-    forTimecpp <- forTime
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
-    
-    if (num_threads == -2) {
-      calcul <- calc_ll_threaded(lambdas,
-                                 mus,
-                                 q_matrix,
-                                 ancescpp,
-                                 forTimecpp,
-                                 states,
-                                 1,
-                                 method,
-                                 is_complete_tree)
-    } else {
-      calcul <- calc_ll_threaded(lambdas,
-                                 mus,
-                                 q_matrix,
-                                 ancescpp,
-                                 forTimecpp,
-                                 states,
-                                 num_threads,
-                                 method,
-                                 is_complete_tree)
-    }
-  }
+  
+  RcppParallel::setThreadOptions(numThreads = num_threads)
+  
+  calcul <- calThruNodes_cpp(ances,
+                             states,
+                             forTime,
+                             lambdas,
+                             mus,
+                             q_matrix,
+                             num_threads,
+                             atol,
+                             rtol,
+                             method,
+                             is_complete_tree)
+  
   
   loglik <- calcul$loglik
   nodeM <- calcul$nodeM

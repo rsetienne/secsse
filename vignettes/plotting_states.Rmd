@@ -4,7 +4,7 @@ author: "Thijs Janzen"
 date: "2023-01-20"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{"Plotting probabilities"}
+  %\VignetteIndexEntry{Plotting probabilities}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
