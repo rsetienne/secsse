@@ -114,13 +114,11 @@ using state_ptr = std::vector<double>*;
 struct des_node_t {
   state_ptr state = nullptr;
   double time = 0;   // branch length to ancestor
-  int ridx = 0;
 };
 
 struct inte_node_t {
   state_ptr ances_state = nullptr;
   des_node_t desc[2];
-  int ridx = 0;
 };
 using inte_nodes_t = std::vector<inte_node_t>;
 
@@ -135,9 +133,7 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
     const auto focal = ances[i];
     auto& inode = res[i];
     inode.ances_state = &(*states)[focal - 1];
-    // ances node shall be set to 'all NA' on the R side, 'all nan' on the C/C++ side.
-    assert(std::all_of(std::begin(*inode.ances_state), std::end(*inode.ances_state), [](const auto& val) { return std::isnan(val); }));
-    inode.ances_state->clear();   // NA is not nan
+    inode.ances_state->clear();   // flag as dirty
     
     auto it0 = std::lower_bound(std::begin(phy_edge), std::end(phy_edge), focal, comp);
     auto it1 = std::lower_bound(it0 + 1, std::end(phy_edge), focal, comp);
@@ -145,15 +141,11 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
     
     // easy to overlook: the sequence matters for creating the 'merged' branch.
     // imposes some pre-condition that is nowere to find :(
-    inode.ridx = focal;
-    inode.desc[0].ridx = (*it0)[1];
-    inode.desc[1].ridx = (*it1)[1];
-    
     if ((*it0)[1] > (*it1)[1]) {
       std::swap(*it0, *it1);
     }
-    inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2], (*it0)[1] };
-    inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2], (*it1)[1] };
+    inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2] };
+    inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2] };
   };
   return res;
 }
