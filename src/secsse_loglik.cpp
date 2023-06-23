@@ -100,6 +100,7 @@ namespace orig {
 namespace fiddled {
 
   // probably the cleanest way to retrieve RcppParallel's concurrency setting
+  // set by RcppParallel::setThreadOptions(numThreads)
   inline size_t get_rcpp_num_threads() {
     auto* nt_env = std::getenv("RCPP_PARALLEL_NUM_THREADS");
     return (nullptr == nt_env) 
@@ -164,7 +165,6 @@ namespace fiddled {
   }
 
   // some SFINAE magic
-
   // Primary template handles all types not supporting the operation.
   template <typename, template <typename> class, typename = std::void_t<>>
   struct detect : std::false_type {};
@@ -201,9 +201,8 @@ namespace fiddled {
       }
       else {
         // ode rhs is mutable - we must create a fresh copy
-        auto od = std::make_unique<OD_TYPE>(*od_.get());  // copy
         odeintcpp::integrate(method_,
-                             std::move(od),               // ode class object
+                             std::make_unique<OD_TYPE>(*od_.get()),  // copy
                              &state,
                              0.0,                         // t0
                              time,                        // t1
@@ -292,7 +291,7 @@ namespace fiddled {
 
 }
 
-using namespace orig;
+using namespace fiddled;
 
 
 // [[Rcpp::export]]
@@ -302,7 +301,7 @@ Rcpp::List calThruNodes_cpp(const Rcpp::NumericVector& ances,
                             const Rcpp::NumericVector& lambdas,
                             const Rcpp::NumericVector& mus,
                             const Rcpp::NumericMatrix& Q,
-                            int num_threads,
+                            int num_threads,  // unused
                             double abstol,
                             double reltol,
                             std::string method,
