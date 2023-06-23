@@ -380,7 +380,7 @@ Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
                        rtol);
   
   Rcpp::NumericVector out;
-  for (int i = 0; i < init_state.size(); ++i) {
+  for (size_t i = 0; i < init_state.size(); ++i) {
     out.push_back(init_state[i]);
   }
   return out;

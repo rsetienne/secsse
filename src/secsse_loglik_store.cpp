@@ -36,7 +36,7 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
 
     if (a % update_freq == 0 && verbose) {
@@ -48,7 +48,7 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
     std::vector<double> timeInte;
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    for (int i = 0; i < desNodes.size(); ++i) {
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
 
       ode_standard_store od(ll, mm, Q);
@@ -106,7 +106,7 @@ storage calc_ll(const Rcpp::NumericVector& ll,
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
 
     if (a % update_freq == 0 && verbose) {
@@ -118,7 +118,7 @@ storage calc_ll(const Rcpp::NumericVector& ll,
     std::vector<double> timeInte;
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    for (int i = 0; i < desNodes.size(); ++i) {
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
 
       data_storage local_storage;

@@ -28,12 +28,12 @@ double calc_ll_cla(const Rcpp::List& ll,
                    double absolute_tol,
                    double relative_tol) {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  for (size_t i = 0; i < ll.size(); ++i) {
+  for (int i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
-    for (size_t j = 0; j < temp.nrow(); ++j) {
+    for (int j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
-      for (size_t k = 0; k < temp.ncol(); ++k) {
+      for (int k = 0; k < temp.ncol(); ++k) {
         row.push_back(temp(j, k));
       }
       temp2.push_back(row);
@@ -56,7 +56,7 @@ double calc_ll_cla(const Rcpp::List& ll,
 
   int max_ances = *std::max_element(ances.begin(), ances.end());
   std::vector< double > add(states[0].size(), 0.0);
-  while (max_ances > (*states).size()) {
+  while (max_ances > static_cast<int>((*states).size())) {
     (*states).push_back(add);
   }
   (*states).push_back(add);
@@ -67,16 +67,16 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector<int> desNodes;
   std::vector<double> timeInte;
   long double loglik = 0;
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
    
     int focal = ances[a];
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    int focal_node;
+    int focal_node = 0;
     for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
       if (focal_node < 0) throw "focal_node < 0";
-      if (focal_node >= states->size()) throw "focal_node > states.size";
+      if (focal_node >= static_cast<int>(states->size())) throw "focal_node > states.size";
 
       y = (*states)[focal_node];
       
@@ -120,19 +120,19 @@ double calc_ll_cla(const Rcpp::List& ll,
   //  std::cerr << loglik << "\n";
     
     std::vector<double> newstate(d);
-    for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
+    for (size_t i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
     if (focal_node < 0) throw "focal_node < 0";
-    if (focal_node >= states->size()) throw "focal_node > states.size";
+    if (focal_node >= static_cast<int>(states->size())) throw "focal_node > states.size";
 
     (*states)[focal] = newstate;
   }
 
-  for (int i = 0; i < mergeBranch.size(); ++i) {
+  for (size_t i = 0; i < mergeBranch.size(); ++i) {
     (*merge_branch_out).push_back(mergeBranch[i]);
   }
-  for (int i = 0; i < nodeM.size(); ++i) {
+  for (size_t i = 0; i < nodeM.size(); ++i) {
     (*nodeM_out).push_back(nodeM[i]);
   }
    
@@ -149,12 +149,12 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
                                  double atol,
                                  double rtol) {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  for (size_t i = 0; i < ll.size(); ++i) {
+  for (int i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
-    for (size_t j = 0; j < temp.nrow(); ++j) {
+    for (int j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
-      for (size_t k = 0; k < temp.ncol(); ++k) {
+      for (int k = 0; k < temp.ncol(); ++k) {
         row.push_back(temp(j, k));
       }
       temp2.push_back(row);
@@ -182,7 +182,7 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
                        rtol);
 
   Rcpp::NumericVector out;
-  for (int i = 0; i < init_state.size(); ++i) {
+  for (size_t i = 0; i < init_state.size(); ++i) {
     out.push_back(init_state[i]);
   }
   return out;

@@ -13,11 +13,11 @@
 
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
-  for (size_t m = 0; m < lambdas_R.size(); ++m) {
+  for (int m = 0; m < lambdas_R.size(); ++m) {
     Rcpp::NumericMatrix entry_R = lambdas_R[m];
     num_mat entry_cpp(entry_R.nrow(), std::vector<double>(entry_R.ncol(), 0.0));
-    for (size_t i = 0; i < entry_R.nrow(); ++i) {
-      for (size_t j = 0; j < entry_R.ncol(); ++j) {
+    for (int i = 0; i < entry_R.nrow(); ++i) {
+      for (int j = 0; j < entry_R.ncol(); ++j) {
         entry_cpp[i][j] = entry_R(i, j);
       }
     }

@@ -21,10 +21,6 @@ cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, me
     .Call(`_secsse_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree)
 }
 
-calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads = 1L, method = "odeint::bulirsch_stoer", is_complete_tree = FALSE) {
-    .Call(`_secsse_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method, is_complete_tree)
-}
-
 cla_calThruNodes_store_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree, num_steps, verbose) {
     .Call(`_secsse_cla_calThruNodes_store_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree, num_steps, verbose)
 }
