@@ -99,9 +99,8 @@ double calc_ll(const Rcpp::NumericVector& ll,
 
 namespace fiddled {
 
-namespace {
-
 // probably the cleanest way to retrieve RcppParallel's concurrency setting
+// set by RcppParallel::setThreadOptions(numThreads)
 inline size_t get_rcpp_num_threads() {
   auto* nt_env = std::getenv("RCPP_PARALLEL_NUM_THREADS");
   return (nullptr == nt_env) 
@@ -109,18 +108,17 @@ inline size_t get_rcpp_num_threads() {
   : static_cast<size_t>(std::atoi(nt_env));
 }
 
+
 using state_ptr = std::vector<double>*;
 
 struct des_node_t {
   state_ptr state = nullptr;
   double time = 0;   // branch length to ancestor
-  int ridx = 0;
 };
 
 struct inte_node_t {
   state_ptr ances_state = nullptr;
   des_node_t desc[2];
-  int ridx = 0;
 };
 using inte_nodes_t = std::vector<inte_node_t>;
 
@@ -145,15 +143,11 @@ inte_nodes_t find_inte_nodes(std::vector<std::vector<double>>& phy_edge, const s
     
     // easy to overlook: the sequence matters for creating the 'merged' branch.
     // imposes some pre-condition that is nowere to find :(
-    inode.ridx = focal;
-    inode.desc[0].ridx = (*it0)[1];
-    inode.desc[1].ridx = (*it1)[1];
-    
     if ((*it0)[1] > (*it1)[1]) {
       std::swap(*it0, *it1);
     }
-    inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2], static_cast<int>((*it0)[1]) };
-    inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2], static_cast<int>((*it1)[1]) };
+    inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2] };
+    inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2] };
   };
   return res;
 }
@@ -171,7 +165,6 @@ double normalize_loglik(RaIt first, RaIt last) {
 }
 
 // some SFINAE magic
-
 // Primary template handles all types not supporting the operation.
 template <typename, template <typename> class, typename = std::void_t<>>
 struct detect : std::false_type {};
@@ -208,9 +201,8 @@ struct detect : std::false_type {};
                   }
                   else {
                     // ode rhs is mutable - we must create a fresh copy
-                    auto od = std::make_unique<OD_TYPE>(*od_.get());  // copy
                     odeintcpp::integrate(method_,
-                                         std::move(od),               // ode class object
+                                         std::make_unique<OD_TYPE>(*od_.get()),  // copy
                                          &state,
                                          0.0,                         // t0
                                          time,                        // t1
@@ -227,78 +219,76 @@ struct detect : std::false_type {};
                 const double rtol_;
               };
               
-}
-
-
-template <typename OD_TYPE>
-double calc_ll(const Rcpp::NumericVector& ll,
-               const Rcpp::NumericVector& mm,
-               const Rcpp::NumericMatrix& Q,
-               const std::vector<int>& ances,
-               std::vector< std::vector<double>>& phy_edge,  // mutable
-               std::vector<std::vector<double>>* states,
-               Rcpp::NumericVector* merge_branch_out,
-               Rcpp::NumericVector* nodeM_out,
-               double absolute_tol,
-               double relative_tol,
-               std::string method) {
-  auto num_threads = get_rcpp_num_threads();
-  auto global_control = tbb::global_control{tbb::global_control::max_allowed_parallelism, num_threads};
-  auto integrator = Integrator{std::make_unique<OD_TYPE>(ll, mm, Q), method, absolute_tol, relative_tol};
-  const size_t d = ll.size();
-  
+              
+              template <typename OD_TYPE>
+              double calc_ll(const Rcpp::NumericVector& ll,
+                             const Rcpp::NumericVector& mm,
+                             const Rcpp::NumericMatrix& Q,
+                             const std::vector<int>& ances,
+                             std::vector< std::vector<double>>& phy_edge,  // mutable
+                             std::vector<std::vector<double>>* states,
+                             Rcpp::NumericVector* merge_branch_out,
+                             Rcpp::NumericVector* nodeM_out,
+                             double absolute_tol,
+                             double relative_tol,
+                             std::string method) {
+                auto num_threads = get_rcpp_num_threads();
+                auto global_control = tbb::global_control{tbb::global_control::max_allowed_parallelism, num_threads};
+                auto integrator = Integrator{std::make_unique<OD_TYPE>(ll, mm, Q), method, absolute_tol, relative_tol};
+                const size_t d = ll.size();
+                
 #ifdef __cpp_lib_atomic_float
-  std::atomic<double> global_loglik{0.0};
+                std::atomic<double> global_loglik{0.0};
 #else
-  std::mutex mutex;   // no RMW for std::atomic<double>
-  double global_loglik = 0.0;
+                std::mutex mutex;   // no RMW for std::atomic<double>
+                double global_loglik = 0.0;
 #endif
-  
-  auto inodes = find_inte_nodes(phy_edge, ances, states);
-  auto is_dirty = [](const auto& inode) {
-    return inode.ances_state->empty() && (inode.desc[0].state->empty() || inode.desc[1].state->empty());
-  };
-  
-  for (auto first = std::begin(inodes); first != std::end(inodes) ;) {
-    auto last = std::partition(first, std::end(inodes), std::not_fn(is_dirty));
-    tbb::parallel_for_each(first, last, [&](auto& inode) {
-      std::vector<double> y[2];
-      double loglik[2];
-      tbb::parallel_for<size_t>(0, 2, 1, [&](size_t i) {
-        auto& dnode = inode.desc[i];
-        y[i] = *dnode.state;    // copy of state vector
-        integrator(y[i], dnode.time);
-        loglik[i] = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
-      });
-      auto& mergebranch = *inode.ances_state;
-      mergebranch.resize(2 * d);
-      for (size_t i = 0; i < d; ++i) {
-        mergebranch[i] =y[1][i];
-        mergebranch[i + d] = y[1][i + d] * y[0][i + d] * ll[i];
-      }
-      loglik[0] += normalize_loglik(std::begin(mergebranch) + d, std::end(mergebranch));
+                
+                auto inodes = find_inte_nodes(phy_edge, ances, states);
+                auto is_dirty = [](const auto& inode) {
+                  return inode.ances_state->empty() && (inode.desc[0].state->empty() || inode.desc[1].state->empty());
+                };
+                
+                for (auto first = std::begin(inodes); first != std::end(inodes) ;) {
+                  auto last = std::partition(first, std::end(inodes), std::not_fn(is_dirty));
+                  tbb::parallel_for_each(first, last, [&](auto& inode) {
+                    std::vector<double> y[2];
+                    double loglik[2];
+                    tbb::parallel_for<size_t>(0, 2, 1, [&](size_t i) {
+                      auto& dnode = inode.desc[i];
+                      y[i] = *dnode.state;    // copy of state vector
+                      integrator(y[i], dnode.time);
+                      loglik[i] = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
+                    });
+                    auto& mergebranch = *inode.ances_state;
+                    mergebranch.resize(2 * d);
+                    for (size_t i = 0; i < d; ++i) {
+                      mergebranch[i] =y[1][i];
+                      mergebranch[i + d] = y[1][i + d] * y[0][i + d] * ll[i];
+                    }
+                    loglik[0] += normalize_loglik(std::begin(mergebranch) + d, std::end(mergebranch));
 #ifdef __cpp_lib_atomic_float
-      global_loglik.fetch_add(inode.desc[0].time_ll + inode.desc[1].time_ll);
+                    global_loglik.fetch_add(inode.desc[0].time_ll + inode.desc[1].time_ll);
 #else               
 {
   std::lock_guard<std::mutex> _{mutex};
   global_loglik += loglik[0] + loglik[1];
 }
 #endif        
-    });
-    first = last;
-  }
-  
-  const auto& root_node = inodes.back();    // the last calculted
-  const auto& last_merge = *root_node.ances_state;
-  (*merge_branch_out) = Rcpp::NumericVector(std::begin(last_merge) + d, std::end(last_merge));
-  std::vector<double> last_M{ *root_node.desc[1].state };
-  integrator(last_M, root_node.desc[1].time);
-  normalize_loglik(std::begin(last_M) + d, std::end(last_M));
-  (*nodeM_out) = Rcpp::NumericVector(std::begin(last_M), std::end(last_M));
-  return global_loglik;
-}
-
+                  });
+                  first = last;
+                }
+                
+                const auto& root_node = inodes.back();    // the last calculted
+                const auto& last_merge = *root_node.ances_state;
+                (*merge_branch_out) = Rcpp::NumericVector(std::begin(last_merge) + d, std::end(last_merge));
+                std::vector<double> last_M{ *root_node.desc[1].state };
+                integrator(last_M, root_node.desc[1].time);
+                normalize_loglik(std::begin(last_M) + d, std::end(last_M));
+                (*nodeM_out) = Rcpp::NumericVector(std::begin(last_M), std::end(last_M));
+                return global_loglik;
+              }
+              
 }
 
 using namespace fiddled;
@@ -311,7 +301,7 @@ Rcpp::List calThruNodes_cpp(const Rcpp::NumericVector& ances,
                             const Rcpp::NumericVector& lambdas,
                             const Rcpp::NumericVector& mus,
                             const Rcpp::NumericMatrix& Q,
-                            int num_threads,
+                            int num_threads,  // unused
                             double abstol,
                             double reltol,
                             std::string method,
@@ -390,7 +380,7 @@ Rcpp::NumericVector ct_condition(const Rcpp::NumericVector& y,
                        rtol);
   
   Rcpp::NumericVector out;
-  for (int i = 0; i < init_state.size(); ++i) {
+  for (size_t i = 0; i < init_state.size(); ++i) {
     out.push_back(init_state[i]);
   }
   return out;
