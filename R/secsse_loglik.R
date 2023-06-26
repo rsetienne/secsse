@@ -403,7 +403,7 @@ build_initStates_time <- function(phy,
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
   
-  use_old <- FALSE
+  
   
   forTime <- cbind(phy$edge, phy$edge.length)
   if (is_complete_tree) {
@@ -417,6 +417,8 @@ build_initStates_time <- function(phy,
    }
   }
   
+  
+  use_old <- FALSE
   if (use_old) {
     
     forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))

@@ -145,17 +145,23 @@ std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m)
 }
 
 std::vector< std::vector< std::vector<double >>>  
-  list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l) {
+  list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& ll) {
   
-  size_t n = l.size();
-  auto v = std::vector< std::vector< std::vector<double>>>(n);
-  for (size_t i = 0; i < n; ++i) {
-    std::vector< std::vector< double >> entry;
-    Rcpp::NumericMatrix temp = l[i];
-    numericmatrix_to_vector(temp, &entry);
-    v.push_back(entry);
+  std::vector< std::vector< std::vector< double > >> ll_cpp;
+  for (size_t i = 0; i < ll.size(); ++i) {
+    Rcpp::NumericMatrix temp = ll[i];
+    std::vector< std::vector< double >> temp2;
+    for (size_t j = 0; j < temp.nrow(); ++j) {
+      std::vector<double> row;
+      for (size_t k = 0; k < temp.ncol(); ++k) {
+        row.push_back(temp(j, k));
+      }
+      temp2.push_back(row);
+    }
+    ll_cpp.push_back(temp2);
   }
-  return v;
+  
+  return ll_cpp;
 }
 
 

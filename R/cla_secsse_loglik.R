@@ -158,6 +158,10 @@ cla_secsse_loglik <- function(parameter,
   loglik <- calcul$loglik
   states <- calcul$states
   
+  cat(loglik, "\n")
+  cat(nodeM, "\n")
+  cat(mergeBranch, "\n")
+  
   ## At the root
   mergeBranch2 <- mergeBranch # nolint
   lmb <- length(mergeBranch2)
@@ -227,13 +231,9 @@ update_using_cpp <- function(ances, states, forTime, lambdas, mus, Q, method,
                              atol, rtol, is_complete_tree, num_threads) {
   RcppParallel::setThreadOptions(numThreads = num_threads)
   
-  ancescpp <- ances #- 1
-  forTimecpp <- forTime # nolint
-  #forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
-  
-  calcul <- cla_calThruNodes_cpp(ancescpp,
+  calcul <- cla_calThruNodes_cpp(ances,
                                  states,
-                                 forTimecpp,
+                                 forTime,
                                  lambdas,
                                  mus,
                                  Q,

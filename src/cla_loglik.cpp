@@ -33,27 +33,13 @@ double calc_ll_cla(const Rcpp::List& ll,
                    std::vector<std::vector<double>>* states,
                    Rcpp::NumericVector* merge_branch_out,
                    Rcpp::NumericVector* nodeM_out,
-                   const std::string& method,
                    double absolute_tol,
-                   double relative_tol) {
-  std::vector< std::vector< std::vector< double > >> ll_cpp;
-  for (int i = 0; i < ll.size(); ++i) {
-    Rcpp::NumericMatrix temp = ll[i];
-    std::vector< std::vector< double >> temp2;
-    for (int j = 0; j < temp.nrow(); ++j) {
-      std::vector<double> row;
-      for (int k = 0; k < temp.ncol(); ++k) {
-        row.push_back(temp(j, k));
-      }
-      temp2.push_back(row);
-    }
-    ll_cpp.push_back(temp2);
-  }
+                   double relative_tol,
+                   const std::string& method) {
 
+  auto ll_cpp = list_to_vector(ll);
   std::vector<double> mm_cpp(mm.begin(), mm.end());
-
-  std::vector< std::vector<double >> Q_cpp;
-  numericmatrix_to_vector(Q, &Q_cpp);
+  auto Q_cpp = num_mat_to_vec(Q);
 
   ODE_TYPE od(ll_cpp, mm_cpp, Q_cpp);
 
@@ -87,9 +73,7 @@ double calc_ll_cla(const Rcpp::List& ll,
       if (focal_node < 0) throw "focal_node < 0";
       if (focal_node >= static_cast<int>(states->size())) throw "focal_node > states.size";
 
-      y = (*states)[focal_node];
-      
-  //    std::cerr << focal << " " << focal_node << " " << timeInte[i] << "\n";
+      y = (*states)[focal_node - 1];
 
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
@@ -135,7 +119,7 @@ double calc_ll_cla(const Rcpp::List& ll,
     if (focal_node < 0) throw "focal_node < 0";
     if (focal_node >= static_cast<int>(states->size())) throw "focal_node > states.size";
 
-    (*states)[focal] = newstate;
+    (*states)[focal - 1] = newstate;
   }
 
   for (size_t i = 0; i < mergeBranch.size(); ++i) {
@@ -162,7 +146,6 @@ inline size_t get_rcpp_num_threads() {
     ? tbb::task_arena::automatic  // -1
   : static_cast<size_t>(std::atoi(nt_env));
 }
-
 
 using state_ptr = std::vector<double>*;
 
@@ -322,12 +305,13 @@ struct detect : std::false_type {};
                     });
                     auto& mergebranch = *inode.ances_state;
                     mergebranch.resize(2 * d);
+                    
                     for (size_t i = 0; i < d; ++i) {
                       for (size_t j = 0; j < d; ++j) {
                         for (size_t k = 0; k < d; ++k) {
                           if (ll_cpp[i][j][k] != 0.0) {
                             mergebranch[i] += ll_cpp[i][j][k] * (y[0][j + d] * y[1][k + d] +
-                              y[1][j + d] * y[0][k + d]);
+                                                                 y[1][j + d] * y[0][k + d]);
                           }
                         }
                       }
@@ -359,7 +343,6 @@ struct detect : std::false_type {};
 }
 
 using namespace fiddled_cla;
-
 
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
