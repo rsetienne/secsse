@@ -562,7 +562,7 @@ struct secsse_sim {
       std::vector<int> focal_traits(num_traits);
       std::iota(focal_traits.begin(), focal_traits.end(), 0);
       for (size_t i = 0; i < pop.size(); ++i) {
-        auto trait = pop.get_trait(i);
+        auto trait = static_cast<int>(pop.get_trait(i));
         for (size_t j = 0; j < focal_traits.size(); ++j) {
           if (focal_traits[j] == trait) {
             focal_traits[j] = focal_traits.back();
@@ -593,7 +593,7 @@ struct secsse_sim {
       }
 
       for (size_t i = 0; i < pop.size(); ++i) {
-        auto trait = pop.get_trait(i) % num_concealed_states;
+        auto trait = static_cast<int>(pop.get_trait(i) % num_concealed_states);
         for (size_t j = 0; j < focal_traits.size(); ++j) {
           if (focal_traits[j] == trait) {
             focal_traits[j] = focal_traits.back();
@@ -685,7 +685,7 @@ struct secsse_sim {
 
   num_mat extract_ltable() {
     num_mat extracted_ltable(L.data_.size(), std::vector<double>(4));
-    for (int i = 0; i < L.data_.size(); ++i) {
+    for (size_t i = 0; i < L.data_.size(); ++i) {
       auto temp = L.data_[i].get_data();
       std::vector<double> row(temp.begin(), temp.end());
       extracted_ltable[i] = row;

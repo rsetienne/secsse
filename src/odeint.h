@@ -38,77 +38,77 @@ using bstime_t = double;
 
 namespace odeintcpp {
 
-namespace bno = boost::numeric::odeint;
+  namespace bno = boost::numeric::odeint;
 
-template <
-  typename STEPPER,
-  typename ODE,
-  typename STATE
->
-void integrate(STEPPER&& stepper, ODE& ode, STATE* y, double t0, double t1, double dt) {
-  using time_type = typename STEPPER::time_type;
-  bno::integrate_adaptive(stepper, std::ref(ode), (*y), time_type{t0}, time_type{t1}, time_type{dt});
-}
-
-namespace {
-
-template <typename T>
-struct is_unique_ptr : std::false_type {};
-                     
-                     template <typename T, typename D>
-                     struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type {};    
-                     
-}
-
-template <
-  typename STATE,
-  typename ODE
->
-void integrate(const std::string& stepper_name,
-               ODE ode,
-               STATE* y,
-               double t0, 
-               double t1,
-               double dt, 
-               double atol, double rtol) {
-  static_assert(is_unique_ptr<ODE>::value || std::is_pointer_v<ODE>, "ODE shall be pointer or unique_ptr type");
-  if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
-  } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
-  } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
-    integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
-  } else if ("odeint::bulirsch_stoer" == stepper_name) {
-    // no controlled stepper for bulrisch stoer
-    integrate(bno::bulirsch_stoer<STATE, double, STATE, bstime_t>(atol, rtol), *ode, y, t0, t1, dt);
-  } else if ("odeint::runge_kutta4" == stepper_name) {
-    integrate(bno::runge_kutta4<STATE>(), *ode, y, t0, t1, dt);
-  } else {
-    throw std::runtime_error("odeintcpp::integrate: unknown stepper");
+  template <
+    typename STEPPER,
+    typename ODE,
+    typename STATE
+  >
+  void integrate(STEPPER&& stepper, ODE& ode, STATE* y, double t0, double t1, double dt) {
+    using time_type = typename STEPPER::time_type;
+    bno::integrate_adaptive(stepper, std::ref(ode), (*y), time_type{t0}, time_type{t1}, time_type{dt});
   }
-}
+
+  namespace {
+
+    template <typename T>
+    struct is_unique_ptr : std::false_type {};
+
+    template <typename T, typename D>
+    struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type {};    
+
+  }
+
+  template <
+    typename STATE,
+    typename ODE
+  >
+  void integrate(const std::string& stepper_name,
+                 ODE ode,
+                 STATE* y,
+                 double t0, 
+                 double t1,
+                 double dt, 
+                 double atol, double rtol) {
+    static_assert(is_unique_ptr<ODE>::value || std::is_pointer_v<ODE>, "ODE shall be pointer or unique_ptr type");
+    if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
+      integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
+    } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
+      integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
+    } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
+      integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
+    } else if ("odeint::bulirsch_stoer" == stepper_name) {
+      // no controlled stepper for bulrisch stoer
+      integrate(bno::bulirsch_stoer<STATE, double, STATE, bstime_t>(atol, rtol), *ode, y, t0, t1, dt);
+    } else if ("odeint::runge_kutta4" == stepper_name) {
+      integrate(bno::runge_kutta4<STATE>(), *ode, y, t0, t1, dt);
+    } else {
+      throw std::runtime_error("odeintcpp::integrate: unknown stepper");
+    }
+  }
 
 
-template <
-  typename STATE,
-  typename ODE
->
-void integrate_full(const std::string& stepper_name,
-                    ODE ode,
-                    STATE* y,
-                    double t0, double t1, double dt,
-                    double atol, double rtol,
-                    std::vector< std::vector<double>>* yvals,
-                    std::vector<double>* tvals) {
-  if constexpr (std::is_pointer_v<ODE>) {
-    integrate(stepper_name, ode, y, t0, t1, dt, atol, rtol);
+  template <
+    typename STATE,
+    typename ODE
+  >
+  void integrate_full(const std::string& stepper_name,
+                      ODE ode,
+                      STATE* y,
+                      double t0, double t1, double dt,
+                      double atol, double rtol,
+                      std::vector< std::vector<double>>* yvals,
+                      std::vector<double>* tvals) {
+    if constexpr (std::is_pointer_v<ODE>) {
+      integrate(stepper_name, ode, y, t0, t1, dt, atol, rtol);
+    }
+    else {
+      integrate(stepper_name, ode.get(), y, t0, t1, dt, atol, rtol);
+    }
+    (*yvals) = (*ode).get_stored_states();
+    (*tvals) = (*ode).get_stored_t();
+    return;
   }
-  else {
-    integrate(stepper_name, ode.get(), y, t0, t1, dt, atol, rtol);
-  }
-  (*yvals) = (*ode).get_stored_states();
-  (*tvals) = (*ode).get_stored_t();
-  return;
-}
 
 }   // namespace odeintcpp

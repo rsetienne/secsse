@@ -7,8 +7,6 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-
-
     {
       "name": "(gbd) devtools::test()",
       "type": "cppdbg",
@@ -70,7 +68,7 @@
       "preLaunchTask": "genenv"
     },
     {
-      "name": "(gbd) secsse_acc.R",
+      "name": "(gbd) test_hanno.R",
       "type": "cppdbg",
       "request": "launch",
       // The binary, not the script
@@ -78,7 +76,7 @@
       "args": [
         "--vanilla",
         "-e",
-        "devtools::load_all(); source('${workspaceFolder}/secsse_acc.R')"
+        "devtools::load_all(); source('${workspaceFolder}/test_hanno.R')"
       ],
       "stopAtEntry": false,
       // needs to be generated, see below
@@ -100,7 +98,7 @@
       "preLaunchTask": "genenv"
     },
     {
-      "name": "(gbd) test_hanno.R",
+      "name": "(gbd) secsse_acc.R",
       "type": "cppdbg",
       "request": "launch",
       // The binary, not the script
@@ -108,7 +106,7 @@
       "args": [
         "--vanilla",
         "-e",
-        "devtools::load_all(); source('${workspaceFolder}/test_hanno.R')"
+        "devtools::load_all(); source('${workspaceFolder}/secsse_acc.R')"
       ],
       "stopAtEntry": false,
       // needs to be generated, see below

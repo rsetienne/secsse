@@ -10,8 +10,8 @@
 #include "odeint.h"       // NOLINT [build/include_subdir]
 #include "rhs.h"       // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
-
 #include <Rcpp.h>
+
 
 storage calc_ll_cla_store_full(
     const Rcpp::List& ll,
@@ -25,12 +25,12 @@ storage calc_ll_cla_store_full(
     double rtol,
     bool verbose)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  for (size_t i = 0; i < ll.size(); ++i) {
+  for (int i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
-    for (size_t j = 0; j < temp.nrow(); ++j) {
+    for (int j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
-      for (size_t k = 0; k < temp.ncol(); ++k) {
+      for (int k = 0; k < temp.ncol(); ++k) {
         row.push_back(temp(j, k));
       }
       temp2.push_back(row);
@@ -54,7 +54,7 @@ storage calc_ll_cla_store_full(
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     if (a % update_freq == 0) {
       if (verbose) Rcpp::Rcout << "**";
     }
@@ -64,11 +64,11 @@ storage calc_ll_cla_store_full(
 
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    int focal_node;
-    for (int i = 0; i < desNodes.size(); ++i) {
+    int focal_node = 0;
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
-      assert((focal_node) >= 0);
-      assert((focal_node) < states.size());
+      assert(focal_node >= 0);
+      assert(focal_node < static_cast<int>(states.size()));
 
       ode_cla_store local_od(ll_cpp, mm_cpp, Q_cpp);
 
@@ -76,8 +76,7 @@ storage calc_ll_cla_store_full(
       std::vector< std::vector< double >> yvecs;
       std::vector<double> t_vals;
 
-      std::unique_ptr<ode_cla_store> od_ptr =
-           std::make_unique<ode_cla_store>(local_od);
+      std::unique_ptr<ode_cla_store> od_ptr = std::make_unique<ode_cla_store>(local_od);
       odeintcpp::integrate_full(method,
                                 std::move(od_ptr),  // ode class object
                                 &y,                 // state vector
@@ -112,12 +111,12 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
                           double rtol,
                           bool verbose = false)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  for (size_t i = 0; i < ll.size(); ++i) {
+  for (int i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
-    for (size_t j = 0; j < temp.nrow(); ++j) {
+    for (int j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
-      for (size_t k = 0; k < temp.ncol(); ++k) {
+      for (int k = 0; k < temp.ncol(); ++k) {
         row.push_back(temp(j, k));
       }
       temp2.push_back(row);
@@ -144,7 +143,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     if (a % update_freq == 0 && verbose) {
       Rcpp::Rcout << "**";
     }
@@ -155,10 +154,10 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
     int focal_node;
-    for (int i = 0; i < desNodes.size(); ++i) {
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
-      assert((focal_node) >= 0);
-      assert((focal_node) < states.size());
+      assert(focal_node >= 0);
+      assert(focal_node < static_cast<int>(states.size()));
 
       data_storage local_storage;
 

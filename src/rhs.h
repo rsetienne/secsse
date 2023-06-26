@@ -31,7 +31,7 @@ class ode_standard {
 
   void operator()(const std::vector< double > &x,
                 std::vector<  double > &dxdt,   // NOLINT [runtime/references]
-                const double /* t */) {
+                const double /* t */) const {
     for (size_t i = 0; i < d; ++i) {
       if (l_[i] != 0.0) {
         dxdt[i] = m_[i] - (l_[i] + m_[i]) * x[i] +
@@ -54,7 +54,7 @@ class ode_standard {
     return;
   }
 
-  double get_l(int index) const {
+  double get_l(size_t index) const {
     return l_[index];
   }
 
@@ -89,15 +89,15 @@ class ode_standard_ct {
 
   void operator()(const std::vector< double > &x ,
                 std::vector<  double > &dxdt,   // NOLINT [runtime/references]
-                const double /* t */) {
-    for (int i = 0; i < d; ++i) {
+                const double /* t */) const {
+    for (size_t i = 0; i < d; ++i) {
       long double diff_1 = (m_[i] - (l_[i] * x[i]));
       dxdt[i] =  diff_1 * (1 - x[i]);
       dxdt[i + d] = -1.0 * (l_[i] + m_[i]) * x[i + d];
     }
 
-    for (int j = 0; j < d; ++j) {
-      for (int k = 0; k < d; ++k) {
+    for (size_t j = 0; j < d; ++j) {
+      for (size_t k = 0; k < d; ++k) {
         long double diff_e = x[k] - x[j];
         dxdt[j] +=  q_[j][k] * diff_e;
 
@@ -109,7 +109,7 @@ class ode_standard_ct {
     return;
   }
 
-  double get_l(int index) const {
+  double get_l(size_t index) const {
     return l_[index];
   }
 
@@ -132,9 +132,9 @@ class ode_cla {
           const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
     lambda_sum = std::vector<long double>(d, 0.0);
-    for (int i = 0; i < d; ++i) {
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
+    for (size_t i = 0; i < d; ++i) {
+      for (size_t j = 0; j < d; ++j) {
+        for (size_t k = 0; k < d; ++k) {
           lambda_sum[i] += l_[i][j][k];
         }
       }
@@ -144,11 +144,11 @@ class ode_cla {
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,    // NOLINT [runtime/references]
                 const double /* t */) const {
-    for (int i = 0; i < d; ++i) {
+    for (size_t i = 0; i < d; ++i) {
       double Df = 0.0;
       double Ef = 0.0;
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
+      for (size_t j = 0; j < d; ++j) {
+        for (size_t k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0.0) {    // slightly safer.
             long double ff1 = (x[j] * x[k + d] + x[j + d] * x[k]);
             long double ff2 = (x[j] * x[k]);
@@ -196,9 +196,9 @@ public:
                  const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
     lambda_sum = std::vector<long double>(d, 0.0);
-    for (int i = 0; i < d; ++i) {
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
+    for (size_t i = 0; i < d; ++i) {
+      for (size_t j = 0; j < d; ++j) {
+        for (size_t k = 0; k < d; ++k) {
           lambda_sum[i] += l_[i][j][k];
         }
       }
@@ -208,12 +208,12 @@ public:
   void operator()(const std::vector< double > &x,
                 std::vector< double > &dxdt,   // NOLINT [runtime/references]
                 const double /* t */) const {
-    for (int i = 0; i < d; ++i) {
+    for (size_t i = 0; i < d; ++i) {
       long double lamEE = 0.0;
       long double lamDE = 0.0;
 
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
+      for (size_t j = 0; j < d; ++j) {
+        for (size_t k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0) {
             long double FF1 = x[j] * x[k];
             lamEE += l_[i][j][k] * FF1;
@@ -231,7 +231,7 @@ public:
       long double FF2 = (-lambda_sum[i] - m_[i]) * x[i + d];
       dxdt[i + d] = FF2 + lamDE;
 
-      for (int j = 0; j < d; ++j) {
+      for (size_t j = 0; j < d; ++j) {
         long double diff = x[j] - x[i];
         dxdt[i] += diff * q_[i][j];
 
@@ -266,9 +266,9 @@ class ode_cla_d {
             const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
     lambda_sum = std::vector<long double>(d, 0.0);
-    for (int i = 0; i < d; ++i) {
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
+    for (size_t i = 0; i < d; ++i) {
+      for (size_t j = 0; j < d; ++j) {
+        for (size_t k = 0; k < d; ++k) {
           lambda_sum[i] += l_[i][j][k];
         }
       }
@@ -277,9 +277,9 @@ class ode_cla_d {
 
   void single_step(const std::vector< double > &x ,
                    std::vector< double > &dxdt) {  // NOLINT [runtime/references]
-    for (int i = 0; i < d; ++i) {
+    for (size_t i = 0; i < d; ++i) {
       dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];
-      for (int j = 0; j < d; ++j) {
+      for (size_t j = 0; j < d; ++j) {
         long double dx = x[j + d] - x[i + d];
         dxdt[i + d] +=  q_[i][j] * dx;
       }
@@ -289,9 +289,9 @@ class ode_cla_d {
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt,    // NOLINT [runtime/references]
                 const double /* t */) const {
-    for (int i = 0; i < d; ++i) {
+    for (size_t i = 0; i < d; ++i) {
       dxdt[i + d] = -1.0 * (lambda_sum[i] + m_[i]) * x[i + d];
-      for (int j = 0; j < d; ++j) {
+      for (size_t j = 0; j < d; ++j) {
         long double dx = x[j + d] - x[i + d];
         dxdt[i + d] +=  q_[i][j] * dx;
       }
@@ -326,15 +326,15 @@ class ode_cla_e {
   void operator()(const std::vector< double > &x ,
                 std::vector< double > &dxdt, // NOLINT [runtime/references]
                 const double /* t */) const {
-    for (int i = 0; i < d; ++i) {
+    for (size_t i = 0; i < d; ++i) {
       dxdt[i] = 0.0;
       if (m_[i] != 0.0) {
         dxdt[i] = m_[i] * (1.0 - x[i]);
       }
-      for (int j = 0; j < d; ++j) {
+      for (size_t j = 0; j < d; ++j) {
         long double diff = (x[j] - x[i]);
         dxdt[i] += q_[i][j] * diff;
-        for (int k = 0; k < d; ++k) {
+        for (size_t k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0.0) {
             long double diff2 = (x[j] * x[k] - x[i]);
             dxdt[i] += l_[i][j][k] * diff2;
@@ -408,7 +408,7 @@ class ode_standard_store {
     return;
   }
 
-  double get_l(int index) const {
+  double get_l(size_t index) const {
     return l_[index];
   }
 
@@ -441,9 +441,9 @@ class ode_cla_store {
                 const std::vector<std::vector<double>>& q) :
   l_(l), m_(m), q_(q), d(m.size()) {
     lambda_sum = std::vector<long double>(d, 0.0);
-    for (int i = 0; i < d; ++i) {
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
+    for (size_t i = 0; i < d; ++i) {
+      for (size_t j = 0; j < d; ++j) {
+        for (size_t k = 0; k < d; ++k) {
           lambda_sum[i] += l_[i][j][k];
         }
       }
@@ -456,11 +456,11 @@ class ode_cla_store {
     stored_t.push_back(t);
     stored_states.push_back(x);
 
-    for (int i = 0; i < d; ++i) {
+    for (size_t i = 0; i < d; ++i) {
       double Df = 0.0;
       double Ef = 0.0;
-      for (int j = 0; j < d; ++j) {
-        for (int k = 0; k < d; ++k) {
+      for (size_t j = 0; j < d; ++j) {
+        for (size_t k = 0; k < d; ++k) {
           if (l_[i][j][k] != 0.0) {   // slightly safer.
             long double ff1 = (x[j] * x[k + d] + x[j + d] * x[k]);
             long double ff2 = (x[j] * x[k]);
