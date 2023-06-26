@@ -157,11 +157,7 @@ cla_secsse_loglik <- function(parameter,
   nodeM <- calcul$nodeM  # nolint
   loglik <- calcul$loglik
   states <- calcul$states
-  
-  cat(loglik, "\n")
-  cat(nodeM, "\n")
-  cat(mergeBranch, "\n")
-  
+
   ## At the root
   mergeBranch2 <- mergeBranch # nolint
   lmb <- length(mergeBranch2)

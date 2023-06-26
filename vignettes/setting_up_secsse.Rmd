@@ -129,11 +129,7 @@ param_posit[[1]] <- lambda_matrices
 param_posit[[2]] <- mus
 param_posit[[3]] <- trans_matrix
 
-# ideally, one should pick random initial parameters,
-# but here, we will reduce computation time by starting in (the otherwise
-# unknown) true parameters
-# initpars <- rexp(n = max(trans_matrix, na.rm = TRUE), 10)
-initpars <- params
+initpars <- runif(n = max(trans_matrix, na.rm = TRUE), 0, 1)
 
 answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               traits = sim_traits,
@@ -187,7 +183,7 @@ fit_model <- function(tree, traits, model) {
   
   max_indicator <- max(trans_matrix, na.rm = TRUE)
   
-  initpars <- rexp(n = max_indicator, 10)
+  initpars <- runif(n = max_indicator, 0, 1)
   testthat::expect_output( # suppress output
   answ <- secsse::cla_secsse_ml(phy = focal_tree,
                                 traits = traits,

@@ -342,7 +342,7 @@ struct detect : std::false_type {};
 
 }
 
-using namespace fiddled_cla;
+using namespace orig_cla;
 
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
