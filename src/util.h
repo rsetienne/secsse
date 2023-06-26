@@ -42,6 +42,9 @@ void normalize_loglik(std::vector<double>* probvec,
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v);
 
+std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m);
+
+
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix* m);
 
@@ -49,6 +52,9 @@ void output_vec(const std::vector<double>& v);
 
 void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
                     std::vector< std::vector< std::vector<double >>>* v);
+
+std::vector< std::vector< std::vector<double >>>  
+  list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l);
 
 struct data_storage {
   std::vector<double> t;

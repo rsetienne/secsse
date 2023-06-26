@@ -10,24 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// ct_condition_cla
-Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y, double t, const Rcpp::List& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol);
-RcppExport SEXP _secsse_ct_condition_cla(SEXP ySEXP, SEXP tSEXP, SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double >::type t(tSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type ll(llSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mm(mmSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
-    Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< double >::type atol(atolSEXP);
-    Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
-    rcpp_result_gen = Rcpp::wrap(ct_condition_cla(y, t, ll, mm, Q, method, atol, rtol));
-    return rcpp_result_gen;
-END_RCPP
-}
 // cla_calThruNodes_cpp
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances, const Rcpp::NumericMatrix& states_R, const Rcpp::NumericMatrix& forTime_R, const Rcpp::List& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol, bool is_complete_tree);
 RcppExport SEXP _secsse_cla_calThruNodes_cpp(SEXP ancesSEXP, SEXP states_RSEXP, SEXP forTime_RSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP) {
@@ -45,6 +27,24 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
     Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
     rcpp_result_gen = Rcpp::wrap(cla_calThruNodes_cpp(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ct_condition_cla
+Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y, double t, const Rcpp::List& ll, const Rcpp::NumericVector& mm, const Rcpp::NumericMatrix& Q, std::string method, double atol, double rtol);
+RcppExport SEXP _secsse_ct_condition_cla(SEXP ySEXP, SEXP tSEXP, SEXP llSEXP, SEXP mmSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type ll(llSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mm(mmSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< std::string >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type atol(atolSEXP);
+    Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
+    rcpp_result_gen = Rcpp::wrap(ct_condition_cla(y, t, ll, mm, Q, method, atol, rtol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -155,8 +155,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_secsse_ct_condition_cla", (DL_FUNC) &_secsse_ct_condition_cla, 8},
     {"_secsse_cla_calThruNodes_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_cpp, 10},
+    {"_secsse_ct_condition_cla", (DL_FUNC) &_secsse_ct_condition_cla, 8},
     {"_secsse_cla_calThruNodes_store_cpp", (DL_FUNC) &_secsse_cla_calThruNodes_store_cpp, 12},
     {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 11},
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},

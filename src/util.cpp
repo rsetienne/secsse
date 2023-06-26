@@ -130,17 +130,32 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   return;
 }
 
-void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
-                    std::vector< std::vector< std::vector<double >>>* v) {
+std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m) {
+  auto v = std::vector< std::vector< double> >(m.nrow(), 
+                                               std::vector<double>(m.ncol(), 
+                                                                   0.0));
+  for (int i = 0; i < m.nrow(); ++i) {
+    std::vector<double> row(m.ncol(), 0.0);
+    for (int j = 0; j < m.ncol(); ++j) {
+      row[j] = m(i, j);
+    }
+    v[i] = row;
+  }
+  return v;
+}
+
+std::vector< std::vector< std::vector<double >>>  
+  list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l) {
+  
   size_t n = l.size();
-  (*v) = std::vector< std::vector< std::vector<double>>>(n);
+  auto v = std::vector< std::vector< std::vector<double>>>(n);
   for (size_t i = 0; i < n; ++i) {
     std::vector< std::vector< double >> entry;
     Rcpp::NumericMatrix temp = l[i];
     numericmatrix_to_vector(temp, &entry);
-    (*v).push_back(entry);
+    v.push_back(entry);
   }
-  return;
+  return v;
 }
 
 
