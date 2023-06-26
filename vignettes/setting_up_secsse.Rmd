@@ -129,7 +129,11 @@ param_posit[[1]] <- lambda_matrices
 param_posit[[2]] <- mus
 param_posit[[3]] <- trans_matrix
 
-initpars <- rexp(n = max(trans_matrix, na.rm = TRUE), 10)
+# ideally, one should pick random initial parameters,
+# but here, we will reduce computation time by starting in (the otherwise
+# unknown) true parameters
+# initpars <- rexp(n = max(trans_matrix, na.rm = TRUE), 10)
+initpars <- params
 
 answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               traits = sim_traits,
