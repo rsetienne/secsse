@@ -151,6 +151,81 @@ create_transition_matrix <- function(state_names,
   return(trans_matrix)
 }
 
+#' @keywords internal
+initialize_new_q_matrix <- function(q_matrix,
+                                    num_concealed_states) {
+  num_traits <- ncol(q_matrix)
+  total_num_states <- ncol(q_matrix) * num_concealed_states
+  new_q_matrix <- matrix(0, nrow = total_num_states, ncol = total_num_states)
+  diag(new_q_matrix) <- NA
+  for (x in seq_len(ncol(q_matrix))) {
+    for (y in seq_len(nrow(q_matrix))) {
+      for (i in 1:num_concealed_states) {
+        incr <- (i - 1) * num_traits
+        new_q_matrix[x + incr, y + incr] <- q_matrix[x, y]
+      }
+    }
+  }
+  return(new_q_matrix)
+}
+
+#' @keywords internal
+fill_all_diff <- function(new_q_matrix, num_concealed_states,
+                          rate_indic, num_traits) {
+  for (i in 1:num_concealed_states) {
+    for (j in 1:num_concealed_states) {
+      if (i != j) {
+        for (k in 1:num_traits) {
+          start <- (i - 1) * num_traits + k
+          end <- (j - 1) * num_traits + k
+          new_q_matrix[start, end] <- rate_indic
+        }
+        rate_indic <- rate_indic + 1
+      }
+    }
+  }
+  return(new_q_matrix)
+}
+
+#' @keywords internal
+get_chosen_rates <- function(q_matrix, num_concealed_states) {
+  existing_rates <- unique(as.vector(q_matrix))
+  existing_rates <- existing_rates[existing_rates > 0]
+  existing_rates <- existing_rates[!is.na(existing_rates)]
+  existing_rates <- sort(existing_rates)
+  
+  num_transitions <- num_concealed_states * (num_concealed_states - 1)
+  chosen_rates <- existing_rates
+  while (num_transitions > length(chosen_rates)) {
+    remain <- num_transitions - length(existing_rates)
+    to_add <- sample(existing_rates,
+                     size = min(remain, length(existing_rates)),
+                     replace = FALSE)
+    chosen_rates <- c(chosen_rates, to_add)
+  }
+  return(chosen_rates)
+}
+
+#' @keywords internal
+fill_from_rates <- function(new_q_matrix, chosen_rates, 
+                            num_traits, num_concealed_states,
+                            rate_indic) {
+  for (i in 1:num_concealed_states) {
+    for (j in i:num_concealed_states) {
+      if (i != j) {
+        for (k in 1:num_traits) {
+          start <- (i - 1) * num_traits + k
+          end <- (j - 1) * num_traits + k
+          new_q_matrix[start, end] <- chosen_rates[rate_indic]
+          new_q_matrix[end, start] <- chosen_rates[rate_indic + 1]
+        }
+        rate_indic <- rate_indic + 2
+      }
+    }
+  }
+  return(new_q_matrix)
+}
+
 #' function to expand an existing q_matrix to a number of
 #' concealed states
 #' @param q_matrix q_matrix with only transitions between observed states
@@ -165,73 +240,65 @@ expand_q_matrix <- function(q_matrix,
                             num_concealed_states,
                             diff.conceal = FALSE) {
   num_traits <- ncol(q_matrix)
-  total_num_states <- ncol(q_matrix) * num_concealed_states
-
-  new_q_matrix <- matrix(0, nrow = total_num_states, ncol = total_num_states)
-  diag(new_q_matrix) <- NA
 
   # we first fill in the existing q matrix
-  for (x in seq_len(ncol(q_matrix))) {
-    for (y in seq_len(nrow(q_matrix))){
-      for (i in 1:num_concealed_states) {
-        incr <- (i - 1) * num_traits
-        new_q_matrix[x + incr, y + incr] <- q_matrix[x, y]
-      }
-    }
-  }
+  new_q_matrix <- initialize_new_q_matrix(q_matrix, num_concealed_states)
 
   # and now we add all forward and reverse transitions
-  # we need all combinations!
   if (diff.conceal == TRUE) {
+    # we need all combinations!
     rate_indic <- max(new_q_matrix, na.rm = TRUE) + 1
-    for (i in 1:num_concealed_states) {
-      for (j in 1:num_concealed_states) {
-        if (i != j) {
-          for (k in 1:num_traits) {
-             start <- (i - 1) * num_traits + k
-             end <- (j - 1) * num_traits + k
-             new_q_matrix[start, end] <- rate_indic
-          }
-          rate_indic <- rate_indic + 1
-        }
-      }
-    }
+    new_q_matrix <- fill_all_diff(new_q_matrix, num_concealed_states,
+                                  rate_indic, num_traits)
   } else {
     # we now re-use the existing rates
-    existing_rates <- unique(as.vector(q_matrix))
-    existing_rates <- existing_rates[existing_rates > 0]
-    existing_rates <- existing_rates[!is.na(existing_rates)]
-    existing_rates <- sort(existing_rates)
-
-    num_transitions <- num_concealed_states * (num_concealed_states - 1)
-    chosen_rates <- existing_rates
-    while (num_transitions > length(chosen_rates)) {
-      remain <- num_transitions - length(existing_rates)
-      to_add <- sample(existing_rates,
-                       size = min(remain, length(existing_rates)),
-                       replace = FALSE)
-      chosen_rates <- c(chosen_rates, to_add)
-    }
-
+    chosen_rates <- get_chosen_rates(q_matrix, num_concealed_states)
     rate_indic <- 1
-
-    for (i in 1:num_concealed_states) {
-      for (j in i:num_concealed_states) {
-        if (i != j) {
-          for (k in 1:num_traits) {
-              start <- (i - 1) * num_traits + k
-              end <- (j - 1) * num_traits + k
-              new_q_matrix[start, end] <- chosen_rates[rate_indic]
-              new_q_matrix[end, start] <- chosen_rates[rate_indic + 1]
-          }
-          rate_indic <- rate_indic + 2
-        }
-      }
-    }
+    new_q_matrix <- fill_from_rates(new_q_matrix, chosen_rates, 
+                                    num_traits, num_concealed_states,
+                                    rate_indic)
   }
   return(new_q_matrix)
 }
 
+#' @keywords internal
+fill_transition_list <- function(transition_list,
+                                 num_obs_states,
+                                 num_concealed_states,
+                                 state_names,
+                                 concealed_state_names,
+                                 focal_rate,
+                                 focal_state = "obs") {
+
+  num_outer_states <- num_obs_states
+  num_inner_states  <- num_concealed_states
+  if (focal_state == "concealed") {
+    num_outer_states <- num_concealed_states
+    num_inner_states <- num_obs_states
+  }
+
+  for (j in 1:num_outer_states) {
+    for (k in 1:num_outer_states) {
+      if (j != k) {
+        # transition of concealed state j -> k
+        for (i in 1:num_inner_states) {
+          if (focal_state == "obs") {
+            start_state <- paste0(state_names[j], concealed_state_names[i])
+            end_state   <- paste0(state_names[k], concealed_state_names[i])
+          } else {
+            start_state <- paste0(state_names[i], concealed_state_names[j])
+            end_state   <- paste0(state_names[i], concealed_state_names[k])
+          }
+          to_add <- c(start_state, end_state, focal_rate)
+          transition_list <- rbind(transition_list, to_add)
+        }
+        focal_rate <- focal_rate + 1
+      }
+    }
+  }
+  return(list(transition_list = transition_list,
+              focal_rate = focal_rate))
+}
 
 #' helper function to create a default q_matrix list
 #' @param state_names names of the observed states
@@ -251,64 +318,23 @@ create_default_q_list <- function(state_names = c("0", "1"),
   transition_list <- c()
   # now we need to find those entries that signify changes between
   # observed states
-  for (j in 1:num_obs_states) {
-    for (k in 1:num_obs_states) {
-      if (j != k) {
-        # transition of concealed state j -> k
-        for (i in 1:num_concealed_states) {
-          start_state <- paste0(state_names[j], concealed_state_names[i])
-          end_state   <- paste0(state_names[k], concealed_state_names[i])
-          to_add <- c(start_state, end_state, focal_rate)
-          transition_list <- rbind(transition_list, to_add)
-        }
-        focal_rate <- focal_rate + 1
-      }
-    }
-  }
+  answ <- fill_transition_list(transition_list,
+                               num_obs_states,
+                               num_concealed_states,
+                               state_names,
+                               concealed_state_names,
+                               focal_rate,
+                               focal_state = "obs")
+  answ <- fill_transition_list(answ$transition_list,
+                               num_obs_states,
+                               num_concealed_states,
+                               state_names,
+                               concealed_state_names,
+                               focal_rate = answ$focal_rate,
+                               focal_state = "concealed")
 
-  # now, we need to find those entries with rate A->B, or rate B->A
-  for (j in 1:num_concealed_states) {
-      for (k in 1:num_concealed_states) {
-        if (j != k) {
-           # transition of concealed state j -> k
-          for (i in 1:num_obs_states) {
-            start_state <- paste0(state_names[i], concealed_state_names[j])
-            end_state   <- paste0(state_names[i], concealed_state_names[k])
-            to_add <- c(start_state, end_state, focal_rate)
-            transition_list <- rbind(transition_list, to_add)
-          }
-          focal_rate <- focal_rate + 1
-        }
-      }
-  }
+  transition_list <- answ$transition_list
 
-  add_later <- FALSE
-  if (add_later == TRUE) {
-    # extinction related transitions
-    for (i in 1:state_names) {
-      state_len <- stringr::str_length(state_names[i])
-      if (state_len > 1) {
-        start_state <- state_names[i]
-        end_state1  <- stringr::str_sub(state_names[i], start = 1, end = 1)
-        end_state2  <- stringr::str_sub(state_names[i], start = 2)
-
-        # we end up in 0 if 1 goes extinct
-        focal_rate1 <- mus[which(names(mus) == end_state2)]
-        # and vice versa
-        focal_rate2 <- mus[which(names(mus) == end_state1)]
-
-        for (j in 1:num_concealed_states) {
-          focal_start <- paste0(start_state, concealed_state_names[j])
-          focal_end_1 <- paste0(end_state1,  concealed_state_names[j])
-          focal_end_2 <- paste0(end_state2,  concealed_state_names[j])
-
-          to_add1 <- c(focal_start, focal_end_1, focal_rate1)
-          to_add2 <- c(focal_start, focal_end_2, focal_rate2)
-          transition_list <- rbind(transition_list, to_add1, to_add2)
-        }
-      }
-    }
-  }
   rownames(transition_list) <- rep("", nrow(transition_list))
   return(transition_list)
 }
