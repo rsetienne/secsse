@@ -82,7 +82,9 @@ test_that("qmat setup", {
   trans_list <- rbind(trans_list, c("IB", "CB", 9))
   trans_list <- rbind(trans_list, c("IB", "IA", 7))
   
-  q_mat2 <- secsse::create_transition_matrix(namez, trans_list)
+  q_mat2 <- secsse::create_transition_matrix(state_names = c("M", "I", "C"), 
+                                             num_concealed_states = 2,
+                                             trans_list)
   
   testthat::expect_equal(nrow(q_mat), nrow(q_mat2))
   testthat::expect_true(all.equal(q_mat, q_mat2))
@@ -105,7 +107,7 @@ test_that("q_matrix", {
                                   diff.conceal = dd)
     testthat::expect_true(all.equal(q1, q2))
   }
-})
+ })
 
 test_that("setup", {
   focal_list <- 
