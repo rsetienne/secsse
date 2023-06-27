@@ -76,7 +76,8 @@ storage calc_ll_cla_store_full(
       std::vector< std::vector< double >> yvecs;
       std::vector<double> t_vals;
 
-      std::unique_ptr<ode_cla_store> od_ptr = std::make_unique<ode_cla_store>(local_od);
+      std::unique_ptr<ode_cla_store> od_ptr =
+          std::make_unique<ode_cla_store>(local_od);
       odeintcpp::integrate_full(method,
                                 std::move(od_ptr),  // ode class object
                                 &y,                 // state vector

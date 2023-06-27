@@ -5,10 +5,12 @@
 \title{helper function to neatly setup a Q matrix, without transitions to 
 concealed states (only observed transitions shown)}
 \usage{
-create_transition_matrix(state_names, transition_list)
+create_transition_matrix(state_names, num_concealed_states, transition_list)
 }
 \arguments{
 \item{state_names}{names of observed states}
+
+\item{num_concealed_states}{number of concealed states}
 
 \item{transition_list}{matrix of transitions, indicating in order: 1) 
 starting state (typically the column in the transition matrix), 2) ending 

@@ -12,8 +12,9 @@
 #' tree is not conditioned on this number, but that this is a safeguard against
 #' generating extremely large trees).
 #' @param conditioning can be 'obs_states', 'true_states' or 'none', the tree is
-#' simulated until one is generated that contains all observed states, all
-#' true states (e.g. obs x hidden states), or is always returned.
+#' simulated until one is generated that contains all observed states 
+#' ('obs_states'), all true states (e.g. all combinations of obs and hidden
+#' states), or is always returned ('none').
 #' @param non_extinction should the tree be conditioned on non-extinction of the
 #' crown lineages? Default is TRUE.
 #' @param verbose provide intermediate output.
