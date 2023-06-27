@@ -49,7 +49,7 @@ test_that("trying a short ML search: cla_secsse", {
       maxiter,
       optimmethod,
       num_cycles = 1,
-      verbose = FALSE)
+      verbose = TRUE)
   ))
 
   testthat::expect_equal(model_R$ML, -16.1342246206186)

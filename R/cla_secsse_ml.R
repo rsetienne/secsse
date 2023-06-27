@@ -73,7 +73,7 @@
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-#' \dontrun{
+#' \donttest{
 #'model <- cla_secsse_ml(
 #'  phylotree,
 #'  traits,
@@ -144,7 +144,7 @@ cla_secsse_ml <- function(phy,
 
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
-        warning("Note: you set some transitions as impossible to happen.", "\n")
+        warning("Note: you set some transitions as impossible to happen.")
     }
 
     if (is.matrix(idparslist[[1]])) {
@@ -160,7 +160,6 @@ cla_secsse_ml <- function(phy,
 
     see_ancestral_states <- FALSE
 
-    utils::flush.console()
     trparsopt <- initparsopt / (1 + initparsopt)
     trparsopt[which(initparsopt == Inf)] <- 1
     trparsfix <- parsfix / (1 + parsfix)

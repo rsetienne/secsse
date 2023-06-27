@@ -73,7 +73,7 @@
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-#' \dontrun{
+#' \donttest{
 #'model<-secsse_ml(
 #'phylotree,
 #'traits,
