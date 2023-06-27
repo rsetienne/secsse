@@ -45,14 +45,16 @@ void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
                    std::vector<int>* desNodes,
                    std::vector<double>* timeInte) {
-  (*desNodes).clear();
-  (*timeInte).clear();
-  std::vector<int> output;
+  (*desNodes).resize(2);
+  (*timeInte).resize(2);
+  size_t cnt = 0;
   for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
-      (*desNodes).push_back(phy_edge[i][1]);
-      (*timeInte).push_back(phy_edge[i][2]);
+      (*desNodes)[cnt] = phy_edge[i][1];
+      (*timeInte)[cnt] = phy_edge[i][2];
+      cnt++;
     }
+    if (cnt > 1) break;
   }
 }
 

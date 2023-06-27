@@ -44,8 +44,8 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
     }
     Rcpp::checkUserInterrupt();
 
-    std::vector<int> desNodes;
-    std::vector<double> timeInte;
+    std::vector<int> desNodes(2);
+    std::vector<double> timeInte(2);
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
     for (size_t i = 0; i < desNodes.size(); ++i) {

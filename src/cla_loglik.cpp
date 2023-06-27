@@ -63,14 +63,14 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector< double > logliks(ances.size());
   std::vector<double> y;
 
-  std::vector<int> desNodes;
-  std::vector<double> timeInte;
+  std::vector<int> desNodes(2, 0);
+  std::vector<double> timeInte(2, 0.0);
   long double loglik = 0;
   for (int a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    int focal_node;
+    int focal_node = 0;
     for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
       if (focal_node < 0) throw "focal_node < 0";
