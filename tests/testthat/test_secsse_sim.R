@@ -13,9 +13,7 @@ test_that("test secsse_sim", {
   masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
-  testthat::expect_warning(
-    idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
-  )
+  idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
   testthat::expect_output(
     startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
@@ -32,7 +30,6 @@ test_that("test secsse_sim", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-  testthat::expect_warning(
   testthat::expect_output(
   model_R <- secsse::cla_secsse_ml(
     phylotree,
@@ -51,7 +48,7 @@ test_that("test secsse_sim", {
     optimmethod,
     num_cycles = 1,
     verbose = FALSE)
-  ))
+  )
 
   qs <- model_R$MLpars[[3]]
   diag(qs) <- 0

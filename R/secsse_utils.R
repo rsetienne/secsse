@@ -98,6 +98,10 @@ create_q_matrix <- function(masterBlock,
 #' are different from the transition rates for the examined states.
 #' @return Q matrix that includes both examined and concealed states, it should
 #' be declared as the third element of idparslist.
+#' @description This function expands the Q_matrix, but it does so assuming
+#' that the number of concealed traits is equal to the number of examined 
+#' traits, if you have a different number, you should consider looking at
+#' the function [expand_q_matrix()].
 #' @examples
 #' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
 #' # For a three-state trait
@@ -116,8 +120,6 @@ create_q_matrix <- function(masterBlock,
 #' param_posit[[3]] <- myQ
 #' @export
 q_doubletrans <- function(traits, masterBlock, diff.conceal) {
-    warning("q_doubletrans assumes that the number of 
-            concealed traits is equal to the number of examined traits")
     if (diff.conceal == TRUE &&
         all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
         integersmasterBlock <- floor(masterBlock)
