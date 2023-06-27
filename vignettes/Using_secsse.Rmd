@@ -308,13 +308,6 @@ out <- secsse_ml(phylo_Vign,
                  sampling_fraction = c(1, 1, 1),
                  optimmethod = "simplex",
                  num_cycles = 1)
-saveRDS(out, file = "output.RDS")
-```
-
-Later on, we can retrieve the data in this file, simply by entering:
-
-```{r}
-readRDS("output.RDS")
 ```
 
 The following is sample output, with two concealed states, notice in this case all transition rates, including dual rates, were set to the fixed value of 0.01:

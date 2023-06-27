@@ -793,75 +793,32 @@ a while and procude a lot of console output.</p>
                  tol = c(1e-04, 1e-05, 1e-07),
                  sampling_fraction = c(1, 1, 1),
                  optimmethod = &quot;simplex&quot;,
-                 num_cycles = 1)
-saveRDS(out, file = &quot;output.RDS&quot;)</code></pre>
-<p>Later on, we can retrieve the data in this file, simply by
-entering:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">readRDS</span>(<span class="st">&quot;output.RDS&quot;</span>)</span></code></pre></div>
-<pre><code>## $MLpars
-## $MLpars[[1]]
-##           1A           2A           3A           1B           2B           3B 
-## 3.991074e-02 1.277549e-01 7.302145e-02 5.204953e-09 1.248659e-02 3.263652e-03 
-##           1C           2C           3C 
-## 1.433773e-15 1.035973e-01 5.393192e-02 
-## 
-## $MLpars[[2]]
-##    1A    2A    3A    1B    2B    3B    1C    2C    3C 
-## 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 
-## 
-## $MLpars[[3]]
-##            1A         2A         3A         1B         2B         3B         1C
-## 1A         NA 0.04665017 0.04665017 0.04665017 0.00000000 0.00000000 0.04665017
-## 2A 0.04665017         NA 0.04665017 0.00000000 0.04665017 0.00000000 0.00000000
-## 3A 0.04665017 0.04665017         NA 0.00000000 0.00000000 0.04665017 0.00000000
-## 1B 0.04665017 0.00000000 0.00000000         NA 0.04665017 0.04665017 0.04665017
-## 2B 0.00000000 0.04665017 0.00000000 0.04665017         NA 0.04665017 0.00000000
-## 3B 0.00000000 0.00000000 0.04665017 0.04665017 0.04665017         NA 0.00000000
-## 1C 0.04665017 0.00000000 0.00000000 0.04665017 0.00000000 0.00000000         NA
-## 2C 0.00000000 0.04665017 0.00000000 0.00000000 0.04665017 0.00000000 0.04665017
-## 3C 0.00000000 0.00000000 0.04665017 0.00000000 0.00000000 0.04665017 0.04665017
-##            2C         3C
-## 1A 0.00000000 0.00000000
-## 2A 0.04665017 0.00000000
-## 3A 0.00000000 0.04665017
-## 1B 0.00000000 0.00000000
-## 2B 0.04665017 0.00000000
-## 3B 0.00000000 0.04665017
-## 1C 0.04665017 0.04665017
-## 2C         NA 0.04665017
-## 3C 0.04665017         NA
-## 
-## 
-## $ML
-## [1] -832.4899
-## 
-## $conv
-## [1] 0</code></pre>
+                 num_cycles = 1)</code></pre>
 <p>The following is sample output, with two concealed states, notice in
 this case all transition rates, including dual rates, were set to the
 fixed value of 0.01:</p>
 <div id="section" class="section level45">
 <p class="heading"></p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="co">#$MLpars[[1]]</span></span>
-<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="co">#          1A           2A           3A           1B           2B           3B</span></span>
-<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co">#4.842634e-16 1.080409e-01 7.843821e-02 4.029147e-09 3.018863e-02 3.018863e-02</span></span>
-<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a></span>
-<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="co">#$MLpars[[2]]</span></span>
-<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a><span class="co">#         1A          2A          3A          1B          2B          3B</span></span>
-<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a><span class="co">#0.002000000 0.002000109 0.002734071 0.001988593 0.002169052 0.003969142</span></span>
-<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a></span>
-<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="co">#$MLpars[[3]]</span></span>
-<span id="cb37-10"><a href="#cb37-10" tabindex="-1"></a><span class="co">#     1A   2A   3A   1B   2B   3B</span></span>
-<span id="cb37-11"><a href="#cb37-11" tabindex="-1"></a><span class="co">#1A   NA 0.01 0.01 0.01 0.01 0.01</span></span>
-<span id="cb37-12"><a href="#cb37-12" tabindex="-1"></a><span class="co">#2A 0.01   NA 0.01 0.01 0.01 0.01</span></span>
-<span id="cb37-13"><a href="#cb37-13" tabindex="-1"></a><span class="co">#3A 0.01 0.01   NA 0.01 0.01 0.01</span></span>
-<span id="cb37-14"><a href="#cb37-14" tabindex="-1"></a><span class="co">#1B 0.01 0.01 0.01   NA 0.01 0.01</span></span>
-<span id="cb37-15"><a href="#cb37-15" tabindex="-1"></a><span class="co">#2B 0.01 0.01 0.01 0.01   NA 0.01</span></span>
-<span id="cb37-16"><a href="#cb37-16" tabindex="-1"></a><span class="co">#3B 0.01 0.01 0.01 0.01 0.01   NA</span></span>
-<span id="cb37-17"><a href="#cb37-17" tabindex="-1"></a></span>
-<span id="cb37-18"><a href="#cb37-18" tabindex="-1"></a></span>
-<span id="cb37-19"><a href="#cb37-19" tabindex="-1"></a><span class="co">#$ML</span></span>
-<span id="cb37-20"><a href="#cb37-20" tabindex="-1"></a><span class="co">#[1] -848.0895</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="co">#$MLpars[[1]]</span></span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a><span class="co">#          1A           2A           3A           1B           2B           3B</span></span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a><span class="co">#4.842634e-16 1.080409e-01 7.843821e-02 4.029147e-09 3.018863e-02 3.018863e-02</span></span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a><span class="co">#$MLpars[[2]]</span></span>
+<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a><span class="co">#         1A          2A          3A          1B          2B          3B</span></span>
+<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a><span class="co">#0.002000000 0.002000109 0.002734071 0.001988593 0.002169052 0.003969142</span></span>
+<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" tabindex="-1"></a><span class="co">#$MLpars[[3]]</span></span>
+<span id="cb35-10"><a href="#cb35-10" tabindex="-1"></a><span class="co">#     1A   2A   3A   1B   2B   3B</span></span>
+<span id="cb35-11"><a href="#cb35-11" tabindex="-1"></a><span class="co">#1A   NA 0.01 0.01 0.01 0.01 0.01</span></span>
+<span id="cb35-12"><a href="#cb35-12" tabindex="-1"></a><span class="co">#2A 0.01   NA 0.01 0.01 0.01 0.01</span></span>
+<span id="cb35-13"><a href="#cb35-13" tabindex="-1"></a><span class="co">#3A 0.01 0.01   NA 0.01 0.01 0.01</span></span>
+<span id="cb35-14"><a href="#cb35-14" tabindex="-1"></a><span class="co">#1B 0.01 0.01 0.01   NA 0.01 0.01</span></span>
+<span id="cb35-15"><a href="#cb35-15" tabindex="-1"></a><span class="co">#2B 0.01 0.01 0.01 0.01   NA 0.01</span></span>
+<span id="cb35-16"><a href="#cb35-16" tabindex="-1"></a><span class="co">#3B 0.01 0.01 0.01 0.01 0.01   NA</span></span>
+<span id="cb35-17"><a href="#cb35-17" tabindex="-1"></a></span>
+<span id="cb35-18"><a href="#cb35-18" tabindex="-1"></a></span>
+<span id="cb35-19"><a href="#cb35-19" tabindex="-1"></a><span class="co">#$ML</span></span>
+<span id="cb35-20"><a href="#cb35-20" tabindex="-1"></a><span class="co">#[1] -848.0895</span></span></code></pre></div>
 </div>
 <div id="section-1" class="section level45">
 <p class="heading"></p>
@@ -882,7 +839,7 @@ found in concealed states. The use of the ‘masterBlock’ implies that you
 are using the same number of concealed as examined states. Here, we are
 generating a ‘masterBlock’ that yields a 3-state q matrix.</p>
 <p>The ‘masterBlock’ can be declared as follows:</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>masterBlock <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">99</span>, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>masterBlock <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">99</span>, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>in which ‘99’ is an example value you can use to populate the matrix
 at first, to be replaced by values you specify. If you make this value
 conspicuously different from others, you can ensure that you are not
@@ -893,15 +850,15 @@ states you are analyzing.</p>
 specify values for the ‘masterBlock’. The values have a row and column
 indicator, so that e.g. ‘[2,7]’ refers to position 7 in row 2, or to a
 transition from 2A to 7A more specifically.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">diag</span>(masterBlock) <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>masterBlock[<span class="dv">1</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">6</span></span>
-<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>masterBlock[<span class="dv">1</span>, <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="dv">7</span></span>
-<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a></span>
-<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>masterBlock[<span class="dv">2</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">8</span></span>
-<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>masterBlock[<span class="dv">2</span>, <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="dv">9</span></span>
-<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a></span>
-<span id="cb39-8"><a href="#cb39-8" tabindex="-1"></a>masterBlock[<span class="dv">3</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb39-9"><a href="#cb39-9" tabindex="-1"></a>masterBlock[<span class="dv">3</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">11</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">diag</span>(masterBlock) <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a>masterBlock[<span class="dv">1</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">6</span></span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a>masterBlock[<span class="dv">1</span>, <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a>masterBlock[<span class="dv">2</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">8</span></span>
+<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a>masterBlock[<span class="dv">2</span>, <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="dv">9</span></span>
+<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a>masterBlock[<span class="dv">3</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a>masterBlock[<span class="dv">3</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">11</span></span></code></pre></div>
 <p>After completing the declaration of the ‘masterBlock’, we will need
 to specify whether or not we want the variation in examined states to be
 exactly the same as in the concealed state (so that e.g. the transition
@@ -910,15 +867,15 @@ concealed state to have additional variation to account for type I error
 in transition rates (so that the total amount of transition parameters
 between concealed states is the same as between examined states, but the
 values are different). This is done by:</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>diff.conceal <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>diff.conceal <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span></code></pre></div>
 <p>Finally, we need to make sure the ‘masterBlock’ is used as a baseline
 for building the transition matrix in IDPARSLIST:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>myQ <span class="ot">&lt;-</span> <span class="fu">q_doubletrans</span>(traits, masterBlock, diff.conceal)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>myQ <span class="ot">&lt;-</span> <span class="fu">q_doubletrans</span>(traits, masterBlock, diff.conceal)</span></code></pre></div>
 <pre><code>## Warning in q_doubletrans(traits, masterBlock, diff.conceal): q_doubletrans assumes that the number of 
 ##             concealed traits is equal to the number of examined traits</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> myQ</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> myQ</span></code></pre></div>
 <p>Which makes our final q matrix look as follows:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]]</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]]</span></code></pre></div>
 <pre><code>##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
 ##  [1,]   NA    6    7    6    0    0    7    0    0
 ##  [2,]    8   NA    9    0    6    0    0    7    0
@@ -931,12 +888,12 @@ for building the transition matrix in IDPARSLIST:</p>
 ##  [9,]    0    0   10    0    0   11   10   11   NA</code></pre>
 <p>Matching the amount of variation in rates between the concealed
 states, yields the following:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>diff.conceal <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>myQ <span class="ot">&lt;-</span> <span class="fu">q_doubletrans</span>(traits, masterBlock, diff.conceal)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>diff.conceal <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb44-2"><a href="#cb44-2" tabindex="-1"></a>myQ <span class="ot">&lt;-</span> <span class="fu">q_doubletrans</span>(traits, masterBlock, diff.conceal)</span></code></pre></div>
 <pre><code>## Warning in q_doubletrans(traits, masterBlock, diff.conceal): q_doubletrans assumes that the number of 
 ##             concealed traits is equal to the number of examined traits</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> myQ</span>
-<span id="cb48-2"><a href="#cb48-2" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]]</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> myQ</span>
+<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]]</span></code></pre></div>
 <pre><code>##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
 ##  [1,]   NA    6    7   12    0    0   13    0    0
 ##  [2,]    8   NA    9    0   12    0    0   13    0
@@ -977,30 +934,30 @@ transitions from P-&gt;S and one from S-&gt;P. Transitions in opposite
 directions are better not fixed to the same multiplicative factor, so
 that at least two are needed here. In this case these are specified as
 follows:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="co">#shareFactors &lt;- c(.1, .2)</span></span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="co">#shareFactors &lt;- c(.1, .2)</span></span></code></pre></div>
 <p>INITFACTORS: Since these shared factors need initial parameter
 estimates, just as other transition parameters in the model do, we need
 to specify these. The initial guesses are best set to 1, so they behave
 similar to the parameters they are ‘tied’ to, unless we have very good
 evidence (e.g. from a previous run) that these are bigger or
 smaller:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a><span class="co">#initFactors &lt;- c(1, 1)</span></span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="co">#initFactors &lt;- c(1, 1)</span></span></code></pre></div>
 <p>Aside from setting these two parameters, we need to specify in our
 rate matrix which rate parameters we want to be governed by which
 factors. Imagine we have a 3-state matrix, where 1 refers to lobed feet,
 2 to semi-palmate and 3 to palmate:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a><span class="co"># diag(masterBlock) &lt;- NA</span></span>
-<span id="cb52-2"><a href="#cb52-2" tabindex="-1"></a><span class="co"># masterBlock[1, 2] &lt;- 6</span></span>
-<span id="cb52-3"><a href="#cb52-3" tabindex="-1"></a><span class="co"># masterBlock[1, 3] &lt;- 6.1  #factor 1: lobed to palmate</span></span>
-<span id="cb52-4"><a href="#cb52-4" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb52-5"><a href="#cb52-5" tabindex="-1"></a><span class="co"># masterBlock[2, 1] &lt;- 7</span></span>
-<span id="cb52-6"><a href="#cb52-6" tabindex="-1"></a><span class="co"># masterBlock[2, 3] &lt;- 8</span></span>
-<span id="cb52-7"><a href="#cb52-7" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb52-8"><a href="#cb52-8" tabindex="-1"></a><span class="co"># masterBlock[3, 1] &lt;- 7.2  #factor 2: palmate to lobed</span></span>
-<span id="cb52-9"><a href="#cb52-9" tabindex="-1"></a><span class="co"># masterBlock[3, 2] &lt;- 9</span></span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="co"># diag(masterBlock) &lt;- NA</span></span>
+<span id="cb50-2"><a href="#cb50-2" tabindex="-1"></a><span class="co"># masterBlock[1, 2] &lt;- 6</span></span>
+<span id="cb50-3"><a href="#cb50-3" tabindex="-1"></a><span class="co"># masterBlock[1, 3] &lt;- 6.1  #factor 1: lobed to palmate</span></span>
+<span id="cb50-4"><a href="#cb50-4" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb50-5"><a href="#cb50-5" tabindex="-1"></a><span class="co"># masterBlock[2, 1] &lt;- 7</span></span>
+<span id="cb50-6"><a href="#cb50-6" tabindex="-1"></a><span class="co"># masterBlock[2, 3] &lt;- 8</span></span>
+<span id="cb50-7"><a href="#cb50-7" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb50-8"><a href="#cb50-8" tabindex="-1"></a><span class="co"># masterBlock[3, 1] &lt;- 7.2  #factor 2: palmate to lobed</span></span>
+<span id="cb50-9"><a href="#cb50-9" tabindex="-1"></a><span class="co"># masterBlock[3, 2] &lt;- 9</span></span></code></pre></div>
 <p>Finally, we run the function secsse_ml_struc instead of secsse_ml,
 and make sure that both new parameters are included.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="co">#secsse_ml_struc(phylo_Vign..., shareFactors, initFactors)</span></span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a><span class="co">#secsse_ml_struc(phylo_Vign..., shareFactors, initFactors)</span></span></code></pre></div>
 <p>Multiplicative factors can also be used in connection with lambdas or
 mus, in the same way as they are used for transition rates. Note that in
 such case the factors will need to be unique across the entire dataset,
@@ -1036,12 +993,12 @@ hand, the species in the fifth row can pertain to all states: the first
 column would have a 1, the second a 2, the third a 3 (although if you
 only have this type of ambiguity, it is easier to assign ‘NA’ and use a
 single-column data file).</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="co">#       traits traits traits</span></span>
-<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a><span class="co"># [1,]      2      2      2</span></span>
-<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a><span class="co"># [2,]      1      1      1</span></span>
-<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a><span class="co"># [3,]      2      2      2</span></span>
-<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a><span class="co"># [4,]      3      1      1</span></span>
-<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a><span class="co"># [5,]      1      2      3</span></span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a><span class="co">#       traits traits traits</span></span>
+<span id="cb52-2"><a href="#cb52-2" tabindex="-1"></a><span class="co"># [1,]      2      2      2</span></span>
+<span id="cb52-3"><a href="#cb52-3" tabindex="-1"></a><span class="co"># [2,]      1      1      1</span></span>
+<span id="cb52-4"><a href="#cb52-4" tabindex="-1"></a><span class="co"># [3,]      2      2      2</span></span>
+<span id="cb52-5"><a href="#cb52-5" tabindex="-1"></a><span class="co"># [4,]      3      1      1</span></span>
+<span id="cb52-6"><a href="#cb52-6" tabindex="-1"></a><span class="co"># [5,]      1      2      3</span></span></code></pre></div>
 </div>
 <div id="do-you-feel-secsse-if-not-please-feel-free-to-e-mail-the-authors.-for-help-with-this-r-package-only." class="section level2">
 <h2>Do you feel SecSSE? If not, please feel free to e-mail the authors.

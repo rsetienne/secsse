@@ -22,7 +22,8 @@
 #' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
 #' @param maxiter max number of iterations. Default is
 #' '1000*round((1.25)^length(idparsopt))'.
-#' @param optimmethod method used for optimization. Default is 'simplex'.
+#' @param optimmethod method used for optimization. Available are simplex and
+#' subplex, default is 'subplex'. Simplex should only be used for debugging.
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param loglik_penalty the size of the penalty for all parameters; default is
 #'  0 (no penalty)
@@ -105,11 +106,11 @@ cla_secsse_ml <- function(phy,
                           sampling_fraction,
                           tol = c(1e-04, 1e-05, 1e-07),
                           maxiter = 1000 * round((1.25)^length(idparsopt)),
-                          optimmethod = "simplex",
+                          optimmethod = "subplex",
                           num_cycles = 1,
                           loglik_penalty = 0,
                           is_complete_tree = FALSE,
-                          verbose = (optimmethod == "subplex"),
+                          verbose = (optimmethod == "simplex"),
                           num_threads = 1,
                           atol = 1e-12,
                           rtol = 1e-12,
