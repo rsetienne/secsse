@@ -23,7 +23,7 @@ std::vector<int> find_desNodes(
     const std::vector< std::vector<double>>& phy_edge,
     int focal) {
   std::vector<int> output;
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
       output.push_back(phy_edge[i][1]);
     }
@@ -33,7 +33,7 @@ std::vector<int> find_desNodes(
 
 double get_dt(const std::vector< std::vector<double>>& phy_edge,
               int focal) {
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][1] == focal) {
       return phy_edge[i][2];
     }
@@ -48,7 +48,7 @@ void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
   (*desNodes).clear();
   (*timeInte).clear();
   std::vector<int> output;
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
       (*desNodes).push_back(phy_edge[i][1]);
       (*timeInte).push_back(phy_edge[i][2]);
@@ -61,7 +61,7 @@ std::vector<int> find_connections(
     int focal) {
   std::vector<int> output(2);
   int cnt = 0;
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
      output[cnt] = phy_edge[i][1];
      cnt++;
@@ -120,9 +120,9 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v) {
   (*v) = std::vector< std::vector< double> >(m.nrow(),
             std::vector<double>(m.ncol(), 0.0));
-  for (size_t i = 0; i < m.nrow(); ++i) {
+  for (int i = 0; i < m.nrow(); ++i) {
     std::vector<double> row(m.ncol(), 0.0);
-    for (size_t j = 0; j < m.ncol(); ++j) {
+    for (int j = 0; j < m.ncol(); ++j) {
       row[j] = m(i, j);
     }
     (*v)[i] = row;
@@ -130,28 +130,48 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   return;
 }
 
-void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
-                    std::vector< std::vector< std::vector<double >>>* v) {
-  int n = l.size();
-
-  (*v) = std::vector< std::vector< std::vector<double>>>(n);
-  for (size_t i = 0; i < n; ++i) {
-    std::vector< std::vector< double >> entry;
-    Rcpp::NumericMatrix temp = l[i];
-    numericmatrix_to_vector(temp, &entry);
-    (*v).push_back(entry);
+std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m) {
+  auto v = std::vector< std::vector< double> >(m.nrow(), 
+                                               std::vector<double>(m.ncol(), 
+                                                                   0.0));
+  for (int i = 0; i < m.nrow(); ++i) {
+    std::vector<double> row(m.ncol(), 0.0);
+    for (int j = 0; j < m.ncol(); ++j) {
+      row[j] = m(i, j);
+    }
+    v[i] = row;
   }
-  return;
+  return v;
+}
+
+std::vector< std::vector< std::vector<double >>>  
+  list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& ll) {
+  
+  std::vector< std::vector< std::vector< double > >> ll_cpp;
+  for (size_t i = 0; i < ll.size(); ++i) {
+    Rcpp::NumericMatrix temp = ll[i];
+    std::vector< std::vector< double >> temp2;
+    for (size_t j = 0; j < temp.nrow(); ++j) {
+      std::vector<double> row;
+      for (size_t k = 0; k < temp.ncol(); ++k) {
+        row.push_back(temp(j, k));
+      }
+      temp2.push_back(row);
+    }
+    ll_cpp.push_back(temp2);
+  }
+  
+  return ll_cpp;
 }
 
 
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix* m) {
-  int n_rows = v.size();
-  int n_cols = v[0].size();
+  size_t n_rows = v.size();
+  size_t n_cols = v[0].size();
   (*m) = Rcpp::NumericMatrix(n_rows, n_cols);
-  for (int i = 0; i < n_rows; ++i) {
-    for (int j = 0; j < n_cols; ++j) {
+  for (size_t i = 0; i < n_rows; ++i) {
+    for (size_t j = 0; j < n_cols; ++j) {
       (*m)(i, j) = v[i][j];
     }
   }
@@ -160,7 +180,7 @@ void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
 
 void output_vec(const std::vector<double>& v) {
   // std::cerr << "vec: ";
-  //  for (int i = 0; i < v.size(); ++i) {
+  //  for (size_t i = 0; i < v.size(); ++i) {
   //    std::cerr << v[i] << " ";
   //} std::cerr << "\n";
 }

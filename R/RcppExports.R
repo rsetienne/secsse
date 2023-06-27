@@ -5,23 +5,6 @@ ct_condition_cla <- function(y, t, ll, mm, Q, method, atol, rtol) {
     .Call(`_secsse_ct_condition_cla`, y, t, ll, mm, Q, method, atol, rtol)
 }
 
-#' function to do cpp stuff
-#' @param ances ances
-#' @param states_R states_R
-#' @param forTime_R fr
-#' @param lambdas l
-#' @param mus mus
-#' @param Q Q
-#' @param method method
-#' @param atol atol
-#' @param rtol rtol
-#' @param is_complete_tree ss
-#' @export
-#' @return A named list with:
-#'   * Numeric vector with states
-#'   * Numeric vector of length 1 with loglik
-#'   * Numeric vector merge branch
-#'   * Numeric vector nodeM
 cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree) {
     .Call(`_secsse_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree)
 }
@@ -44,10 +27,6 @@ ct_condition <- function(y, t, ll, mm, Q, method, atol, rtol) {
 
 calThruNodes_store_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps, verbose) {
     .Call(`_secsse_calThruNodes_store_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps, verbose)
-}
-
-calc_ll_threaded <- function(ll, mm, Q, ances, for_time, states, num_threads, method = "odeint::bulirsch_stoer", is_complete_tree = FALSE) {
-    .Call(`_secsse_calc_ll_threaded`, ll, mm, Q, ances, for_time, states, num_threads, method, is_complete_tree)
 }
 
 secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries) {

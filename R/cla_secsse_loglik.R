@@ -101,7 +101,7 @@ cla_secsse_loglik <- function(parameter,
   Q <- parameter[[3]]  # nolint
 
   num_modeled_traits <- ncol(Q) / floor(num_concealed_states)
-  
+
   if (is.null(setting_calculation)) {
     check_input(traits,
                 phy,

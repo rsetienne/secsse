@@ -68,7 +68,6 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector<double> timeInte;
   long double loglik = 0;
   for (int a = 0; a < ances.size(); ++a) {
-   
     int focal = ances[a];
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
@@ -80,8 +79,6 @@ double calc_ll_cla(const Rcpp::List& ll,
 
       y = (*states)[focal_node];
       
-  //    std::cerr << focal << " " << focal_node << " " << timeInte[i] << "\n";
-
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr),     // ode class object
@@ -99,8 +96,6 @@ double calc_ll_cla(const Rcpp::List& ll,
     normalize_loglik_node(&nodeM, &loglik);
     normalize_loglik_node(&nodeN, &loglik);
 
-  //  std::cerr << loglik << " ";
-    
     mergeBranch = std::vector<double>(d, 0.0);
 
     for (size_t i = 0; i < d; ++i) {
@@ -117,8 +112,6 @@ double calc_ll_cla(const Rcpp::List& ll,
 
     normalize_loglik(&mergeBranch, &loglik);
 
-  //  std::cerr << loglik << "\n";
-    
     std::vector<double> newstate(d);
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
@@ -135,7 +128,7 @@ double calc_ll_cla(const Rcpp::List& ll,
   for (int i = 0; i < nodeM.size(); ++i) {
     (*nodeM_out).push_back(nodeM[i]);
   }
-   
+
   return loglik;
 }
 
@@ -189,23 +182,6 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
 }
 
 
-//' function to do cpp stuff
-//' @param ances ances
-//' @param states_R states_R
-//' @param forTime_R fr
-//' @param lambdas l
-//' @param mus mus
-//' @param Q Q
-//' @param method method
-//' @param atol atol
-//' @param rtol rtol
-//' @param is_complete_tree ss
-//' @export
-//' @return A named list with:
-//'   * Numeric vector with states
-//'   * Numeric vector of length 1 with loglik
-//'   * Numeric vector merge branch
-//'   * Numeric vector nodeM
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& states_R,

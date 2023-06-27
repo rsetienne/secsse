@@ -159,11 +159,10 @@ startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylo_Vign))
 intGuessLamba <- startingpoint$lambda0
 intGuessMu <- startingpoint$mu0
 #Make sure that the dimensions of initparsopt agree with those of
-#idparslist and idparsopt, especially in the case of the initial
-#guesses for rates supplied to the Q matrix. Rules of thumb are
-#that if n=number of examined states, both intGuessLamba and
-#intGuessMu should be replicated 2n times, and (intGuessLamba / 5)
-#should be replicated (2n)2/2 times:
+#idparsopt. We have idparsopt <- c(1:9, 11) here, so we have 10 parameters
+#which correspond (look at idparslist) to 9 lambdas and 1 transition rate.
+#Here the transition rate is initially set at 20% (one fifth) of the initial
+#guess for lambda:
 initparsopt <- c(rep(intGuessLamba, 9), rep((intGuessLamba / 5), 1))
 
 ## -----------------------------------------------------------------------------

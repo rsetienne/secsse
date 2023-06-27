@@ -12,8 +12,9 @@
 #' tree is not conditioned on this number, but that this is a safeguard against
 #' generating extremely large trees).
 #' @param conditioning can be 'obs_states', 'true_states' or 'none', the tree is
-#' simulated until one is generated that contains all observed states, all
-#' true states (e.g. obs x hidden states), or is always returned.
+#' simulated until one is generated that contains all observed states
+#' ('obs_states'), all true states (e.g. all combinations of obs and hidden
+#' states), or is always returned ('none').
 #' @param non_extinction should the tree be conditioned on non-extinction of the
 #' crown lineages? Default is TRUE.
 #' @param verbose provide intermediate output.
@@ -114,9 +115,9 @@ secsse_sim <- function(lambdas,
   initialState  <- res$initial_state
   Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
                                            # not at crown age
-  notmin1 = which(Ltable[, 4] != -1)
-  Ltable[notmin1, 4] = crown_age - c(Ltable[notmin1, 4])
-  Ltable[which(Ltable[, 4] == crown_age + 1), 4] = -1          
+  notmin1 <- which(Ltable[, 4] != -1)
+  Ltable[notmin1, 4] <- crown_age - c(Ltable[notmin1, 4])
+  Ltable[which(Ltable[, 4] == crown_age + 1), 4] <- -1
 
   indices       <- seq(1, length(res$traits), by = 2)
   speciesTraits <- 1 + res$traits[indices]
@@ -130,10 +131,9 @@ secsse_sim <- function(lambdas,
 
   true_traits <- names(mus)[true_traits]
   obs_traits <- c()
-  for (i in 1:length(true_traits)) {
+  for (i in seq_along(true_traits)) {
     obs_traits[i] <- stringr::str_sub(true_traits[i], 1, -2)
   }
-  #obs_traits <- as.numeric(gsub("[^0-9.-]", "", true_traits))
 
   if (sum(Ltable[, 4] < 0)) {
       return(list(phy = phy,

@@ -8,11 +8,11 @@ likelihood inference run.}
 extract_par_vals(param_posit, ml_pars)
 }
 \arguments{
-\item{param_posit}{initial parameter structure, consisting of a list with 
+\item{param_posit}{initial parameter structure, consisting of a list with
 three entries: 1) lambda matrices, 2) mus and 3) Q matrix. In each entry,
 integers numbers (1-n) indicate the parameter to be optimized}
 
-\item{ml_pars}{resulting parameter estimates as returned by for instance 
+\item{ml_pars}{resulting parameter estimates as returned by for instance
 cla_secsse_ml, having the same structure as param_post}
 }
 \value{

@@ -1,4 +1,3 @@
-
 # SecSSE: Several Examined and Concealed States-Dependent Speciation and Extinction
 
 <!-- badges: start -->

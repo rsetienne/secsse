@@ -116,47 +116,47 @@ secsse_ml <- function(phy,
                       atol = 1e-12,
                       rtol = 1e-12,
                       method = "odeint::bulirsch_stoer") {
-    
+
     structure_func <- NULL
     check_input(traits,
                 phy,
                 sampling_fraction,
                 root_state_weight,
                 is_complete_tree)
-    
+
     if (is.matrix(traits)) {
         warning("You are setting a model where some species had more than 
             one trait state.")
     }
-    
+
     if (length(initparsopt) != length(idparsopt)) {
         stop("initparsopt must be the same length as idparsopt. 
              Number of parameters to optimize does not match the number of 
              initial values for the search")
     }
-    
+
     if (length(idparsfix) != length(parsfix)) {
         stop("idparsfix and parsfix must be the same length. 
              Number of fixed elements does not match the fixed figures")
     }
-    
+
     if (anyDuplicated(c(idparsopt, idparsfix)) != 0) {
         stop("At least one element was asked to be both fixed and estimated ")
     }
-    
+
     if (identical(as.numeric(sort(c(idparsopt, idparsfix))),
                   as.numeric(sort(unique(unlist(idparslist))))) == FALSE) {
         stop("All elements in idparslist must be included in either 
              idparsopt or idparsfix ")
     }
-    
+
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
         warning("You set some transitions as impossible to happen")
     }
-    
+
     see_ancestral_states <- FALSE
-    
+
     utils::flush.console()
     trparsopt <- initparsopt / (1 + initparsopt)
     trparsopt[which(initparsopt == Inf)] <- 1
@@ -169,14 +169,14 @@ secsse_ml <- function(phy,
                     idparsopt,
                     initparsopt)
     optimpars <- c(tol, maxiter)
-    
+
     setting_calculation <- build_initStates_time(phy,
                                                  traits,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
                                                  mus)
-    
+
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                           trparsfix = trparsfix,
                                           idparsopt = idparsopt,
@@ -203,7 +203,8 @@ secsse_ml <- function(phy,
                                           method = method)
     
     print_init_ll(initloglik = initloglik, verbose = verbose)
-        if (initloglik == -Inf) {
+    
+    if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 
              Try again with different initial values.")
@@ -264,30 +265,30 @@ transf_funcdefpar <- function(idparsfuncdefpar,
                               idparsopt) {
     trparfuncdefpar <- NULL
     ids_all <- c(idparsfix, idparsopt)
-    
+
     values_all <- c(trparsfix / (1 - trparsfix),
                     trparsopt / (1 - trparsopt))
     a_new_envir <- new.env()
     x <- as.list(values_all)  ## To declare all the ids as variables
-    
+
     if (is.null(idfactorsopt)) {
         names(x) <- paste0("par_", ids_all)
     } else {
         names(x) <- c(paste0("par_", ids_all), paste0("factor_", idfactorsopt))
     }
     list2env(x, envir = a_new_envir)
-    
+
     for (jj in seq_along(functions_defining_params)) {
         myfunc <- functions_defining_params[[jj]]
         environment(myfunc) <- a_new_envir
         value_func_defining_parm <- local(myfunc(), envir = a_new_envir)
-        
+
         ## Now, declare the variable that is just calculated, so it is available
         ## for the next calculation if needed
         y <- as.list(value_func_defining_parm)
         names(y) <- paste0("par_", idparsfuncdefpar[jj])
         list2env(y, envir = a_new_envir)
-        
+
         if (is.numeric(value_func_defining_parm) == FALSE) {
             stop("Something went wrong with the calculation of 
                  parameters in 'functions_param_struct'")
@@ -330,18 +331,18 @@ transform_params_cla <- function(idparslist,
     for (j in seq_len(nrow(trpars1[[3]]))) {
         trpars1[[1]][[j]][, ] <- NA
     }
-    
+
     for (j in 2:3) {
         trpars1[[j]][] <- NA
     }
-    
+
     if (length(idparsfix) != 0) {
         trpars1 <- update_values_transform_cla(trpars1,
                                                idparslist,
                                                idparsfix,
                                                trparsfix)
     }
-    
+
     trpars1 <- update_values_transform_cla(trpars1,
                                            idparslist,
                                            idparsopt,
@@ -353,19 +354,19 @@ transform_params_cla <- function(idparslist,
                                                idparsfuncdefpar,
                                                trparfuncdefpar)
     }
-    
+
     pre_pars1 <- list()
     pars1 <- list()
-    
+
     for (j in seq_len(nrow(trpars1[[3]]))) {
         pre_pars1[[j]] <- trpars1[[1]][[j]][, ] / (1 - trpars1[[1]][[j]][, ])
     }
-    
+
     pars1[[1]] <- pre_pars1
     for (j in 2:3) {
         pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
     }
-    
+
     return(pars1)
 }
 
@@ -402,12 +403,12 @@ transform_params_normal <- function(idparslist,
                                            idparsfix,
                                            trparsfix)
     }
-    
+
     trpars1 <- update_values_transform(trpars1,
                                        idparslist,
                                        idparsopt,
                                        trparsopt)
-    
+
     ## if structure_func part
     if (is.null(structure_func) == FALSE) {
         trpars1 <- update_values_transform(trpars1,
@@ -432,7 +433,7 @@ secsse_transform_parameters <- function(trparsopt,
     if (!is.null(structure_func)) {
         idparsfuncdefpar <- structure_func[[1]]
         functions_defining_params <- structure_func[[2]]
-        
+
         if (length(structure_func[[3]]) > 1) {
             idfactorsopt <- structure_func[[3]]
         } else {
@@ -442,7 +443,7 @@ secsse_transform_parameters <- function(trparsopt,
                 idfactorsopt <- structure_func[[3]]
             }
         }
-        
+
         trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar =
                                                  idparsfuncdefpar,
                                              functions_defining_params =
@@ -453,7 +454,7 @@ secsse_transform_parameters <- function(trparsopt,
                                              idparsfix = idparsfix,
                                              idparsopt = idparsopt)
     }
-    
+
     if (is.list(idparslist[[1]])) {
         # when the ml function is called from cla_secsse
         pars1 <- transform_params_cla(idparslist,
@@ -506,7 +507,7 @@ secsse_loglik_choosepar <- function(trparsopt,
         pars1 <- secsse_transform_parameters(trparsopt, trparsfix,
                                              idparsopt, idparsfix,
                                              idparslist, structure_func)
-        
+
         if (is.list(pars1[[1]])) {
             # is the cla_ used?
             loglik <- secsse::cla_secsse_loglik(parameter = pars1,
@@ -515,14 +516,17 @@ secsse_loglik_choosepar <- function(trparsopt,
                                                 num_concealed_states =
                                                     num_concealed_states,
                                                 cond = cond,
-                                                root_state_weight = root_state_weight,
-                                                sampling_fraction = sampling_fraction,
+                                                root_state_weight =
+                                                    root_state_weight,
+                                                sampling_fraction =
+                                                    sampling_fraction,
                                                 setting_calculation =
                                                     setting_calculation,
                                                 see_ancestral_states =
                                                     see_ancestral_states,
                                                 loglik_penalty = loglik_penalty,
-                                                is_complete_tree = is_complete_tree,
+                                                is_complete_tree =
+                                                    is_complete_tree,
                                                 num_threads = num_threads,
                                                 method = method,
                                                 atol = atol,

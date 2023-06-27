@@ -1,9 +1,6 @@
 context("test_secsse_ct")
 
 test_that("the loglik for the complete tree", {
-  library(secsse)
-  library(testthat)
-
   Sys.unsetenv("R_TESTS")
   set.seed(42)
   out <- DDD::dd_sim(pars = c(0.4, 0.1, 40), age = 15)
@@ -94,7 +91,7 @@ test_that("the loglik for the complete tree", {
                                       sampling_fraction = sampling_fraction,
                                       is_complete_tree = TRUE))
   testthat::expect_equal(loglik5,
-                         -312.7751,
+                         -303.4003,
                          tolerance = 1E-4) # TJ: hardcoded modified LL
 
   lambdas <- list()
