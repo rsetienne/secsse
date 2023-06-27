@@ -42,7 +42,7 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
-  testthat::expect_warning(
+  testthat::expect_warning(testthat::expect_output(
     model <- secsse_ml_func_def_pars(phy = phylotree,
                                    traits = traits,
                                    num_concealed_states = num_concealed_states,
@@ -63,7 +63,7 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
                                    maxiter = maxiter,
                                    optimmethod = optimmethod,
                                    num_cycles = 1)
-  )
+  ))
 
   testthat::expect_equal(model$ML, -12.87974)
 })
