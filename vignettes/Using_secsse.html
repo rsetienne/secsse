@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Leonel Herrera-Alsina, Paul van Els &amp; Rampal S. Etienne" />
+
+<meta name="date" content="2023-06-27" />
+
+<title>Using SecSSE ML search</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using SecSSE ML search</h1>
+<h4 class="author">Leonel Herrera-Alsina, Paul van Els &amp; Rampal S.
+Etienne</h4>
+<h4 class="date">2023-06-27</h4>
+
+
+
+<div id="secsse-introduction" class="section level2">
+<h2>SecSSE introduction</h2>
+<p>SecSSE is an R package designed for multistate data sets under a
+concealed state and speciation (‘hisse’) framework. In this sense, it is
+parallel to the ‘MuSSE’ functionality implemented in ‘diversitree’, but
+it accounts for finding possible spurious relationships between traits
+and diversification rates (‘false positives’, Rabosky &amp; Goldberg
+2015) by testing against a ‘hidden trait’ (Beaulieu et al. 2013), which
+is responsible for more variation in diversification rates than the
+trait being investigated.</p>
+</div>
+<div id="secsse-input-files" class="section level2">
+<h2>SecSSE input files</h2>
+<p>A good practice is always remove all the objects in memory and then
+load SecSSE:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(secsse)</span></code></pre></div>
+<p>Similar to the ‘diversitree’ (Fitzjohn et al. 2012) and ‘hisse’
+(Beaulieu &amp; O’Meara 2016) packages, SecSSE uses two input files: a
+rooted, ultrametric tree in nexus format (for conversion of other
+formats to nexus, we refer to the documentation in package ‘ape’) and a
+data file with two columns, the first containing taxa names and the
+second a numeric code for trait state with a header (usually 0,1,2,3,
+etc., but notice that ‘NA’ is a valid code too, if you are not sure what
+trait state to assign to a taxon). A comma-separated value file (.csv)
+generated in MsExcel works particularly well. The *.csv file can be
+loaded into R using the read.csv() function. and should look like
+this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">data</span>(traitinfo)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>trait <span class="ot">&lt;-</span> traitinfo</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">tail</span>(trait)</span></code></pre></div>
+<pre><code>##     species states
+## 171 out_171      2
+## 172 out_172      3
+## 173 out_173      2
+## 174 out_174      2
+## 175 out_175      3
+## 176 out_176      1</code></pre>
+<p>This data set (here we see only the bottom lines of the data frame)
+has three character states labeled as 1, 2 and 3. Notice that unless you
+want to assign ambiguity to some but not all states (see below), the
+third column in your data file should be empty. Ambiguity about trait
+state (you are not sure which trait state to assign a taxon too, or you
+have no data on trait state for a particular taxon), can be assigned
+using ‘NA’. SecSSE handles ‘NA’ differently from a full trait state, in
+that it assigns probabilities to all trait states for a taxon demarcated
+with ‘NA’.</p>
+<p>The second object we need is an ultrametric phylogenetic tree, that
+is rooted and has labeled tips. One can load it in R by using
+read.nexus(). In our example we load a prepared phylogeny named
+“phylo_Vign”:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;phylo_Vign&quot;</span>)</span></code></pre></div>
+<p>For running SecSSE it is important that tree tip labels agree with
+taxon names in the data file, but also that these are in the same order.
+For this purpose, we run the following piece of code prior to any
+analysis:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>traits <span class="ot">&lt;-</span> <span class="fu">sortingtraits</span>(trait, phylo_Vign)</span></code></pre></div>
+<p>If there is a mismatch in the number of taxa between data and tree
+file, you will receive an error message. However, to then identify which
+taxa are causing issues and if they are in the tree or data file, you
+can use the name.check function in the ‘geiger’(Harmon et al. 2008)
+package:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">library</span>(geiger)</span></code></pre></div>
+<pre><code>## Loading required package: ape</code></pre>
+<pre><code>## Loading required package: phytools</code></pre>
+<pre><code>## Loading required package: maps</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co">#making sure that the first line is identified as containing header info:</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">rownames</span>(trait) <span class="ot">&lt;-</span> trait[, <span class="dv">1</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#pick out all elements that do not agree between tree and data</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>mismat <span class="ot">&lt;-</span> <span class="fu">name.check</span>(phylo_Vign, trait)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#this will call all taxa that are in the tree, but not the data file</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#mismat$tree_not_data</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#and conversely,</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#mismat$data_not_tree</span></span></code></pre></div>
+<p>If you have taxa in your tree file that do not appear in your trait
+file, it is worth adding them with value ‘NA’ for trait state. After you
+are done properly setting up your data, you can proceed to setting
+parameters and constraints.</p>
+</div>
+<div id="parameter-settings-and-constraints" class="section level2">
+<h2>Parameter settings and constraints</h2>
+<p>SecSSE allows for the implementation of different models of
+evolution, and just as in ‘diversitree’ and ‘hisse’, parameters can be
+fixed at certain values (if prior information is known on particular
+values) or made to be equal to each other. Initial parameter values can
+also be supplied, to start off the maximum likelihood search with. The
+main function in the SecSSE package is secsse_ml, which performs a
+maximum likelihood search and uses as input a set of speciation rate
+parameters (lambda), a set of extinction rate parameters (mu), and a
+matrix composed of transition rates (q) between the various states. The
+identifiers of the parameters are broadly the same as those used in
+‘hisse’, and numbers indicate examined state, whereas letters denote
+concealed state, 2A for example being in examined state 2, and concealed
+state A.</p>
+<p>Both the speciation and extinction parameters are supplied as
+vectors, and the transition rates are supplied as a matrix, joined in a
+list.</p>
+<p>The function secsse_ml takes the following arguments, PHY, TRAITS,
+NUM_CONCEALED_STATES, IDPARSLIST, INITPARSOPT, IDPARSOPT, IDPARSFIX,
+PARSFIX, COND,WEIGHTTRAITS, SAMPLING_FRACTION, TOL, METHODE,
+OPTIMMETHOD, and bigtree. These are best declared outside of the
+secsse_ml function, then called in the function. We discuss these here
+chronologically:</p>
+<p>PHY: a user-supplied phylogenetic tree of class ‘phylo’ (see
+above)</p>
+<p>TRAITS: user-supplied trait data of class ‘data frame’ (see
+above)</p>
+<p>NUM_CONCEALED_STATES: In general, we recommend this value to be equal
+to the number of examined states in your data set (that way they have
+the same parametric complexity), however , this may or may not be
+computationally tractable depending on the size of the tree. An
+alternative is to set this value to 3, an advantage of having just three
+concealed states is that data interpretation gets a lot easier. Notice
+this value needs to be specified also under id_paramPos.</p>
+<p>IDPARSLIST: a list of parameters to be supplied to the function. This
+list contains information on the number of parameters, as well as on how
+parameters interact. E.g., if we would like all speciation rates to
+behave similarly or if we want two transition rates to be identical, we
+can set this up here. Setting the parameters for this argument is the
+bulk of the work for setting up the model, especially when the number of
+states is relatively high.</p>
+<p>The following is a visual example of the input parameters of SecSSE,
+this list is composed of three elements, one containing the number of
+parameters for lambda, one for mu, and a matrix of transition rates.
+Notice that this list contains the set-up for a model in which all
+parameters are free, every parameter having a unique value, indicating
+that each parameter is optimized separately. The diagonal of the q
+matrix is always set to NA, because transitions within a state are not
+possible. The dimensions of the transition matrix follow the following
+rule: (3n)2, where n is the number of observed states. Needless to say,
+we have not tried running SecSSE with n&gt;10, both for computational
+and practical reasons, and neither should you probably, especially in
+combination with large trees.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># First we have to define idparslist, as well as, again,</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co"># a user-specified value for the number of concealed states</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co"># to be assessed by SecSSE.</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">id_paramPos</span>(traits, <span class="at">num_concealed_states =</span> <span class="dv">3</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#Let&#39;s take a look at the full all-free model by now simply typing</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>idparslist</span></code></pre></div>
+<pre><code>## $lambdas
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+##  1  2  3  4  5  6  7  8  9 
+## 
+## $mus
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+## 10 11 12 13 14 15 16 17 18 
+## 
+## $Q
+##    1A 2A 3A 1B 2B 3B 1C 2C 3C
+## 1A NA 19 20 21 22 23 24 25 26
+## 2A 27 NA 28 29 30 31 32 33 34
+## 3A 35 36 NA 37 38 39 40 41 42
+## 1B 43 44 45 NA 46 47 48 49 50
+## 2B 51 52 53 54 NA 55 56 57 58
+## 3B 59 60 61 62 63 NA 64 65 66
+## 1C 67 68 69 70 71 72 NA 73 74
+## 2C 75 76 77 78 79 80 81 NA 82
+## 3C 83 84 85 86 87 88 89 90 NA</code></pre>
+<p>If we would like the speciation rate of states 1B and 2B to be the
+same, we can do this as follows:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># idparslist[[1]][c(5,6)] &lt;- 5</span></span></code></pre></div>
+<p>Notice that if one were to set extinction parameters to be the same,
+the numbering used to identify parameters is not the same as that in
+idparslist, but rather consecutive numbering referring to the elements
+within the extinction parameters component in idparslist:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co">#idparslist[[2]][c(1:9)] &lt;- 7</span></span></code></pre></div>
+<p>There are also several things we can do to improve the rate matrix
+and reduce its computational complexity. First of all, we should leave
+transitions between the same state out of the calculations with a simple
+command that orders all values on the diagonal of the matrix not to be
+calculated. This is included as a default within idparslist, but after
+modifying the q matrix in any way, it is a good idea to ensure that the
+diagonals are still not included in the calculations:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">diag</span>(idparslist[[<span class="dv">3</span>]]) <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code></pre></div>
+<p>Additionally, we would like to set all dual transitions (so for
+example from state 0 to 1 AND from concealed state A to B) to 0, as
+these are unlikely to occur. It is a bit of a matter of personal
+preference whether or not you should do this, but we follow Beaulieu
+&amp; O’Meara (2016) here and set dual transitions to zero. One good
+reason for doing so is simply to reduce computational burden.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">7</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
+<p>These three actions together then yield the following:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>idparslist</span></code></pre></div>
+<pre><code>## $lambdas
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+##  1  2  3  4  5  6  7  8  9 
+## 
+## $mus
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+## 10 11 12 13 14 15 16 17 18 
+## 
+## $Q
+##    1A 2A 3A 1B 2B 3B 1C 2C 3C
+## 1A NA 19 20 21  0  0 24  0  0
+## 2A 27 NA 28  0 30  0  0 33  0
+## 3A 35 36 NA  0  0 39  0  0 42
+## 1B 43  0  0 NA 46 47 48  0  0
+## 2B  0 52  0 54 NA 55  0 57  0
+## 3B  0  0 61 62 63 NA  0  0 66
+## 1C 67  0  0 70  0  0 NA 73 74
+## 2C  0 76  0  0 79  0 81 NA 82
+## 3C  0  0 85  0  0 88 89 90 NA</code></pre>
+<p>Notice that all entries in the lambda and mu vectors, as well as the
+rate matrix should be supplied to either idparsopt or idparsfix,
+including the zeros that represent dual transitions (which are supplied
+to idparsfix and set to zero under parsfix.</p>
+<p>Numbers in all elements of the list can be skipped without a problem,
+as long as they are supplied correctly to other arguments. When
+Q-matrices get larger, it can be good to specify all values in the
+matrices separately and consecutively (no matter how laborious), for
+reasons of intuition. This can facilitate setting up idparsopt,
+idparsfix, and initparsopt, as well as help in setting up different
+models (using various combinations of parameter constraints) along the
+way. Here is a piece of code that can be copied for a 3-state
+analysis:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">2</span>)] <span class="ot">&lt;-</span> <span class="dv">19</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">3</span>)] <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">4</span>)] <span class="ot">&lt;-</span> <span class="dv">21</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">7</span>)] <span class="ot">&lt;-</span> <span class="dv">22</span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">1</span>)] <span class="ot">&lt;-</span> <span class="dv">23</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">3</span>)] <span class="ot">&lt;-</span> <span class="dv">24</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">5</span>)] <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">26</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">1</span>)] <span class="ot">&lt;-</span> <span class="dv">27</span></span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">2</span>)] <span class="ot">&lt;-</span> <span class="dv">28</span></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">29</span></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">1</span>)] <span class="ot">&lt;-</span> <span class="dv">31</span></span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">5</span>)] <span class="ot">&lt;-</span> <span class="dv">32</span></span>
+<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">33</span></span>
+<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">7</span>)] <span class="ot">&lt;-</span> <span class="dv">34</span></span>
+<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">2</span>)] <span class="ot">&lt;-</span> <span class="dv">35</span></span>
+<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">4</span>)] <span class="ot">&lt;-</span> <span class="dv">36</span></span>
+<span id="cb19-23"><a href="#cb19-23" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">37</span></span>
+<span id="cb19-24"><a href="#cb19-24" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">38</span></span>
+<span id="cb19-25"><a href="#cb19-25" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-26"><a href="#cb19-26" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">3</span>)] <span class="ot">&lt;-</span> <span class="dv">39</span></span>
+<span id="cb19-27"><a href="#cb19-27" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">4</span>)] <span class="ot">&lt;-</span> <span class="dv">40</span></span>
+<span id="cb19-28"><a href="#cb19-28" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">5</span>)] <span class="ot">&lt;-</span> <span class="dv">41</span></span>
+<span id="cb19-29"><a href="#cb19-29" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">42</span></span>
+<span id="cb19-30"><a href="#cb19-30" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">7</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-31"><a href="#cb19-31" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">1</span>)] <span class="ot">&lt;-</span> <span class="dv">43</span></span>
+<span id="cb19-32"><a href="#cb19-32" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">4</span>)] <span class="ot">&lt;-</span> <span class="dv">44</span></span>
+<span id="cb19-33"><a href="#cb19-33" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">45</span></span>
+<span id="cb19-34"><a href="#cb19-34" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">46</span></span>
+<span id="cb19-35"><a href="#cb19-35" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-36"><a href="#cb19-36" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">2</span>)] <span class="ot">&lt;-</span> <span class="dv">47</span></span>
+<span id="cb19-37"><a href="#cb19-37" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">5</span>)] <span class="ot">&lt;-</span> <span class="dv">48</span></span>
+<span id="cb19-38"><a href="#cb19-38" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">7</span>)] <span class="ot">&lt;-</span> <span class="dv">49</span></span>
+<span id="cb19-39"><a href="#cb19-39" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb19-40"><a href="#cb19-40" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-41"><a href="#cb19-41" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">3</span>)] <span class="ot">&lt;-</span> <span class="dv">51</span></span>
+<span id="cb19-42"><a href="#cb19-42" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">52</span></span>
+<span id="cb19-43"><a href="#cb19-43" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">7</span>)] <span class="ot">&lt;-</span> <span class="dv">53</span></span>
+<span id="cb19-44"><a href="#cb19-44" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">54</span></span>
+<span id="cb19-45"><a href="#cb19-45" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-46"><a href="#cb19-46" tabindex="-1"></a><span class="fu">diag</span>(idparslist[[<span class="dv">3</span>]]) <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code></pre></div>
+<p>This yields the following data setup:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>idparslist</span></code></pre></div>
+<pre><code>## $lambdas
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+##  1  2  3  4  5  6  7  8  9 
+## 
+## $mus
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+## 10 11 12 13 14 15 16 17 18 
+## 
+## $Q
+##    1A 2A 3A 1B 2B 3B 1C 2C 3C
+## 1A NA 19 20 21  0  0 22  0  0
+## 2A 23 NA 24  0 25  0  0 26  0
+## 3A 27 28 NA  0  0 29  0  0 30
+## 1B 31  0  0 NA 32 33 34  0  0
+## 2B  0 35  0 36 NA 37  0 38  0
+## 3B  0  0 39 40 41 NA  0  0 42
+## 1C 43  0  0 44  0  0 NA 45 46
+## 2C  0 47  0  0 48  0 49 NA 50
+## 3C  0  0 51  0  0 52 53 54 NA</code></pre>
+<p>INITPARSOPT: user-supplied values of parameters, a vector of values
+of lambda, mu, and q that should agree in number with the number of
+parameters specified in the model. If values are known beforehand, they
+can be specified as follows for the case of the above defined parameter
+set, where there are 5 lambda’s (two equal), 6 mu’s (all free), and q’s
+(all free, but no dual transitions):</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">1.2</span>, <span class="dv">9</span>), <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">9</span>), <span class="fu">rep</span>(<span class="fl">0.25</span>, <span class="dv">36</span>))</span></code></pre></div>
+<p>IDPARSOPT: the id’s of the parameters we want to optimize (versus
+those that are to be fixed). The id’s should correspond to those
+specified under idparslist. For example, if we take our previously
+defined idparslist:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>idparslist</span></code></pre></div>
+<pre><code>## $lambdas
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+##  1  2  3  4  5  6  7  8  9 
+## 
+## $mus
+## 1A 2A 3A 1B 2B 3B 1C 2C 3C 
+## 10 11 12 13 14 15 16 17 18 
+## 
+## $Q
+##    1A 2A 3A 1B 2B 3B 1C 2C 3C
+## 1A NA 19 20 21  0  0 22  0  0
+## 2A 23 NA 24  0 25  0  0 26  0
+## 3A 27 28 NA  0  0 29  0  0 30
+## 1B 31  0  0 NA 32 33 34  0  0
+## 2B  0 35  0 36 NA 37  0 38  0
+## 3B  0  0 39 40 41 NA  0  0 42
+## 1C 43  0  0 44  0  0 NA 45 46
+## 2C  0 47  0  0 48  0 49 NA 50
+## 3C  0  0 51  0  0 52 53 54 NA</code></pre>
+<p>And we want to optimize only speciation rate parameters, while
+keeping the rest fixed, we specify the following:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)</span></code></pre></div>
+<p>In this case, values must be provided for the extinction parameters
+and transition rate matrix under parsfix, and their corresponding
+numbers must be identified under idparsfix.</p>
+<p>Another example:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co">#this would optimize speciation and extinction in the above setup</span></span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="co">#idparsopt &lt;- c(1:18)</span></span></code></pre></div>
+<p>Often what we will want to do is to make all transition rates equal.
+Or define that all extinctions are the same. We first define our
+parameter list as follows:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]][] <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">7</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">3</span>, <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">6</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">7</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-15"><a href="#cb27-15" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-16"><a href="#cb27-16" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-17"><a href="#cb27-17" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">8</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-18"><a href="#cb27-18" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>)] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb27-19"><a href="#cb27-19" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]][<span class="dv">9</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-20"><a href="#cb27-20" tabindex="-1"></a><span class="fu">diag</span>(idparslist[[<span class="dv">3</span>]]) <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code></pre></div>
+<p>Then we will optimize speciation and the single transition rate:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="dv">11</span>)</span></code></pre></div>
+<p>IDPARSFIX: the id’s of parameters we want fixed at a certain value
+(including zero).Notice that 0 in idparslist is just another ID.
+Parallel to idparsopt, the following statement would fix all parameters
+associated with extinction rates:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span></code></pre></div>
+<p>Notice that if dual transitions were set to zero under idparslist, we
+should do this here too.</p>
+<p>PARSFIX: specifies at which values the parameters identified under
+idparsfix should be set. Should have the same number of entries as
+idparsfix (same order too). In this example, the first zero means that
+all those entries in idparslist with ID 0 will be fixed to zero. The
+second zero means that all the entries in idparslist with ID 10, will be
+fixed to 0.0001.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>parsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.0001</span>)</span></code></pre></div>
+<p>One can also estimate initial lambda and mu values from the tree
+using a simple birth-death model that does not take into account trait
+states. Here we do this with the bd_ML function from the DDD package. A
+good starting point for q is lambda/5:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="fu">library</span>(DDD)</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>startingpoint <span class="ot">&lt;-</span> DDD<span class="sc">::</span><span class="fu">bd_ML</span>(<span class="at">brts =</span> ape<span class="sc">::</span><span class="fu">branching.times</span>(phylo_Vign))</span></code></pre></div>
+<pre><code>## You are optimizing lambda0 mu0 
+## You are fixing lambda1 mu1 
+## Optimizing the likelihood - this may take a while. 
+## The loglikelihood for the initial parameter values is -657.651689076689.
+## 
+## Maximum likelihood parameter estimates: lambda0: 0.066492, mu0: 0.000115, lambda1: 0.000000, mu1: 0.000000: 
+## Maximum loglikelihood: -645.684269</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>intGuessLamba <span class="ot">&lt;-</span> startingpoint<span class="sc">$</span>lambda0</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>intGuessMu <span class="ot">&lt;-</span> startingpoint<span class="sc">$</span>mu0</span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a><span class="co">#Make sure that the dimensions of initparsopt agree with those of</span></span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a><span class="co">#idparsopt. We have idparsopt &lt;- c(1:9, 11) here, so we have 10 parameters</span></span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1"></a><span class="co">#which correspond (look at idparslist) to 9 lambdas and 1 transition rate.</span></span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1"></a><span class="co">#Here the transition rate is initially set at 20% (one fifth) of the initial</span></span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1"></a><span class="co">#guess for lambda:</span></span>
+<span id="cb33-8"><a href="#cb33-8" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(intGuessLamba, <span class="dv">9</span>), <span class="fu">rep</span>((intGuessLamba <span class="sc">/</span> <span class="dv">5</span>), <span class="dv">1</span>))</span></code></pre></div>
+<p>COND: conditioning on the state of the root. Set to “maddison_cond”
+if you want conditioning as done in other -SSE packages, or
+“proper_cond” if you want to use our new improved conditioning.</p>
+<p>root_state_weight: SecSSe offers to methods to weigh the
+probabilities of states at the root:“proper_weights” and
+“maddison_weights”. In the accompanying paper you can read the
+differences between them.</p>
+<p>SAMPLING_FRACTION: include a sampling fraction. Sampling.f always has
+as many elements as there are examined states, so a SecSSE analysis with
+3 states could have the following sampling_fraction = c(0.5,0.25,0.75),
+in which half of taxa in state 1 are sampled, a quarter in state two,
+and three quarters in state three. If 100% of known taxa in each state
+are sampled, sampling_fraction=c(1,1,1). If only an overall value is
+known (for example, we know we sampled 80% of all taxa, but we do not
+know how they are distributed across states), we assign this value to
+each state: sampling_fraction = c(0.8,0.8,0.8). Sampling.f is always
+placed after the ‘cond’ statement.</p>
+<p>TOL: basically, a range of values between which samples in the ML
+chain will be accepted or not. Typically, the value of tol = c(1e-04,
+1e-05, 1e-07) is generally best.</p>
+<p>METHODE: method for integration of likelihood values along branches,
+generally we recommend “ode45”.</p>
+<p>OPTIMMETHOD: optimization method, generally we recommend
+“simplex”.</p>
+<p>RUN_PARALLEL: this specifies whether or not to use the SecSSE
+tree-breaking function. If you have a large tree, this tree can be
+broken into two pieces so that computation of likelihood along branches
+can take place simultaneously on the two pieces, yielding a gain in
+computation time. The size of the two pieces is established by SecSSE,
+and depends on how balanced the tree is; a better-balanced tree yields
+two pieces of relatively equal size and results in relatively larger
+gain in computation time. With large trees (say, n&gt;1000), it is our
+experience that even two chunks of tree of unequal size yield a time
+advantage. Needless to say, your computational setup needs to be able to
+accommodate parallel computation (multiple cores, nodes).</p>
+</div>
+<div id="running-the-likelihood-maximization" class="section level2">
+<h2>Running the likelihood maximization</h2>
+<p>After we have defined all of the necessary parameters for running
+secsse_ml, we can start running our analysis and saving them to an R
+data file, for example, here called output.RDS. Note that this may take
+a while and procude a lot of console output.</p>
+<pre><code>out &lt;- secsse_ml(phylo_Vign,
+                 traits,
+                 num_concealed_states = 3,
+                 idparslist,
+                 idparsopt,
+                 initparsopt,
+                 idparsfix,
+                 parsfix,
+                 cond = &quot;maddison_cond&quot;,
+                 root_state_weight = &quot;maddison_weights&quot;,
+                 tol = c(1e-04, 1e-05, 1e-07),
+                 sampling_fraction = c(1, 1, 1),
+                 optimmethod = &quot;simplex&quot;,
+                 num_cycles = 1)
+saveRDS(out, file = &quot;output.RDS&quot;)</code></pre>
+<p>Later on, we can retrieve the data in this file, simply by
+entering:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">readRDS</span>(<span class="st">&quot;output.RDS&quot;</span>)</span></code></pre></div>
+<pre><code>## $MLpars
+## $MLpars[[1]]
+##           1A           2A           3A           1B           2B           3B 
+## 3.991074e-02 1.277549e-01 7.302145e-02 5.204953e-09 1.248659e-02 3.263652e-03 
+##           1C           2C           3C 
+## 1.433773e-15 1.035973e-01 5.393192e-02 
+## 
+## $MLpars[[2]]
+##    1A    2A    3A    1B    2B    3B    1C    2C    3C 
+## 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 1e-04 
+## 
+## $MLpars[[3]]
+##            1A         2A         3A         1B         2B         3B         1C
+## 1A         NA 0.04665017 0.04665017 0.04665017 0.00000000 0.00000000 0.04665017
+## 2A 0.04665017         NA 0.04665017 0.00000000 0.04665017 0.00000000 0.00000000
+## 3A 0.04665017 0.04665017         NA 0.00000000 0.00000000 0.04665017 0.00000000
+## 1B 0.04665017 0.00000000 0.00000000         NA 0.04665017 0.04665017 0.04665017
+## 2B 0.00000000 0.04665017 0.00000000 0.04665017         NA 0.04665017 0.00000000
+## 3B 0.00000000 0.00000000 0.04665017 0.04665017 0.04665017         NA 0.00000000
+## 1C 0.04665017 0.00000000 0.00000000 0.04665017 0.00000000 0.00000000         NA
+## 2C 0.00000000 0.04665017 0.00000000 0.00000000 0.04665017 0.00000000 0.04665017
+## 3C 0.00000000 0.00000000 0.04665017 0.00000000 0.00000000 0.04665017 0.04665017
+##            2C         3C
+## 1A 0.00000000 0.00000000
+## 2A 0.04665017 0.00000000
+## 3A 0.00000000 0.04665017
+## 1B 0.00000000 0.00000000
+## 2B 0.04665017 0.00000000
+## 3B 0.00000000 0.04665017
+## 1C 0.04665017 0.04665017
+## 2C         NA 0.04665017
+## 3C 0.04665017         NA
+## 
+## 
+## $ML
+## [1] -832.4899
+## 
+## $conv
+## [1] 0</code></pre>
+<p>The following is sample output, with two concealed states, notice in
+this case all transition rates, including dual rates, were set to the
+fixed value of 0.01:</p>
+<div id="section" class="section level45">
+<p class="heading"></p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="co">#$MLpars[[1]]</span></span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="co">#          1A           2A           3A           1B           2B           3B</span></span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co">#4.842634e-16 1.080409e-01 7.843821e-02 4.029147e-09 3.018863e-02 3.018863e-02</span></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="co">#$MLpars[[2]]</span></span>
+<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a><span class="co">#         1A          2A          3A          1B          2B          3B</span></span>
+<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a><span class="co">#0.002000000 0.002000109 0.002734071 0.001988593 0.002169052 0.003969142</span></span>
+<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="co">#$MLpars[[3]]</span></span>
+<span id="cb37-10"><a href="#cb37-10" tabindex="-1"></a><span class="co">#     1A   2A   3A   1B   2B   3B</span></span>
+<span id="cb37-11"><a href="#cb37-11" tabindex="-1"></a><span class="co">#1A   NA 0.01 0.01 0.01 0.01 0.01</span></span>
+<span id="cb37-12"><a href="#cb37-12" tabindex="-1"></a><span class="co">#2A 0.01   NA 0.01 0.01 0.01 0.01</span></span>
+<span id="cb37-13"><a href="#cb37-13" tabindex="-1"></a><span class="co">#3A 0.01 0.01   NA 0.01 0.01 0.01</span></span>
+<span id="cb37-14"><a href="#cb37-14" tabindex="-1"></a><span class="co">#1B 0.01 0.01 0.01   NA 0.01 0.01</span></span>
+<span id="cb37-15"><a href="#cb37-15" tabindex="-1"></a><span class="co">#2B 0.01 0.01 0.01 0.01   NA 0.01</span></span>
+<span id="cb37-16"><a href="#cb37-16" tabindex="-1"></a><span class="co">#3B 0.01 0.01 0.01 0.01 0.01   NA</span></span>
+<span id="cb37-17"><a href="#cb37-17" tabindex="-1"></a></span>
+<span id="cb37-18"><a href="#cb37-18" tabindex="-1"></a></span>
+<span id="cb37-19"><a href="#cb37-19" tabindex="-1"></a><span class="co">#$ML</span></span>
+<span id="cb37-20"><a href="#cb37-20" tabindex="-1"></a><span class="co">#[1] -848.0895</span></span></code></pre></div>
+</div>
+<div id="section-1" class="section level45">
+<p class="heading"></p>
+<p>The maximum likelihood value at the bottom of the output can be used
+in model comparison.</p>
+</div>
+</div>
+<div id="secsse-tool-to-facilitate-composition-of-q-matrices" class="section level2">
+<h2>SecSSE tool to facilitate composition of q matrices</h2>
+<p>Often, q matrices can get quite large and complicated, the more
+states you are analyzing. We have devised a tool to more easily put
+together q matrices. This tool starts from the so-called ‘masterBlock’,
+the basic matrix in which we only find information on transitions
+between examined states. The information contained in this ‘masterBlock’
+is then automatically mimicked for inclusion in the full matrix, to
+ensure that the same complexity in examined state transitions is also
+found in concealed states. The use of the ‘masterBlock’ implies that you
+are using the same number of concealed as examined states. Here, we are
+generating a ‘masterBlock’ that yields a 3-state q matrix.</p>
+<p>The ‘masterBlock’ can be declared as follows:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>masterBlock <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">99</span>, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>in which ‘99’ is an example value you can use to populate the matrix
+at first, to be replaced by values you specify. If you make this value
+conspicuously different from others, you can ensure that you are not
+skipping the specification of values, as any non-specified rates will
+take this value. ‘Ncol’ and ‘nrow’ will need to reflect the number of
+states you are analyzing.</p>
+<p>We first declare all values on the diagonal to be ‘NA’, then we
+specify values for the ‘masterBlock’. The values have a row and column
+indicator, so that e.g. ‘[2,7]’ refers to position 7 in row 2, or to a
+transition from 2A to 7A more specifically.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">diag</span>(masterBlock) <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>masterBlock[<span class="dv">1</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">6</span></span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>masterBlock[<span class="dv">1</span>, <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a></span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>masterBlock[<span class="dv">2</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">8</span></span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>masterBlock[<span class="dv">2</span>, <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="dv">9</span></span>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" tabindex="-1"></a>masterBlock[<span class="dv">3</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb39-9"><a href="#cb39-9" tabindex="-1"></a>masterBlock[<span class="dv">3</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">11</span></span></code></pre></div>
+<p>After completing the declaration of the ‘masterBlock’, we will need
+to specify whether or not we want the variation in examined states to be
+exactly the same as in the concealed state (so that e.g. the transition
+1A-&gt;3A takes the same value as 5A-&gt;5C), or if we want the
+concealed state to have additional variation to account for type I error
+in transition rates (so that the total amount of transition parameters
+between concealed states is the same as between examined states, but the
+values are different). This is done by:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>diff.conceal <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span></code></pre></div>
+<p>Finally, we need to make sure the ‘masterBlock’ is used as a baseline
+for building the transition matrix in IDPARSLIST:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>myQ <span class="ot">&lt;-</span> <span class="fu">q_doubletrans</span>(traits, masterBlock, diff.conceal)</span></code></pre></div>
+<pre><code>## Warning in q_doubletrans(traits, masterBlock, diff.conceal): q_doubletrans assumes that the number of 
+##             concealed traits is equal to the number of examined traits</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> myQ</span></code></pre></div>
+<p>Which makes our final q matrix look as follows:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]]</span></code></pre></div>
+<pre><code>##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+##  [1,]   NA    6    7    6    0    0    7    0    0
+##  [2,]    8   NA    9    0    6    0    0    7    0
+##  [3,]   10   11   NA    0    0    6    0    0    7
+##  [4,]    8    0    0   NA    6    7    9    0    0
+##  [5,]    0    8    0    8   NA    9    0    9    0
+##  [6,]    0    0    8   10   11   NA    0    0    9
+##  [7,]   10    0    0   11    0    0   NA    6    7
+##  [8,]    0   10    0    0   11    0    8   NA    9
+##  [9,]    0    0   10    0    0   11   10   11   NA</code></pre>
+<p>Matching the amount of variation in rates between the concealed
+states, yields the following:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>diff.conceal <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>myQ <span class="ot">&lt;-</span> <span class="fu">q_doubletrans</span>(traits, masterBlock, diff.conceal)</span></code></pre></div>
+<pre><code>## Warning in q_doubletrans(traits, masterBlock, diff.conceal): q_doubletrans assumes that the number of 
+##             concealed traits is equal to the number of examined traits</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> myQ</span>
+<span id="cb48-2"><a href="#cb48-2" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]]</span></code></pre></div>
+<pre><code>##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+##  [1,]   NA    6    7   12    0    0   13    0    0
+##  [2,]    8   NA    9    0   12    0    0   13    0
+##  [3,]   10   11   NA    0    0   12    0    0   13
+##  [4,]   14    0    0   NA    6    7   15    0    0
+##  [5,]    0   14    0    8   NA    9    0   15    0
+##  [6,]    0    0   14   10   11   NA    0    0   15
+##  [7,]   16    0    0   17    0    0   NA    6    7
+##  [8,]    0   16    0    0   17    0    8   NA    9
+##  [9,]    0    0   16    0    0   17   10   11   NA</code></pre>
+</div>
+<div id="secsse-function-to-reduce-number-of-transition-rate-parameters-by-including-multiplicative-factors" class="section level2">
+<h2>SecSSE function to reduce number of transition rate parameters by
+including multiplicative factors</h2>
+<p>SecSSE has the capability of reducing computational burden by
+decreasing the number of transition rate parameters through the
+inclusion of multiplicative factors. Factors can also be used to
+disentangle complex patterns of trait-dependent diversification when
+multiple traits are included.</p>
+<p>Suppose you are running an analysis with a large number of transition
+rate parameters, but you suspect there are linear relationships between
+some of them. If the transition between lobed (L) and palmate (P) feet
+is twice as infrequent as that between palmate and semi-palmate (S)
+feet, and could say that P-&gt;L is 2(P-&gt;S). The reverse would also
+be true: L-&gt;P is 2(S-&gt;P). By applying these factors, we are
+reducing the transition matrix from a 6 parameters to 4, and in models
+where transitions between concealed states are allowed, we are reducing
+our parameters from 12 to 8. Of course, the inclusion of these factors
+comes with a loss of resolution, and is therefore best done with
+parameters where exact estimation is not essential.</p>
+<p>In SecSSE, the factors are represented in a function separate from
+secsse_ml, and the setup of this function is very similar to secsse_ml,
+but requires the addition of two parameters, SHAREFACTORS and
+INITFACTORS.</p>
+<p>SHAREFACTORS: these are the identifiers of the factors you want to
+specify. In the above example, we have two factors, one governing
+transitions from P-&gt;S and one from S-&gt;P. Transitions in opposite
+directions are better not fixed to the same multiplicative factor, so
+that at least two are needed here. In this case these are specified as
+follows:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="co">#shareFactors &lt;- c(.1, .2)</span></span></code></pre></div>
+<p>INITFACTORS: Since these shared factors need initial parameter
+estimates, just as other transition parameters in the model do, we need
+to specify these. The initial guesses are best set to 1, so they behave
+similar to the parameters they are ‘tied’ to, unless we have very good
+evidence (e.g. from a previous run) that these are bigger or
+smaller:</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a><span class="co">#initFactors &lt;- c(1, 1)</span></span></code></pre></div>
+<p>Aside from setting these two parameters, we need to specify in our
+rate matrix which rate parameters we want to be governed by which
+factors. Imagine we have a 3-state matrix, where 1 refers to lobed feet,
+2 to semi-palmate and 3 to palmate:</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a><span class="co"># diag(masterBlock) &lt;- NA</span></span>
+<span id="cb52-2"><a href="#cb52-2" tabindex="-1"></a><span class="co"># masterBlock[1, 2] &lt;- 6</span></span>
+<span id="cb52-3"><a href="#cb52-3" tabindex="-1"></a><span class="co"># masterBlock[1, 3] &lt;- 6.1  #factor 1: lobed to palmate</span></span>
+<span id="cb52-4"><a href="#cb52-4" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb52-5"><a href="#cb52-5" tabindex="-1"></a><span class="co"># masterBlock[2, 1] &lt;- 7</span></span>
+<span id="cb52-6"><a href="#cb52-6" tabindex="-1"></a><span class="co"># masterBlock[2, 3] &lt;- 8</span></span>
+<span id="cb52-7"><a href="#cb52-7" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb52-8"><a href="#cb52-8" tabindex="-1"></a><span class="co"># masterBlock[3, 1] &lt;- 7.2  #factor 2: palmate to lobed</span></span>
+<span id="cb52-9"><a href="#cb52-9" tabindex="-1"></a><span class="co"># masterBlock[3, 2] &lt;- 9</span></span></code></pre></div>
+<p>Finally, we run the function secsse_ml_struc instead of secsse_ml,
+and make sure that both new parameters are included.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="co">#secsse_ml_struc(phylo_Vign..., shareFactors, initFactors)</span></span></code></pre></div>
+<p>Multiplicative factors can also be used in connection with lambdas or
+mus, in the same way as they are used for transition rates. Note that in
+such case the factors will need to be unique across the entire dataset,
+so that both speciation- and transition-related factors have unique
+values for shareFactors. They can also be used to disentangle complex
+patterns of diversification when multiple traits are taken into account.
+Assume that aside from foot shape (the above example), we are also
+looking at the presence or absence of a spur, and we would like to know
+how the two traits interact to influence diversification. In such a
+case, presence or absence of spur can be used as a multiplicative
+factor, and models can be run where presence or absence is coded as the
+same multiplicative factor (.1), and where presence or absence are coded
+as two different factors (.1,.2).</p>
+</div>
+<div id="note-on-assigning-ambiguity-to-taxon-trait-states" class="section level2">
+<h2>Note on assigning ambiguity to taxon trait states</h2>
+<p>If the user wishes to assign a taxon to multiple trait states,
+because he/she is unsure which state best describes the taxon, he/she
+can use ‘NA’. ‘NA’ is used when there is no information on possible
+state at all; for example when a state was not measured or a taxon is
+unavailable for inspection. ‘NA’ means a taxon is equally likely to
+pertain to any state. In case the user does have some information, for
+example if a taxon can pertain to multiple states, or if there is
+uncertainty regarding state but one or multiple states can with
+certainty be excluded, SecSSE offers flexibility to handle ambiguity. In
+this case, the user only needs to supply a trait file, with at least
+four columns, one for the taxon name, and three for trait state. Below,
+we show an example of what the trait info should be like (the column
+with species’ names has been removed).If a taxon may pertain to trait
+state 1 or 3, but not to 2, the three columns should have at least the
+values 1 and a 3, but never 2 (species in the third row). On the other
+hand, the species in the fifth row can pertain to all states: the first
+column would have a 1, the second a 2, the third a 3 (although if you
+only have this type of ambiguity, it is easier to assign ‘NA’ and use a
+single-column data file).</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="co">#       traits traits traits</span></span>
+<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a><span class="co"># [1,]      2      2      2</span></span>
+<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a><span class="co"># [2,]      1      1      1</span></span>
+<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a><span class="co"># [3,]      2      2      2</span></span>
+<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a><span class="co"># [4,]      3      1      1</span></span>
+<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a><span class="co"># [5,]      1      2      3</span></span></code></pre></div>
+</div>
+<div id="do-you-feel-secsse-if-not-please-feel-free-to-e-mail-the-authors.-for-help-with-this-r-package-only." class="section level2">
+<h2>Do you feel SecSSE? If not, please feel free to e-mail the authors.
+For help with this R package only.</h2>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Beaulieu, J. M., O’meara, B. C., &amp; Donoghue, M. J. (2013).
+Identifying hidden rate changes in the evolution of a binary
+morphological character: the evolution of plant habit in campanulid
+angiosperms. Systematic biology, 62(5), 725-737.</p>
+<p>Beaulieu, J. M., &amp; O’Meara, B. C. (2016). Detecting hidden
+diversification shifts in models of trait-dependent speciation and
+extinction. Systematic biology, 65(4), 583-601.</p>
+<p>FitzJohn, R. G. (2012). Diversitree: comparative phylogenetic
+analyses of diversification in R. Methods in Ecology and Evolution,
+3(6), 1084-1092.</p>
+<p>Harmon, L. J., Weir, J. T., Brock, C. D., Glor, R. E., &amp;
+Challenger, W. (2008). GEIGER: investigating evolutionary radiations.
+Bioinformatics, 24(1), 129-131.</p>
+<p>Rabosky, D. L., &amp; Goldberg, E. E. (2015). Model inadequacy and
+mistaken inferences of trait-dependent speciation. Systematic Biology,
+64(2), 340-355.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

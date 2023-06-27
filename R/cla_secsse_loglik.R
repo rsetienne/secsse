@@ -91,15 +91,15 @@ cla_secsse_loglik <- function(parameter,
                               is_complete_tree = FALSE,
                               num_threads = 1,
                               method = ifelse(num_threads == 1,
-                                              "odeint::bulirsch_stoer",
-                                              "odeint::runge_kutta_fehlberg78"),
+                                          "odeint::bulirsch_stoer",
+                                          "odeint::runge_kutta_fehlberg78"),
                               atol = 1e-16,
                               rtol = 1e-16) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   Q <- parameter[[3]]  # nolint
-  
+
   num_modeled_traits <- ncol(Q) / floor(num_concealed_states)
   
   if (is.null(setting_calculation)) {
@@ -118,7 +118,7 @@ cla_secsse_loglik <- function(parameter,
                                                  first_time = TRUE)
   }
   states <- setting_calculation$states
-  
+
   if (is_complete_tree) {
     states <- build_states(phy = phy,
                            traits = traits,
@@ -129,10 +129,10 @@ cla_secsse_loglik <- function(parameter,
                            num_unique_traits = num_modeled_traits,
                            first_time = FALSE)
   }
-  
+
   forTime <- setting_calculation$forTime  # nolint
   ances <- setting_calculation$ances
-  
+
   if (num_concealed_states != round(num_concealed_states)) {
     # for testing
     d <- ncol(states) / 2
@@ -140,19 +140,19 @@ cla_secsse_loglik <- function(parameter,
     new_states <- states[, c(1, 2, 3, 10, 11, 12)]
     states <- new_states
   }
-  
+
   loglik <- 0
   d <- ncol(states) / 2
-  
+
   if (see_ancestral_states == TRUE && num_threads != 1) {
-    warning("see ancestral states only works with one thread, 
+      warning("see ancestral states only works with one thread, 
               setting to one thread")
-    num_threads <- 1
+      num_threads <- 1
   }
-  
+
   calcul <- update_using_cpp(ances, states, forTime, lambdas, mus, Q, method,
                              atol, rtol, is_complete_tree, num_threads)
-  
+
   mergeBranch <- calcul$mergeBranch # nolint
   nodeM <- calcul$nodeM  # nolint
   loglik <- calcul$loglik
@@ -161,7 +161,7 @@ cla_secsse_loglik <- function(parameter,
   ## At the root
   mergeBranch2 <- mergeBranch # nolint
   lmb <- length(mergeBranch2)
-  
+
   weight_states <- get_weight_states(root_state_weight,
                                      num_concealed_states,
                                      mergeBranch,
@@ -169,21 +169,21 @@ cla_secsse_loglik <- function(parameter,
                                      nodeM,
                                      d,
                                      is_cla = TRUE)
-  
+
   if (cond == "maddison_cond") {
     pre_cond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
       pre_cond[j] <- sum(weight_states[j] *
-                           lambdas[[j]] *
-                           (1 - nodeM[1:d][j]) ^ 2)
-    }
+                        lambdas[[j]] *
+                        (1 - nodeM[1:d][j]) ^ 2)
+     }
     mergeBranch2 <- mergeBranch2 / sum(pre_cond) # nolint
   }
-  
+
   if (is_complete_tree) {
     timeInte <- max(abs(ape::branching.times(phy))) # nolint
     y <- rep(0, lmb)
-    
+
     nodeM <- ct_condition_cla(y, # nolint
                               timeInte,
                               lambdas,
@@ -194,7 +194,7 @@ cla_secsse_loglik <- function(parameter,
                               1e-12)
     nodeM <- c(nodeM, y) # nolint
   }
-  
+
   if (cond == "proper_cond") {
     pre_cond <- rep(NA, lmb) # nolint
     for (j in 1:lmb) {
@@ -202,22 +202,22 @@ cla_secsse_loglik <- function(parameter,
     }
     mergeBranch2 <- mergeBranch2 / pre_cond # nolint
   }
-  
+
   wholeLike_atRoot <- sum(mergeBranch2 * weight_states, na.rm = TRUE) # nolint
   LL <- log(wholeLike_atRoot) + # nolint
-    loglik -
-    penalty(pars = parameter,
-            loglik_penalty = loglik_penalty)
-  
+        loglik -
+        penalty(pars = parameter,
+                loglik_penalty = loglik_penalty)
+
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     # last row contains safety entry from C++ (all zeros)
     ancestral_states <- states[(num_tips + 1):(nrow(states) - 1), ]
     ancestral_states <-
-      ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
+        ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL, states = states))
-  } else {
+    } else {
     return(LL)
   }
 }
@@ -225,17 +225,45 @@ cla_secsse_loglik <- function(parameter,
 #' @keywords internal
 update_using_cpp <- function(ances, states, forTime, lambdas, mus, Q, method,
                              atol, rtol, is_complete_tree, num_threads) {
-  RcppParallel::setThreadOptions(numThreads = num_threads)
-  
-  calcul <- cla_calThruNodes_cpp(ances,
-                                 states,
-                                 forTime,
-                                 lambdas,
-                                 mus,
-                                 Q,
-                                 method,
-                                 atol,
-                                 rtol,
-                                 is_complete_tree)
+  calcul <- c()
+
+  ancescpp <- ances - 1
+  forTimecpp <- forTime # nolint
+  forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
+
+  if (num_threads == 1) {
+    calcul <- cla_calThruNodes_cpp(ancescpp,
+                                   states,
+                                   forTimecpp,
+                                   lambdas,
+                                   mus,
+                                   Q,
+                                   method,
+                                   atol,
+                                   rtol,
+                                   is_complete_tree)
+  } else {
+    if (num_threads == -2) {
+      calcul <- calc_cla_ll_threaded(ancescpp,
+                                     states,
+                                     forTimecpp,
+                                     lambdas,
+                                     mus,
+                                     Q,
+                                     1,
+                                     method,
+                                     is_complete_tree)
+    } else {
+      calcul <- calc_cla_ll_threaded(ancescpp,
+                                     states,
+                                     forTimecpp,
+                                     lambdas,
+                                     mus,
+                                     Q,
+                                     num_threads,
+                                     method,
+                                     is_complete_tree)
+    }
+  }
   return(calcul)
 }

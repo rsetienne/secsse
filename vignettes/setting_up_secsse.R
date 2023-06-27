@@ -1,67 +1,25 @@
----
-title: "Setting up a secsse analysis"
-author: "Thijs Janzen"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Setting up a secsse analysis}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include=FALSE}
+## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
-```
 
-## Setting up
-
-When preparing a secsse analysis, it can be daunting to prepare the different required matrices and settings in order to be able to perform a meaningful analysis. Starting with secsse package version 2.6, there are now general helper functions available that can prepare all matrices for some general cases. Often, these general cases can already be applicable, alternatively, they can be modified later on to better reflect the intricacies of the specific studied system.
-
-## Requirements for secsse analysis
-
-To perform a secsse analysis, we want to use maximum likelihood to find the most likely values for our parameters, given a phylogenetic tree and tip states. To do so, secsse requires the user to specify how speciation changes the state of the daughter species in relation to the parent species, and requires the user to specify the number of unique speciation rates to be fitted. Here, we will explore a basic example.
-
-### Two observed states, two hidden state
-We start with a straightforward, simple case where we have two observed states (perhaps the presence / absence of an ornament or so), and we assume that the concealed state follows a similar structure, e.g. it also has two unique states. 
-Now, we can specify three different models, 1) constant-rates model, where rates are not dependent on any trait, 2) Examined-Trait-Diversification (ETD), where rates are dependent on the observed trait and 3) CTD (Concealed-Trait-Diversification), where rates are dependent on the concealed trait.
-
-#### Lambdas
-To create the required lambda-matrices, we need as input information about the observed state names, the number of concealed states, and a transition_list object, which is a matrix defining the traits of daughter species upon speciation and their associated rate. We will here generate a default transition_list, but the user is free to create (and encouraged) one manually her/him self in order to reflect the focal system better.
-We assume here that we have a trait with lables "S" and "N", and use the default settings:
-
-```{r default_trans_list}
+## ----default_trans_list-------------------------------------------------------
 focal_list <- secsse::create_default_transition_list(state_names = c("S", "N"))
 focal_list
-```
 
-With this list generated, we can now use this to populate our lambda matrices, using a constant rates model:
-```{r default lambda matrices}
+## ----default lambda matrices--------------------------------------------------
 lambda_matrices <- secsse::create_lambda_matrices(state_names = c("S", "N"),
                                                   num_concealed_states = 2, 
                                                   transition_list = focal_list,
                                                   model = "CR")
 lambda_matrices
-```
 
-We see that there are four lambda matrices, one for each of the combined states (e.g. for each combination of observed and hidden states). So in this case we have our two observed states S and N, and the two hidden states A and B. This results in the four real states SA, NA, SB and NB. 
-
-#### Extinction
-
-We also need to specify an extinction rate:
-
-```{r adding extinction}
+## ----adding extinction--------------------------------------------------------
 mus <- secsse::create_mus(state_names = colnames(lambda_matrices[[1]]),
                           num_concealed_states = 2,
                           model = "CR",
                           lambdas = lambda_matrices)
 mus
-```
 
-#### Q matrix
-
-To specify a q-matrix, we again need to specify the transitions using a transition list. Again, we use the standard settings.
-
-```{r default_trans} 
+## ----default_trans------------------------------------------------------------
 q_list <- secsse::create_default_q_list(state_names = c("S", "N"),
                                         num_concealed_states = 2,
                                         mus = mus)
@@ -71,15 +29,8 @@ q_list
 trans_matrix <- secsse::create_transition_matrix(state_names = colnames(lambda_matrices[[1]]),
                                                  transition_list = q_list)
 trans_matrix
-```
-Here, we find transitions from A->B, B->A but also S->N and N->S.
 
-### Simulating data
-Now, we can use our settings to perform an analysis.
-Because we are lacking empirical data in this example, we will simulate a tree for this. 
-To do so, we first need to specify our focal rates, and then fill them in.
-
-```{r fill in parameters}
+## ----fill in parameters-------------------------------------------------------
 
 speciation_S <- 0.5
 speciation_N <- 0.3
@@ -100,11 +51,8 @@ trans_matrix_p <- secsse::fill_in(trans_matrix,
                                   params)
 mus_p <- secsse::fill_in(mus,
                          params)
-```
 
-With the values replaced, we can now simulate an "empirical" dataset:
-
-```{r simulate tree}
+## ----simulate tree------------------------------------------------------------
 simulated_tree <- secsse::secsse_sim(lambdas = lambda_matrices_p,
                                      mus = mus_p,
                                      qs = trans_matrix_p,
@@ -114,16 +62,8 @@ simulated_tree <- secsse::secsse_sim(lambdas = lambda_matrices_p,
                                      verbose = TRUE)
 sim_traits <- simulated_tree$obs_traits
 focal_tree <- simulated_tree$phy
-```
 
-### Maximum Likelihood
-
-Given this data, we can now perform our maximum likelihood analysis. Here, we
-choose to initialize our parameters with random values in [0, 1], we use 
-multithreading to speed up the analysis, and use the subplex optimization 
-method, as this has shown to be more reliable.
-
-```{r maximum likelihood}
+## ----maximum likelihood-------------------------------------------------------
 param_posit <- list()
 param_posit[[1]] <- lambda_matrices
 param_posit[[2]] <- mus
@@ -144,21 +84,12 @@ answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               optimmethod = "subplex",
                               verbose = FALSE,
                               num_threads = 6)
-```
 
-We can now extract our parameters to get them in the right place:
-
-```{r extract_pars}
+## ----extract_pars-------------------------------------------------------------
 found_pars_vals <- secsse::extract_par_vals(param_posit, answ$MLpars)
 found_pars_vals
-```
 
-## Comparing models using AIC
-
-We have done this now only for the CR model, but we can also use the 
-CTD and ETD model. Let's do that semi-automagically! We first define a generic
-function to optimize for a model:
-```{r define_model_function}
+## ----define_model_function----------------------------------------------------
 fit_model <- function(tree, traits, model) {
   focal_list <- secsse::create_default_transition_list(state_names = c("S", "N"))
   lambda_matrices <- secsse::create_lambda_matrices(state_names = c("S", "N"),
@@ -214,11 +145,8 @@ fit_model <- function(tree, traits, model) {
               ml = as.numeric(answ$ML),
               aic = aic))
 }
-```
 
-And then we loop over the different models:
-
-```{r model looping}
+## ----model looping------------------------------------------------------------
 found <- c()
 for (focal_model in c("CR", "CTD", "ETD")) {
   local_answ <- fit_model(tree = focal_tree, 
@@ -232,7 +160,4 @@ found <- as.data.frame(found)
 found$LL <- as.numeric(found$LL)
 found$AIC <- as.numeric(found$AIC)
 found 
-```
 
-Because we have simulated the tree using the CR model, we expect the model with
-the lowest AIC to be the CR model again, and indeed we do find this!
