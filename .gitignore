@@ -15,3 +15,5 @@ src-x64
 .vscode/genenv.R
 test.R
 test2.R
+/doc/
+/Meta/
