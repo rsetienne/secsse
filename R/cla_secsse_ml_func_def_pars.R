@@ -238,7 +238,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
                     initparsopt)
 
     optimpars <- c(tol, maxiter)
-    
+
     num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
 
     setting_calculation <- build_initStates_time(phy, traits,

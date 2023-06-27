@@ -12,13 +12,13 @@ create_default_transition_list(
 \arguments{
 \item{state_names}{names of the observed states}
 
-\item{consider_combinations}{should there be extra 
+\item{consider_combinations}{should there be extra
 states considering combinations of the observed states?}
 }
 \description{
 This function generates a generic transition list, assuming no transitions
 between states, e.g. a species of observed state 0 generates two daughter
-species with state 0 as well. 
+species with state 0 as well.
 If consider_combinations is set to TRUE, the function automatically
 generates transitions for the combined states as well, for example if there
 are two states A and B, it adds a third state AB, which generates two unique

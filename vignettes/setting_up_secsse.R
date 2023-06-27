@@ -7,7 +7,7 @@ focal_list
 
 ## ----default lambda matrices--------------------------------------------------
 lambda_matrices <- secsse::create_lambda_matrices(state_names = c("S", "N"),
-                                                  num_concealed_states = 2, 
+                                                  num_concealed_states = 2,
                                                   transition_list = focal_list,
                                                   model = "CR")
 lambda_matrices
@@ -40,8 +40,8 @@ q_ba <- 0.5
 sp_ns <- 0.2
 sp_sn <- 0.2
 
-params <- c(speciation, 
-            extinction, 
+params <- c(speciation,
+            extinction,
             sp_ns, sp_sn, q_ab, q_ba)
 
 lambda_matrices_p <- secsse::fill_in(lambda_matrices,
@@ -92,10 +92,12 @@ found_pars_vals
 
 ## ----define_model_function----------------------------------------------------
 fit_model <- function(tree, traits, model) {
-  focal_list <- secsse::create_default_transition_list(state_names = c("S", "N"))
+  focal_list <- secsse::create_default_transition_list(state_names =
+                                                         c("S", "N"))
   lambda_matrices <- secsse::create_lambda_matrices(state_names = c("S", "N"),
-                                                    num_concealed_states = 2, 
-                                                    transition_list = focal_list,
+                                                    num_concealed_states = 2,
+                                                    transition_list =
+                                                        focal_list,
                                                     model = model)
   mus <- secsse::create_mus(state_names = c("S", "N"),
                             num_concealed_states = 2,
@@ -104,18 +106,18 @@ fit_model <- function(tree, traits, model) {
   q_list <- secsse::create_default_q_list(state_names = c("S", "N"),
                                           num_concealed_states = 2,
                                           mus = mus)
-  
+
   trans_matrix <- secsse::create_transition_matrix(state_names = c("S", "N"),
                                                    num_concealed_states = 2,
                                                    transition_list = q_list)
-  
+
   param_posit <- list()
   param_posit[[1]] <- lambda_matrices
   param_posit[[2]] <- mus
   param_posit[[3]] <- trans_matrix
-  
+
   max_indicator <- max(trans_matrix, na.rm = TRUE)
-  
+
   # we cheat a bit by setting extinction to zero -
   # in a real analysis this should be avoided.
   extinct_rates <- unique(mus)
@@ -123,7 +125,7 @@ fit_model <- function(tree, traits, model) {
   idparsopt <- idparsopt[-extinct_rates]
   idparsfix <- c(0, extinct_rates)
   parsfix <- rep(0.0, length(idparsfix))
-  
+
   initpars <- runif(n = length(idparsopt))
 
   testthat::expect_output( # suppress output
@@ -150,7 +152,7 @@ fit_model <- function(tree, traits, model) {
 ## ----model looping------------------------------------------------------------
 found <- c()
 for (focal_model in c("CR", "CTD", "ETD")) {
-  local_answ <- fit_model(tree = focal_tree, 
+  local_answ <- fit_model(tree = focal_tree,
                           traits = sim_traits,
                           model = focal_model)
   found <- rbind(found, c(focal_model, local_answ$ml, local_answ$aic))
@@ -159,5 +161,5 @@ colnames(found) <- c("model", "LL", "AIC")
 found <- as.data.frame(found)
 found$LL <- as.numeric(found$LL)
 found$AIC <- as.numeric(found$AIC)
-found 
+found
 

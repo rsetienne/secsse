@@ -2,7 +2,7 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_transition_matrix}
 \alias{create_transition_matrix}
-\title{helper function to neatly setup a Q matrix, without transitions to 
+\title{helper function to neatly setup a Q matrix, without transitions to
 concealed states (only observed transitions shown)}
 \usage{
 create_transition_matrix(state_names, num_concealed_states, transition_list)
@@ -12,15 +12,15 @@ create_transition_matrix(state_names, num_concealed_states, transition_list)
 
 \item{num_concealed_states}{number of concealed states}
 
-\item{transition_list}{matrix of transitions, indicating in order: 1) 
-starting state (typically the column in the transition matrix), 2) ending 
-state (typically the row in the transition matrix) and 3) associated rate 
+\item{transition_list}{matrix of transitions, indicating in order: 1)
+starting state (typically the column in the transition matrix), 2) ending
+state (typically the row in the transition matrix) and 3) associated rate
 indicator}
 }
 \value{
 transition matrix
 }
 \description{
-helper function to neatly setup a Q matrix, without transitions to 
+helper function to neatly setup a Q matrix, without transitions to
 concealed states (only observed transitions shown)
 }

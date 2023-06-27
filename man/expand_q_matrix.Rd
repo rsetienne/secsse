@@ -2,7 +2,7 @@
 % Please edit documentation in R/secsse_prep.R
 \name{expand_q_matrix}
 \alias{expand_q_matrix}
-\title{function to expand an existing q_matrix to a number of 
+\title{function to expand an existing q_matrix to a number of
 concealed states}
 \usage{
 expand_q_matrix(q_matrix, num_concealed_states, diff.conceal = FALSE)
@@ -21,6 +21,6 @@ to avoid having a huge number of parameters.}
 updated q matrix
 }
 \description{
-function to expand an existing q_matrix to a number of 
+function to expand an existing q_matrix to a number of
 concealed states
 }

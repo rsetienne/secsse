@@ -40,7 +40,7 @@ tree is not conditioned on this number, but that this is a safeguard against
 generating extremely large trees).}
 
 \item{conditioning}{can be 'obs_states', 'true_states' or 'none', the tree is
-simulated until one is generated that contains all observed states 
+simulated until one is generated that contains all observed states
 ('obs_states'), all true states (e.g. all combinations of obs and hidden
 states), or is always returned ('none').}
 
