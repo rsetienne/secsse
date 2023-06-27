@@ -536,12 +536,12 @@ optimization method, as this has shown to be more reliable.</p>
 <span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">6</span>)</span></code></pre></div>
 <pre><code>## Note: you set some transitions as impossible to happen. 
 ## Calculating the likelihood for the initial parameters ... 
-## The loglikelihood for the initial parameter values is -22.74935 
+## The loglikelihood for the initial parameter values is -25.13051 
 ## Optimizing the likelihood - this may take a while.</code></pre>
 <p>We can now extract our parameters to get them in the right place:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>found_pars_vals <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(param_posit, answ<span class="sc">$</span>MLpars)</span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>found_pars_vals</span></code></pre></div>
-<pre><code>## [1] 0.37622052 0.00000000 0.07002267 0.32634813 0.72504275 0.87013356</code></pre>
+<pre><code>## [1] 0.4028125 0.0000000 0.9687167 0.2692200 1.7710024 0.9791207</code></pre>
 </div>
 </div>
 <div id="comparing-models-using-aic" class="section level2">
@@ -598,14 +598,16 @@ generic function to optimize for a model:</p>
 <span id="cb17-47"><a href="#cb17-47" tabindex="-1"></a>                                <span class="at">sampling_fraction =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
 <span id="cb17-48"><a href="#cb17-48" tabindex="-1"></a>                                <span class="at">optimmethod =</span> <span class="st">&quot;subplex&quot;</span>,</span>
 <span id="cb17-49"><a href="#cb17-49" tabindex="-1"></a>                                <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb17-50"><a href="#cb17-50" tabindex="-1"></a>                                <span class="at">num_threads =</span> <span class="dv">6</span>)</span>
-<span id="cb17-51"><a href="#cb17-51" tabindex="-1"></a>  )</span>
-<span id="cb17-52"><a href="#cb17-52" tabindex="-1"></a>  found_pars_vals <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(param_posit, answ<span class="sc">$</span>MLpars)</span>
-<span id="cb17-53"><a href="#cb17-53" tabindex="-1"></a>  aic <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> max_indicator <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">as.numeric</span>(answ<span class="sc">$</span>ML)</span>
-<span id="cb17-54"><a href="#cb17-54" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">pars =</span> found_pars_vals,</span>
-<span id="cb17-55"><a href="#cb17-55" tabindex="-1"></a>              <span class="at">ml =</span> <span class="fu">as.numeric</span>(answ<span class="sc">$</span>ML),</span>
-<span id="cb17-56"><a href="#cb17-56" tabindex="-1"></a>              <span class="at">aic =</span> aic))</span>
-<span id="cb17-57"><a href="#cb17-57" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb17-50"><a href="#cb17-50" tabindex="-1"></a>                                <span class="at">num_threads =</span> <span class="dv">6</span>,</span>
+<span id="cb17-51"><a href="#cb17-51" tabindex="-1"></a>                                <span class="at">atol =</span> <span class="fl">0.1</span>, <span class="co"># high values for demonstration </span></span>
+<span id="cb17-52"><a href="#cb17-52" tabindex="-1"></a>                                <span class="at">rtol =</span> <span class="fl">0.1</span>) <span class="co"># purposes, don&#39;t use at home!</span></span>
+<span id="cb17-53"><a href="#cb17-53" tabindex="-1"></a>  )</span>
+<span id="cb17-54"><a href="#cb17-54" tabindex="-1"></a>  found_pars_vals <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(param_posit, answ<span class="sc">$</span>MLpars)</span>
+<span id="cb17-55"><a href="#cb17-55" tabindex="-1"></a>  aic <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> max_indicator <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">as.numeric</span>(answ<span class="sc">$</span>ML)</span>
+<span id="cb17-56"><a href="#cb17-56" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">pars =</span> found_pars_vals,</span>
+<span id="cb17-57"><a href="#cb17-57" tabindex="-1"></a>              <span class="at">ml =</span> <span class="fu">as.numeric</span>(answ<span class="sc">$</span>ML),</span>
+<span id="cb17-58"><a href="#cb17-58" tabindex="-1"></a>              <span class="at">aic =</span> aic))</span>
+<span id="cb17-59"><a href="#cb17-59" tabindex="-1"></a>}</span></code></pre></div>
 <p>And then we loop over the different models:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>found <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
 <span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="cf">for</span> (focal_model <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;CR&quot;</span>, <span class="st">&quot;CTD&quot;</span>, <span class="st">&quot;ETD&quot;</span>)) {</span>
@@ -620,9 +622,9 @@ generic function to optimize for a model:</p>
 <span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>found<span class="sc">$</span>AIC <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(found<span class="sc">$</span>AIC)</span>
 <span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>found</span></code></pre></div>
 <pre><code>##   model        LL      AIC
-## 1    CR -21.64423 55.28845
-## 2   CTD -20.64832 57.29665
-## 3   ETD -21.53458 59.06916</code></pre>
+## 1    CR -23.97504 59.95008
+## 2   CTD -23.88787 63.77574
+## 3   ETD -23.41466 62.82932</code></pre>
 <p>Because we have simulated the tree using the CR model, we expect the
 model with the lowest AIC to be the CR model again, and indeed we do
 find this!</p>

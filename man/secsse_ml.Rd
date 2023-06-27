@@ -18,11 +18,11 @@ secsse_ml(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  optimmethod = "simplex",
+  optimmethod = "subplex",
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  verbose = (optimmethod == "subplex"),
+  verbose = (optimmethod == "simplex"),
   num_threads = 1,
   atol = 1e-12,
   rtol = 1e-12,
@@ -64,7 +64,8 @@ trait state. It must have as many elements as there are trait states.}
 \item{maxiter}{max number of iterations.
 Default is '1000 *round((1.25)^length(idparsopt))'.}
 
-\item{optimmethod}{method used for optimization. Default is 'simplex'.}
+\item{optimmethod}{method used for optimization. Available are simplex and
+subplex, default is 'subplex'. Simplex should only be used for debugging.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
@@ -75,7 +76,7 @@ is 0 (no penalty)}
 is provided}
 
 \item{verbose}{sets verbose output; default is verbose when optimmethod is
-'subplex'}
+'simplex'}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}

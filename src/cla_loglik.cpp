@@ -14,7 +14,6 @@
 #include <Rcpp.h>
 
 
-
 template <typename ODE_TYPE>
 double calc_ll_cla(const Rcpp::List& ll,
                    const Rcpp::NumericVector& mm,

@@ -140,7 +140,9 @@ fit_model <- function(tree, traits, model) {
                                 sampling_fraction = c(1, 1),
                                 optimmethod = "subplex",
                                 verbose = FALSE,
-                                num_threads = 6)
+                                num_threads = 6,
+                                atol = 0.1, # high values for demonstration 
+                                rtol = 0.1) # purposes, don't use at home!
   )
   found_pars_vals <- secsse::extract_par_vals(param_posit, answ$MLpars)
   aic <- 2 * max_indicator - 2 * as.numeric(answ$ML)

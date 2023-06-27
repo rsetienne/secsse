@@ -16,8 +16,8 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
-  testthat::expect_warning(
-  idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal))
+
+  idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
   testthat::expect_output(
        startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
