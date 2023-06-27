@@ -20,9 +20,9 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
                         byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
-
-  idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
-  
+  testthat::expect_warning(
+    idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
+  )
   idparsfuncdefpar <- c(3)
   idparsopt <- c(1, 4)
   idparsfix <- c(0, 2)
