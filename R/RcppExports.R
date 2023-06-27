@@ -17,6 +17,11 @@ ct_condition_cla <- function(y, t, ll, mm, Q, method, atol, rtol) {
 #' @param rtol rtol
 #' @param is_complete_tree ss
 #' @export
+#' @return A named list with:
+#'   * Numeric vector with states
+#'   * Numeric vector of length 1 with loglik
+#'   * Numeric vector merge branch
+#'   * Numeric vector nodeM
 cla_calThruNodes_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree) {
     .Call(`_secsse_cla_calThruNodes_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, method, atol, rtol, is_complete_tree)
 }

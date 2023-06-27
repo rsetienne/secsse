@@ -33,7 +33,7 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
-  testthat::expect_output(
+  testthat::expect_warning(
     model <- secsse_ml(
       phy = phylotree,
       traits = traits,

@@ -117,8 +117,8 @@ cla_secsse_ml <- function(phy,
 
     structure_func <- NULL
     if (is.matrix(traits)) {
-        cat("you are setting a model where some species have more
-            than one trait state \n")
+        warning("you are setting a model where some species have more
+            than one trait state")
     }
 
     if (length(initparsopt) != length(idparsopt)) {
@@ -144,7 +144,7 @@ cla_secsse_ml <- function(phy,
 
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
-        cat("Note: you set some transitions as impossible to happen.", "\n")
+        warning("Note: you set some transitions as impossible to happen.", "\n")
     }
 
     if (is.matrix(idparslist[[1]])) {
@@ -160,7 +160,6 @@ cla_secsse_ml <- function(phy,
 
     see_ancestral_states <- FALSE
 
-    cat("Calculating the likelihood for the initial parameters ...", "\n")
     utils::flush.console()
     trparsopt <- initparsopt / (1 + initparsopt)
     trparsopt[which(initparsopt == Inf)] <- 1
@@ -209,15 +208,13 @@ cla_secsse_ml <- function(phy,
                                           atol = atol,
                                           rtol = rtol,
                                           method = method)
-    cat("The loglikelihood for the initial parameter values is",
-        initloglik, "\n")
+    # Function here
+    print_init_ll(initloglik = initloglik, verbose = verbose)
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 
              Try again with different initial values.")
     } else {
-        cat("Optimizing the likelihood - this may take a while.", "\n")
-        utils::flush.console()
         out <- DDD::optimizer(optimmethod = optimmethod,
                               optimpars = optimpars,
                               fun = secsse_loglik_choosepar,
@@ -245,7 +242,7 @@ cla_secsse_ml <- function(phy,
                               method = method)
         if (out$conv != 0) {
             stop("Optimization has not converged. 
-                 Try again with different initial values.\n")
+                 Try again with different initial values.")
         } else {
             ml_pars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)),
                                                    trparsfix,

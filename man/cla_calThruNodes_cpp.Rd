@@ -38,6 +38,13 @@ cla_calThruNodes_cpp(
 
 \item{is_complete_tree}{ss}
 }
+\value{
+A named list with:
+  * Numeric vector with states
+  * Numeric vector of length 1 with loglik
+  * Numeric vector merge branch
+  * Numeric vector nodeM
+}
 \description{
 function to do cpp stuff
 }

@@ -16,7 +16,7 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
     if (is.matrix(traits)) {
         traits <- traits[, 1]
     }
-
+    
     ly <- length(sort(unique(traits))) * 2 * num_concealed_states
     d <- ly / 2
     idparslist[[1]] <- 1:d
@@ -31,23 +31,23 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
     Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = TRUE)
     diag(Q) <- NA
     idparslist[[3]] <- Q
-
+    
     lab_states <- rep(as.character(sort(unique(traits))), num_concealed_states)
-
+    
     lab_conceal <- NULL
     for (i in 1:num_concealed_states) {
-
+        
         lab_conceal <- c(lab_conceal,
                          rep(LETTERS[i],
                              length(sort(unique(traits)))))
     }
-
+    
     statesCombiNames <- character()
     for (i in seq_along(lab_states)) {
         statesCombiNames <- c(statesCombiNames,
                               paste0(lab_states[i],
                                      lab_conceal[i]))
-
+        
     }
     colnames(idparslist[[3]]) <- statesCombiNames
     rownames(idparslist[[3]]) <- statesCombiNames
@@ -72,7 +72,7 @@ create_q_matrix <- function(masterBlock,
                 if (diff.conceal == TRUE) {
                     entry <- concealnewQMatr[i, ii]
                 }
-
+                
                 outDiagBlock <- matrix(0,
                                        ncol = ntraits,
                                        nrow = ntraits,
@@ -122,30 +122,30 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
         all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
         integersmasterBlock <- floor(masterBlock)
         factorBlock <- signif(masterBlock - integersmasterBlock, digits = 2)
-
+        
         factorstoExpand <- unique(sort(c(factorBlock)))
         factorstoExpand <- factorstoExpand[factorstoExpand > 0]
         newshareFac <-
             (max(factorstoExpand * 10) + 1):(max(factorstoExpand * 10) +
                                                  length(factorstoExpand))
         newshareFac <- newshareFac / 10
-
+        
         for (iii in seq_along(newshareFac)) {
             factorBlock[which(factorBlock == factorstoExpand[iii])] <-
-                                                             newshareFac[iii]
+                newshareFac[iii]
         }
-
+        
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(floor(masterBlock))))
         uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
         concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
-
+        
         for (iii in seq_along(concealnewQ)) {
             integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <-
-                                                             concealnewQ[iii]
+                concealnewQ[iii]
         }
         concealnewQMatr <- integersmasterBlock + factorBlock
-
+        
         Q <- create_q_matrix(masterBlock,
                              concealnewQMatr,
                              ntraits,
@@ -160,7 +160,7 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
             uniqParQ2
             concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
         }
-
+        
         Q <- create_q_matrix(masterBlock,
                              concealnewQMatr,
                              ntraits,
@@ -190,23 +190,25 @@ sortingtraits <- function(traitinfo, phy) {
         stop("Number of species in the tree must be the same as
              in the trait file")
     }
-
+    
     if (identical(as.character(sort(phy$tip.label)),
                   as.character(sort(traitinfo[, 1]))) == FALSE) {
         mismatch <- match(as.character(sort(traitinfo[, 1])),
                           as.character(sort(phy$tip.label)))
         mismatched <- (sort(traitinfo[, 1]))[which(is.na(mismatch))]
-        stop(cat("Mismatch on tip labels and taxa names, check the species:",
-                 mismatched))
+        stop(
+            paste(c("Mismatch on tip labels and taxa names, check the species:",
+                    mismatched), collapse = " ")
+        )
     }
-
+    
     traitinfo <- traitinfo[match(phy$tip.label, traitinfo[, 1]), ]
     traitinfo[, 1] == phy$tip.label
-
+    
     if (ncol(traitinfo) == 2) {
         traits <- as.numeric(traitinfo[, 2])
     }
-
+    
     if (ncol(traitinfo) > 2) {
         traits <- NULL
         for (i in 1:(ncol(traitinfo) - 1)) {
@@ -234,7 +236,7 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     if (is.matrix(traits)) {
         traits <- traits[, 1]
     }
-
+    
     ly <- length(sort(unique(traits))) * 2 * num_concealed_states
     d <- ly / 2
     toMatrix <- 1
@@ -242,38 +244,38 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     for (i in 1:d) {
         toMatrix <- c(toMatrix,
                       matPos[(i * d - (d - 1)):((i * d - (d - 1)) + d)])
-
+        
     }
     toMatrix <- toMatrix[1:d^2]
     Q <- matrix(toMatrix, ncol = d, nrow = d, byrow = TRUE)
     diag(Q) <- NA
     lab_states <- rep(as.character(sort(unique(traits))), num_concealed_states)
-
+    
     lab_conceal <- NULL
     for (i in 1:num_concealed_states) {
-
+        
         lab_conceal <- c(lab_conceal,
                          rep(LETTERS[i],
                              length(sort(unique(traits)))))
     }
-
-
+    
+    
     statesCombiNames <- character()
     for (i in seq_along(lab_states)) {
         statesCombiNames <- c(statesCombiNames,
                               paste0(lab_states[i],
                                      lab_conceal[i]))
     }
-
+    
     idparslist[[1]] <- matrix(0, ncol = d, nrow = 4)
     idparslist[[2]] <- (d + 1):ly
     idparslist[[3]] <- Q
-
+    
     rownames(idparslist[[1]]) <- c("dual_inheritance",
                                    "single_inheritance",
                                    "dual_symmetric_transition",
                                    "dual_asymmetric_transition")
-
+    
     colnames(idparslist[[1]]) <- statesCombiNames
     colnames(idparslist[[3]]) <- statesCombiNames
     rownames(idparslist[[3]]) <- statesCombiNames
@@ -305,28 +307,28 @@ prepare_full_lambdas <- function(traits,
     posib_trans <- q_doubletrans(traits,
                                  masterBlock = posib_trans,
                                  diff.conceal = FALSE)
-
+    
     full_lambdas <- list()
-
+    
     for (jj in 1:mat_size) {
         # dual_state_inhe
         m1 <- matrix(0, ncol = mat_size, nrow = mat_size)
         m1[jj, jj] <- as.numeric(lambd_and_modeSpe[, jj][1])
-
+        
         # single_state_inhe
         m2 <- matrix(0, ncol = mat_size, nrow = mat_size)
         m2[, jj] <- posib_trans[jj, ]
         m2[jj, jj] <- 0
         m2[m2 == 1] <- as.numeric(lambd_and_modeSpe[, jj][2])
         # symet_state_emerge
-
+        
         m3 <- matrix(0, ncol = mat_size, nrow = mat_size)
-
+        
         diag(m3) <- posib_trans[jj, ]
         m3[jj, jj] <- 0
         m3[m3 == 1] <- as.numeric(lambd_and_modeSpe[, jj][3])
         # symet_state_emerge
-
+        
         m4 <- matrix(0, ncol = mat_size, nrow = mat_size)
         for (i in seq_along(which(posib_trans[jj, ] == 1))) {
             m4[which(posib_trans[jj, ] == 1)[i], ] <- posib_trans[jj, ]
@@ -336,7 +338,7 @@ prepare_full_lambdas <- function(traits,
         diag(m4) <- 0
         m4[is.na(m4)] <- 0
         m4[m4 == 1] <- as.numeric(lambd_and_modeSpe[, jj][4])
-
+        
         full_lambdas[[jj]] <- m1 + m2 + m3 + m4
     }
     return(full_lambdas)
@@ -350,7 +352,7 @@ normalize_loglik <- function(probs, loglik) {
     sumabsprobs <- sum(abs(probs))
     probs <- probs / sumabsprobs
     loglik <- loglik + log(sumabsprobs)
-    cat(probs, loglik, "\n")
+    message(paste(c(probs, loglik), collapse = " "))
     return(list(probs = probs, loglik = loglik))
 }
 

@@ -201,6 +201,11 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
 //' @param rtol rtol
 //' @param is_complete_tree ss
 //' @export
+//' @return A named list with:
+//'   * Numeric vector with states
+//'   * Numeric vector of length 1 with loglik
+//'   * Numeric vector merge branch
+//'   * Numeric vector nodeM
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& states_R,
