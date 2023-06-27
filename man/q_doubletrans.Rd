@@ -22,6 +22,12 @@ Q matrix that includes both examined and concealed states, it should
 be declared as the third element of idparslist.
 }
 \description{
+This function expands the Q_matrix, but it does so assuming
+that the number of concealed traits is equal to the number of examined 
+traits, if you have a different number, you should consider looking at
+the function [expand_q_matrix()].
+}
+\details{
 Sets a Q matrix where double transitions are not allowed
 }
 \examples{
