@@ -144,7 +144,9 @@ answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               sampling_fraction = c(1, 1),
                               optimmethod = "subplex",
                               verbose = FALSE,
-                              num_threads = 6)
+                              num_threads = 6,
+                              atol = 0.1, # high values for demonstration 
+                              rtol = 0.1) # purposes, don't use at home!
 ```
 
 We can now extract our parameters to get them in the right place:

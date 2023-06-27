@@ -45,8 +45,8 @@ storage calc_ll_cla_store_full(
 
   std::vector<double> y;
 
-  std::vector<int> desNodes;
-  std::vector<double> timeInte;
+  std::vector<int> desNodes(2);
+  std::vector<double> timeInte(2);
 
   storage master_storage;
   int update_freq = ances.size() / 20;
