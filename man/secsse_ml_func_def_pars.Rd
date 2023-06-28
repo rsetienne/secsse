@@ -166,13 +166,12 @@ functions_defining_params[[3]] <- function(){
  par_6 <- par_3 * factor_1
 }
 
-tol = c(1e-04, 1e-05, 1e-07)
+tol = c(1e-02, 1e-03, 1e-04)
 maxiter = 1000 * round((1.25)^length(idparsopt))
-optimmethod = "simplex"
+optimmethod = "subplex"
 cond<-"proper_cond"
 root_state_weight <- "proper_weights"
 sampling_fraction <- c(1,1,1)
-\donttest{
 model <- secsse_ml_func_def_pars(phylotree,
 traits,
 num_concealed_states,
@@ -192,6 +191,5 @@ tol,
 maxiter,
 optimmethod,
 num_cycles = 1)
-}
 # ML -136.5796
 }

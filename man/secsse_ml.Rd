@@ -125,13 +125,12 @@ idparsopt <- c(1,2,3,5)
 initparsopt <- c(rep(intGuessLamba,3),rep((intGuessLamba/5),1))
 idparsfix <- c(0,4)
 parsfix <- c(0,0)
-tol <- c(1e-04, 1e-05, 1e-07)
+tol <- c(1e-02, 1e-03, 1e-04)
 maxiter <- 1000 * round((1.25)^length(idparsopt))
-optimmethod <- 'simplex'
+optimmethod <- 'subplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
-\donttest{
 model<-secsse_ml(
 phylotree,
 traits,
@@ -148,7 +147,7 @@ tol,
 maxiter,
 optimmethod,
 num_cycles = 1,
-)}
+verbose = FALSE)
 # model$ML
 # [1] -16.04127
 }
