@@ -60,13 +60,13 @@
 #'   return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
 #' }
 #'
-#' plot_state_exact(parameters = params,
-#'                  focal_tree = focal_tree,
-#'                  traits = traits,
-#'                  num_concealed_states = 2,
-#'                  sampling_fraction = c(1, 1),
-#'                  steps = 10,
-#'                  prob_func = helper_function)
+#' out_plot <- plot_state_exact(parameters = params,
+#'                              focal_tree = focal_tree,
+#'                              traits = traits,
+#'                              num_concealed_states = 2,
+#'                              sampling_fraction = c(1, 1),
+#'                              steps = 10,
+#'                              prob_func = helper_function)
 #' @export
 plot_state_exact <- function(parameters,
                              focal_tree,

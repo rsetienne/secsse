@@ -1,15 +1,9 @@
-// Copyright 2022 - 2023 Thijs Janzen
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
 //
+//  Copyright (c) 2022 - 2023, Thijs Janzen
 //
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -18,6 +12,7 @@
 #include <array>
 #include <random>
 #include <tuple>
+#include <string>
 
 using num_mat = std::vector< std::vector<double >>;
 using num_mat_mat = std::vector<num_mat>;
@@ -225,6 +220,14 @@ struct population {
 
   int get_id(size_t index) const {
     return pop[index].id_;
+  }
+
+  auto begin() const {
+    return pop.begin();
+  }
+
+  auto end() const {
+    return pop.end();
   }
 
   void clear() {
@@ -555,28 +558,110 @@ struct secsse_sim {
     return cnt;
   }
 
-  void check_num_traits(std::vector<double> traits) {
+  void check_true_states(size_t num_traits) {
+      std::vector<int> focal_traits(num_traits);
+      std::iota(focal_traits.begin(), focal_traits.end(), 0);
+      for (size_t i = 0; i < pop.size(); ++i) {
+        auto trait = static_cast<int>(pop.get_trait(i));
+        for (size_t j = 0; j < focal_traits.size(); ++j) {
+          if (focal_traits[j] == trait) {
+            focal_traits[j] = focal_traits.back();
+            focal_traits.pop_back();
+            break;
+          }
+        }
+        if (focal_traits.empty()) {
+          break;
+        }
+      }
+      if (focal_traits.empty()) {
+        run_info = done;
+        return;
+      }
+
+      // otherwise, conditioning is a reason to reject:
+      run_info = conditioning;
+
+      return;
+  }
+
+  void check_obs_states(size_t num_concealed_states,
+                        size_t num_observed_states) {
+      std::vector<int> focal_traits;    //(num_observed_states);
+      for (size_t i = 0; i < num_observed_states; ++i)  {
+        focal_traits.push_back(i);
+      }
+
+      for (size_t i = 0; i < pop.size(); ++i) {
+        auto trait = static_cast<int>(pop.get_trait(i) % num_concealed_states);
+        for (size_t j = 0; j < focal_traits.size(); ++j) {
+          if (focal_traits[j] == trait) {
+            focal_traits[j] = focal_traits.back();
+            focal_traits.pop_back();
+            break;
+          }
+        }
+        if (focal_traits.empty()) {
+          break;
+        }
+      }
+      if (focal_traits.empty()) {
+        run_info = done;
+        return;
+      }
+
+      // otherwise, conditioning is a reason to reject:
+      run_info = conditioning;
+      return;
+  }
+
+  void check_conditioning(std::string conditioning_type,
+                          size_t num_concealed_states,
+                          size_t num_states) {
+    if (run_info == extinct) return;
+
+    if (conditioning_type == "none") {
+      run_info = done;
+    }
+
+    if (conditioning_type == "true_states") {
+        check_true_states(num_states);
+    }
+
+    if (conditioning_type == "obs_states") {
+      check_obs_states(num_concealed_states,
+                       num_states / num_concealed_states);
+    }
+
+    return;
+  }
+
+  void check_num_traits(const std::vector<double>& input_traits) {
+    std::vector<double> focal_traits = input_traits;
     if (run_info != done) return;
 
     // check if all focal traits are there
-    if (traits.empty()) return;  // no conditioning
+    if (focal_traits.empty()) return;  // no conditioning
 
     // now check if each trait to be checked is present:
     for (size_t i = 0; i < pop.size(); ++i) {
       auto trait = pop.get_trait(i);
-      for (size_t j = 0; j < traits.size(); ++j) {
-        if (traits[j] == trait) {
-          traits[j] = traits.back();
-          traits.pop_back();
+      for (size_t j = 0; j < focal_traits.size(); ++j) {
+        if (focal_traits[j] == trait) {
+          focal_traits[j] = focal_traits.back();
+          focal_traits.pop_back();
           break;
         }
       }
-      if (traits.empty()) {
+      if (focal_traits.empty()) {
         break;
       }
     }
     // if traits is empty, all traits were found:
-    if (traits.empty()) return;
+    if (focal_traits.empty()) {
+      run_info = done;
+      return;
+    }
 
     // otherwise, conditioning is a reason to reject:
     run_info = conditioning;
@@ -600,7 +685,7 @@ struct secsse_sim {
 
   num_mat extract_ltable() {
     num_mat extracted_ltable(L.data_.size(), std::vector<double>(4));
-    for (int i = 0; i < L.data_.size(); ++i) {
+    for (size_t i = 0; i < L.data_.size(); ++i) {
       auto temp = L.data_[i].get_data();
       std::vector<double> row(temp.begin(), temp.end());
       extracted_ltable[i] = row;

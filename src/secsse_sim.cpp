@@ -1,27 +1,23 @@
-// Copyright 2022 - 2023 Thijs Janzen
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
 //
+//  Copyright (c) 2022 - 2023, Thijs Janzen
 //
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 #include <Rcpp.h>
 
 #include "secsse_sim.h"   // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
 
+#include <string>
+
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
-  for (size_t m = 0; m < lambdas_R.size(); ++m) {
+  for (int m = 0; m < lambdas_R.size(); ++m) {
     Rcpp::NumericMatrix entry_R = lambdas_R[m];
     num_mat entry_cpp(entry_R.nrow(), std::vector<double>(entry_R.ncol(), 0.0));
-    for (size_t i = 0; i < entry_R.nrow(); ++i) {
-      for (size_t j = 0; j < entry_R.ncol(); ++j) {
+    for (int i = 0; i < entry_R.nrow(); ++i) {
+      for (int j = 0; j < entry_R.ncol(); ++j) {
         entry_cpp[i][j] = entry_R(i, j);
       }
     }
@@ -37,7 +33,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           double max_time,
                           double max_species,
                           const std::vector<double>& init_states,
-                          std::vector<double> conditioning_vec,
+                          std::string condition,
+                          int num_concealed_states,
                           bool non_extinction,
                           bool verbose,
                           int max_tries) {
@@ -46,7 +43,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
 
   num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
 
-  if (conditioning_vec[0] == -1) conditioning_vec.clear();   // "none"
+  // if (conditioning_vec[0] == -1) conditioning_vec.clear();   // "none"
 
   secsse_sim sim(m_R,
                  lambdas,
@@ -59,7 +56,10 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   int cnt = 0;
   while (true) {
         sim.run();
-        sim.check_num_traits(conditioning_vec);
+        // sim.check_num_traits(conditioning_vec);
+        sim.check_conditioning(condition,
+                               num_concealed_states,
+                               m_R.size());
 
         if (sim.run_info != done) {
           cnt++;

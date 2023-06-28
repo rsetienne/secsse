@@ -1,19 +1,15 @@
-// Copyright 2022 - 2023 Thijs Janzen
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
 //
+//  Copyright (c) 2022 - 2023, Thijs Janzen
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <vector>
+#include "config.h"
 #include "Rcpp.h"
+#include <vector>
 
 void force_output();
 
@@ -46,6 +42,9 @@ void normalize_loglik(std::vector<double>* probvec,
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v);
 
+std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m);
+
+
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix* m);
 
@@ -53,6 +52,9 @@ void output_vec(const std::vector<double>& v);
 
 void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
                     std::vector< std::vector< std::vector<double >>>* v);
+
+std::vector< std::vector< std::vector<double >>>  
+  list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l);
 
 struct data_storage {
   std::vector<double> t;

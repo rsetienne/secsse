@@ -1,20 +1,16 @@
-// Copyright 2022 - 2023 Thijs Janzen
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+//
+//  Copyright (c) 2022 - 2023, Thijs Janzen
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-//
+#include "config.h"    // NOLINT [build/include_subdir]
+#include "util.h"   // NOLINT [build/include_subdir]
 
 #include <thread>   // NOLINT [build/c++11]
 #include <chrono>   // NOLINT [build/c++11]
 
-#include "util.h"   // NOLINT [build/include_subdir]
 
 void force_output() {
   std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -27,7 +23,7 @@ std::vector<int> find_desNodes(
     const std::vector< std::vector<double>>& phy_edge,
     int focal) {
   std::vector<int> output;
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
       output.push_back(phy_edge[i][1]);
     }
@@ -37,7 +33,7 @@ std::vector<int> find_desNodes(
 
 double get_dt(const std::vector< std::vector<double>>& phy_edge,
               int focal) {
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][1] == focal) {
       return phy_edge[i][2];
     }
@@ -49,14 +45,16 @@ void find_desNodes(const std::vector< std::vector<double>>& phy_edge,
                    int focal,
                    std::vector<int>* desNodes,
                    std::vector<double>* timeInte) {
-  (*desNodes).clear();
-  (*timeInte).clear();
-  std::vector<int> output;
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  (*desNodes).resize(2);
+  (*timeInte).resize(2);
+  size_t cnt = 0;
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
-      (*desNodes).push_back(phy_edge[i][1]);
-      (*timeInte).push_back(phy_edge[i][2]);
+      (*desNodes)[cnt] = phy_edge[i][1];
+      (*timeInte)[cnt] = phy_edge[i][2];
+      cnt++;
     }
+    if (cnt > 1) break;
   }
 }
 
@@ -65,7 +63,7 @@ std::vector<int> find_connections(
     int focal) {
   std::vector<int> output(2);
   int cnt = 0;
-  for (int i = 0; i < phy_edge.size(); ++i) {
+  for (size_t i = 0; i < phy_edge.size(); ++i) {
     if (phy_edge[i][0] == focal) {
      output[cnt] = phy_edge[i][1];
      cnt++;
@@ -110,10 +108,13 @@ void normalize_loglik(std::vector<double>* probvec,
                                        0.0,
                                        abssum);
 
-  for (auto& i : (*probvec)) {
-    i *= 1.0 / sumabsprobs;
+  if (sumabsprobs > 0.0) {
+
+      for (auto& i : (*probvec)) {
+        i *= 1.0 / sumabsprobs;
+      }
+      (*loglik) += log(sumabsprobs);
   }
-  (*loglik) += log(sumabsprobs);
   return;
 }
 
@@ -121,9 +122,9 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v) {
   (*v) = std::vector< std::vector< double> >(m.nrow(),
             std::vector<double>(m.ncol(), 0.0));
-  for (size_t i = 0; i < m.nrow(); ++i) {
+  for (int i = 0; i < m.nrow(); ++i) {
     std::vector<double> row(m.ncol(), 0.0);
-    for (size_t j = 0; j < m.ncol(); ++j) {
+    for (int j = 0; j < m.ncol(); ++j) {
       row[j] = m(i, j);
     }
     (*v)[i] = row;
@@ -131,28 +132,48 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   return;
 }
 
-void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
-                    std::vector< std::vector< std::vector<double >>>* v) {
-  int n = l.size();
-
-  (*v) = std::vector< std::vector< std::vector<double>>>(n);
-  for (size_t i = 0; i < n; ++i) {
-    std::vector< std::vector< double >> entry;
-    Rcpp::NumericMatrix temp = l[i];
-    numericmatrix_to_vector(temp, &entry);
-    (*v).push_back(entry);
+std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m) {
+  auto v = std::vector< std::vector< double> >(m.nrow(), 
+                                               std::vector<double>(m.ncol(), 
+                                                                   0.0));
+  for (int i = 0; i < m.nrow(); ++i) {
+    std::vector<double> row(m.ncol(), 0.0);
+    for (int j = 0; j < m.ncol(); ++j) {
+      row[j] = m(i, j);
+    }
+    v[i] = row;
   }
-  return;
+  return v;
+}
+
+std::vector< std::vector< std::vector<double >>>  
+  list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& ll) {
+  
+  std::vector< std::vector< std::vector< double > >> ll_cpp;
+  for (size_t i = 0; i < ll.size(); ++i) {
+    Rcpp::NumericMatrix temp = ll[i];
+    std::vector< std::vector< double >> temp2;
+    for (size_t j = 0; j < temp.nrow(); ++j) {
+      std::vector<double> row;
+      for (size_t k = 0; k < temp.ncol(); ++k) {
+        row.push_back(temp(j, k));
+      }
+      temp2.push_back(row);
+    }
+    ll_cpp.push_back(temp2);
+  }
+  
+  return ll_cpp;
 }
 
 
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix* m) {
-  int n_rows = v.size();
-  int n_cols = v[0].size();
+  size_t n_rows = v.size();
+  size_t n_cols = v[0].size();
   (*m) = Rcpp::NumericMatrix(n_rows, n_cols);
-  for (int i = 0; i < n_rows; ++i) {
-    for (int j = 0; j < n_cols; ++j) {
+  for (size_t i = 0; i < n_rows; ++i) {
+    for (size_t j = 0; j < n_cols; ++j) {
       (*m)(i, j) = v[i][j];
     }
   }
@@ -161,7 +182,7 @@ void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
 
 void output_vec(const std::vector<double>& v) {
   // std::cerr << "vec: ";
-  //  for (int i = 0; i < v.size(); ++i) {
+  //  for (size_t i = 0; i < v.size(); ++i) {
   //    std::cerr << v[i] << " ";
   //} std::cerr << "\n";
 }

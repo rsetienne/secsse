@@ -9,12 +9,14 @@ secsse_sim(
   mus,
   qs,
   crown_age,
+  num_concealed_states,
   pool_init_states = NULL,
   maxSpec = 1e+05,
   conditioning = "none",
   non_extinction = TRUE,
   verbose = FALSE,
-  max_tries = 1e+06
+  max_tries = 1e+06,
+  drop_extinct = TRUE
 )
 }
 \arguments{
@@ -28,6 +30,8 @@ generally in the form of a matrix.}
 \item{crown_age}{crown age of the tree, tree will be simulated conditional
 on non-extinction and this crown age.}
 
+\item{num_concealed_states}{number of concealed states}
+
 \item{pool_init_states}{pool of initial states at the crown, in case this is
 different from all available states, otherwise leave at NULL}
 
@@ -36,8 +40,9 @@ tree is not conditioned on this number, but that this is a safeguard against
 generating extremely large trees).}
 
 \item{conditioning}{can be 'obs_states', 'true_states' or 'none', the tree is
-simulated until one is generated that contains all observed states, all
-true states (e.g. obs x hidden states), or is always returned.}
+simulated until one is generated that contains all observed states
+('obs_states'), all true states (e.g. all combinations of obs and hidden
+states), or is always returned ('none').}
 
 \item{non_extinction}{should the tree be conditioned on non-extinction of the
 crown lineages? Default is TRUE.}
@@ -45,6 +50,9 @@ crown lineages? Default is TRUE.}
 \item{verbose}{provide intermediate output.}
 
 \item{max_tries}{maximum number of simulations to try to obtain a tree.}
+
+\item{drop_extinct}{should extinct species be dropped from the tree? default
+is TRUE.}
 }
 \value{
 a list with four properties: phy: reconstructed phylogeny,

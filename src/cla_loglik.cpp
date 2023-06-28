@@ -1,23 +1,17 @@
-// Copyright 2022 - 2023 Thijs Janzen
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
 //
+//  Copyright (c) 2022 - 2023, Thijs Janzen
 //
-
-#include <vector>
-#include <Rcpp.h>
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "config.h"       // NOLINT [build/include_subdir]
 #include "odeint.h"       // NOLINT [build/include_subdir]
+#include "rhs.h"          // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
 
+#include <vector>
+#include <Rcpp.h>
 
 
 template <typename ODE_TYPE>
@@ -69,30 +63,28 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector< double > logliks(ances.size());
   std::vector<double> y;
 
-  std::vector<int> desNodes;
-  std::vector<double> timeInte;
+  std::vector<int> desNodes(2, 0);
+  std::vector<double> timeInte(2, 0.0);
   long double loglik = 0;
-
   for (int a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
-
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    int focal_node;
-    for (int i = 0; i < desNodes.size(); ++i) {
+    int focal_node = 0;
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
-      assert((focal_node) >= 0);
-      assert((focal_node) < states.size());
+      if (focal_node < 0) throw "focal_node < 0";
+      if (focal_node >= states->size()) throw "focal_node > states.size";
 
       y = (*states)[focal_node];
-
+      
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr),     // ode class object
                            &y,                    // state vector
-                           0.0,                   // t0
-                           timeInte[i],           // t1
-                           timeInte[i] * 0.1,
+                           bstime_t{0.0},                   // t0
+                           bstime_t{timeInte[i]},           // t1
+                           bstime_t{timeInte[i] * 0.1},
                            absolute_tol,
                            relative_tol);
 
@@ -123,8 +115,8 @@ double calc_ll_cla(const Rcpp::List& ll,
     for (int i = 0; i < d; ++i) newstate[i] = nodeM[i];
     newstate.insert(newstate.end(), mergeBranch.begin(), mergeBranch.end());
 
-    assert((focal) >= 0);
-    assert((focal) < states.size());
+    if (focal_node < 0) throw "focal_node < 0";
+    if (focal_node >= states->size()) throw "focal_node > states.size";
 
     (*states)[focal] = newstate;
   }
@@ -175,9 +167,9 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
   odeintcpp::integrate(method,
                        std::move(od_ptr),    // ode class object
                        &init_state,          // state vector
-                       0.0,                  // t0
-                       t,                    // t1
-                       t * 0.01,
+                       bstime_t{0.0},                  // t0
+                       bstime_t{t},                    // t1
+                       bstime_t{t * 0.01},
                        atol,
                        rtol);
 
@@ -189,18 +181,6 @@ Rcpp::NumericVector ct_condition_cla(const Rcpp::NumericVector& y,
 }
 
 
-//' function to do cpp stuff
-//' @param ances ances
-//' @param states_R states_R
-//' @param forTime_R fr
-//' @param lambdas l
-//' @param mus mus
-//' @param Q Q
-//' @param method method
-//' @param atol atol
-//' @param rtol rtol
-//' @param is_complete_tree ss
-//' @export
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_cpp(const Rcpp::NumericVector& ances,
                                 const Rcpp::NumericMatrix& states_R,
@@ -246,7 +226,6 @@ try {
   }
   Rcpp::NumericMatrix states_out;
   vector_to_numericmatrix(states, &states_out);
-
   Rcpp::List output = Rcpp::List::create(Rcpp::Named("states") = states_out,
                                          Rcpp::Named("loglik") = loglik,
                                          Rcpp::Named("mergeBranch") =

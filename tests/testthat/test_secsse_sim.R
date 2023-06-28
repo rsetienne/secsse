@@ -25,12 +25,12 @@ test_that("test secsse_sim", {
   parsfix <- c(0, 0, 0.01)
   tol <- c(1e-04, 1e-05, 1e-07)
   maxiter <- 1000 * round((1.25)^length(idparsopt))
-  optimmethod <- "simplex"
+  optimmethod <- "subplex"
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-  testthat::expect_output(
+  testthat::expect_warning(
   model_R <- secsse::cla_secsse_ml(
     phylotree,
     traits,
@@ -63,6 +63,7 @@ test_that("test secsse_sim", {
   tree1 <- secsse::secsse_sim(lambdas = lambdas,
                              mus = mus,
                              qs = qs,
+                             num_concealed_states = num_concealed_states,
                              crown_age = max_time,
                              maxSpec = maxSpec,
                              conditioning = "obs_states")
@@ -73,6 +74,7 @@ test_that("test secsse_sim", {
   tree2 <- secsse::secsse_sim(lambdas = lambdas,
                              mus = mus,
                              qs = qs,
+                             num_concealed_states = num_concealed_states,
                              crown_age = max_time,
                              maxSpec = maxSpec,
                              conditioning = "true_states")

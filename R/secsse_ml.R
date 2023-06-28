@@ -22,14 +22,15 @@
 #' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
 #' @param maxiter max number of iterations.
 #' Default is '1000 *round((1.25)^length(idparsopt))'.
-#' @param optimmethod method used for optimization. Default is 'simplex'.
+#' @param optimmethod method used for optimization. Available are simplex and
+#' subplex, default is 'subplex'. Simplex should only be used for debugging.
 #' @param num_cycles number of cycles of the optimization (default is 1).
 #' @param loglik_penalty the size of the penalty for all parameters; default
 #' is 0 (no penalty)
 #' @param is_complete_tree whether or not a tree with all its extinct species
 #' is provided
 #' @param verbose sets verbose output; default is verbose when optimmethod is
-#' 'subplex'
+#' 'simplex'
 #' @param num_threads number of threads. Set to -1 to use all available threads.
 #' Default is one thread.
 #' @param atol absolute tolerance of integration
@@ -67,13 +68,12 @@
 #'initparsopt <- c(rep(intGuessLamba,3),rep((intGuessLamba/5),1))
 #'idparsfix <- c(0,4)
 #'parsfix <- c(0,0)
-#'tol <- c(1e-04, 1e-05, 1e-07)
+#'tol <- c(1e-02, 1e-03, 1e-04)
 #'maxiter <- 1000 * round((1.25)^length(idparsopt))
-#'optimmethod <- 'simplex'
+#'optimmethod <- 'subplex'
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-#' \dontrun{
 #'model<-secsse_ml(
 #'phylotree,
 #'traits,
@@ -90,7 +90,7 @@
 #'maxiter,
 #'optimmethod,
 #'num_cycles = 1,
-#')}
+#'verbose = FALSE)
 #'# model$ML
 #'# [1] -16.04127
 #' @export
@@ -107,7 +107,7 @@ secsse_ml <- function(phy,
                       sampling_fraction,
                       tol = c(1e-04, 1e-05, 1e-07),
                       maxiter = 1000 * round((1.25)^length(idparsopt)),
-                      optimmethod = "simplex",
+                      optimmethod = "subplex",
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
@@ -125,8 +125,8 @@ secsse_ml <- function(phy,
                 is_complete_tree)
 
     if (is.matrix(traits)) {
-        cat("You are setting a model where some species had more than 
-            one trait state \n")
+        warning("You are setting a model where some species had more than 
+            one trait state.")
     }
 
     if (length(initparsopt) != length(idparsopt)) {
@@ -152,12 +152,11 @@ secsse_ml <- function(phy,
 
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
-        cat("You set some transitions as impossible to happen", "\n")
+        warning("You set some transitions as impossible to happen")
     }
 
     see_ancestral_states <- FALSE
 
-    cat("Calculating the likelihood for the initial parameters.", "\n")
     utils::flush.console()
     trparsopt <- initparsopt / (1 + initparsopt)
     trparsopt[which(initparsopt == Inf)] <- 1
@@ -202,16 +201,14 @@ secsse_ml <- function(phy,
                                           atol = atol,
                                           rtol = rtol,
                                           method = method)
-
-    cat("The loglikelihood for the initial parameter values is",
-        initloglik, "\n")
+    
+    print_init_ll(initloglik = initloglik, verbose = verbose)
+    
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 
              Try again with different initial values.")
     } else {
-        cat("Optimizing the likelihood - this may take a while.", "\n")
-        utils::flush.console()
         if (is_complete_tree == TRUE) {
             setting_calculation <- NULL
         }
@@ -305,9 +302,9 @@ transf_funcdefpar <- function(idparsfuncdefpar,
 
 #' @keywords internal
 update_values_transform_cla <- function(trpars,
-                              idparslist,
-                              idpars,
-                              parvals) {
+                                        idparslist,
+                                        idpars,
+                                        parvals) {
     for (i in seq_along(idpars)) {
         for (j in seq_len(nrow(trpars[[3]]))) {
             id <- which(idparslist[[1]][[j]] == idpars[i])
@@ -323,13 +320,13 @@ update_values_transform_cla <- function(trpars,
 
 #' @keywords internal
 transform_params_cla <- function(idparslist,
-                               idparsfix,
-                               trparsfix,
-                               idparsopt,
-                               trparsopt,
-                               structure_func,
-                               idparsfuncdefpar,
-                               trparfuncdefpar) {
+                                 idparsfix,
+                                 trparsfix,
+                                 idparsopt,
+                                 trparsopt,
+                                 structure_func,
+                                 idparsfuncdefpar,
+                                 trparfuncdefpar) {
     trpars1 <- idparslist
     for (j in seq_len(nrow(trpars1[[3]]))) {
         trpars1[[1]][[j]][, ] <- NA
@@ -341,21 +338,21 @@ transform_params_cla <- function(idparslist,
 
     if (length(idparsfix) != 0) {
         trpars1 <- update_values_transform_cla(trpars1,
-                                     idparslist,
-                                     idparsfix,
-                                     trparsfix)
+                                               idparslist,
+                                               idparsfix,
+                                               trparsfix)
     }
 
     trpars1 <- update_values_transform_cla(trpars1,
-                                 idparslist,
-                                 idparsopt,
-                                 trparsopt)
+                                           idparslist,
+                                           idparsopt,
+                                           trparsopt)
     ## structure_func part
     if (!is.null(structure_func)) {
         trpars1 <- update_values_transform_cla(trpars1,
-                                     idparslist,
-                                     idparsfuncdefpar,
-                                     trparfuncdefpar)
+                                               idparslist,
+                                               idparsfuncdefpar,
+                                               trparfuncdefpar)
     }
 
     pre_pars1 <- list()
@@ -514,23 +511,26 @@ secsse_loglik_choosepar <- function(trparsopt,
         if (is.list(pars1[[1]])) {
             # is the cla_ used?
             loglik <- secsse::cla_secsse_loglik(parameter = pars1,
-                                        phy = phy,
-                                        traits = traits,
-                                        num_concealed_states =
-                                            num_concealed_states,
-                                        cond = cond,
-                                        root_state_weight = root_state_weight,
-                                        sampling_fraction = sampling_fraction,
-                                        setting_calculation =
-                                            setting_calculation,
-                                        see_ancestral_states =
-                                            see_ancestral_states,
-                                        loglik_penalty = loglik_penalty,
-                                        is_complete_tree = is_complete_tree,
-                                        num_threads = num_threads,
-                                        method = method,
-                                        atol = atol,
-                                        rtol = rtol)
+                                                phy = phy,
+                                                traits = traits,
+                                                num_concealed_states =
+                                                    num_concealed_states,
+                                                cond = cond,
+                                                root_state_weight =
+                                                    root_state_weight,
+                                                sampling_fraction =
+                                                    sampling_fraction,
+                                                setting_calculation =
+                                                    setting_calculation,
+                                                see_ancestral_states =
+                                                    see_ancestral_states,
+                                                loglik_penalty = loglik_penalty,
+                                                is_complete_tree =
+                                                    is_complete_tree,
+                                                num_threads = num_threads,
+                                                method = method,
+                                                atol = atol,
+                                                rtol = rtol)
         } else {
             loglik <- secsse_loglik(parameter = pars1,
                                     phy = phy,
@@ -549,13 +549,14 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     method = method)
         }
         if (is.nan(loglik) || is.na(loglik)) {
-            cat("There are parameter values used which cause
-                numerical problems.\n")
+            warning("There are parameter values used which cause
+                numerical problems.")
             loglik <- -Inf
         }
     }
     if (verbose) {
-        cat(c(trparsopt / (1 - trparsopt), loglik), "\n")
+        out_print <- c(trparsopt / (1 - trparsopt), loglik)
+        message(paste(out_print, collapse = " "))
     }
     return(loglik)
 }

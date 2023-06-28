@@ -267,11 +267,10 @@ startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylo_Vign))
 intGuessLamba <- startingpoint$lambda0
 intGuessMu <- startingpoint$mu0
 #Make sure that the dimensions of initparsopt agree with those of
-#idparslist and idparsopt, especially in the case of the initial
-#guesses for rates supplied to the Q matrix. Rules of thumb are
-#that if n=number of examined states, both intGuessLamba and
-#intGuessMu should be replicated 2n times, and (intGuessLamba / 5)
-#should be replicated (2n)2/2 times:
+#idparsopt. We have idparsopt <- c(1:9, 11) here, so we have 10 parameters
+#which correspond (look at idparslist) to 9 lambdas and 1 transition rate.
+#Here the transition rate is initially set at 20% (one fifth) of the initial
+#guess for lambda:
 initparsopt <- c(rep(intGuessLamba, 9), rep((intGuessLamba / 5), 1))
 ```
 
@@ -289,7 +288,7 @@ OPTIMMETHOD: optimization method, generally we recommend "simplex".
 
 RUN_PARALLEL: this specifies whether or not to use the SecSSE tree-breaking function. If you have a large tree, this tree can be broken into two pieces so that computation of likelihood along branches can take place simultaneously on the two pieces, yielding a gain in computation time. The size of the two pieces is established by SecSSE, and depends on how balanced the tree is; a better-balanced tree yields two pieces of relatively equal size and results in relatively larger gain in computation time. With large trees (say, n\>1000), it is our experience that even two chunks of tree of unequal size yield a time advantage. Needless to say, your computational setup needs to be able to accommodate parallel computation (multiple cores, nodes).
 
-## Running the likelihood function
+## Running the likelihood maximization
 
 After we have defined all of the necessary parameters for running secsse_ml, we can start running our analysis and saving them to an R data file, for example, here called output.RDS.
 Note that this may take a while and procude a lot of console output.
@@ -309,13 +308,6 @@ out <- secsse_ml(phylo_Vign,
                  sampling_fraction = c(1, 1, 1),
                  optimmethod = "simplex",
                  num_cycles = 1)
-saveRDS(out, file = "output.RDS")
-```
-
-Later on, we can retrieve the data in this file, simply by entering:
-
-```{r}
-readRDS("output.RDS")
 ```
 
 The following is sample output, with two concealed states, notice in this case all transition rates, including dual rates, were set to the fixed value of 0.01:

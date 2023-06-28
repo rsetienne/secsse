@@ -29,6 +29,7 @@ Other contributors:
 \itemize{
   \item Thijs Janzen \email{t.janzen@rug.nl} (\href{https://orcid.org/0000-0002-4162-1140}{ORCID}) [contributor]
   \item Hanno Hildenbrandt \email{h.hildenbrandt@rug.nl} (\href{https://orcid.org/0000-0002-6784-1037}{ORCID}) [contributor]
+  \item Pedro Santos Neves \email{p.m.santos.neves@rug.nl} (\href{https://orcid.org/0000-0003-2561-4677}{ORCID}) [contributor]
 }
 
 }

@@ -3,6 +3,7 @@
 #' @param mus extinction rates, in the form of a vector
 #' @param qs The Q matrix, for example the result of function q_doubletrans, but
 #' generally in the form of a matrix.
+#' @param num_concealed_states number of concealed states
 #' @param crown_age crown age of the tree, tree will be simulated conditional
 #' on non-extinction and this crown age.
 #' @param pool_init_states pool of initial states at the crown, in case this is
@@ -11,12 +12,15 @@
 #' tree is not conditioned on this number, but that this is a safeguard against
 #' generating extremely large trees).
 #' @param conditioning can be 'obs_states', 'true_states' or 'none', the tree is
-#' simulated until one is generated that contains all observed states, all
-#' true states (e.g. obs x hidden states), or is always returned.
+#' simulated until one is generated that contains all observed states
+#' ('obs_states'), all true states (e.g. all combinations of obs and hidden
+#' states), or is always returned ('none').
 #' @param non_extinction should the tree be conditioned on non-extinction of the
 #' crown lineages? Default is TRUE.
 #' @param verbose provide intermediate output.
 #' @param max_tries maximum number of simulations to try to obtain a tree.
+#' @param drop_extinct should extinct species be dropped from the tree? default
+#' is TRUE.
 #' @return a list with four properties: phy: reconstructed phylogeny,
 #' true_traits: the true traits in order of tip label, obs_traits: observed
 #' traits, ignoring hidden traits and lastly:
@@ -40,20 +44,20 @@ secsse_sim <- function(lambdas,
                        mus,
                        qs,
                        crown_age,
+                       num_concealed_states,
                        pool_init_states = NULL,
                        maxSpec = 1e5,
                        conditioning = "none",
                        non_extinction = TRUE,
                        verbose = FALSE,
-                       max_tries = 1e6) {
+                       max_tries = 1e6,
+                       drop_extinct = TRUE) {
 
   if (is.matrix(lambdas)) {
-    hidden_traits <- unique(gsub("[[:digit:]]+", "", names(mus)))
     # need to be converted
-    lambdas <- prepare_full_lambdas(
-                                names(mus),
-                                num_concealed_states = length(hidden_traits),
-                                lambdas)
+    lambdas <- prepare_full_lambdas(names(mus),
+                                   num_concealed_states = num_concealed_states,
+                                   lambdas)
   }
 
   if (length(lambdas) != length(mus)) {
@@ -84,22 +88,14 @@ secsse_sim <- function(lambdas,
          'none', 'obs_states', 'true_states'")
   }
 
-  conditioning_vec <- c(-1)
-  if (conditioning == "true_states") {
-    conditioning_vec <- -1 + seq_along(mus)
-  }
-  if (conditioning == "obs_states") {
-    obs_traits <- as.numeric(gsub("[^0-9.-]", "", names(mus)))
-    conditioning_vec <- sort(unique(obs_traits))
-  }
-
   res <- secsse_sim_cpp(mus,
                         lambdas,
                         qs,
                         crown_age,
                         maxSpec,
                         pool_init_states,
-                        conditioning_vec,
+                        conditioning,
+                        num_concealed_states,
                         non_extinction,
                         verbose,
                         max_tries)
@@ -118,12 +114,15 @@ secsse_sim <- function(lambdas,
   speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
   initialState  <- res$initial_state
   Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
-                                             # not at crown age
+                                           # not at crown age
+  notmin1 <- which(Ltable[, 4] != -1)
+  Ltable[notmin1, 4] <- crown_age - c(Ltable[notmin1, 4])
+  Ltable[which(Ltable[, 4] == crown_age + 1), 4] <- -1
 
   indices       <- seq(1, length(res$traits), by = 2)
   speciesTraits <- 1 + res$traits[indices]
 
-  phy <- DDD::L2phylo(Ltable, dropextinct = TRUE)
+  phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
 
   true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
                                              speciesTraits),
@@ -131,7 +130,10 @@ secsse_sim <- function(lambdas,
                             phy)
 
   true_traits <- names(mus)[true_traits]
-  obs_traits <- as.numeric(gsub("[^0-9.-]", "", true_traits))
+  obs_traits <- c()
+  for (i in seq_along(true_traits)) {
+    obs_traits[i] <- stringr::str_sub(true_traits[i], 1, -2)
+  }
 
   if (sum(Ltable[, 4] < 0)) {
       return(list(phy = phy,

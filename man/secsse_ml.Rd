@@ -18,7 +18,7 @@ secsse_ml(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  optimmethod = "simplex",
+  optimmethod = "subplex",
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
@@ -64,7 +64,8 @@ trait state. It must have as many elements as there are trait states.}
 \item{maxiter}{max number of iterations.
 Default is '1000 *round((1.25)^length(idparsopt))'.}
 
-\item{optimmethod}{method used for optimization. Default is 'simplex'.}
+\item{optimmethod}{method used for optimization. Available are simplex and
+subplex, default is 'subplex'. Simplex should only be used for debugging.}
 
 \item{num_cycles}{number of cycles of the optimization (default is 1).}
 
@@ -75,7 +76,7 @@ is 0 (no penalty)}
 is provided}
 
 \item{verbose}{sets verbose output; default is verbose when optimmethod is
-'subplex'}
+'simplex'}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
@@ -124,13 +125,12 @@ idparsopt <- c(1,2,3,5)
 initparsopt <- c(rep(intGuessLamba,3),rep((intGuessLamba/5),1))
 idparsfix <- c(0,4)
 parsfix <- c(0,0)
-tol <- c(1e-04, 1e-05, 1e-07)
+tol <- c(1e-02, 1e-03, 1e-04)
 maxiter <- 1000 * round((1.25)^length(idparsopt))
-optimmethod <- 'simplex'
+optimmethod <- 'subplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
-\dontrun{
 model<-secsse_ml(
 phylotree,
 traits,
@@ -147,7 +147,7 @@ tol,
 maxiter,
 optimmethod,
 num_cycles = 1,
-)}
+verbose = FALSE)
 # model$ML
 # [1] -16.04127
 }

@@ -1,20 +1,17 @@
-// Copyright 2022 - 2023 Thijs Janzen
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+//
+//  Copyright (c) 2022 - 2023, Thijs Janzen
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-//
+#include "config.h"
+#include "odeint.h"    // NOLINT [build/include_subdir]
+#include "rhs.h"       // NOLINT [build/include_subdir]
+#include "util.h"      // NOLINT [build/include_subdir]
+
 #include <vector>
 #include <Rcpp.h>
-
-#include "odeint.h"    // NOLINT [build/include_subdir]
-#include "util.h"      // NOLINT [build/include_subdir]
 
 //// continuous storage
 storage calc_ll_full(const Rcpp::NumericVector& ll,
@@ -39,7 +36,7 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
 
     if (a % update_freq == 0 && verbose) {
@@ -47,11 +44,11 @@ storage calc_ll_full(const Rcpp::NumericVector& ll,
     }
     Rcpp::checkUserInterrupt();
 
-    std::vector<int> desNodes;
-    std::vector<double> timeInte;
+    std::vector<int> desNodes(2);
+    std::vector<double> timeInte(2);
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    for (int i = 0; i < desNodes.size(); ++i) {
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
 
       ode_standard_store od(ll, mm, Q);
@@ -109,7 +106,7 @@ storage calc_ll(const Rcpp::NumericVector& ll,
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     int focal = ances[a];
 
     if (a % update_freq == 0 && verbose) {
@@ -121,7 +118,7 @@ storage calc_ll(const Rcpp::NumericVector& ll,
     std::vector<double> timeInte;
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    for (int i = 0; i < desNodes.size(); ++i) {
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       int focal_node = desNodes[i];
 
       data_storage local_storage;

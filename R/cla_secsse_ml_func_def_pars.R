@@ -107,13 +107,12 @@
 #'  par_6 <- par_3 * factor_1
 #'}
 #'
-#'tol = c(1e-04, 1e-05, 1e-07)
+#'tol = c(1e-02, 1e-03, 1e-04)
 #'maxiter = 1000 * round((1.25)^length(idparsopt))
-#'optimmethod = 'simplex'
+#'optimmethod = 'subplex'
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-#' \dontrun{
 #'model <- cla_secsse_ml_func_def_pars(phylotree,
 #'traits,
 #'num_concealed_states,
@@ -133,7 +132,6 @@
 #'maxiter,
 #'optimmethod,
 #'num_cycles = 1)
-#'}
 #'# ML -136.5796
 #' @export
 cla_secsse_ml_func_def_pars <- function(phy,
@@ -186,7 +184,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
     }
 
     if (is.matrix(traits)) {
-        cat("You are setting a model where some species had more 
+        message("You are setting a model where some species had more 
             than one trait state \n")
     }
 
@@ -210,17 +208,18 @@ cla_secsse_ml_func_def_pars <- function(phy,
                   as.numeric(sort(unique(unlist(idparslist))))) ==
         FALSE) {
         stop("All elements in idparslist must be included in either 
-             idparsopt or idparsfix or idparsfuncdefpar ")
+             idparsopt or idparsfix or idparsfuncdefpar.")
     }
 
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
-        cat("Note: you set some transitions as impossible to happen.", "\n")
+        warning("Warning: you set some transitions as impossible to happen.")
     }
 
+    idparslist[[1]] <- prepare_full_lambdas(traits, num_concealed_states, idparslist[[1]])
     see_ancestral_states <- FALSE
 
-    cat("Calculating the likelihood for the initial parameters.", "\n")
+    message("Calculating the likelihood for the initial parameters.", "\n")
     utils::flush.console()
 
     initparsopt2 <- c(initparsopt, initfactors)
@@ -239,13 +238,14 @@ cla_secsse_ml_func_def_pars <- function(phy,
 
     optimpars <- c(tol, maxiter)
 
+    num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
 
     setting_calculation <- build_initStates_time(phy, traits,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus)
-
+                                                 mus,
+                                                 num_modeled_traits)
 
     initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                           trparsfix = trparsfix,
@@ -272,15 +272,12 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                           atol = atol,
                                           rtol = rtol,
                                           method = method)
-    cat("The loglikelihood for the initial parameter values is",
-        initloglik, "\n")
+    print_init_ll(initloglik = initloglik, verbose = verbose)
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is
              equal to 0 or below machine precision.
              Try again with different initial values.")
     } else {
-        cat("Optimizing the likelihood - this may take a while.", "\n")
-        utils::flush.console()
         out <- DDD::optimizer(optimmethod = optimmethod,
                               optimpars = optimpars,
                               fun = secsse_loglik_choosepar,

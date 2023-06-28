@@ -1,22 +1,17 @@
-// Copyright 2023 Thijs Janzen
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
 //
+//  Copyright (c) 2023, Thijs Janzen
 //
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <vector>
 #include "config.h"       // NOLINT [build/include_subdir]
 #include "odeint.h"       // NOLINT [build/include_subdir]
+#include "rhs.h"       // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
-
 #include <Rcpp.h>
+
 
 storage calc_ll_cla_store_full(
     const Rcpp::List& ll,
@@ -30,12 +25,12 @@ storage calc_ll_cla_store_full(
     double rtol,
     bool verbose)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  for (size_t i = 0; i < ll.size(); ++i) {
+  for (int i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
-    for (size_t j = 0; j < temp.nrow(); ++j) {
+    for (int j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
-      for (size_t k = 0; k < temp.ncol(); ++k) {
+      for (int k = 0; k < temp.ncol(); ++k) {
         row.push_back(temp(j, k));
       }
       temp2.push_back(row);
@@ -50,8 +45,8 @@ storage calc_ll_cla_store_full(
 
   std::vector<double> y;
 
-  std::vector<int> desNodes;
-  std::vector<double> timeInte;
+  std::vector<int> desNodes(2);
+  std::vector<double> timeInte(2);
 
   storage master_storage;
   int update_freq = ances.size() / 20;
@@ -59,7 +54,7 @@ storage calc_ll_cla_store_full(
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     if (a % update_freq == 0) {
       if (verbose) Rcpp::Rcout << "**";
     }
@@ -69,11 +64,11 @@ storage calc_ll_cla_store_full(
 
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
-    int focal_node;
-    for (int i = 0; i < desNodes.size(); ++i) {
+    int focal_node = 0;
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
-      assert((focal_node) >= 0);
-      assert((focal_node) < states.size());
+      assert(focal_node >= 0);
+      assert(focal_node < static_cast<int>(states.size()));
 
       ode_cla_store local_od(ll_cpp, mm_cpp, Q_cpp);
 
@@ -82,7 +77,7 @@ storage calc_ll_cla_store_full(
       std::vector<double> t_vals;
 
       std::unique_ptr<ode_cla_store> od_ptr =
-           std::make_unique<ode_cla_store>(local_od);
+          std::make_unique<ode_cla_store>(local_od);
       odeintcpp::integrate_full(method,
                                 std::move(od_ptr),  // ode class object
                                 &y,                 // state vector
@@ -117,12 +112,12 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
                           double rtol,
                           bool verbose = false)  {
   std::vector< std::vector< std::vector< double > >> ll_cpp;
-  for (size_t i = 0; i < ll.size(); ++i) {
+  for (int i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
     std::vector< std::vector< double >> temp2;
-    for (size_t j = 0; j < temp.nrow(); ++j) {
+    for (int j = 0; j < temp.nrow(); ++j) {
       std::vector<double> row;
-      for (size_t k = 0; k < temp.ncol(); ++k) {
+      for (int k = 0; k < temp.ncol(); ++k) {
         row.push_back(temp(j, k));
       }
       temp2.push_back(row);
@@ -149,7 +144,7 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
   if (verbose) Rcpp::Rcout << "0--------25--------50--------75--------100\n";
   if (verbose) Rcpp::Rcout << "*";
 
-  for (int a = 0; a < ances.size(); ++a) {
+  for (size_t a = 0; a < ances.size(); ++a) {
     if (a % update_freq == 0 && verbose) {
       Rcpp::Rcout << "**";
     }
@@ -160,10 +155,10 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
     find_desNodes(for_time, focal, &desNodes, &timeInte);
 
     int focal_node;
-    for (int i = 0; i < desNodes.size(); ++i) {
+    for (size_t i = 0; i < desNodes.size(); ++i) {
       focal_node = desNodes[i];
-      assert((focal_node) >= 0);
-      assert((focal_node) < states.size());
+      assert(focal_node >= 0);
+      assert(focal_node < static_cast<int>(states.size()));
 
       data_storage local_storage;
 
@@ -179,9 +174,9 @@ storage calc_ll_cla_store(const Rcpp::List& ll,
         odeintcpp::integrate(method,
                              std::move(od_ptr),  // ode class object
                              &y,                 // state vector
-                             t,                  // t0
-                             t + dt,             // t1
-                             dt * 0.1,
+                             bstime_t{t},                  // t0
+                             bstime_t{t + dt},             // t1/
+                             bstime_t{dt * 0.1},
                              atol,
                              rtol);
         t += dt;

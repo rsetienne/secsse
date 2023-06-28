@@ -47,7 +47,6 @@
 #' cond <- "proper_cond"
 #' root_state_weight <- "proper_weights"
 #' sampling_fraction <- c(1,1,1)
-#' run_parallel <- FALSE
 #' drill <- id_paramPos(traits,num_concealed_states)
 #' drill[[1]][] <- c(0.12,0.01,0.2,0.21,0.31,0.23)
 #' drill[[2]][] <- 0
@@ -107,7 +106,6 @@ secsse_loglik <- function(parameter,
     states <- new_states
   }
 
-
   if (is_complete_tree) {
     states <- build_states(phy = phy,
                            traits = traits,
@@ -129,46 +127,20 @@ secsse_loglik <- function(parameter,
       num_threads <- 1
     }
   }
-  calcul <- c()
-  if (num_threads == 1) {
-    calcul <- calThruNodes_cpp(ances,
-                               states,
-                               forTime,
-                               lambdas,
-                               mus,
-                               q_matrix,
-                               1,
-                               atol,
-                               rtol,
-                               method,
-                               is_complete_tree)
-  } else {
-    ancescpp <- ances - 1
-    forTimecpp <- forTime
-    forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
 
-    if (num_threads == -2) {
-      calcul <- calc_ll_threaded(lambdas,
-                                 mus,
-                                 q_matrix,
-                                 ancescpp,
-                                 forTimecpp,
-                                 states,
-                                 1,
-                                 method,
-                                 is_complete_tree)
-    } else {
-      calcul <- calc_ll_threaded(lambdas,
-                                 mus,
-                                 q_matrix,
-                                 ancescpp,
-                                 forTimecpp,
-                                 states,
-                                 num_threads,
-                                 method,
-                                 is_complete_tree)
-    }
-  }
+  RcppParallel::setThreadOptions(numThreads = num_threads)
+
+  calcul <- calThruNodes_cpp(ances,
+                             states,
+                             forTime,
+                             lambdas,
+                             mus,
+                             q_matrix,
+                             num_threads,
+                             atol,
+                             rtol,
+                             method,
+                             is_complete_tree)
 
   loglik <- calcul$loglik
   nodeM <- calcul$nodeM
@@ -213,8 +185,8 @@ secsse_loglik <- function(parameter,
 
   wholeLike <- sum((mergeBranch2) * (weightStates))
   LL <- log(wholeLike) +
-        loglik -
-        penalty(pars = parameter, loglik_penalty = loglik_penalty)
+    loglik -
+    penalty(pars = parameter, loglik_penalty = loglik_penalty)
 
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
@@ -358,7 +330,9 @@ build_states <- function(phy,
                          num_concealed_states,
                          sampling_fraction,
                          is_complete_tree = FALSE,
-                         mus = NULL) {
+                         mus = NULL,
+                         num_unique_traits = NULL,
+                         first_time = FALSE) {
   if (!is.matrix(traits)) {
     traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
   }
@@ -366,7 +340,18 @@ build_states <- function(phy,
   if (length(phy$tip.label) != nrow(traits)) {
     stop("Number of species in the tree must be the same as in the trait file")
   }
+  # if there are traits that are not in the observed tree,
+  # the user passes these themselves.
+  # yes, this is a weird use-case
+
   traitStates <- sort(unique(traits[, 1]))
+
+  if (!is.null(num_unique_traits)) {
+    if (num_unique_traits > length(traitStates)) {
+      if (first_time) message("found un-observed traits, expanding state space")
+       traitStates <- 1:num_unique_traits
+    }
+  }
 
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
@@ -401,37 +386,23 @@ build_initStates_time <- function(phy,
                                   num_concealed_states,
                                   sampling_fraction,
                                   is_complete_tree = FALSE,
-                                  mus = NULL) {
+                                  mus = NULL,
+                                  num_unique_traits = NULL,
+                                  first_time = FALSE) {
   states <- build_states(phy,
                          traits,
                          num_concealed_states,
                          sampling_fraction,
                          is_complete_tree,
-                         mus)
+                         mus,
+                         num_unique_traits,
+                         first_time)
   phy$node.label <- NULL
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
-  forTime <- matrix(NA, ncol = 3, nrow = nrow(phy$edge))
-  forTime[, 1:2] <- phy$edge
 
-  for (ab in seq_along(ances)) {
-    focalTime <- ances[ab]
-    desRows <- which(phy$edge[, 1] == focalTime)
-    desNodes <- phy$edge[desRows, 2]
-    rootward_age <- split_times[which(names(split_times) == focalTime)]
-    for (desIndex in 1:2) {
-      ## to Find the time which the integration will be done in
-      if (any(desNodes[desIndex] == names(split_times))) {
-        tipward_age <- split_times[which(names(split_times) ==
-                                         desNodes[desIndex])]
-        timeInterv <- c(tipward_age, rootward_age)
-      } else {
-        timeInterv <- c(0, rootward_age)
-      }
-      forTime[which(forTime[, 2] ==
-                    desNodes[desIndex]), 3] <- timeInterv[2] - timeInterv[1]
-    }
-  }
+  forTime <- cbind(phy$edge, phy$edge.length)
+
   return(list(
     states = states,
     ances = ances,
@@ -461,14 +432,14 @@ get_weight_states <- function(root_state_weight,
         lmb <- length(mergeBranch)
         numerator <- rep(NA, lmb)
         for (j in 1:lmb) {
-          numerator[j] <- mergeBranch[j] / sum(lambdas[[j]] *
+           numerator[j] <- mergeBranch[j] / sum(lambdas[[j]] *
                                         ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
         }
         weight_states <- numerator / sum(numerator) # nolint
       } else {
-      weight_states <- (mergeBranch /
-                          (lambdas * (1 - nodeM[1:d]) ^ 2)) /
-        sum((mergeBranch / (lambdas * (1 - nodeM[1:d]) ^ 2)))
+        weight_states <- (mergeBranch /
+                            (lambdas * (1 - nodeM[1:d]) ^ 2)) /
+          sum((mergeBranch / (lambdas * (1 - nodeM[1:d]) ^ 2)))
       }
     }
 

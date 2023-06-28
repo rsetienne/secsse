@@ -95,3 +95,16 @@ parameter[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
 helper_function <- function(x) {
   return(sum(x[c(10, 13, 16)]) / sum(x)) # normalized by total sum, just in case
 }
+
+## ----plot cla-----------------------------------------------------------------
+secsse::plot_state_exact_cla(parameters = parameter,
+                             focal_tree = phy,
+                             traits = traits,
+                             num_concealed_states = 3,
+                             sampling_fraction = sampling_fraction,
+                             cond = "maddison_cond",
+                             root_state_weight = "maddison_weights",
+                             is_complete_tree = FALSE,
+                             prob_func = helper_function,
+                             steps = 10)
+

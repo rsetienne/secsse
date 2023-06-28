@@ -92,7 +92,6 @@ num_concealed_states <- 2
 cond <- "proper_cond"
 root_state_weight <- "proper_weights"
 sampling_fraction <- c(1,1,1)
-run_parallel <- FALSE
 drill <- id_paramPos(traits,num_concealed_states)
 drill[[1]][] <- c(0.12,0.01,0.2,0.21,0.31,0.23)
 drill[[2]][] <- 0
