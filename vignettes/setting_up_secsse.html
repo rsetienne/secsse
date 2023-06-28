@@ -12,7 +12,7 @@
 
 <meta name="author" content="Thijs Janzen" />
 
-<meta name="date" content="2023-06-27" />
+<meta name="date" content="2023-06-28" />
 
 <title>Setting up a secsse analysis</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Setting up a secsse analysis</h1>
 <h4 class="author">Thijs Janzen</h4>
-<h4 class="date">2023-06-27</h4>
+<h4 class="date">2023-06-28</h4>
 
 
 
@@ -382,20 +382,23 @@ transition_list object, which is a matrix defining the traits of
 daughter species upon speciation and their associated rate. We will here
 generate a default transition_list, but the user is free to create (and
 encouraged) one manually her/him self in order to reflect the focal
-system better. We assume here that we have a trait with lables “S” and
+system better. We assume here that we have a trait with labels “S” and
 “N”, and use the default settings:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>focal_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_transition_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>))</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>focal_list</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>used_states <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>focal_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_lambda_list</span>(<span class="at">state_names =</span> used_states)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>focal_list</span></code></pre></div>
 <pre><code>##  [,1] [,2] [,3] [,4]
 ##  &quot;S&quot;  &quot;S&quot;  &quot;S&quot;  &quot;1&quot; 
 ##  &quot;N&quot;  &quot;N&quot;  &quot;N&quot;  &quot;2&quot;</code></pre>
 <p>With this list generated, we can now use this to populate our lambda
-matrices, using a constant rates model:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>lambda_matrices <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_matrices</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                                                  <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                                                  <span class="at">transition_list =</span> focal_list,</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                                                  <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>lambda_matrices</span></code></pre></div>
+matrices, using a constant rates model and assuming two concealed states
+(the same number as our observed states):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>num_hidden_states <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>lambda_matrices <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_matrices</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                                                  <span class="at">num_concealed_states =</span> num_hidden_states,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                                                  <span class="at">transition_list =</span> focal_list,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>                                                  <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>lambda_matrices</span></code></pre></div>
 <pre><code>## [[1]]
 ##    SA NA SB NB
 ## SA  1  0  0  0
@@ -432,8 +435,8 @@ NA, SB and NB.</p>
 <div id="extinction" class="section level4">
 <h4>Extinction</h4>
 <p>We also need to specify an extinction rate:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>mus <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mus</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>mus <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mus</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                          <span class="at">num_concealed_states =</span> num_hidden_states,</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                          <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                          <span class="at">lambdas =</span> lambda_matrices)</span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>mus</span></code></pre></div>
@@ -444,24 +447,19 @@ NA, SB and NB.</p>
 <h4>Q matrix</h4>
 <p>To specify a q-matrix, we again need to specify the transitions using
 a transition list. Again, we use the standard settings.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>q_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_q_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>                                        <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>q_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_q_list</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>                                        <span class="at">num_concealed_states =</span> num_hidden_states,</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                                        <span class="at">mus =</span> mus)</span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>q_list</span></code></pre></div>
 <pre><code>##  [,1] [,2] [,3]
-##  &quot;SA&quot; &quot;NA&quot; &quot;3&quot; 
-##  &quot;SB&quot; &quot;NB&quot; &quot;3&quot; 
-##  &quot;NA&quot; &quot;SA&quot; &quot;4&quot; 
-##  &quot;NB&quot; &quot;SB&quot; &quot;4&quot; 
-##  &quot;SA&quot; &quot;SB&quot; &quot;5&quot; 
-##  &quot;NA&quot; &quot;NB&quot; &quot;5&quot; 
-##  &quot;SB&quot; &quot;SA&quot; &quot;6&quot; 
-##  &quot;NB&quot; &quot;NA&quot; &quot;6&quot;</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>trans_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_transition_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>                                                 <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>                                                 <span class="at">transition_list =</span> q_list)</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>trans_matrix</span></code></pre></div>
+##  &quot;S&quot;  &quot;N&quot;  &quot;3&quot; 
+##  &quot;N&quot;  &quot;S&quot;  &quot;4&quot;</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>trans_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_transition_matrix</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>                                                 <span class="at">num_concealed_states =</span> num_hidden_states,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>                                                 <span class="at">transition_list =</span> q_list,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>                                                 <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>trans_matrix</span></code></pre></div>
 <pre><code>##    SA NA SB NB
 ## SA NA  3  5  0
 ## NA  4 NA  0  5
@@ -479,27 +477,28 @@ this. To do so, we first need to specify our focal rates, and then fill
 them in.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>speciation <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>extinction <span class="ot">&lt;-</span> <span class="fl">0.0</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>q_ab <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>q_ba <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>sp_ns <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>sp_sn <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>sp_sn <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>sp_ns <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>q_ab <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>q_ba <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
 <span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a></span>
 <span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>params <span class="ot">&lt;-</span> <span class="fu">c</span>(speciation,</span>
 <span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>            extinction,</span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>            sp_ns, sp_sn, q_ab, q_ba)</span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>lambda_matrices_p <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">fill_in</span>(lambda_matrices,</span>
-<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>                                     params)</span>
-<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>trans_matrix_p <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">fill_in</span>(trans_matrix,</span>
-<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>                                  params)</span>
-<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>mus_p <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">fill_in</span>(mus,</span>
-<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>                         params)</span></code></pre></div>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>            sp_sn, sp_ns,</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>            q_ab, q_ba)</span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>lambda_matrices_p <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">fill_in</span>(lambda_matrices,</span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>                                     params)</span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>trans_matrix_p <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">fill_in</span>(trans_matrix,</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>                                  params)</span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>mus_p <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">fill_in</span>(mus,</span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>                         params)</span></code></pre></div>
 <p>With the values replaced, we can now simulate an “empirical”
 dataset:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>simulated_tree <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">secsse_sim</span>(<span class="at">lambdas =</span> lambda_matrices_p,</span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                                     <span class="at">mus =</span> mus_p,</span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                                     <span class="at">qs =</span> trans_matrix_p,</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>                                     <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>                                     <span class="at">num_concealed_states =</span> num_hidden_states,</span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>                                     <span class="at">crown_age =</span> <span class="dv">5</span>,</span>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                                     <span class="at">conditioning =</span> <span class="st">&quot;obs_states&quot;</span>,</span>
 <span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>                                     <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
@@ -524,7 +523,7 @@ optimization method, as this has shown to be more reliable.</p>
 <span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a></span>
 <span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> focal_tree,</span>
 <span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>                              <span class="at">traits =</span> sim_traits,</span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> num_hidden_states,</span>
 <span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>                              <span class="at">idparslist =</span> param_posit,</span>
 <span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>                              <span class="at">idparsopt =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>),</span>
 <span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initpars,</span>
@@ -533,15 +532,17 @@ optimization method, as this has shown to be more reliable.</p>
 <span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
 <span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>                              <span class="at">optimmethod =</span> <span class="st">&quot;subplex&quot;</span>,</span>
 <span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">6</span>)</span></code></pre></div>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">6</span>,</span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a>                              <span class="at">atol =</span> <span class="fl">0.1</span>, <span class="co"># high values for demonstration </span></span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a>                              <span class="at">rtol =</span> <span class="fl">0.1</span>) <span class="co"># purposes, don&#39;t use at home!</span></span></code></pre></div>
 <pre><code>## Note: you set some transitions as impossible to happen. 
 ## Calculating the likelihood for the initial parameters ... 
-## The loglikelihood for the initial parameter values is -25.13051 
+## The loglikelihood for the initial parameter values is -93.82564 
 ## Optimizing the likelihood - this may take a while.</code></pre>
 <p>We can now extract our parameters to get them in the right place:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>found_pars_vals <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(param_posit, answ<span class="sc">$</span>MLpars)</span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>found_pars_vals</span></code></pre></div>
-<pre><code>## [1] 0.4028125 0.0000000 0.9687167 0.2692200 1.7710024 0.9791207</code></pre>
+<pre><code>## [1] 0.4700694 0.0000000 0.6663108 0.9732841 0.1818746 0.9294617</code></pre>
 </div>
 </div>
 <div id="comparing-models-using-aic" class="section level2">
@@ -550,24 +551,24 @@ optimization method, as this has shown to be more reliable.</p>
 CTD and ETD model. Let’s do that semi-automagically! We first define a
 generic function to optimize for a model:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>fit_model <span class="ot">&lt;-</span> <span class="cf">function</span>(tree, traits, model) {</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>  focal_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_transition_list</span>(<span class="at">state_names =</span></span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                                                         <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>))</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  lambda_matrices <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_matrices</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                                                    <span class="at">transition_list =</span></span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>                                                        focal_list,</span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>                                                    <span class="at">model =</span> model)</span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>  mus <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mus</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>                            <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>                            <span class="at">model =</span> model,</span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>                            <span class="at">lambdas =</span> lambda_matrices)</span>
-<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>  q_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_q_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a>                                          <span class="at">mus =</span> mus)</span>
-<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a></span>
-<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a>  trans_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_transition_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;N&quot;</span>),</span>
-<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a>                                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb17-19"><a href="#cb17-19" tabindex="-1"></a>                                                   <span class="at">transition_list =</span> q_list)</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>  focal_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_lambda_list</span>(<span class="at">state_names =</span> used_states)</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>  lambda_matrices <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_matrices</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                                                    <span class="at">num_concealed_states =</span> num_hidden_states,</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                                                    <span class="at">transition_list =</span></span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                                                        focal_list,</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>                                                    <span class="at">model =</span> model)</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>  mus <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mus</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>                            <span class="at">num_concealed_states =</span> num_hidden_states,</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>                            <span class="at">model =</span> model,</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>                            <span class="at">lambdas =</span> lambda_matrices)</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>  q_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_default_q_list</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> num_hidden_states,</span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>                                          <span class="at">mus =</span> mus)</span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>  trans_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_transition_matrix</span>(<span class="at">state_names =</span> used_states,</span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a>                                                   <span class="at">num_concealed_states =</span> num_hidden_states,</span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a>                                                   <span class="at">transition_list =</span> q_list,</span>
+<span id="cb17-19"><a href="#cb17-19" tabindex="-1"></a>                                                   <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb17-20"><a href="#cb17-20" tabindex="-1"></a></span>
 <span id="cb17-21"><a href="#cb17-21" tabindex="-1"></a>  param_posit <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb17-22"><a href="#cb17-22" tabindex="-1"></a>  param_posit[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_matrices</span>
@@ -589,7 +590,7 @@ generic function to optimize for a model:</p>
 <span id="cb17-38"><a href="#cb17-38" tabindex="-1"></a>  testthat<span class="sc">::</span><span class="fu">expect_output</span>( <span class="co"># suppress output</span></span>
 <span id="cb17-39"><a href="#cb17-39" tabindex="-1"></a>  answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> focal_tree,</span>
 <span id="cb17-40"><a href="#cb17-40" tabindex="-1"></a>                                <span class="at">traits =</span> traits,</span>
-<span id="cb17-41"><a href="#cb17-41" tabindex="-1"></a>                                <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb17-41"><a href="#cb17-41" tabindex="-1"></a>                                <span class="at">num_concealed_states =</span> num_hidden_states,</span>
 <span id="cb17-42"><a href="#cb17-42" tabindex="-1"></a>                                <span class="at">idparslist =</span> param_posit,</span>
 <span id="cb17-43"><a href="#cb17-43" tabindex="-1"></a>                                <span class="at">idparsopt =</span> idparsopt,</span>
 <span id="cb17-44"><a href="#cb17-44" tabindex="-1"></a>                                <span class="at">initparsopt =</span> initpars,</span>
@@ -622,9 +623,9 @@ generic function to optimize for a model:</p>
 <span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>found<span class="sc">$</span>AIC <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(found<span class="sc">$</span>AIC)</span>
 <span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>found</span></code></pre></div>
 <pre><code>##   model        LL      AIC
-## 1    CR -23.97504 59.95008
-## 2   CTD -23.88787 63.77574
-## 3   ETD -23.41466 62.82932</code></pre>
+## 1    CR -91.61343 195.2269
+## 2   CTD -91.05780 198.1156
+## 3   ETD -90.66990 197.3398</code></pre>
 <p>Because we have simulated the tree using the CR model, we expect the
 model with the lowest AIC to be the CR model again, and indeed we do
 find this!</p>

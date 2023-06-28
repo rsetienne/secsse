@@ -107,3 +107,4 @@ secsse::plot_state_exact_cla(parameters = parameter,
                              is_complete_tree = FALSE,
                              prob_func = helper_function,
                              steps = 10)
+

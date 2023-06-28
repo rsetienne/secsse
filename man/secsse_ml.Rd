@@ -22,7 +22,7 @@ secsse_ml(
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  verbose = (optimmethod == "simplex"),
+  verbose = (optimmethod == "subplex"),
   num_threads = 1,
   atol = 1e-12,
   rtol = 1e-12,

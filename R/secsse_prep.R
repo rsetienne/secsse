@@ -126,18 +126,22 @@ create_lambda_matrices <- function(state_names,
 #' starting state (typically the column in the transition matrix), 2) ending
 #' state (typically the row in the transition matrix) and 3) associated rate
 #' indicator
+#' @param diff.conceal should we use the same number of rates for the
+#' concealed state transitions, or should all concealed state transitions
+#' have separate rates? Typically, FALSE is fine and should be used in order
+#' to avoid having a huge number of parameters.
 #' @return transition matrix
 #' @export
 create_transition_matrix <- function(state_names,
                                      num_concealed_states,
-                                     transition_list) {
-  all_state_names <- get_state_names(state_names, num_concealed_states)
-  total_num_states <- length(all_state_names)
+                                     transition_list,
+                                     diff.conceal = FALSE) {
+
+  total_num_states <- length(state_names)
   trans_matrix <- matrix(0, ncol = total_num_states,
-                            nrow = total_num_states)
-
-  transition_list <- convert_transition_list_q(transition_list, all_state_names)
-
+                         nrow = total_num_states)
+  
+  transition_list <- convert_transition_list_q(transition_list, state_names)
   for (i in seq_len(nrow(transition_list))) {
     parent_state <- transition_list[i, 1]
     daughter_state <- transition_list[i, 2]
@@ -145,9 +149,19 @@ create_transition_matrix <- function(state_names,
     trans_matrix[parent_state, daughter_state] <- focal_rate
   }
 
+  diag(trans_matrix) <- NA
+  
+  
+  trans_matrix <- secsse::expand_q_matrix(q_matrix = trans_matrix,
+                                          num_concealed_states = 
+                                            num_concealed_states,
+                                          diff.conceal = diff.conceal)
+
+  all_state_names <- get_state_names(state_names, num_concealed_states)
   colnames(trans_matrix) <- all_state_names
   rownames(trans_matrix) <- all_state_names
   diag(trans_matrix) <- NA
+  
   return(trans_matrix)
 }
 
@@ -261,44 +275,6 @@ expand_q_matrix <- function(q_matrix,
   return(new_q_matrix)
 }
 
-#' @keywords internal
-fill_transition_list <- function(transition_list,
-                                 num_obs_states,
-                                 num_concealed_states,
-                                 state_names,
-                                 concealed_state_names,
-                                 focal_rate,
-                                 focal_state = "obs") {
-
-  num_outer_states <- num_obs_states
-  num_inner_states  <- num_concealed_states
-  if (focal_state == "concealed") {
-    num_outer_states <- num_concealed_states
-    num_inner_states <- num_obs_states
-  }
-
-  for (j in 1:num_outer_states) {
-    for (k in 1:num_outer_states) {
-      if (j != k) {
-        # transition of concealed state j -> k
-        for (i in 1:num_inner_states) {
-          if (focal_state == "obs") {
-            start_state <- paste0(state_names[j], concealed_state_names[i])
-            end_state   <- paste0(state_names[k], concealed_state_names[i])
-          } else {
-            start_state <- paste0(state_names[i], concealed_state_names[j])
-            end_state   <- paste0(state_names[i], concealed_state_names[k])
-          }
-          to_add <- c(start_state, end_state, focal_rate)
-          transition_list <- rbind(transition_list, to_add)
-        }
-        focal_rate <- focal_rate + 1
-      }
-    }
-  }
-  return(list(transition_list = transition_list,
-              focal_rate = focal_rate))
-}
 
 #' helper function to create a default q_matrix list
 #' @param state_names names of the observed states
@@ -313,67 +289,38 @@ create_default_q_list <- function(state_names = c("0", "1"),
   lm <- unlist(mus)
   focal_rate <- max(lm) + 1
   num_obs_states <- length(state_names)
-  concealed_state_names <- LETTERS[1:num_concealed_states]
-
   transition_list <- c()
-  # now we need to find those entries that signify changes between
-  # observed states
-  answ <- fill_transition_list(transition_list,
-                               num_obs_states,
-                               num_concealed_states,
-                               state_names,
-                               concealed_state_names,
-                               focal_rate,
-                               focal_state = "obs")
-  answ <- fill_transition_list(answ$transition_list,
-                               num_obs_states,
-                               num_concealed_states,
-                               state_names,
-                               concealed_state_names,
-                               focal_rate = answ$focal_rate,
-                               focal_state = "concealed")
-
-  transition_list <- answ$transition_list
+  for (i in 1:num_obs_states) {
+    for (j in 1:num_obs_states) {
+      if (i != j) {
+        start_state <- state_names[i]
+        end_state <- state_names[j]
+        to_add <- c(start_state, end_state, focal_rate)
+        transition_list <- rbind(transition_list, to_add)
+        focal_rate <- focal_rate + 1
+      }  
+    }
+  }
 
   rownames(transition_list) <- rep("", nrow(transition_list))
   return(transition_list)
 }
 
-#' helper function to create a default transition list
+#' helper function to create a default lambda list
 #' @param state_names names of the observed states
-#' @param consider_combinations should there be extra
-#' states considering combinations of the observed states?
 #' @description
-#' This function generates a generic transition list, assuming no transitions
-#' between states, e.g. a species of observed state 0 generates two daughter
+#' This function generates a generic lambda list, assuming no transitions
+#' between states, e.g. a species of observed state 0 generates daughter
 #' species with state 0 as well.
-#' If consider_combinations is set to TRUE, the function automatically
-#' generates transitions for the combined states as well, for example if there
-#' are two states A and B, it adds a third state AB, which generates two unique
-#' daughter species, in this case each having either trait A, or B.
 #' @export
-create_default_transition_list <- function(state_names = c("0", "1"),
-                                           consider_combinations = FALSE) {
+create_default_lambda_list <- function(state_names = c("0", "1")) {
+  
   transition_list <- c()
   for (i in seq_along(state_names)) {
     transition_list <- rbind(transition_list,
                              c(state_names[i],
                                state_names[i],
                                state_names[i], i))
-  }
-  cnt <- length(state_names)
-  if (consider_combinations) {
-    # TODO: write for triple states, e.g. if there are more than 2 single states
-    for (i in seq_along(state_names)) {
-      for (j in seq_along(state_names)) {
-        if (state_names[i] != state_names[j]) {
-          focal_state_name <- paste0(state_names[i], state_names[j])
-          to_add <- c(focal_state_name, state_names[i], state_names[j], cnt + 1)
-          cnt <- cnt + 1
-          transition_list <- rbind(transition_list, to_add)
-        }
-      }
-    }
   }
   rownames(transition_list) <- rep("", nrow(transition_list))
   return(transition_list)

@@ -2,47 +2,51 @@
 knitr::opts_chunk$set(echo = TRUE)
 
 ## ----default_trans_list-------------------------------------------------------
-focal_list <- secsse::create_default_transition_list(state_names = c("S", "N"))
+used_states <- c("S", "N")
+focal_list <- secsse::create_default_lambda_list(state_names = used_states)
 focal_list
 
 ## ----default lambda matrices--------------------------------------------------
-lambda_matrices <- secsse::create_lambda_matrices(state_names = c("S", "N"),
-                                                  num_concealed_states = 2,
+num_hidden_states <- 2
+lambda_matrices <- secsse::create_lambda_matrices(state_names = used_states,
+                                                  num_concealed_states = num_hidden_states,
                                                   transition_list = focal_list,
                                                   model = "CR")
 lambda_matrices
 
 ## ----adding extinction--------------------------------------------------------
-mus <- secsse::create_mus(state_names = c("S", "N"),
-                          num_concealed_states = 2,
+mus <- secsse::create_mus(state_names = used_states,
+                          num_concealed_states = num_hidden_states,
                           model = "CR",
                           lambdas = lambda_matrices)
 mus
 
 ## ----default_trans------------------------------------------------------------
-q_list <- secsse::create_default_q_list(state_names = c("S", "N"),
-                                        num_concealed_states = 2,
+q_list <- secsse::create_default_q_list(state_names = used_states,
+                                        num_concealed_states = num_hidden_states,
                                         mus = mus)
 
 q_list
 
-trans_matrix <- secsse::create_transition_matrix(state_names = c("S", "N"),
-                                                 num_concealed_states = 2,
-                                                 transition_list = q_list)
+trans_matrix <- secsse::create_transition_matrix(state_names = used_states,
+                                                 num_concealed_states = num_hidden_states,
+                                                 transition_list = q_list,
+                                                 diff.conceal = TRUE)
 trans_matrix
 
 ## ----fill in parameters-------------------------------------------------------
 
 speciation <- 0.5
 extinction <- 0.0
+sp_sn <- 0.2
+sp_ns <- 0.2
 q_ab <- 0.5
 q_ba <- 0.5
-sp_ns <- 0.2
-sp_sn <- 0.2
 
 params <- c(speciation,
             extinction,
-            sp_ns, sp_sn, q_ab, q_ba)
+            sp_sn, sp_ns,
+            q_ab, q_ba)
 
 lambda_matrices_p <- secsse::fill_in(lambda_matrices,
                                      params)
@@ -55,7 +59,7 @@ mus_p <- secsse::fill_in(mus,
 simulated_tree <- secsse::secsse_sim(lambdas = lambda_matrices_p,
                                      mus = mus_p,
                                      qs = trans_matrix_p,
-                                     num_concealed_states = 2,
+                                     num_concealed_states = num_hidden_states,
                                      crown_age = 5,
                                      conditioning = "obs_states",
                                      verbose = TRUE)
@@ -75,7 +79,7 @@ initpars <- initpars[-2]
 
 answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               traits = sim_traits,
-                              num_concealed_states = 2,
+                              num_concealed_states = num_hidden_states,
                               idparslist = param_posit,
                               idparsopt = c(1, 3, 4, 5, 6),
                               initparsopt = initpars,
@@ -84,7 +88,9 @@ answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               sampling_fraction = c(1, 1),
                               optimmethod = "subplex",
                               verbose = FALSE,
-                              num_threads = 6)
+                              num_threads = 6,
+                              atol = 0.1, # high values for demonstration 
+                              rtol = 0.1) # purposes, don't use at home!
 
 ## ----extract_pars-------------------------------------------------------------
 found_pars_vals <- secsse::extract_par_vals(param_posit, answ$MLpars)
@@ -92,24 +98,24 @@ found_pars_vals
 
 ## ----define_model_function----------------------------------------------------
 fit_model <- function(tree, traits, model) {
-  focal_list <- secsse::create_default_transition_list(state_names =
-                                                         c("S", "N"))
-  lambda_matrices <- secsse::create_lambda_matrices(state_names = c("S", "N"),
-                                                    num_concealed_states = 2,
+  focal_list <- secsse::create_default_lambda_list(state_names = used_states)
+  lambda_matrices <- secsse::create_lambda_matrices(state_names = used_states,
+                                                    num_concealed_states = num_hidden_states,
                                                     transition_list =
                                                         focal_list,
                                                     model = model)
-  mus <- secsse::create_mus(state_names = c("S", "N"),
-                            num_concealed_states = 2,
+  mus <- secsse::create_mus(state_names = used_states,
+                            num_concealed_states = num_hidden_states,
                             model = model,
                             lambdas = lambda_matrices)
-  q_list <- secsse::create_default_q_list(state_names = c("S", "N"),
-                                          num_concealed_states = 2,
+  q_list <- secsse::create_default_q_list(state_names = used_states,
+                                          num_concealed_states = num_hidden_states,
                                           mus = mus)
 
-  trans_matrix <- secsse::create_transition_matrix(state_names = c("S", "N"),
-                                                   num_concealed_states = 2,
-                                                   transition_list = q_list)
+  trans_matrix <- secsse::create_transition_matrix(state_names = used_states,
+                                                   num_concealed_states = num_hidden_states,
+                                                   transition_list = q_list,
+                                                   diff.conceal = TRUE)
 
   param_posit <- list()
   param_posit[[1]] <- lambda_matrices
@@ -131,7 +137,7 @@ fit_model <- function(tree, traits, model) {
   testthat::expect_output( # suppress output
   answ <- secsse::cla_secsse_ml(phy = focal_tree,
                                 traits = traits,
-                                num_concealed_states = 2,
+                                num_concealed_states = num_hidden_states,
                                 idparslist = param_posit,
                                 idparsopt = idparsopt,
                                 initparsopt = initpars,

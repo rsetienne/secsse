@@ -37,59 +37,6 @@ test_that("lambda setup", {
   }
 })
 
-test_that("qmat setup", {
-  q_mat <- matrix(0, nrow = 6, ncol = 6)
-  diag(q_mat) <- NA
-  q_mat[1, 3] <- 5 # mu_I
-  q_mat[1, 4] <- 7 # Q_BA
-  q_mat[2, 3] <- 4 # mu_m
-  q_mat[2, 5] <- 7 # Q_BA
-  q_mat[3, 1] <- 8 # gamma
-  q_mat[3, 2] <- 9 # delta
-  q_mat[3, 6] <- 7 # Q_BA
-  q_mat[4, 1] <- 6 # Q_AB
-  q_mat[4, 6] <- 5 # mu_I
-  q_mat[5, 2] <- 6 # Q_AB
-  q_mat[5, 6] <- 4 # mu_m
-  q_mat[6, 3] <- 6 # Q_AB
-  q_mat[6, 4] <- 8 # gamma
-  q_mat[6, 5] <- 9 # delta
-
-  namez <- c("MA", "IA", "CA", "MB", "IB", "CB")
-
-  colnames(q_mat) <- namez
-  rownames(q_mat) <- namez
-
-  q_mat <- t(q_mat)
-
-  trans_list <- c()
-  trans_list <- rbind(trans_list, c("CA", "MA", 5))
-  trans_list <- rbind(trans_list, c("CA", "IA", 4))
-  trans_list <- rbind(trans_list, c("CA", "CB", 6))
-
-  trans_list <- rbind(trans_list, c("CB", "MB", 5))
-  trans_list <- rbind(trans_list, c("CB", "IB", 4))
-  trans_list <- rbind(trans_list, c("CB", "CA", 7))
-
-  trans_list <- rbind(trans_list, c("MA", "CA", 8))
-  trans_list <- rbind(trans_list, c("MA", "MB", 6))
-
-  trans_list <- rbind(trans_list, c("MB", "CB", 8))
-  trans_list <- rbind(trans_list, c("MB", "MA", 7))
-
-  trans_list <- rbind(trans_list, c("IA", "CA", 9))
-  trans_list <- rbind(trans_list, c("IA", "IB", 6))
-  trans_list <- rbind(trans_list, c("IB", "CB", 9))
-  trans_list <- rbind(trans_list, c("IB", "IA", 7))
-
-  q_mat2 <- secsse::create_transition_matrix(state_names = c("M", "I", "C"),
-                                             num_concealed_states = 2,
-                                             trans_list)
-
-  testthat::expect_equal(nrow(q_mat), nrow(q_mat2))
-  testthat::expect_true(all.equal(q_mat, q_mat2))
-})
-
 test_that("q_matrix", {
   q_mat <- matrix(data = NA, nrow = 2, ncol = 2)
   q_mat[1, 2] <- 1
@@ -110,7 +57,7 @@ test_that("q_matrix", {
 
 test_that("setup", {
   focal_list <-
-    secsse::create_default_transition_list(state_names = c("S", "N"))
+    secsse::create_default_lambda_list(state_names = c("S", "N"))
   lambda_matrices_CR <- secsse::create_lambda_matrices(state_names =
                                                          c("S", "N"),
                                                     num_concealed_states = 2,
@@ -174,7 +121,8 @@ test_that("setup", {
                                         mus = mus_CR)
   q_CR <- secsse::create_transition_matrix(state_names = c("S", "N"),
                                            num_concealed_states = 2,
-                                           transition_list = t_CR)
+                                           transition_list = t_CR,
+                                           diff.conceal = TRUE)
   testthat::expect_equal(6, max(q_CR, na.rm = TRUE))
 
   t_CTD <- secsse::create_default_q_list(state_names = c("S", "N"),
@@ -182,7 +130,8 @@ test_that("setup", {
                                         mus = mus_CTD)
   q_CTD <- secsse::create_transition_matrix(state_names = c("S", "N"),
                                            num_concealed_states = 2,
-                                           transition_list = t_CTD)
+                                           transition_list = t_CTD,
+                                           diff.conceal = TRUE)
 
   testthat::expect_equal(8, max(q_CTD, na.rm = TRUE))
 
@@ -191,6 +140,7 @@ test_that("setup", {
                                          mus = mus_ETD)
   q_ETD <- secsse::create_transition_matrix(state_names = c("S", "N"),
                                             num_concealed_states = 2,
-                                            transition_list = t_ETD)
+                                            transition_list = t_ETD,
+                                            diff.conceal = TRUE)
   testthat::expect_equal(8, max(q_ETD, na.rm = TRUE))
 })
