@@ -296,9 +296,36 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
 #' @return A list of lambdas, its length would be the same than the number of
 #' trait states * num_concealed_states..
 #' @export
+#' @examples
+#' set.seed(13)
+#' phylotree <- ape::rcoal(12, tip.label = 1:12)
+#' traits <- sample(c(0, 1, 2),
+#'                  ape::Ntip(phylotree), replace = TRUE)
+#' num_concealed_states <- 3
+#' # the idparlist for a ETD model (dual state inheritance model of evolution)
+#' # would be set like this:
+#' idparlist <- secsse::cla_id_paramPos(traits, num_concealed_states)
+#' lambd_and_modeSpe <- idparlist$lambdas
+#' lambd_and_modeSpe[1, ] <- c(1, 1, 1, 2, 2, 2, 3, 3, 3)
+#' idparlist[[1]] <- lambd_and_modeSpe
+#' idparlist[[2]][] <- 0
+#' masterBlock <- matrix(4, ncol = 3, nrow = 3, byrow = TRUE)
+#' diag(masterBlock) <- NA
+#' idparlist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+#' # Now, internally, clasecsse sorts the lambda matrices, so they look like
+#' #  a list with 9 matrices, corresponding to the 9 states
+#' # (0A,1A,2A,0B, etc)
+#' 
+#' parameter <- idparlist
+#' lambda_and_modeSpe <- parameter$lambdas
+#' lambda_and_modeSpe[1, ] <- c(0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.01, 0.01, 0.01)
+#' parameter[[1]] <- prepare_full_lambdas(traits, num_concealed_states,
+#'                                        lambda_and_modeSpe)
 prepare_full_lambdas <- function(traits,
                                  num_concealed_states,
                                  lambd_and_modeSpe) {
+    if (is.list(lambd_and_modeSpe)) return(lambd_and_modeSpe)
+    
     num_exami <- length(sort(unique(traits)))
     mat_size <- num_exami * num_concealed_states
     posib_trans <- matrix(1,
@@ -311,7 +338,6 @@ prepare_full_lambdas <- function(traits,
                                  diff.conceal = FALSE)
     
     full_lambdas <- list()
-    
     for (jj in 1:mat_size) {
         # dual_state_inhe
         m1 <- matrix(0, ncol = mat_size, nrow = mat_size)

@@ -5,7 +5,12 @@
 \title{helper function to neatly setup a Q matrix, without transitions to
 concealed states (only observed transitions shown)}
 \usage{
-create_transition_matrix(state_names, num_concealed_states, transition_list)
+create_transition_matrix(
+  state_names,
+  num_concealed_states,
+  transition_list,
+  diff.conceal = FALSE
+)
 }
 \arguments{
 \item{state_names}{names of observed states}
@@ -16,6 +21,11 @@ create_transition_matrix(state_names, num_concealed_states, transition_list)
 starting state (typically the column in the transition matrix), 2) ending
 state (typically the row in the transition matrix) and 3) associated rate
 indicator}
+
+\item{diff.conceal}{should we use the same number of rates for the
+concealed state transitions, or should all concealed state transitions
+have separate rates? Typically, FALSE is fine and should be used in order
+to avoid having a huge number of parameters.}
 }
 \value{
 transition matrix
