@@ -113,7 +113,7 @@
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-#' \dontrun{
+#' \donttest{
 #'model <- cla_secsse_ml_func_def_pars(phylotree,
 #'traits,
 #'num_concealed_states,
@@ -210,12 +210,12 @@ cla_secsse_ml_func_def_pars <- function(phy,
                   as.numeric(sort(unique(unlist(idparslist))))) ==
         FALSE) {
         stop("All elements in idparslist must be included in either 
-             idparsopt or idparsfix or idparsfuncdefpar ")
+             idparsopt or idparsfix or idparsfuncdefpar.")
     }
 
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
-        cat("Note: you set some transitions as impossible to happen.", "\n")
+        warning("Warning: you set some transitions as impossible to happen.")
     }
 
     idparslist[[1]] <- prepare_full_lambdas(traits, num_concealed_states, idparslist[[1]])
@@ -274,15 +274,12 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                           atol = atol,
                                           rtol = rtol,
                                           method = method)
-    cat("The loglikelihood for the initial parameter values is",
-        initloglik, "\n")
+    print_init_ll(initloglik = initloglik, verbose = verbose)
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is
              equal to 0 or below machine precision.
              Try again with different initial values.")
     } else {
-        cat("Optimizing the likelihood - this may take a while.", "\n")
-        utils::flush.console()
         out <- DDD::optimizer(optimmethod = optimmethod,
                               optimpars = optimpars,
                               fun = secsse_loglik_choosepar,

@@ -74,7 +74,7 @@
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-#' \dontrun{
+#' \donttest{
 #'model<-secsse_ml(
 #'phylotree,
 #'traits,
@@ -126,8 +126,8 @@ secsse_ml <- function(phy,
                 is_complete_tree)
 
     if (is.matrix(traits)) {
-        cat("You are setting a model where some species had more than 
-            one trait state \n")
+        warning("You are setting a model where some species had more than 
+            one trait state.")
     }
 
     if (length(initparsopt) != length(idparsopt)) {
@@ -153,12 +153,11 @@ secsse_ml <- function(phy,
 
     if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                         idparsfix[which(parsfix == 0)])) != 0) {
-        cat("You set some transitions as impossible to happen", "\n")
+        warning("You set some transitions as impossible to happen")
     }
 
     see_ancestral_states <- FALSE
 
-    cat("Calculating the likelihood for the initial parameters.", "\n")
     utils::flush.console()
     trparsopt <- initparsopt / (1 + initparsopt)
     trparsopt[which(initparsopt == Inf)] <- 1
@@ -203,16 +202,14 @@ secsse_ml <- function(phy,
                                           atol = atol,
                                           rtol = rtol,
                                           method = method)
-
-    cat("The loglikelihood for the initial parameter values is",
-        initloglik, "\n")
+    
+    print_init_ll(initloglik = initloglik, verbose = verbose)
+    
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 
              Try again with different initial values.")
     } else {
-        cat("Optimizing the likelihood - this may take a while.", "\n")
-        utils::flush.console()
         if (is_complete_tree == TRUE) {
             setting_calculation <- NULL
         }
@@ -553,13 +550,14 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     method = method)
         }
         if (is.nan(loglik) || is.na(loglik)) {
-            cat("There are parameter values used which cause
-                numerical problems.\n")
+            warning("There are parameter values used which cause
+                numerical problems.")
             loglik <- -Inf
         }
     }
     if (verbose) {
-        cat(c(trparsopt / (1 - trparsopt), loglik), "\n")
+        out_print <- c(trparsopt / (1 - trparsopt), loglik)
+        message(paste(out_print, collapse = " "))
     }
     return(loglik)
 }

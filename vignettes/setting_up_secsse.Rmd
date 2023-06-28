@@ -203,7 +203,6 @@ fit_model <- function(tree, traits, model) {
 
   initpars <- runif(n = length(idparsopt))
 
-  testthat::expect_output( # suppress output
   answ <- secsse::cla_secsse_ml(phy = focal_tree,
                                 traits = traits,
                                 num_concealed_states = num_hidden_states,
@@ -218,7 +217,6 @@ fit_model <- function(tree, traits, model) {
                                 num_threads = 6,
                                 atol = 0.1, # high values for demonstration 
                                 rtol = 0.1) # purposes, don't use at home!
-  )
   found_pars_vals <- secsse::extract_par_vals(param_posit, answ$MLpars)
   aic <- 2 * max_indicator - 2 * as.numeric(answ$ML)
   return(list(pars = found_pars_vals,

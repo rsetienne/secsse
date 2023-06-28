@@ -179,7 +179,7 @@ optimmethod = 'simplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
-\dontrun{
+\donttest{
 model <- cla_secsse_ml_func_def_pars(phylotree,
 traits,
 num_concealed_states,

@@ -108,7 +108,7 @@
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction <- c(1,1,1)
-#'\dontrun{
+#'\donttest{
 #'model <- secsse_ml_func_def_pars(phylotree,
 #'traits,
 #'num_concealed_states,
@@ -189,8 +189,8 @@ secsse_ml_func_def_pars <- function(phy,
     }
 
     if (is.matrix(traits)) {
-        cat("You are setting a model where some species had more than 
-            one trait state \n")
+        warning("You are setting a model where some species had more than 
+            one trait state")
     }
 
     if (length(initparsopt) != length(idparsopt)) {
@@ -227,11 +227,8 @@ secsse_ml_func_def_pars <- function(phy,
     if (anyDuplicated(c(unique(sort(
         as.vector(idparslist[[3]])
     )), idparsfix[which(parsfix == 0)])) != 0) {
-        cat("You set some transitions as impossible to happen", "\n")
+        warning("You set some transitions as impossible to happen")
     }
-
-    cat("Calculating the likelihood for the initial parameters.", "\n")
-    utils::flush.console()
 
     initparsopt2 <- c(initparsopt, initfactors)
 
@@ -281,16 +278,12 @@ secsse_ml_func_def_pars <- function(phy,
             rtol = rtol,
             method = method
         )
-    cat("The loglikelihood for the initial parameter values is",
-        initloglik,
-        "\n")
+    print_init_ll(initloglik = initloglik, verbose = verbose)
     if (initloglik == -Inf) {
       stop("The initial parameter values have a likelihood that is equal to 0 
            or below machine precision. Try again with different initial values."
       )
     } else {
-        cat("Optimizing the likelihood - this may take a while.", "\n")
-        utils::flush.console()
         out <-
             DDD::optimizer(
                 optimmethod = optimmethod,

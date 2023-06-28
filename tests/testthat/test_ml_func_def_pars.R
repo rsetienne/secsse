@@ -6,7 +6,7 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
   phylotree <- ape::read.tree(file = "", parenthesis)
   traits <- c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
   testthat::expect_output(
-     startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
+    startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
   intGuessLamba <- startingpoint$lambda0
   intGuessMu <- startingpoint$mu0
@@ -20,7 +20,7 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
                         byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
-
+  
   idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
   
   idparsfuncdefpar <- c(3)
@@ -42,28 +42,28 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
-  testthat::expect_output(
+  testthat::expect_warning(testthat::expect_output(
     model <- secsse_ml_func_def_pars(phy = phylotree,
-                                   traits = traits,
-                                   num_concealed_states = num_concealed_states,
-                                   idparslist = idparslist,
-                                   idparsopt = idparsopt,
-                                   initparsopt = initparsopt,
-                                   idfactorsopt = idfactorsopt,
-                                   initfactors = initfactors,
-                                   idparsfix = idparsfix,
-                                   parsfix = parsfix,
-                                   idparsfuncdefpar = idparsfuncdefpar,
-                                   functions_defining_params =
-                                     functions_defining_params,
-                                   cond = cond,
-                                   root_state_weight = root_state_weight,
-                                   sampling_fraction = sampling_fraction,
-                                   tol = tol,
-                                   maxiter = maxiter,
-                                   optimmethod = optimmethod,
-                                   num_cycles = 1)
-  )
-
+                                     traits = traits,
+                                     num_concealed_states = num_concealed_states,
+                                     idparslist = idparslist,
+                                     idparsopt = idparsopt,
+                                     initparsopt = initparsopt,
+                                     idfactorsopt = idfactorsopt,
+                                     initfactors = initfactors,
+                                     idparsfix = idparsfix,
+                                     parsfix = parsfix,
+                                     idparsfuncdefpar = idparsfuncdefpar,
+                                     functions_defining_params =
+                                       functions_defining_params,
+                                     cond = cond,
+                                     root_state_weight = root_state_weight,
+                                     sampling_fraction = sampling_fraction,
+                                     tol = tol,
+                                     maxiter = maxiter,
+                                     optimmethod = optimmethod,
+                                     num_cycles = 1)
+  ))
+  
   testthat::expect_equal(model$ML, -12.87974)
 })

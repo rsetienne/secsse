@@ -55,12 +55,12 @@ test_that("cla plotting", {
   parsfix <- c(0, 0, 0.01)
   tol <- c(1e-04, 1e-05, 1e-07)
   maxiter <- 1000 * round((1.25) ^ length(idparsopt))
-  optimmethod <- "simplex"
+  optimmethod <- "subplex"
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-  testthat::expect_output(
+  testthat::expect_warning(
     model_R <- cla_secsse_ml(
       phylotree,
       traits,
