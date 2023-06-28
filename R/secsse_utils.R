@@ -297,6 +297,8 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
 prepare_full_lambdas <- function(traits,
                                  num_concealed_states,
                                  lambd_and_modeSpe) {
+    if (is.list(lambd_and_modeSpe)) return(lambd_and_modeSpe)
+    
     num_exami <- length(sort(unique(traits)))
     mat_size <- num_exami * num_concealed_states
     posib_trans <- matrix(1,
@@ -309,7 +311,6 @@ prepare_full_lambdas <- function(traits,
                                  diff.conceal = FALSE)
 
     full_lambdas <- list()
-
     for (jj in 1:mat_size) {
         # dual_state_inhe
         m1 <- matrix(0, ncol = mat_size, nrow = mat_size)

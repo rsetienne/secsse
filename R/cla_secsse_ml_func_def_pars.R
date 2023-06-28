@@ -218,6 +218,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
         cat("Note: you set some transitions as impossible to happen.", "\n")
     }
 
+    idparslist[[1]] <- prepare_full_lambdas(traits, num_concealed_states, idparslist[[1]])
     see_ancestral_states <- FALSE
 
     message("Calculating the likelihood for the initial parameters.", "\n")
