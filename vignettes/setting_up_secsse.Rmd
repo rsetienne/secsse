@@ -136,8 +136,6 @@ param_posit[[3]] <- trans_matrix
 initpars <- params
 initpars <- initpars[-2]
 
-
-
 answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               traits = sim_traits,
                               num_concealed_states = num_hidden_states,
@@ -226,9 +224,19 @@ fit_model <- function(tree, traits, model) {
 }
 ```
 
-And then we loop over the different models:
+And then we can loop over the different models:
 
 ```{r model looping}
+
+# unfortunately, sometimes the ML doesn't converge
+# as this breaks knitting of the vignette
+# we recommend running the code locally, or knitting locally.
+# if at home, set the flag 'at_home' to TRUE
+
+at_home <- FALSE
+
+if (at_home) {
+
 found <- c()
 for (focal_model in c("CR", "CTD", "ETD")) {
   local_answ <- fit_model(tree = focal_tree,
@@ -241,7 +249,14 @@ found <- as.data.frame(found)
 found$LL <- as.numeric(found$LL)
 found$AIC <- as.numeric(found$AIC)
 found
+
+}
+
+# typical output looks like:
+##   model        LL      AIC
+## 1    CR -34.38893 82.77786
+## 2   CTD -35.59013 87.18026
+## 3   ETD -34.38893 84.77786
 ```
 
-Because we have simulated the tree using the CR model, we expect the model with
-the lowest AIC to be the CR model again, and indeed we do find this!
+Because we have simulated the tree using the CR model, we expect the model with the lowest AIC to be the CR model again, and indeed we do find this!
