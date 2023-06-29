@@ -4,10 +4,13 @@
 \alias{create_default_lambda_list}
 \title{helper function to create a default lambda list}
 \usage{
-create_default_lambda_list(state_names = c("0", "1"))
+create_default_lambda_list(state_names = c("0", "1"), model = "ETD")
 }
 \arguments{
 \item{state_names}{names of the observed states}
+
+\item{model}{chosen model of interest, either "CR" (Constant Rates), "ETD" 
+(Examined Trait Diversification) or "CTD" ("Concealed Trait Diversification).}
 }
 \description{
 This function generates a generic lambda list, assuming no transitions
