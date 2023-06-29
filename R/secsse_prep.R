@@ -106,7 +106,7 @@ create_lambda_matrices <- function(state_names,
       incr <- (j - 1) * num_obs_states
       focal_rate <- target_rate
       if (model == "CTD") focal_rate <- concealed_spec_rates[j]
-      if (model == "CR") focal_rate <- 1
+      # if (model == "CR") focal_rate <- 1
 
       lambdas[[focal_state + incr]][daughter1 + incr,
                                     daughter2 + incr] <- focal_rate
@@ -308,19 +308,25 @@ create_default_q_list <- function(state_names = c("0", "1"),
 
 #' helper function to create a default lambda list
 #' @param state_names names of the observed states
+#' @param model chosen model of interest, either "CR" (Constant Rates), "ETD" 
+#' (Examined Trait Diversification) or "CTD" ("Concealed Trait Diversification).
 #' @description
 #' This function generates a generic lambda list, assuming no transitions
 #' between states, e.g. a species of observed state 0 generates daughter
 #' species with state 0 as well.
 #' @export
-create_default_lambda_list <- function(state_names = c("0", "1")) {
+create_default_lambda_list <- function(state_names = c("0", "1"),
+                                       model = "ETD") {
   
   transition_list <- c()
   for (i in seq_along(state_names)) {
+    focal_rate <- i
+    if (model == "CR") focal_rate <- 1
     transition_list <- rbind(transition_list,
                              c(state_names[i],
                                state_names[i],
-                               state_names[i], i))
+                               state_names[i], 
+                               focal_rate))
   }
   rownames(transition_list) <- rep("", nrow(transition_list))
   return(transition_list)

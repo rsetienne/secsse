@@ -31,7 +31,8 @@ We assume here that we have a trait with labels "S" and "N", and use the default
 
 ```{r default_trans_list}
 used_states <- c("S", "N")
-focal_list <- secsse::create_default_lambda_list(state_names = used_states)
+focal_list <- secsse::create_default_lambda_list(state_names = used_states,
+                                                 model = "CR")
 focal_list
 ```
 

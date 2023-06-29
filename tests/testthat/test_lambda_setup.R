@@ -57,7 +57,8 @@ test_that("q_matrix", {
 
 test_that("setup", {
   focal_list <-
-    secsse::create_default_lambda_list(state_names = c("S", "N"))
+    secsse::create_default_lambda_list(state_names = c("S", "N"),
+                                       model = "CR")
   lambda_matrices_CR <- secsse::create_lambda_matrices(state_names =
                                                          c("S", "N"),
                                                     num_concealed_states = 2,
@@ -68,6 +69,9 @@ test_that("setup", {
     testthat::expect_equal(lambda_matrices_CR[[i]][i, i], 1)
   }
 
+  focal_list <-
+    secsse::create_default_lambda_list(state_names = c("S", "N"),
+                                       model = "CTD")
   # now for the CTD model:
   lambda_matrices_CTD <- secsse::create_lambda_matrices(state_names =
                                                           c("S", "N"),
