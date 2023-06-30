@@ -29,7 +29,7 @@ calThruNodes_store_cpp <- function(ances, states_R, forTime_R, lambdas, mus, Q, 
     .Call(`_secsse_calThruNodes_store_cpp`, ances, states_R, forTime_R, lambdas, mus, Q, num_threads, abstol, reltol, method, is_complete_tree, num_steps, verbose)
 }
 
-secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries) {
-    .Call(`_secsse_secsse_sim_cpp`, m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries)
+secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed) {
+    .Call(`_secsse_secsse_sim_cpp`, m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed)
 }
 

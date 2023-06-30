@@ -67,10 +67,11 @@ test_that("secsse gives the same result as GeoSSE", {
                                        see_ancestral_states = FALSE,
                                        loglik_penalty = 0)
 
-    testthat::expect_equal(classe_diversitree_LL,  secsse_cla_LL)
+    testthat::expect_equal(classe_diversitree_LL,  secsse_cla_LL,
+                           tolerance = 1e-5)
 
     # Parallel code doesn't work on CI
-    skip_on_cran()
+    testthat::skip_on_cran()
     secsse_cla_LL3 <- cla_secsse_loglik(parameter,
                                         phy,
                                         traits,
@@ -82,6 +83,7 @@ test_that("secsse gives the same result as GeoSSE", {
                                         see_ancestral_states = FALSE,
                                         loglik_penalty = 0,
                                         num_threads = 4)
-    testthat::expect_equal(classe_diversitree_LL, secsse_cla_LL3)
+    testthat::expect_equal(classe_diversitree_LL, secsse_cla_LL3,
+                           tolerance = 1e-5)
   }
 })

@@ -24,8 +24,8 @@ secsse_ml(
   is_complete_tree = FALSE,
   verbose = (optimmethod == "subplex"),
   num_threads = 1,
-  atol = 1e-12,
-  rtol = 1e-12,
+  atol = 1e-08,
+  rtol = 1e-07,
   method = "odeint::bulirsch_stoer"
 )
 }

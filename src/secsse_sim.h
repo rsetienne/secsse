@@ -84,7 +84,8 @@ struct lambda_dist {
   std::discrete_distribution<size_t> d;
 
   size_t draw_from_dist(std::mt19937* rndgen) {
-    return indices[d(*rndgen)];
+    auto index = d(*rndgen);
+    return indices[index];
   }
 
   lambda_dist(const std::vector<size_t>& i,
@@ -269,7 +270,9 @@ struct secsse_sim {
              double mt,
              size_t max_s,
              const std::vector<double>& init,
-             const bool& ne) : mus(m),
+             const bool& ne,
+             int seed) : 
+             mus(m),
              num_states(m.size()), max_t(mt),
              max_spec(max_s),
              init_states(init),
@@ -280,8 +283,10 @@ struct secsse_sim {
 
     // randomize randomizer
     std::random_device rd;
-    std::mt19937 rndgen_t(rd());
+    if (seed < 0) seed = rd();
+    std::mt19937 rndgen_t(seed);
     rndgen_ = rndgen_t;
+   
     run_info = not_run_yet;
     t = 0.0;
     init_state = 0;
@@ -292,7 +297,8 @@ struct secsse_sim {
 
     // randomly draw initial trait
     std::uniform_int_distribution<size_t> d(0, init_states.size() - 1);
-    init_state = init_states[d(rndgen_)];
+    auto index = d(rndgen_);
+    init_state = init_states[index];
 
     run_info = not_run_yet;
 

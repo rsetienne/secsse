@@ -16,7 +16,8 @@ secsse_sim(
   non_extinction = TRUE,
   verbose = FALSE,
   max_tries = 1e+06,
-  drop_extinct = TRUE
+  drop_extinct = TRUE,
+  seed = NULL
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ crown lineages? Default is TRUE.}
 
 \item{drop_extinct}{should extinct species be dropped from the tree? default
 is TRUE.}
+
+\item{seed}{pseudo-random number generator seed}
 }
 \value{
 a list with four properties: phy: reconstructed phylogeny,

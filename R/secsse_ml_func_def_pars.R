@@ -152,8 +152,8 @@ secsse_ml_func_def_pars <- function(phy,
                                     loglik_penalty = 0,
                                     is_complete_tree = FALSE,
                                     num_threads = 1,
-                                    atol = 1e-12,
-                                    rtol = 1e-12,
+                                    atol = 1e-8,
+                                    rtol = 1e-6,
                                     method = "odeint::bulirsch_stoer") {
 
     structure_func <- list()

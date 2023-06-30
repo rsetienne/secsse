@@ -152,8 +152,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // secsse_sim_cpp
-Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, const std::vector<double>& init_states, std::string condition, int num_concealed_states, bool non_extinction, bool verbose, int max_tries);
-RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP init_statesSEXP, SEXP conditionSEXP, SEXP num_concealed_statesSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP) {
+Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, const std::vector<double>& init_states, std::string condition, int num_concealed_states, bool non_extinction, bool verbose, int max_tries, int seed);
+RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP init_statesSEXP, SEXP conditionSEXP, SEXP num_concealed_statesSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -168,7 +168,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type non_extinction(non_extinctionSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
-    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries));
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -181,7 +182,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_calThruNodes_cpp", (DL_FUNC) &_secsse_calThruNodes_cpp, 11},
     {"_secsse_ct_condition", (DL_FUNC) &_secsse_ct_condition, 8},
     {"_secsse_calThruNodes_store_cpp", (DL_FUNC) &_secsse_calThruNodes_store_cpp, 13},
-    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 11},
+    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 12},
     {NULL, NULL, 0}
 };
 

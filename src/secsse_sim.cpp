@@ -37,7 +37,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           int num_concealed_states,
                           bool non_extinction,
                           bool verbose,
-                          int max_tries) {
+                          int max_tries,
+                          int seed) {
   num_mat q;
   numericmatrix_to_vector(q_R, &q);
 
@@ -51,7 +52,9 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  max_time,
                  max_species,
                  init_states,
-                 non_extinction);
+                 non_extinction,
+                 seed);
+
   std::array<int, 5> tracker = {0, 0, 0, 0, 0};
   int cnt = 0;
   while (true) {

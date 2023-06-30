@@ -90,11 +90,9 @@ cla_secsse_loglik <- function(parameter,
                               loglik_penalty = 0,
                               is_complete_tree = FALSE,
                               num_threads = 1,
-                              method = ifelse(num_threads == 1,
-                                          "odeint::bulirsch_stoer",
-                                          "odeint::runge_kutta_fehlberg78"),
-                              atol = 1e-16,
-                              rtol = 1e-16) {
+                              method = "odeint::bulirsch_stoer",
+                              atol = 1e-8,
+                              rtol = 1e-7) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -189,9 +187,9 @@ cla_secsse_loglik <- function(parameter,
                               lambdas,
                               mus,
                               Q,
-                              "odeint::bulirsch_stoer",
-                              1e-16,
-                              1e-12)
+                              method,
+                              atol,
+                              rtol)
     nodeM <- c(nodeM, y) # nolint
   }
 

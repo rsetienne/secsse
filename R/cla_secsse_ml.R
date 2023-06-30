@@ -112,8 +112,8 @@ cla_secsse_ml <- function(phy,
                           is_complete_tree = FALSE,
                           verbose = (optimmethod == "subplex"),
                           num_threads = 1,
-                          atol = 1e-12,
-                          rtol = 1e-12,
+                          atol = 1e-8,
+                          rtol = 1e-7,
                           method = "odeint::bulirsch_stoer") {
 
     structure_func <- NULL
