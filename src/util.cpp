@@ -8,17 +8,6 @@
 #include "config.h"    // NOLINT [build/include_subdir]
 #include "util.h"   // NOLINT [build/include_subdir]
 
-#include <thread>   // NOLINT [build/c++11]
-#include <chrono>   // NOLINT [build/c++11]
-
-
-void force_output() {
-  std::this_thread::sleep_for(std::chrono::milliseconds(30));
-  R_FlushConsole();
-  R_ProcessEvents();
-  R_CheckUserInterrupt();
-}
-
 std::vector<int> find_desNodes(
     const std::vector< std::vector<double>>& phy_edge,
     int focal) {

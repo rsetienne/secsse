@@ -11,8 +11,6 @@
 #include "Rcpp.h"
 #include <vector>
 
-void force_output();
-
 std::vector<int> find_desNodes(
     const std::vector< std::vector<double>>& phy_edge,
     int focal);
