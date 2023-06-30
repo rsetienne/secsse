@@ -21,6 +21,7 @@
 #' @param max_tries maximum number of simulations to try to obtain a tree.
 #' @param drop_extinct should extinct species be dropped from the tree? default
 #' is TRUE.
+#' @param seed pseudo-random number generator seed
 #' @return a list with four properties: phy: reconstructed phylogeny,
 #' true_traits: the true traits in order of tip label, obs_traits: observed
 #' traits, ignoring hidden traits and lastly:
@@ -51,7 +52,8 @@ secsse_sim <- function(lambdas,
                        non_extinction = TRUE,
                        verbose = FALSE,
                        max_tries = 1e6,
-                       drop_extinct = TRUE) {
+                       drop_extinct = TRUE,
+                       seed = NULL) {
 
   if (is.matrix(lambdas)) {
     # need to be converted
@@ -87,6 +89,8 @@ secsse_sim <- function(lambdas,
     stop("unknown conditioning, please pick from
          'none', 'obs_states', 'true_states'")
   }
+  
+  if (is.null(seed)) seed <- -1
 
   res <- secsse_sim_cpp(mus,
                         lambdas,
@@ -98,7 +102,8 @@ secsse_sim <- function(lambdas,
                         num_concealed_states,
                         non_extinction,
                         verbose,
-                        max_tries)
+                        max_tries,
+                        seed)
 
   if (length(res$traits) < 1) {
     warning("crown lineages died out")
