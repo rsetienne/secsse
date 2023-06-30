@@ -92,7 +92,7 @@ cla_secsse_loglik <- function(parameter,
                               num_threads = 1,
                               method = "odeint::bulirsch_stoer",
                               atol = 1e-8,
-                              rtol = 1e-6) {
+                              rtol = 1e-7) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0

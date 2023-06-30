@@ -392,7 +392,7 @@ class ode_cla_store {
       double Ef = 0.0;
       for (size_t j = 0; j < d; ++j) {
         for (size_t k = 0; k < d; ++k) {
-          if (l_[i][j][k] != 0.0) {   // slightly safer.
+          if (l_[i][j][k] != 0.0) {   // slightly faster.
             long double ff1 = (x[j] * x[k + d] + x[j + d] * x[k]);
             long double ff2 = (x[j] * x[k]);
 

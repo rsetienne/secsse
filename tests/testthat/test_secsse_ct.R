@@ -140,5 +140,5 @@ test_that("the loglik for the complete tree", {
                                sampling_fraction = sampling_fraction,
                                is_complete_tree = TRUE,
                                num_threads = 4)
-  testthat::expect_equal(loglik8, loglik7, tolerance = 0.001)
+  testthat::expect_equal(loglik8, loglik7, tolerance = 1e-5)
 })

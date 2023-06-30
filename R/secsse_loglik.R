@@ -76,7 +76,7 @@ secsse_loglik <- function(parameter,
                           is_complete_tree = FALSE,
                           num_threads = 1,
                           atol = 1e-8,
-                          rtol = 1e-6,
+                          rtol = 1e-7,
                           method = "odeint::bulirsch_stoer") {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
