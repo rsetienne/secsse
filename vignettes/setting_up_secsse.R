@@ -3,7 +3,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----default_trans_list-------------------------------------------------------
 used_states <- c("S", "N")
-focal_list <- secsse::create_default_lambda_list(state_names = used_states)
+focal_list <- secsse::create_default_lambda_list(state_names = used_states,
+                                                 model = "CR")
 focal_list
 
 ## ----default lambda matrices--------------------------------------------------
@@ -75,8 +76,6 @@ param_posit[[3]] <- trans_matrix
 initpars <- params
 initpars <- initpars[-2]
 
-
-
 answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               traits = sim_traits,
                               num_concealed_states = num_hidden_states,
@@ -134,7 +133,6 @@ fit_model <- function(tree, traits, model) {
 
   initpars <- runif(n = length(idparsopt))
 
-  testthat::expect_output( # suppress output
   answ <- secsse::cla_secsse_ml(phy = focal_tree,
                                 traits = traits,
                                 num_concealed_states = num_hidden_states,
@@ -149,7 +147,6 @@ fit_model <- function(tree, traits, model) {
                                 num_threads = 6,
                                 atol = 0.1, # high values for demonstration 
                                 rtol = 0.1) # purposes, don't use at home!
-  )
   found_pars_vals <- secsse::extract_par_vals(param_posit, answ$MLpars)
   aic <- 2 * max_indicator - 2 * as.numeric(answ$ML)
   return(list(pars = found_pars_vals,
@@ -158,6 +155,16 @@ fit_model <- function(tree, traits, model) {
 }
 
 ## ----model looping------------------------------------------------------------
+
+# unfortunately, sometimes the ML doesn't converge
+# as this breaks knitting of the vignette
+# we recommend running the code locally, or knitting locally.
+# if at home, set the flag 'at_home' to TRUE
+
+at_home <- FALSE
+
+if (at_home) {
+
 found <- c()
 for (focal_model in c("CR", "CTD", "ETD")) {
   local_answ <- fit_model(tree = focal_tree,
@@ -170,4 +177,12 @@ found <- as.data.frame(found)
 found$LL <- as.numeric(found$LL)
 found$AIC <- as.numeric(found$AIC)
 found
+
+}
+
+# typical output looks like:
+##   model        LL      AIC
+## 1    CR -34.38893 82.77786
+## 2   CTD -35.59013 87.18026
+## 3   ETD -34.38893 84.77786
 
