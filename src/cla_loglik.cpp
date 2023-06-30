@@ -54,7 +54,7 @@ double calc_ll_cla(const Rcpp::List& ll,
   std::vector<double> nodeM;
 
   int max_ances = *std::max_element(ances.begin(), ances.end());
-  std::vector< double > add(states[0].size(), 0.0);
+  std::vector< double > add((*states)[0].size(), 0.0);
   while (max_ances > (*states).size()) {
     (*states).push_back(add);
   }
