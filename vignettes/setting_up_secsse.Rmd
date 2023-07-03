@@ -21,11 +21,11 @@ When preparing a secsse analysis, it can be daunting to prepare the different re
 
 To perform a secsse analysis, we want to use maximum likelihood to find the most likely values for our parameters, given a phylogenetic tree and tip states. To do so, secsse requires the user to specify how speciation changes the state of the daughter species in relation to the parent species, and requires the user to specify the number of unique speciation rates to be fitted. Here, we will explore a basic example.
 
-### Two observed states, two hidden state
-We start with a straightforward, simple case where we have two observed states (perhaps the presence / absence of an ornament or so), and we assume that the concealed state follows a similar structure, e.g. it also has two unique states. 
-Now, we can specify three different models, 1) constant-rates model, where rates are not dependent on any trait, 2) Examined-Trait-Diversification (ETD), where rates are dependent on the observed trait and 3) CTD (Concealed-Trait-Diversification), where rates are dependent on the concealed trait.
+### Two examined states, two concealed states
+We start with a straightforward, simple case where we have two examined (observed) states (such as the presence / absence of an ornament), and we assume that the concealed (hidden) state follows a similar structure, e.g. it also has two unique states. 
+Now, we can specify three different models, 1) constant-rates model, where rates are not dependent on any trait, 2) Examined-Trait-Diversification (ETD), where rates are dependent on the examined trait and 3) CTD (Concealed-Trait-Diversification), where rates are dependent on the concealed trait.
 
-#### Lambdas
+## 1. Speciation rates (lambda-matrices)
 To create the required lambda-matrices, we need as input information about the observed state names, the number of concealed states, and a transition_list object, which is a matrix defining the traits of daughter species upon speciation and their associated rate. We will here generate a default transition_list, but the user is free to create (and encouraged) one manually her/him self in order to reflect the focal system better.
 We assume here that we have a trait with labels "S" and "N", and use the default settings:
 
@@ -48,7 +48,7 @@ lambda_matrices
 
 We see that there are four lambda matrices, one for each of the combined states (e.g. for each combination of observed and hidden states). So in this case we have our two observed states S and N, and the two hidden states A and B. This results in the four real states SA, NA, SB and NB. 
 
-#### Extinction
+## 2. Extinction rates
 
 We also need to specify an extinction rate:
 
@@ -60,9 +60,9 @@ mus <- secsse::create_mus(state_names = used_states,
 mus
 ```
 
-#### Q matrix
+## 3. Transition rates (Q-matrix)
 
-To specify a q-matrix, we again need to specify the transitions using a transition list. Again, we use the standard settings.
+To specify a Q-matrix, we again need to specify the transitions using a transition list. Again, we use the standard settings.
 
 ```{r default_trans} 
 q_list <- secsse::create_default_q_list(state_names = used_states,

@@ -3,7 +3,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----default_trans_list-------------------------------------------------------
 used_states <- c("S", "N")
-focal_list <- secsse::create_default_lambda_list(state_names = used_states)
+focal_list <- secsse::create_default_lambda_list(state_names = used_states,
+                                                 model = "CR")
 focal_list
 
 ## ----default lambda matrices--------------------------------------------------
@@ -62,7 +63,8 @@ simulated_tree <- secsse::secsse_sim(lambdas = lambda_matrices_p,
                                      num_concealed_states = num_hidden_states,
                                      crown_age = 5,
                                      conditioning = "obs_states",
-                                     verbose = TRUE)
+                                     verbose = TRUE,
+                                     seed = 26)
 sim_traits <- simulated_tree$obs_traits
 focal_tree <- simulated_tree$phy
 
@@ -74,8 +76,6 @@ param_posit[[3]] <- trans_matrix
 
 initpars <- params
 initpars <- initpars[-2]
-
-
 
 answ <- secsse::cla_secsse_ml(phy = focal_tree,
                               traits = sim_traits,
@@ -97,8 +97,9 @@ found_pars_vals <- secsse::extract_par_vals(param_posit, answ$MLpars)
 found_pars_vals
 
 ## ----define_model_function----------------------------------------------------
-fit_model <- function(tree, traits, model) {
-  focal_list <- secsse::create_default_lambda_list(state_names = used_states)
+fit_model <- function(focal_tree, traits, model) {
+  focal_list <- secsse::create_default_lambda_list(state_names = used_states,
+                                                   model = model)
   lambda_matrices <- secsse::create_lambda_matrices(state_names = used_states,
                                                     num_concealed_states = num_hidden_states,
                                                     transition_list =
@@ -132,9 +133,9 @@ fit_model <- function(tree, traits, model) {
   idparsfix <- c(0, extinct_rates)
   parsfix <- rep(0.0, length(idparsfix))
 
-  initpars <- runif(n = length(idparsopt))
+  initpars <- c(rep(params[1], min(extinct_rates) - 1),
+                params[-c(1, 2)])
 
-  testthat::expect_output( # suppress output
   answ <- secsse::cla_secsse_ml(phy = focal_tree,
                                 traits = traits,
                                 num_concealed_states = num_hidden_states,
@@ -149,7 +150,6 @@ fit_model <- function(tree, traits, model) {
                                 num_threads = 6,
                                 atol = 0.1, # high values for demonstration 
                                 rtol = 0.1) # purposes, don't use at home!
-  )
   found_pars_vals <- secsse::extract_par_vals(param_posit, answ$MLpars)
   aic <- 2 * max_indicator - 2 * as.numeric(answ$ML)
   return(list(pars = found_pars_vals,
@@ -158,9 +158,10 @@ fit_model <- function(tree, traits, model) {
 }
 
 ## ----model looping------------------------------------------------------------
+
 found <- c()
 for (focal_model in c("CR", "CTD", "ETD")) {
-  local_answ <- fit_model(tree = focal_tree,
+  local_answ <- fit_model(focal_tree = focal_tree,
                           traits = sim_traits,
                           model = focal_model)
   found <- rbind(found, c(focal_model, local_answ$ml, local_answ$aic))
