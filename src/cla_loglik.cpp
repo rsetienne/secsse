@@ -77,7 +77,7 @@ double calc_ll_cla(const Rcpp::List& ll,
       if (focal_node >= states->size()) throw "focal_node > states.size";
 
       y = (*states)[focal_node];
-      
+
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr),     // ode class object

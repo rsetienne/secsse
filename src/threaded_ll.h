@@ -11,14 +11,14 @@
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
 
-#include <Rcpp.h>
+#include <Rcpp.h>                    // NOLINT [build/include_order]
 
-#include <vector>
-#include <tuple>
+#include <vector>                    // NOLINT [build/include_order]
+#include <tuple>                    // NOLINT [build/include_order]
 
-#include <utility>
-#include <string>
-#include <memory>
+#include <utility>                    // NOLINT [build/include_order]
+#include <string>                    // NOLINT [build/include_order]
+#include <memory>                    // NOLINT [build/include_order]
 
 #include <RcppParallel.h>
 

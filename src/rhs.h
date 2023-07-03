@@ -8,7 +8,7 @@
 #pragma once
 #include "Rcpp.h"                     // NOLINT [build/include_subdir]
 #include "util.h"                     // NOLINT [build/include_subdir]
-#include <vector>
+#include <vector>                     // NOLINT [build/include_order]
 
 
 class ode_standard {
@@ -152,7 +152,7 @@ class ode_cla {
           if (l_[i][j][k] != 0.0) {    // slightly safer.
             long double ff1 = (x[j] * x[k + d] + x[j + d] * x[k]);
             long double ff2 = (x[j] * x[k]);
-            
+
             Df += l_[i][j][k] * ff1;
             Ef += l_[i][j][k] * ff2;
           }

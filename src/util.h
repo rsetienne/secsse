@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "config.h"
-#include "Rcpp.h"
-#include <vector>
+#include "config.h"                    // NOLINT [build/include_order]
+#include "Rcpp.h"                    // NOLINT [build/include_order]
+#include <vector>                    // NOLINT [build/include_order]
 
 std::vector<int> find_desNodes(
     const std::vector< std::vector<double>>& phy_edge,
@@ -40,7 +40,8 @@ void normalize_loglik(std::vector<double>* probvec,
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v);
 
-std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m);
+std::vector< std::vector< double> >
+  num_mat_to_vec(const Rcpp::NumericMatrix& m);
 
 
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
@@ -51,7 +52,7 @@ void output_vec(const std::vector<double>& v);
 void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
                     std::vector< std::vector< std::vector<double >>>* v);
 
-std::vector< std::vector< std::vector<double >>>  
+std::vector< std::vector< std::vector<double >>>
   list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l);
 
 struct data_storage {

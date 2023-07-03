@@ -5,13 +5,13 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include "config.h"
+#include "config.h"    // NOLINT [build/include_order]
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "rhs.h"       // NOLINT [build/include_subdir]
 #include "util.h"      // NOLINT [build/include_subdir]
 
-#include <vector>
-#include <Rcpp.h>
+#include <vector>      // NOLINT [build/include_order]
+#include <Rcpp.h>      // NOLINT [build/include_order]
 
 //// continuous storage
 storage calc_ll_full(const Rcpp::NumericVector& ll,
