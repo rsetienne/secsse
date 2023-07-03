@@ -457,6 +457,7 @@ For more advanced settings and shortcut functions to set up a secsse analysis, p
 
 If after reading these vignettes, you still have questions, please feel free to e-mail the authors for help with this R package.
 
+=======
 ## References 
 
 Beaulieu, J. M., O'meara, B. C., & Donoghue, M. J. (2013). Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.
