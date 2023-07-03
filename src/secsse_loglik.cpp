@@ -10,14 +10,14 @@
 // GNU General Public License for more details.
 //
 //
-#include <cstdlib>    // std::getenv, std::atoi
-#include <vector>
-#include <thread>
-#include <chrono>
-#include <type_traits>
-#include <Rcpp.h>
-#include <RcppParallel.h>
-#include <set> 
+#include <cstdlib>    // std::getenv, std::atoi                    // NOLINT [build/include_order]
+#include <vector>                   // NOLINT [build/include_order]
+#include <thread>                   // NOLINT [build/include_order]
+#include <chrono>                   // NOLINT [build/include_order]
+#include <type_traits>                   // NOLINT [build/include_order]
+#include <Rcpp.h>                   // NOLINT [build/include_order]
+#include <RcppParallel.h>                   // NOLINT [build/include_order]
+#include <set>                    // NOLINT [build/include_order]
 #include "config.h"    // NOLINT [build/include_subdir]
 #include "odeint.h"    // NOLINT [build/include_subdir]
 #include "rhs.h"       // NOLINT [build/include_subdir]
@@ -93,7 +93,7 @@ namespace orig {
 
     return loglik;
   }
-}
+}    // namespace orig
 
 namespace fiddled {
 
@@ -101,7 +101,7 @@ namespace fiddled {
   // set by RcppParallel::setThreadOptions(numThreads)
   inline size_t get_rcpp_num_threads() {
     auto* nt_env = std::getenv("RCPP_PARALLEL_NUM_THREADS");
-    return (nullptr == nt_env) 
+    return (nullptr == nt_env)
       ? tbb::task_arena::automatic  // -1
       : static_cast<size_t>(std::atoi(nt_env));
   }
@@ -127,30 +127,31 @@ namespace fiddled {
     });
     auto comp = [](auto& edge, int val) { return edge[0] < val; };
     auto res = inte_nodes_t{ances.size()};
-    for (size_t i = 0; i < ances.size(); ++i) { 
+    for (size_t i = 0; i < ances.size(); ++i) {
       const auto focal = ances[i];
       auto& inode = res[i];
       inode.ances_state = &(*states)[focal - 1];
-      // ances node shall be set to 'all NA' on the R side, 'all nan' on the C/C++ side.
+      // ances node shall be set to 'all NA' on the R side, 
+      // 'all nan' on the C/C++ side.
       assert(std::all_of(std::begin(*inode.ances_state),
                          std::end(*inode.ances_state),
                          [](const auto& val) { return std::isnan(val); }));
       inode.ances_state->clear();   // NA is not nan
-      
+
       auto it0 = std::lower_bound(std::begin(phy_edge), std::end(phy_edge),
                                   focal, comp);
-      auto it1 = std::lower_bound(it0 + 1, std::end(phy_edge),
+      auto it1 = std::lower_bound((it0 + 1), std::end(phy_edge),
                                   focal, comp);
       assert((it0 != phy_edge.end()) && (it1 != phy_edge.end()));
-      
-      // easy to overlook: the sequence matters for creating the 'merged' branch.
+
+      // easy to overlook: the sequence matters for creating the 'merged' branch
       // imposes some pre-condition that is nowere to find :(
       if ((*it0)[1] > (*it1)[1]) {
         std::swap(*it0, *it1);
       }
       inode.desc[0] = { &(*states)[(*it0)[1] - 1], (*it0)[2] };
       inode.desc[1] = { &(*states)[(*it1)[1] - 1], (*it1)[2] };
-    };
+    }
     return res;
   }
 
@@ -158,9 +159,9 @@ namespace fiddled {
   double normalize_loglik(RaIt first, RaIt last) {
     const auto sabs = std::accumulate(first, last, 0.0,
                                       [](const auto& s, const auto& x) {
-      return s + std::abs(x); 
+      return s + std::abs(x);
     });
-    if (sabs <= 0.0) return 0.0; // unlikely
+    if (sabs <= 0.0) return 0.0;   // unlikely
     const auto fact = 1.0 / sabs;
     for (; first != last; ++first) *first *= fact;
     return std::log(sabs);
@@ -170,11 +171,11 @@ namespace fiddled {
   // Primary template handles all types not supporting the operation.
   template <typename, template <typename> class, typename = std::void_t<>>
   struct detect : std::false_type {};
-                
+
   // Specialization recognizes/validates only types supporting the archetype.
   template <typename T, template <typename> class Op>
   struct detect<T, Op, std::void_t<Op<T>>> : std::true_type {};
-  
+
   template <typename OD_TYPE>
   using const_ode_callop =
          decltype(static_cast<void(OD_TYPE::*)(const std::vector<double>&,
@@ -183,7 +184,7 @@ namespace fiddled {
 
   template <typename OD_TYPE>
   class Integrator {
-  public:
+   public:
     Integrator(std::unique_ptr<OD_TYPE>&& od,
                const std::string& method,
                double atol,
@@ -218,7 +219,7 @@ namespace fiddled {
       }
     }
 
-  private:
+   private:
     std::unique_ptr<OD_TYPE> od_;
     const std::string method_;
     const double atol_;
@@ -256,7 +257,7 @@ namespace fiddled {
 
     auto inodes = find_inte_nodes(phy_edge, ances, states);
     auto is_dirty = [](const auto& inode) {
-      return inode.ances_state->empty() && 
+      return inode.ances_state->empty() &&
               (inode.desc[0].state->empty() || inode.desc[1].state->empty());
     };
 
@@ -275,23 +276,23 @@ namespace fiddled {
         auto& mergebranch = *inode.ances_state;
         mergebranch.resize(2 * d);
         for (size_t i = 0; i < d; ++i) {
-          mergebranch[i] =y[1][i];
+          mergebranch[i] = y[1][i];
           mergebranch[i + d] = y[1][i + d] * y[0][i + d] * ll[i];
         }
         loglik[0] += normalize_loglik(std::begin(mergebranch) + d,
                                       std::end(mergebranch));
 #ifdef __cpp_lib_atomic_float
         global_loglik.fetch_add(inode.desc[0].time_ll + inode.desc[1].time_ll);
-#else               
+#else
         {
           std::lock_guard<std::mutex> _{mutex};
           global_loglik += loglik[0] + loglik[1];
         }
-#endif        
+#endif
       });
       first = last;
     }
-    
+
     const auto& root_node = inodes.back();    // the last calculated
     const auto& last_merge = *root_node.ances_state;
     (*merge_branch_out) = Rcpp::NumericVector(std::begin(last_merge) + d,
@@ -302,7 +303,7 @@ namespace fiddled {
     (*nodeM_out) = Rcpp::NumericVector(std::begin(last_M), std::end(last_M));
     return global_loglik;
   }
-}
+}    // namespace fiddled
 
 using namespace fiddled;
 

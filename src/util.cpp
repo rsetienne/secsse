@@ -120,9 +120,9 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   return;
 }
 
-std::vector< std::vector< double> > 
+std::vector< std::vector< double> >
     num_mat_to_vec(const Rcpp::NumericMatrix& m) {
-  auto v = std::vector< std::vector< double> >(m.nrow(), 
+  auto v = std::vector< std::vector< double> >(m.nrow(),
                                                std::vector<double>(m.ncol(),
                                                                    0.0));
   for (int i = 0; i < m.nrow(); ++i) {

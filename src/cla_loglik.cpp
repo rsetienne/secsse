@@ -10,8 +10,8 @@
 #include "rhs.h"          // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
 
-#include <vector>
-#include <Rcpp.h>
+#include <vector>                   // NOLINT [build/include_order]
+#include <Rcpp.h>                   // NOLINT [build/include_order]
 
 
 template <typename ODE_TYPE>

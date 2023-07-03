@@ -25,7 +25,8 @@
 #include <boost/units/quantity.hpp>                     // NOLINT [build/include_order]
 #include <boost/units/systems/si/dimensionless.hpp>                    // NOLINT [build/include_order]
 
-using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
+using bstime_t = 
+  boost::units::quantity<boost::units::si::dimensionless, double>;
 
 #else   // USE_BULRISCH_STOER_PATCH
 
@@ -56,10 +57,10 @@ namespace {
 
 template <typename T>
 struct is_unique_ptr : std::false_type {};
-                     
+
 template <typename T, typename D>
-struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type {};    
-                     
+struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type {};
+
 }
 
 template <
@@ -68,11 +69,11 @@ template <
 void integrate(const std::string& stepper_name,
                ODE ode,
                STATE* y,
-               double t0, 
+               double t0,
                double t1,
-               double dt, 
+               double dt,
                double atol, double rtol) {
-  static_assert(is_unique_ptr<ODE>::value || std::is_pointer_v<ODE>, 
+  static_assert(is_unique_ptr<ODE>::value || std::is_pointer_v<ODE>,
                 "ODE shall be pointer or unique_ptr type");
   if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
     integrate(
