@@ -451,8 +451,6 @@ If the user wishes to assign a taxon to multiple trait states, because he/she is
 # [5,]      1      2      3
 ```
 
-## Do you feel SecSSE? If not, please feel free to e-mail the authors. For help with this R package only.
-
 ## References 
 
 Beaulieu, J. M., O'meara, B. C., & Donoghue, M. J. (2013). Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.
