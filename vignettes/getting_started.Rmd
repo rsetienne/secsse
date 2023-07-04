@@ -50,7 +50,6 @@ diversitree::trait.plot(focal_tree, dat = focal_traits,
                         cols = list("trait" = c("blue", "red")),
                         type = "p")
 }
-
 ```
 
 Our dataset is a tree with 68 species that show either the presence (1)
@@ -206,13 +205,13 @@ initial values. We can do so as follows:
 ```{r ETD_ML_init}
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep al zeros at zero
-initparsopt <- runif(n = 8, min = 0, max = 1) # we start at a random starting point
+initparsopt <- rep(0.1, 8) 
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 ```
 
 Here, we specify that we want to optimize all parameters with rates 1,
-2, ..., 8. We set these at initial values in uniform(0, 1). Here, we
+2, ..., 8. We set these at initial values at 0.1 for all parameters. Here, we
 will only use one starting point, but in practice it is often advisable
 to explore multiple different initial values to avoid getting stuck in a
 local optimum and missing the global optimum. idparsfix and initparsfix
@@ -342,7 +341,7 @@ used for the ETD model to perform our maximum likelihood:
 ```{r CTD_ML}
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep al zeros at zero
-initparsopt <- runif(n = 8, min = 0, max = 1) # we start at a random starting point
+initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 
@@ -446,7 +445,7 @@ trans_matrix
 ```{r CR_ML}
 idparsopt <- 1:6 # our maximum rate parameter was 6
 idparsfix <- c(0) # we want to keep al zeros at zero
-initparsopt <- runif(n = 6, min = 0, max = 1) # we start at a random starting point
+initparsopt <- rep(0.1, 6)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 
