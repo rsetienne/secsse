@@ -271,7 +271,7 @@ struct secsse_sim {
              size_t max_s,
              const std::vector<double>& init,
              const bool& ne,
-             int seed) :
+             int seed) : 
              mus(m),
              num_states(m.size()), max_t(mt),
              max_spec(max_s),
@@ -286,7 +286,7 @@ struct secsse_sim {
     if (seed < 0) seed = rd();
     std::mt19937 rndgen_t(seed);
     rndgen_ = rndgen_t;
-
+   
     run_info = not_run_yet;
     t = 0.0;
     init_state = 0;
@@ -593,7 +593,7 @@ struct secsse_sim {
 
   void check_obs_states(size_t num_concealed_states,
                         size_t num_observed_states) {
-      std::vector<int> focal_traits;
+      std::vector<int> focal_traits;    //(num_observed_states);
       for (size_t i = 0; i < num_observed_states; ++i)  {
         focal_traits.push_back(i);
       }

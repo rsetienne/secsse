@@ -10,8 +10,8 @@
 #include "rhs.h"          // NOLINT [build/include_subdir]
 #include "util.h"         // NOLINT [build/include_subdir]
 
-#include <vector>                   // NOLINT [build/include_order]
-#include <Rcpp.h>                   // NOLINT [build/include_order]
+#include <vector>
+#include <Rcpp.h>
 
 
 template <typename ODE_TYPE>
@@ -77,7 +77,7 @@ double calc_ll_cla(const Rcpp::List& ll,
       if (focal_node >= states->size()) throw "focal_node > states.size";
 
       y = (*states)[focal_node];
-
+      
       std::unique_ptr<ODE_TYPE> od_ptr = std::make_unique<ODE_TYPE>(od);
       odeintcpp::integrate(method,
                            std::move(od_ptr),     // ode class object

@@ -1,28 +1,28 @@
 ---
-title: "Using SecSSE ML search"
+title: "Using secsse - basics"
 author: "Leonel Herrera-Alsina, Paul van Els & Rampal S. Etienne"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using SecSSE ML search}
+  %\VignetteIndexEntry{Using secsse - basics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-## SecSSE introduction
+## secsse introduction
 
-SecSSE is an R package designed for multistate data sets under a concealed state and speciation ('hisse') framework. In this sense, it is parallel to the 'MuSSE' functionality implemented in 'diversitree', but it accounts for finding possible spurious relationships between traits and diversification rates ('false positives', Rabosky & Goldberg 2015) by testing against a 'hidden trait' (Beaulieu et al. 2013), which is responsible for more variation in diversification rates than the trait being investigated.
+secsse is an R package designed for multistate data sets under a concealed state and speciation ('hisse') framework. In this sense, it is parallel to the 'MuSSE' functionality implemented in 'diversitree', but it accounts for finding possible spurious relationships between traits and diversification rates ('false positives', Rabosky & Goldberg 2015) by testing against a 'hidden trait' (Beaulieu et al. 2013), which is responsible for more variation in diversification rates than the trait being investigated.
 
-## SecSSE input files
+## secsse input files
 
-A good practice is always remove all the objects in memory and then load SecSSE:
+A good practice is always remove all the objects in memory and then load secsse:
 
 ```{r}
 rm(list = ls())
 library(secsse)
 ```
 
-Similar to the 'diversitree' (Fitzjohn et al. 2012) and 'hisse' (Beaulieu & O'Meara 2016) packages, SecSSE uses two input files: a rooted, ultrametric tree in nexus format (for conversion of other formats to nexus, we refer to the documentation in package 'ape') and a data file with two columns, the first containing taxa names and the second a numeric code for trait state with a header (usually 0,1,2,3, etc., but notice that 'NA' is a valid code too, if you are not sure what trait state to assign to a taxon). A comma-separated value file (.csv) generated in MsExcel works particularly well. The \*.csv file can be loaded into R using the read.csv() function. and should look like this:
+Similar to the 'diversitree' (Fitzjohn et al. 2012) and 'hisse' (Beaulieu & O'Meara 2016) packages, secsse uses two input files: a rooted, ultrametric tree in nexus format (for conversion of other formats to nexus, we refer to the documentation in package 'ape') and a data file with two columns, the first containing taxa names and the second a numeric code for trait state with a header (usually 0,1,2,3, etc., but notice that 'NA' is a valid code too, if you are not sure what trait state to assign to a taxon). A comma-separated value file (.csv) generated in MsExcel works particularly well. The \*.csv file can be loaded into R using the read.csv() function. and should look like this:
 
 ```{r}
 data(traitinfo)
@@ -30,7 +30,7 @@ trait <- traitinfo
 tail(trait)
 ```
 
-This data set (here we see only the bottom lines of the data frame) has three character states labeled as 1, 2 and 3. Notice that unless you want to assign ambiguity to some but not all states (see below), the third column in your data file should be empty. Ambiguity about trait state (you are not sure which trait state to assign a taxon too, or you have no data on trait state for a particular taxon), can be assigned using 'NA'. SecSSE handles 'NA' differently from a full trait state, in that it assigns probabilities to all trait states for a taxon demarcated with 'NA'.
+This data set (here we see only the bottom lines of the data frame) has three character states labeled as 1, 2 and 3. Notice that unless you want to assign ambiguity to some but not all states (see below), the third column in your data file should be empty. Ambiguity about trait state (you are not sure which trait state to assign a taxon too, or you have no data on trait state for a particular taxon), can be assigned using 'NA'. secsse handles 'NA' differently from a full trait state, in that it assigns probabilities to all trait states for a taxon demarcated with 'NA'.
 
 The second object we need is an ultrametric phylogenetic tree, that is rooted and has labeled tips. One can load it in R by using read.nexus(). In our example we load a prepared phylogeny named "phylo_Vign":
 
@@ -38,7 +38,7 @@ The second object we need is an ultrametric phylogenetic tree, that is rooted an
 data("phylo_Vign")
 ```
 
-For running SecSSE it is important that tree tip labels agree with taxon names in the data file, but also that these are in the same order. For this purpose, we run the following piece of code prior to any analysis:
+For running secsse it is important that tree tip labels agree with taxon names in the data file, but also that these are in the same order. For this purpose, we run the following piece of code prior to any analysis:
 
 ```{r}
 traits <- sortingtraits(trait, phylo_Vign)
@@ -62,7 +62,7 @@ If you have taxa in your tree file that do not appear in your trait file, it is 
 
 ## Parameter settings and constraints
 
-SecSSE allows for the implementation of different models of evolution, and just as in 'diversitree' and 'hisse', parameters can be fixed at certain values (if prior information is known on particular values) or made to be equal to each other. Initial parameter values can also be supplied, to start off the maximum likelihood search with. The main function in the SecSSE package is secsse_ml, which performs a maximum likelihood search and uses as input a set of speciation rate parameters (lambda), a set of extinction rate parameters (mu), and a matrix composed of transition rates (q) between the various states. The identifiers of the parameters are broadly the same as those used in 'hisse', and numbers indicate examined state, whereas letters denote concealed state, 2A for example being in examined state 2, and concealed state A.
+secsse allows for the implementation of different models of evolution, and just as in 'diversitree' and 'hisse', parameters can be fixed at certain values (if prior information is known on particular values) or made to be equal to each other. Initial parameter values can also be supplied, to start off the maximum likelihood search with. The main function in the secsse package is secsse_ml, which performs a maximum likelihood search and uses as input a set of speciation rate parameters (lambda), a set of extinction rate parameters (mu), and a matrix composed of transition rates (q) between the various states. The identifiers of the parameters are broadly the same as those used in 'hisse', and numbers indicate examined state, whereas letters denote concealed state, 2A for example being in examined state 2, and concealed state A.
 
 Both the speciation and extinction parameters are supplied as vectors, and the transition rates are supplied as a matrix, joined in a list.
 
@@ -76,12 +76,12 @@ NUM_CONCEALED_STATES: In general, we recommend this value to be equal to the num
 
 IDPARSLIST: a list of parameters to be supplied to the function. This list contains information on the number of parameters, as well as on how parameters interact. E.g., if we would like all speciation rates to behave similarly or if we want two transition rates to be identical, we can set this up here. Setting the parameters for this argument is the bulk of the work for setting up the model, especially when the number of states is relatively high.
 
-The following is a visual example of the input parameters of SecSSE, this list is composed of three elements, one containing the number of parameters for lambda, one for mu, and a matrix of transition rates. Notice that this list contains the set-up for a model in which all parameters are free, every parameter having a unique value, indicating that each parameter is optimized separately. The diagonal of the q matrix is always set to NA, because transitions within a state are not possible. The dimensions of the transition matrix follow the following rule: (3n)2, where n is the number of observed states. Needless to say, we have not tried running SecSSE with n\>10, both for computational and practical reasons, and neither should you probably, especially in combination with large trees.
+The following is a visual example of the input parameters of secsse, this list is composed of three elements, one containing the number of parameters for lambda, one for mu, and a matrix of transition rates. Notice that this list contains the set-up for a model in which all parameters are free, every parameter having a unique value, indicating that each parameter is optimized separately. The diagonal of the Q matrix is always set to NA, because transitions within a state are not possible. The dimensions of the transition matrix follow the following rule: (3n)2, where n is the number of observed states. Needless to say, we have not tried running secsse with n\>10, both for computational and practical reasons, and neither should you probably, especially in combination with large trees.
 
 ```{r}
 # First we have to define idparslist, as well as, again,
 # a user-specified value for the number of concealed states
-# to be assessed by SecSSE.
+# to be assessed by secsse.
 
 idparslist <- id_paramPos(traits, num_concealed_states = 3)
 
@@ -102,7 +102,7 @@ Notice that if one were to set extinction parameters to be the same, the numberi
 #idparslist[[2]][c(1:9)] <- 7
 ```
 
-There are also several things we can do to improve the rate matrix and reduce its computational complexity. First of all, we should leave transitions between the same state out of the calculations with a simple command that orders all values on the diagonal of the matrix not to be calculated. This is included as a default within idparslist, but after modifying the q matrix in any way, it is a good idea to ensure that the diagonals are still not included in the calculations:
+There are also several things we can do to improve the rate matrix and reduce its computational complexity. First of all, we should leave transitions between the same state out of the calculations with a simple command that orders all values on the diagonal of the matrix not to be calculated. This is included as a default within idparslist, but after modifying the Q matrix in any way, it is a good idea to ensure that the diagonals are still not included in the calculations:
 
 ```{r}
 diag(idparslist[[3]]) <- NA
@@ -187,7 +187,7 @@ This yields the following data setup:
 idparslist
 ```
 
-INITPARSOPT: user-supplied values of parameters, a vector of values of lambda, mu, and q that should agree in number with the number of parameters specified in the model. If values are known beforehand, they can be specified as follows for the case of the above defined parameter set, where there are 5 lambda's (two equal), 6 mu's (all free), and q's (all free, but no dual transitions):
+INITPARSOPT: user-supplied values of parameters, a vector of values of lambda, mu, and Q that should agree in number with the number of parameters specified in the model. If values are known beforehand, they can be specified as follows for the case of the above defined parameter set, where there are 5 lambda's (two equal), 6 mu's (all free), and q's (all free, but no dual transitions):
 
 ```{r}
 initparsopt <- c(rep(1.2, 9), rep(0.1, 9), rep(0.25, 36))
@@ -259,7 +259,7 @@ PARSFIX: specifies at which values the parameters identified under idparsfix sho
 parsfix <- c(0, 0.0001)
 ```
 
-One can also estimate initial lambda and mu values from the tree using a simple birth-death model that does not take into account trait states. Here we do this with the bd_ML function from the DDD package. A good starting point for q is lambda/5:
+One can also estimate initial lambda and mu values from the tree using a simple birth-death model that does not take into account trait states. Here we do this with the bd_ML function from the DDD package. A good starting point for Q is lambda/5:
 
 ```{r}
 library(DDD)
@@ -276,9 +276,9 @@ initparsopt <- c(rep(intGuessLamba, 9), rep((intGuessLamba / 5), 1))
 
 COND: conditioning on the state of the root. Set to "maddison_cond" if you want conditioning as done in other -SSE packages, or "proper_cond" if you want to use our new improved conditioning.
 
-root_state_weight: SecSSe offers to methods to weigh the probabilities of states at the root:"proper_weights" and "maddison_weights". In the accompanying paper you can read the differences between them.
+root_state_weight: secsse offers to methods to weigh the probabilities of states at the root:"proper_weights" and "maddison_weights". In the accompanying paper you can read the differences between them.
 
-SAMPLING_FRACTION: include a sampling fraction. Sampling.f always has as many elements as there are examined states, so a SecSSE analysis with 3 states could have the following sampling_fraction = c(0.5,0.25,0.75), in which half of taxa in state 1 are sampled, a quarter in state two, and three quarters in state three. If 100% of known taxa in each state are sampled, sampling_fraction=c(1,1,1). If only an overall value is known (for example, we know we sampled 80% of all taxa, but we do not know how they are distributed across states), we assign this value to each state: sampling_fraction = c(0.8,0.8,0.8). Sampling.f is always placed after the 'cond' statement.
+SAMPLING_FRACTION: include a sampling fraction. Sampling.f always has as many elements as there are examined states, so a secsse analysis with 3 states could have the following sampling_fraction = c(0.5,0.25,0.75), in which half of taxa in state 1 are sampled, a quarter in state two, and three quarters in state three. If 100% of known taxa in each state are sampled, sampling_fraction=c(1,1,1). If only an overall value is known (for example, we know we sampled 80% of all taxa, but we do not know how they are distributed across states), we assign this value to each state: sampling_fraction = c(0.8,0.8,0.8). Sampling.f is always placed after the 'cond' statement.
 
 TOL: basically, a range of values between which samples in the ML chain will be accepted or not. Typically, the value of tol = c(1e-04, 1e-05, 1e-07) is generally best.
 
@@ -286,7 +286,7 @@ METHODE: method for integration of likelihood values along branches, generally w
 
 OPTIMMETHOD: optimization method, generally we recommend "simplex".
 
-RUN_PARALLEL: this specifies whether or not to use the SecSSE tree-breaking function. If you have a large tree, this tree can be broken into two pieces so that computation of likelihood along branches can take place simultaneously on the two pieces, yielding a gain in computation time. The size of the two pieces is established by SecSSE, and depends on how balanced the tree is; a better-balanced tree yields two pieces of relatively equal size and results in relatively larger gain in computation time. With large trees (say, n\>1000), it is our experience that even two chunks of tree of unequal size yield a time advantage. Needless to say, your computational setup needs to be able to accommodate parallel computation (multiple cores, nodes).
+RUN_PARALLEL: this specifies whether or not to use the secsse tree-breaking function. If you have a large tree, this tree can be broken into two pieces so that computation of likelihood along branches can take place simultaneously on the two pieces, yielding a gain in computation time. The size of the two pieces is established by secsse, and depends on how balanced the tree is; a better-balanced tree yields two pieces of relatively equal size and results in relatively larger gain in computation time. With large trees (say, n\>1000), it is our experience that even two chunks of tree of unequal size yield a time advantage. Needless to say, your computational setup needs to be able to accommodate parallel computation (multiple cores, nodes).
 
 ## Running the likelihood maximization
 
@@ -341,9 +341,9 @@ The following is sample output, with two concealed states, notice in this case a
 
 The maximum likelihood value at the bottom of the output can be used in model comparison.
 
-## SecSSE tool to facilitate composition of q matrices
+## secsse tool to facilitate composition of Q matrices
 
-Often, q matrices can get quite large and complicated, the more states you are analyzing. We have devised a tool to more easily put together q matrices. This tool starts from the so-called 'masterBlock', the basic matrix in which we only find information on transitions between examined states. The information contained in this 'masterBlock' is then automatically mimicked for inclusion in the full matrix, to ensure that the same complexity in examined state transitions is also found in concealed states. The use of the 'masterBlock' implies that you are using the same number of concealed as examined states. Here, we are generating a 'masterBlock' that yields a 3-state q matrix.
+Often, q matrices can get quite large and complicated, the more states you are analyzing. We have devised a tool to more easily put together Q matrices. This tool starts from the so-called 'masterBlock', the basic matrix in which we only find information on transitions between examined states. The information contained in this 'masterBlock' is then automatically mimicked for inclusion in the full matrix, to ensure that the same complexity in examined state transitions is also found in concealed states. The use of the 'masterBlock' implies that you are using the same number of concealed as examined states. Here, we are generating a 'masterBlock' that yields a 3-state Q matrix.
 
 The 'masterBlock' can be declared as follows:
 
@@ -381,7 +381,7 @@ myQ <- q_doubletrans(traits, masterBlock, diff.conceal)
 idparslist[[3]] <- myQ
 ```
 
-Which makes our final q matrix look as follows:
+Which makes our final Q matrix look as follows:
 
 ```{r}
 idparslist[[3]]
@@ -396,13 +396,13 @@ idparslist[[3]] <- myQ
 idparslist[[3]]
 ```
 
-## SecSSE function to reduce number of transition rate parameters by including multiplicative factors
+## secsse function to reduce number of transition rate parameters by including multiplicative factors
 
-SecSSE has the capability of reducing computational burden by decreasing the number of transition rate parameters through the inclusion of multiplicative factors. Factors can also be used to disentangle complex patterns of trait-dependent diversification when multiple traits are included.
+secsse has the capability of reducing computational burden by decreasing the number of transition rate parameters through the inclusion of multiplicative factors. Factors can also be used to disentangle complex patterns of trait-dependent diversification when multiple traits are included.
 
 Suppose you are running an analysis with a large number of transition rate parameters, but you suspect there are linear relationships between some of them. If the transition between lobed (L) and palmate (P) feet is twice as infrequent as that between palmate and semi-palmate (S) feet, and could say that P-\>L is 2(P-\>S). The reverse would also be true: L-\>P is 2(S-\>P). By applying these factors, we are reducing the transition matrix from a 6 parameters to 4, and in models where transitions between concealed states are allowed, we are reducing our parameters from 12 to 8. Of course, the inclusion of these factors comes with a loss of resolution, and is therefore best done with parameters where exact estimation is not essential.
 
-In SecSSE, the factors are represented in a function separate from secsse_ml, and the setup of this function is very similar to secsse_ml, but requires the addition of two parameters, SHAREFACTORS and INITFACTORS.
+In secsse, the factors are represented in a function separate from secsse_ml, and the setup of this function is very similar to secsse_ml, but requires the addition of two parameters, SHAREFACTORS and INITFACTORS.
 
 SHAREFACTORS: these are the identifiers of the factors you want to specify. In the above example, we have two factors, one governing transitions from P-\>S and one from S-\>P. Transitions in opposite directions are better not fixed to the same multiplicative factor, so that at least two are needed here. In this case these are specified as follows:
 
@@ -440,7 +440,7 @@ Multiplicative factors can also be used in connection with lambdas or mus, in th
 
 ## Note on assigning ambiguity to taxon trait states
 
-If the user wishes to assign a taxon to multiple trait states, because he/she is unsure which state best describes the taxon, he/she can use 'NA'. 'NA' is used when there is no information on possible state at all; for example when a state was not measured or a taxon is unavailable for inspection. 'NA' means a taxon is equally likely to pertain to any state. In case the user does have some information, for example if a taxon can pertain to multiple states, or if there is uncertainty regarding state but one or multiple states can with certainty be excluded, SecSSE offers flexibility to handle ambiguity. In this case, the user only needs to supply a trait file, with at least four columns, one for the taxon name, and three for trait state. Below, we show an example of what the trait info should be like (the column with species' names has been removed).If a taxon may pertain to trait state 1 or 3, but not to 2, the three columns should have at least the values 1 and a 3, but never 2 (species in the third row). On the other hand, the species in the fifth row can pertain to all states: the first column would have a 1, the second a 2, the third a 3 (although if you only have this type of ambiguity, it is easier to assign 'NA' and use a single-column data file).
+If the user wishes to assign a taxon to multiple trait states, because he/she is unsure which state best describes the taxon, he/she can use 'NA'. 'NA' is used when there is no information on possible state at all; for example when a state was not measured or a taxon is unavailable for inspection. 'NA' means a taxon is equally likely to pertain to any state. In case the user does have some information, for example if a taxon can pertain to multiple states, or if there is uncertainty regarding state but one or multiple states can with certainty be excluded, secsse offers flexibility to handle ambiguity. In this case, the user only needs to supply a trait file, with at least four columns, one for the taxon name, and three for trait state. Below, we show an example of what the trait info should be like (the column with species' names has been removed).If a taxon may pertain to trait state 1 or 3, but not to 2, the three columns should have at least the values 1 and a 3, but never 2 (species in the third row). On the other hand, the species in the fifth row can pertain to all states: the first column would have a 1, the second a 2, the third a 3 (although if you only have this type of ambiguity, it is easier to assign 'NA' and use a single-column data file).
 
 ```{r}
 #       traits traits traits
@@ -451,6 +451,13 @@ If the user wishes to assign a taxon to multiple trait states, because he/she is
 # [5,]      1      2      3
 ```
 
+## Further help
+
+For more advanced settings and shortcut functions to set up a secsse analysis, please see the vignette setting_up_secsse.
+
+If after reading these vignettes, you still have questions, please feel free to e-mail the authors for help with this R package.
+
+=======
 ## References 
 
 Beaulieu, J. M., O'meara, B. C., & Donoghue, M. J. (2013). Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.

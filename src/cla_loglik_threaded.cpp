@@ -11,11 +11,11 @@
 #include "util.h"         // NOLINT [build/include_subdir]
 #include "threaded_ll.h"  // NOLINT [build/include_subdir]
 
-#include <Rcpp.h>                   // NOLINT [build/include_order]
-#include <vector>                   // NOLINT [build/include_order]
-#include <tuple>                   // NOLINT [build/include_order]
-#include <cmath>                   // NOLINT [build/include_order]
-#include <RcppParallel.h>                   // NOLINT [build/include_order]
+#include <Rcpp.h>
+#include <vector>
+#include <tuple>
+#include <cmath>
+#include <RcppParallel.h>
 
 template< typename OD_TYPE>
 struct combine_states_cla {

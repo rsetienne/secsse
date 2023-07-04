@@ -98,6 +98,7 @@ void normalize_loglik(std::vector<double>* probvec,
                                        abssum);
 
   if (sumabsprobs > 0.0) {
+
       for (auto& i : (*probvec)) {
         i *= 1.0 / sumabsprobs;
       }
@@ -120,10 +121,9 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   return;
 }
 
-std::vector< std::vector< double> >
-    num_mat_to_vec(const Rcpp::NumericMatrix& m) {
-  auto v = std::vector< std::vector< double> >(m.nrow(),
-                                               std::vector<double>(m.ncol(),
+std::vector< std::vector< double> > num_mat_to_vec(const Rcpp::NumericMatrix& m) {
+  auto v = std::vector< std::vector< double> >(m.nrow(), 
+                                               std::vector<double>(m.ncol(), 
                                                                    0.0));
   for (int i = 0; i < m.nrow(); ++i) {
     std::vector<double> row(m.ncol(), 0.0);
@@ -135,8 +135,9 @@ std::vector< std::vector< double> >
   return v;
 }
 
-std::vector< std::vector< std::vector<double >>>
+std::vector< std::vector< std::vector<double >>>  
   list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& ll) {
+  
   std::vector< std::vector< std::vector< double > >> ll_cpp;
   for (size_t i = 0; i < ll.size(); ++i) {
     Rcpp::NumericMatrix temp = ll[i];
@@ -150,9 +151,10 @@ std::vector< std::vector< std::vector<double >>>
     }
     ll_cpp.push_back(temp2);
   }
-
+  
   return ll_cpp;
 }
+
 
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix* m) {
