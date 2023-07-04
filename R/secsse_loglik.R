@@ -99,33 +99,15 @@ secsse_loglik <- function(parameter,
 
   states <- setting_calculation$states
 
-  if (num_concealed_states != round(num_concealed_states)) { # for test case
-    d <- ncol(states) / 2
-    new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
-    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
-    states <- new_states
-  }
-
-  if (is_complete_tree) {
-    states <- build_states(phy = phy,
-                           traits = traits,
-                           num_concealed_states = num_concealed_states,
-                           sampling_fraction = sampling_fraction,
-                           is_complete_tree = is_complete_tree,
-                           mus = mus)
-  }
-
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
 
   d <- ncol(states) / 2
 
-  if (see_ancestral_states == TRUE) {
-    if (num_threads != 1) {
+  if (see_ancestral_states == TRUE && num_threads != 1) {
       warning("see ancestral states only works with one thread, 
               setting to one thread")
       num_threads <- 1
-    }
   }
 
   RcppParallel::setThreadOptions(numThreads = num_threads)

@@ -116,28 +116,8 @@ cla_secsse_loglik <- function(parameter,
                                                  first_time = TRUE)
   }
   states <- setting_calculation$states
-
-  if (is_complete_tree) {
-    states <- build_states(phy = phy,
-                           traits = traits,
-                           num_concealed_states = num_concealed_states,
-                           sampling_fraction = sampling_fraction,
-                           is_complete_tree = is_complete_tree,
-                           mus = mus,
-                           num_unique_traits = num_modeled_traits,
-                           first_time = FALSE)
-  }
-
   forTime <- setting_calculation$forTime  # nolint
   ances <- setting_calculation$ances
-
-  if (num_concealed_states != round(num_concealed_states)) {
-    # for testing
-    d <- ncol(states) / 2
-    new_states <- states[, c(1:sqrt(d), (d + 1):((d + 1) + sqrt(d) - 1))]
-    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
-    states <- new_states
-  }
 
   loglik <- 0
   d <- ncol(states) / 2

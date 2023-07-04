@@ -54,8 +54,22 @@ test_that("secsse gives the same result as GeoSSE", {
     parameter[[2]] <- mus
     parameter[[3]] <- q
 
-    num_concealed_states <- 3.1
-
+    num_concealed_states <- 3
+    
+    num_modeled_traits <- ncol(q) / floor(num_concealed_states)
+    
+    setting_calculation <- build_initStates_time(phy,
+                                                 traits,
+                                                 num_concealed_states,
+                                                 sampling_fraction = c(1, 1, 1),
+                                                 is_complete_tree = FALSE,
+                                                 mus,
+                                                 num_modeled_traits,
+                                                 first_time = TRUE)
+    setting_calculation$states <- 
+         setting_calculation$states[, c(1, 2, 3, 10, 11, 12)]
+    
+    
     secsse_cla_LL <- cla_secsse_loglik(parameter,
                                        phy,
                                        traits,
@@ -63,7 +77,7 @@ test_that("secsse gives the same result as GeoSSE", {
                                        cond = "maddison_cond",
                                        root_state_weight = "maddison_weights",
                                        sampling_fraction = c(1, 1, 1),
-                                       setting_calculation = NULL,
+                                      setting_calculation = setting_calculation,
                                        see_ancestral_states = FALSE,
                                        loglik_penalty = 0)
 
@@ -79,7 +93,7 @@ test_that("secsse gives the same result as GeoSSE", {
                                         cond = "maddison_cond",
                                         root_state_weight = "maddison_weights",
                                         sampling_fraction = c(1, 1, 1),
-                                        setting_calculation = NULL,
+                                      setting_calculation = setting_calculation,
                                         see_ancestral_states = FALSE,
                                         loglik_penalty = 0,
                                         num_threads = 4)
