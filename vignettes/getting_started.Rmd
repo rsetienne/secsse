@@ -1,0 +1,502 @@
+---
+title: "Getting started with secsse"
+author: "Thijs Janzen"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with secsse}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+------------------------------------------------------------------------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Getting started
+
+Welcome to this tutorial on how to get started with doing a secsse
+analysis. You are the proud owner of a dataset containing a phylogeny
+and tip states, and would like to know whether the observed trait had
+any effect on diversification. As an alternative hypothesis, there might
+be some other trait - unbeknownst to you - that equally well explains
+the observed diversification patterns. Using secsse you can test
+directly for this. Setting up a secsse analysis follows a number of
+distinct steps that may seem overwhelming at first, but in this tutorial
+we will take a joint look at the decisions required to be made and
+perform our own analysis!
+
+### Data
+
+To perform a secsse analysis, we need two sources of data: 1) a
+phylogeny and 2) trait data. Here, we will make use of a pre-simulated
+tree (for now, I won't reveal the model used).
+
+```{r data}
+focal_tree <- ape::read.tree(text = "((t1:2.586692974,((t13:0.8873239777,(t34:0.7528802927,t44:0.7528802927):0.134443685):1.04055583,t21:1.927879808):0.6588131659):2.413307026,(((((t2:0.5479660671,t49:0.5479660671):1.365717301,((t22:0.6512648145,(t47:0.2049372686,t61:0.2049372686):0.446327546):0.2120207488,((t36:0.1639000795,t62:0.1639000795):0.6477110608,(t40:0.7930189281,t41:0.7930189281):0.01859221218):0.05167442306):1.050397805):0.3472868921,t17:2.26097026):0.06999807465,((t15:0.3772986189,t55:0.3772986189):1.943391575,(t16:1.196137061,((t26:0.9825148624,((t31:0.02350286365,t67:0.02350286365):0.9171104913,(t32:0.7837716587,t42:0.7837716587):0.1568416962):0.04190150739):0.10830946,t28:1.090824322):0.1053127385):1.124553133):0.01027814129):2.38725674,((((t3:1.083671921,(((t29:0.01474991842,t68:0.01474991842):0.07607893188,t66:0.0908288503):0.1671480643,t59:0.2579769146):0.8256950068):1.890217226,((((t8:0.5490733351,(t48:0.297289906,t58:0.297289906):0.2517834291):0.513828506,t30:1.062901841):1.550593154,(((t12:0.7280698912,(((t45:0.2153519103,t60:0.2153519103):0.1016221231,t57:0.3169740334):0.2050447992,t51:0.5220188326):0.2060510586):0.6068040975,(t23:0.09157856985,t65:0.09157856985):1.243295419):0.8042199558,(t18:1.142634904,((t27:0.4159759965,(t54:0.1286255831,t63:0.1286255831):0.2873504134):0.3623222946,t43:0.7782982911):0.3643366127):0.9964590407):0.4744010501):0.01756278112,(t11:1.233211103,(t25:0.09389678922,t64:0.09389678922):1.139314314):1.397846673):0.3428313717):1.179614451,(((t5:1.939201203,((t20:0.510099777,t53:0.510099777):0.008496491915,t52:0.5185962689):1.420604934):0.8473155895,(t9:2.345942038,((t14:0.8336233238,t38:0.8336233238):0.09720732437,t33:0.9308306482):1.41511139):0.4405747545):0.9289638311,((t6:2.048542159,(((t19:0.5446778552,t50:0.5446778552):0.3019110389,(t37:0.8329466556,t39:0.8329466556):0.01364223839):0.02536522407,(t35:0.7210670433,(t46:0.3394466403,t56:0.3394466403):0.381620403):0.1508870748):1.176588041):1.260277226,(t7:2.68471232,(t10:1.267107488,t24:1.267107488):1.417604832):0.6241070654):0.4066612378):0.4380229751):0.1283519611,t4:4.28185556):0.4363695154):0.2817749251):0;")
+focal_traits <- data.frame(trait = c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0),
+  row.names = focal_tree$tip.label)
+if (requireNamespace("diversitree")) {
+diversitree::trait.plot(focal_tree, dat = focal_traits, 
+                        cols = list("trait" = c("blue", "red")),
+                        type = "p")
+}
+
+```
+
+Our dataset is a tree with 68 species that show either the presence (1)
+or absence (0) of having a black spot on their tail (we are focusing
+here on a fish phylogeny, although that is not necessarily important for
+the analysis itself). We observe that there seem to be some speciose
+groups that all do have black spots (red tips), perhaps the black spot
+has some effect on speciation after all. To find this out, we will fit
+three distinct models to the data: 1) a ETD ( Examined Trait
+Diversification) model, where the observed tip trait impacts speciation,
+2) a CTD (Concealed Trait Diversification), where an unobserved trait
+impacts speciation and 3) a CR (Constant Rates) model, where
+diversification is not impacted by a trait at all. We will use Maximum
+Likelihood to obtain LogLikelihood estimates for each model, and can
+then use AIC to compare these models.
+
+## Setting up an analysis
+
+To perform a Maximum Likelihood analysis, secsse makes use of the
+function DDD::optimize, which in turn, typically, uses the subplex
+package to perform the Maximum Likelihood optimization. In such an
+analysis, we need to specify which parameters we want to optimize, which
+parameters to keep fix, and the initial values per parameter. We do so
+by providing the structure of the input parameters (e.g. in vector,
+matrix or list form), and within this structure we highlight values that
+stay at zero with a 0, and parameters to be inferred with indexes 1, 2,
+... n. The optimizer will then use these indexes to fill in the
+associated parameters and perform the optimization. If this all seems a
+bit unclear, please continue reading and look at the fully set up
+parameterization for the maximum likelihood below to gain more insight.
+
+### ETD
+
+In the ETD model, we assume that the examined trait affects
+diversification. In a secsse analysis we need to specify the structure
+of three distinct properties: the lambda list, the mu vector and the
+transition (Q) matrix. Each of these informs properties of the model of
+speciation, extinction and trait-shifts respectively.
+
+#### Lambda matrices
+
+Speciation in a secsse model is defined using a list of matrices, where
+each matrix highlights the state of the daughter species resulting from
+a speciation event. In our case, we have a trait with two states, and
+thus we will require to specify a list with two matrices, one for each
+state, where each matrix in turn will then specify the daughter states.
+We can do so by hand, but secsse includes functionality to do this in a
+more organized manner - this is especially useful if you have a trait
+with more than two states for instance. In this more organized manner,
+we can provide secsse with a matrix specifying the potential speciation
+results, and secsse will construct the lambda list accordingly:
+
+```{r ETD_lambda}
+spec_matrix <- c()
+spec_matrix <- rbind(spec_matrix, c(0, 0, 0, 1))
+spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 2))
+lambda_list <- secsse::create_lambda_matrices(state_names = c(0, 1),
+                                              num_concealed_states = 2,
+                                              transition_list = spec_matrix,
+                                              model = "ETD")
+lambda_list
+```
+
+Let's see what the code has done. First, we create a spec_matrix, where
+the first column indicates the parent species (0 or 1) and the second
+and third column indicate the identities of the two daughter species. In
+this case, we choose for symmetric speciation without a change of trait,
+e.g. the daughters have the same trait as the parent. If you have
+evidence of perhaps asymmetric inheritance, you can specify this here.
+The fourth column indicates the associated rate indicator. In this case
+we choose two different speciation rates. We choose two concealed
+states, as it is good practice to have the same number of concealed
+states as observed states. The resulting lambda_list then contains four
+entries, one for each unique state, that is, for each combination of
+observed and concealed states, where the concealed states are indicates
+with a capital letter. Looking at the first entry in the list, e.g. the
+result of a speciation event starting with a parent in state 0A, will
+result with rate 1 in two daughter species of state 0A as well. The way
+to read this, is by looking at the row and column identifiers of the
+entered rate. Similarly, for a speciation event starting in state 1A
+(lambda_list[[2]]), the two daughter species are 1A as well, but this
+time with rate 2, as we specified that species with trait 1 will have a
+different speciation rate. Note that here, rates 1 and 2 are ordered
+with the observed trait, we will later explore the CTD model, where the
+rates will be sorted according to the concealed state.
+
+#### Mu vector
+
+Having the speciation rates set, we can move on to extinction rates.
+Since we are using the ETD model, here we also expect the extinction
+rates to be different:
+
+```{r ETD_mu}
+mu_vec <- secsse::create_mus(state_names = c(0, 1),
+                             num_concealed_states = 2,
+                             model = "ETD",
+                             lambdas = lambda_list)
+mu_vec
+```
+
+The function create_mus takes the same standard information we provided
+earlier, with as addition our previously made lambda_list. It uses the
+lambda_list to identify the rate indicators (in this case 1 and 2) that
+are already used and to thus pick new rates. We see that secsse has
+created a named vector with two extinction rates (3 and 4), which are
+associated with our observed traits 0 and 1.
+
+#### Transition matrix
+
+Lastly, we need to specify our transition matrix. Here, we can make use
+of a trick: we can specify the transition matrix for our observed trait,
+and let secsse expand this to the concealed traits. For this, we first,
+like with the lambda list, need to specify the potential transitions and
+their associated rates. For a two-trait system, we need to specify the
+rates of trait change from 0-\>1 and from 1-\>0. Similarly, we also need
+to specify A-\>B and B-\>A. In the Maximum Likelihood approach, we will
+estimate all four of these rates. You can either choose for all these
+rates to be distinct, or alternatively choose to keep some identical
+(e.g. the rate of 0-\>1 equal to the rate of 1-\>0).
+
+```{r ETD_Q}
+q_matrix <- c()
+q_matrix <- rbind(q_matrix, c(0, 1, 5))
+q_matrix <- rbind(q_matrix, c(1, 0, 6))
+
+trans_matrix <- secsse::create_transition_matrix(state_names = c(0, 1),
+                                                 num_concealed_states = 2,
+                                                 transition_list = q_matrix,
+                                                 diff.conceal = TRUE)
+trans_matrix
+```
+
+Again, we first specify a matrix containing the potential state
+transitions, here 0-\>1 and 1-\>0. Then, we use
+'create_transition_matrix' to create a transition matrix. By setting
+'diff.conceal' to TRUE, we ensure that the concealed states will get
+their own rates specified. Setting this to FALSE would set their rates
+equal to the observed rates (5 and 6). The way to read the transition
+matrix is column-row, e.g. starting at state 0A, with rate 5 the species
+will shift to state 1A and with rate 7 it will shift to state 0B. We
+intentially ignore 'double' shifts, e.g. from 0A to 1B, where both the
+observed and the concealed trait shift at the same time. If you have
+good evidence to include such shifts in your model, you can modify the
+trans_matrix by hand of course.
+
+#### Maximum Likelihood
+
+We have now specified the required ingredients to perform Maximum
+Likelihood. Prerequisite for performing Maximum Likelihood with secsse
+is that we specify the ids of the rates we want optimized, and provide
+initial values. We can do so as follows:
+
+```{r ETD_ML_init}
+idparsopt <- 1:8 # our maximum rate parameter was 8
+idparsfix <- c(0) # we want to keep al zeros at zero
+initparsopt <- runif(n = 8, min = 0, max = 1) # we start at a random starting point
+initparsfix <- c(0.0) # all zeros remain at zero.
+sampling_fraction <- c(1, 1)
+```
+
+Here, we specify that we want to optimize all parameters with rates 1,
+2, ..., 8. We set these at initial values in uniform(0, 1). Here, we
+will only use one starting point, but in practice it is often advisable
+to explore multiple different initial values to avoid getting stuck in a
+local optimum and missing the global optimum. idparsfix and initparsfix
+indicate that all entries with a zero are to be kept at the value zero.
+Lastly, we set the sampling fraction to be c(1, 1), this indicates to
+secsse that we have sampled per trait all species with that trait in our
+dataset. Alternatively, if we know that perhaps some species with trait
+0 are missing, we could specify that as c(0.8, 1.0). Thus, note that the
+sampling fraction does not add up to 1 across traits, but within traits.
+
+And now we can perform maximum likelihood:
+
+```{r ETD_ML}
+
+idparslist <- list()
+idparslist[[1]] <- lambda_list
+idparslist[[2]] <- mu_vec
+idparslist[[3]] <- trans_matrix
+
+answ <- secsse::cla_secsse_ml(phy = focal_tree,
+                              traits = focal_traits$trait,
+                              num_concealed_states = 2,
+                              idparslist = idparslist,
+                              idparsopt = idparsopt,
+                              initparsopt = initparsopt,
+                              idparsfix = idparsfix,
+                              parsfix = initparsfix,
+                              sampling_fraction = sampling_fraction,
+                              verbose = FALSE,
+                              num_threads = 4)
+```
+
+We can now extract several pieces of information from the returned
+answer:
+
+```{R ETD_res}
+ML_ETD <- answ$ML
+ETD_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
+ML_ETD
+ETD_par
+spec_rates <- ETD_par[1:2]
+ext_rates <- ETD_par[3:4]
+Q_Examined <- ETD_par[5:6]
+Q_Concealed <- ETD_par[7:8]
+spec_rates
+ext_rates
+Q_Examined
+Q_Concealed
+```
+
+The function 'extract_par_vals' goes over the list answ\$MLpars and
+places the found parameter values back in consecutive vector 1:8 in this
+case. Here, we find that the speciation rate of trait 1 is higher than
+the speciation rate of trait 0.
+
+### CTD
+
+Let's compare our findings with a CTD model, e.g. a model centered
+around the concealed trait. Again, we need to specify our lambda list,
+mu vector and transition matrix. We will see that this is quite
+straightforward now that we have gotten the hang of how this works.
+
+#### Lambda matrices
+
+Again, we specify two distinct rates, indicating that the observed state
+inherits faithfully to the daughter species. However, this time, we set
+the model indicator to "CTD":
+
+```{r CTD_lambda}
+spec_matrix <- c()
+spec_matrix <- rbind(spec_matrix, c(0, 0, 0, 1))
+spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 2))
+lambda_list <- secsse::create_lambda_matrices(state_names = c(0, 1),
+                                              num_concealed_states = 2,
+                                              transition_list = spec_matrix,
+                                              model = "CTD")
+lambda_list
+```
+
+The resulting lambda_list now has the chosen rates 1 and 2 sorted
+differently across the matrices, with matrices 1 and 2 containing rate
+1, and matrices 3 and 4 containing rate 2. Looking at the column names
+of the matrices, states 1 and 2 are states 0A and 1A, and states 3 and 4
+are states 0B and 1B, in other words, speciation rate 1 is now
+associated with all states with concealed state A, and speciation rate 2
+is now associated with all states with concealed state B.
+
+#### Mu vector
+
+For the mu vector, we repeat the same we did for the ETD model:
+
+```{r CTD_mu}
+mu_vec <- secsse::create_mus(state_names = c(0, 1),
+                             num_concealed_states = 2,
+                             model = "CTD",
+                             lambdas = lambda_list)
+mu_vec
+```
+
+Here, again, we see that whereas previously extinction rate 3 was
+associated with states 0A and 0B (e.g. all states with state 0), it is
+now associated with states 0A and 1A, e.g. all states associated with
+concealed state A.
+
+#### Transition matrix
+
+Setting up the transition matrix is not different from the ETD model,
+the same transitions are possible:
+
+```{r CTD_Q}
+q_matrix <- c()
+q_matrix <- rbind(q_matrix, c(0, 1, 5))
+q_matrix <- rbind(q_matrix, c(1, 0, 6))
+
+trans_matrix <- secsse::create_transition_matrix(state_names = c(0, 1),
+                                                 num_concealed_states = 2,
+                                                 transition_list = q_matrix,
+                                                 diff.conceal = TRUE)
+trans_matrix
+```
+
+#### Maximum Likelihood
+
+Now that we have specified our matrices, we can use the same code we
+used for the ETD model to perform our maximum likelihood:
+
+```{r CTD_ML}
+idparsopt <- 1:8 # our maximum rate parameter was 8
+idparsfix <- c(0) # we want to keep al zeros at zero
+initparsopt <- runif(n = 8, min = 0, max = 1) # we start at a random starting point
+initparsfix <- c(0.0) # all zeros remain at zero.
+sampling_fraction <- c(1, 1)
+
+idparslist <- list()
+idparslist[[1]] <- lambda_list
+idparslist[[2]] <- mu_vec
+idparslist[[3]] <- trans_matrix
+
+answ <- secsse::cla_secsse_ml(phy = focal_tree,
+                              traits = focal_traits$trait,
+                              num_concealed_states = 2,
+                              idparslist = idparslist,
+                              idparsopt = idparsopt,
+                              initparsopt = initparsopt,
+                              idparsfix = idparsfix,
+                              parsfix = initparsfix,
+                              sampling_fraction = sampling_fraction,
+                              verbose = FALSE,
+                              num_threads = 4)
+ML_CTD <- answ$ML
+CTD_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
+ML_CTD
+CTD_par
+spec_rates <- CTD_par[1:2]
+ext_rates <- CTD_par[3:4]
+Q_Examined <- CTD_par[5:6]
+Q_Concealed <- CTD_par[7:8]
+spec_rates
+ext_rates
+Q_Examined
+Q_Concealed
+```
+
+Here we now find that state A has a very low speciation rate, in
+contrast to a much higher speciation rate for state B (remember that
+speciation rate 1 is now associated with A, and not with state 0!).
+Similarly, extinction rates for both states are also quite different,
+with state A having a much lower extinction rate than state B. Examined
+trait shifts (Q_Examined) are quite low, whereas concealed trait shifts
+seem to be quite high. The LogLikelihood seems to be lower than what we
+found for the ETD model.
+
+### CR
+
+As a check, we will also fit a model where there is no trait effect -
+perhaps we are looking for an effect when there is none. This is always
+a good sanity check.
+
+#### Lambda matrices
+
+To specify the lambda matrices, this time we choose the same rate
+indicator across both states.
+
+```{r CR_lambda}
+spec_matrix <- c()
+spec_matrix <- rbind(spec_matrix, c(0, 0, 0, 1))
+spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 1))
+lambda_list <- secsse::create_lambda_matrices(state_names = c(0, 1),
+                                              num_concealed_states = 2,
+                                              transition_list = spec_matrix,
+                                              model = "CR")
+lambda_list
+```
+
+#### Mu vector
+
+The mu vector follows closely from this, having a shared extinction rate
+across all states:
+
+```{r CR_mu}
+mu_vec <- secsse::create_mus(state_names = c(0, 1),
+                             num_concealed_states = 2,
+                             model = "CR",
+                             lambdas = lambda_list)
+mu_vec
+```
+
+#### Transition matrix
+
+We will use the same transition matrix as used before, although one
+could perhaps argue that without a trait effect, all rates in the
+transition matrix (both forward and reverse trait shifts) should share
+the same rate. Here, we will choose the more parameter-rich version
+(Home assignment: try to modify the code to perform an analysis in which
+all rates in the transition matrix are the same).
+
+```{r CR_Q}
+q_matrix <- c()
+q_matrix <- rbind(q_matrix, c(0, 1, 3))
+q_matrix <- rbind(q_matrix, c(1, 0, 4))
+
+trans_matrix <- secsse::create_transition_matrix(state_names = c(0, 1),
+                                                 num_concealed_states = 2,
+                                                 transition_list = q_matrix,
+                                                 diff.conceal = TRUE)
+trans_matrix
+```
+
+#### Maximum Likelihood
+
+```{r CR_ML}
+idparsopt <- 1:6 # our maximum rate parameter was 6
+idparsfix <- c(0) # we want to keep al zeros at zero
+initparsopt <- runif(n = 6, min = 0, max = 1) # we start at a random starting point
+initparsfix <- c(0.0) # all zeros remain at zero.
+sampling_fraction <- c(1, 1)
+
+idparslist <- list()
+idparslist[[1]] <- lambda_list
+idparslist[[2]] <- mu_vec
+idparslist[[3]] <- trans_matrix
+
+answ <- secsse::cla_secsse_ml(phy = focal_tree,
+                              traits = focal_traits$trait,
+                              num_concealed_states = 2,
+                              idparslist = idparslist,
+                              idparsopt = idparsopt,
+                              initparsopt = initparsopt,
+                              idparsfix = idparsfix,
+                              parsfix = initparsfix,
+                              sampling_fraction = sampling_fraction,
+                              verbose = FALSE,
+                              num_threads = 4)
+ML_CR <- answ$ML
+CR_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
+ML_CR
+CR_par
+spec_rate <- CR_par[1]
+ext_rate <-  CR_par[2]
+Q_Examined <- CR_par[3:4]
+Q_Concealed <- CR_par[5:6]
+spec_rate
+ext_rate
+Q_Examined
+Q_Concealed
+```
+
+We now recover a non-zero extinction rate, and much higher transition
+rates for the concealed than for the observed states.
+
+### Model comparisong using AIC
+
+Having collected the different log likelihoods, we can directly compare
+the models using AIC. Remembering that the AIC is 2k - 2LL, where k is
+the number of parameters of each model and LL is the Log Likelihood, we
+can calculate this as follows:
+
+```{r AIC}
+res <- data.frame(ll = c(ML_ETD, ML_CTD, ML_CR),
+                  k  = c(8, 8, 6),
+                  model = c("ETD", "CTD", "CR"))
+res$AIC <- 2 * res$k - 2 * res$ll
+res
+```
+
+I can now reveal to you that the tree we used was generated using an ETD
+model, which we have correctly recovered!
