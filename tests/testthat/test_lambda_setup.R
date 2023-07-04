@@ -27,9 +27,9 @@ test_that("lambda setup", {
   transition_matrix <- rbind(transition_matrix, c("I", "I", "I", 2))
   transition_matrix <- rbind(transition_matrix, c("C", "M", "I", 3))
 
-  lambdas <- secsse::create_lambda_matrices(state_names = states,
-                                            num_concealed_states = 2,
-                                            transition_list = transition_matrix)
+  lambdas <- secsse::create_lambda_list(state_names = states,
+                                        num_concealed_states = 2,
+                                        transition_matrix = transition_matrix)
 
   testthat::expect_equal(length(lambdas), length(full_lambdas))
   for (i in seq_along(lambdas)) {
@@ -56,27 +56,27 @@ test_that("q_matrix", {
  })
 
 test_that("setup", {
-  focal_list <-
-    secsse::create_default_lambda_list(state_names = c("S", "N"),
+  focal_matrix <- 
+    secsse::create_default_lambda_transition_matrix(state_names = c("S", "N"),
                                        model = "CR")
-  lambda_matrices_CR <- secsse::create_lambda_matrices(state_names =
+  lambda_matrices_CR <- secsse::create_lambda_list(state_names =
                                                          c("S", "N"),
                                                     num_concealed_states = 2,
-                                                  transition_list = focal_list,
+                                              transition_matrix = focal_matrix,
                                                     model = "CR")
 
   for (i in 1:4) {
     testthat::expect_equal(lambda_matrices_CR[[i]][i, i], 1)
   }
 
-  focal_list <-
-    secsse::create_default_lambda_list(state_names = c("S", "N"),
+  focal_matrix <-
+    secsse::create_default_lambda_transition_matrix(state_names = c("S", "N"),
                                        model = "CTD")
   # now for the CTD model:
-  lambda_matrices_CTD <- secsse::create_lambda_matrices(state_names =
+  lambda_matrices_CTD <- secsse::create_lambda_list(state_names =
                                                           c("S", "N"),
                                                     num_concealed_states = 2,
-                                                  transition_list = focal_list,
+                                            transition_matrix = focal_matrix,
                                                     model = "CTD")
 
   for (i in 1:4) {
@@ -84,10 +84,10 @@ test_that("setup", {
   }
 
   # and the ETD model:
-  lambda_matrices_ETD <- secsse::create_lambda_matrices(state_names =
+  lambda_matrices_ETD <- secsse::create_lambda_list(state_names =
                                                           c("S", "N"),
                                                     num_concealed_states = 2,
-                                                  transition_list = focal_list,
+                                                    transition_matrix = focal_matrix,
                                                     model = "ETD")
 
   for (i in 1:4) {
@@ -120,31 +120,31 @@ test_that("setup", {
   }
 
   # and the q matrices
-  t_CR <- secsse::create_default_q_list(state_names = c("S", "N"),
+  t_CR <- secsse::create_default_shift_matrix(state_names = c("S", "N"),
                                         num_concealed_states = 2,
                                         mus = mus_CR)
   q_CR <- secsse::create_transition_matrix(state_names = c("S", "N"),
                                            num_concealed_states = 2,
-                                           transition_list = t_CR,
+                                           shift_matrix = t_CR,
                                            diff.conceal = TRUE)
   testthat::expect_equal(6, max(q_CR, na.rm = TRUE))
 
-  t_CTD <- secsse::create_default_q_list(state_names = c("S", "N"),
+  t_CTD <- secsse::create_default_shift_matrix(state_names = c("S", "N"),
                                         num_concealed_states = 2,
                                         mus = mus_CTD)
   q_CTD <- secsse::create_transition_matrix(state_names = c("S", "N"),
                                            num_concealed_states = 2,
-                                           transition_list = t_CTD,
+                                           shift_matrix = t_CTD,
                                            diff.conceal = TRUE)
 
   testthat::expect_equal(8, max(q_CTD, na.rm = TRUE))
 
-  t_ETD <- secsse::create_default_q_list(state_names = c("S", "N"),
+  t_ETD <- secsse::create_default_shift_matrix(state_names = c("S", "N"),
                                          num_concealed_states = 2,
                                          mus = mus_ETD)
   q_ETD <- secsse::create_transition_matrix(state_names = c("S", "N"),
                                             num_concealed_states = 2,
-                                            transition_list = t_ETD,
+                                            shift_matrix = t_ETD,
                                             diff.conceal = TRUE)
   testthat::expect_equal(8, max(q_ETD, na.rm = TRUE))
 })

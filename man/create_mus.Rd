@@ -2,13 +2,12 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_mus}
 \alias{create_mus}
-\title{function to generate generic mus vector}
+\title{function to generate mus vector}
 \usage{
 create_mus(state_names, num_concealed_states, model = "CR", lambdas)
 }
 \arguments{
-\item{state_names}{full state names, including concealed states, for example
-c("0A", "1A", "0B", "1B")}
+\item{state_names}{names of the observed states}
 
 \item{num_concealed_states}{number of concealed states}
 
@@ -21,5 +20,5 @@ number to start with}
 mu vector
 }
 \description{
-function to generate generic mus vector
+function to generate mus vector
 }

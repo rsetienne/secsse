@@ -8,7 +8,7 @@ concealed states (only observed transitions shown)}
 create_transition_matrix(
   state_names,
   num_concealed_states,
-  transition_list,
+  shift_matrix,
   diff.conceal = FALSE
 )
 }
@@ -17,7 +17,7 @@ create_transition_matrix(
 
 \item{num_concealed_states}{number of concealed states}
 
-\item{transition_list}{matrix of transitions, indicating in order: 1)
+\item{shift_matrix}{matrix of shifts, indicating in order: 1)
 starting state (typically the column in the transition matrix), 2) ending
 state (typically the row in the transition matrix) and 3) associated rate
 indicator}
@@ -33,4 +33,12 @@ transition matrix
 \description{
 helper function to neatly setup a Q matrix, without transitions to
 concealed states (only observed transitions shown)
+}
+\examples{
+shift_matrix <- c(0, 1, 5)
+shift_matrix <- rbind(shift_matrix, c(1, 0, 6))
+q_matrix <- secsse::create_transition_matrix(state_names = c(0, 1),
+                                             num_concealed_states = 2,
+                                             shift_matrix = shift_matrix,
+                                             diff.conceal = TRUE)
 }

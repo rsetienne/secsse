@@ -3,7 +3,7 @@
 \name{expand_q_matrix}
 \alias{expand_q_matrix}
 \title{function to expand an existing q_matrix to a number of
-concealed states}
+concealed states, highly similar to q_doubletrans.}
 \usage{
 expand_q_matrix(q_matrix, num_concealed_states, diff.conceal = FALSE)
 }
@@ -22,5 +22,5 @@ updated q matrix
 }
 \description{
 function to expand an existing q_matrix to a number of
-concealed states
+concealed states, highly similar to q_doubletrans.
 }
