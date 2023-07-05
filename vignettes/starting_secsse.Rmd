@@ -24,7 +24,7 @@ tail(traits) # NOTE: Data file is different? trait columng only has 0 and 1
 
 This data set (here we see only the bottom lines of the data frame) has three character states labeled as 1, 2 and 3. Notice that unless you want to assign ambiguity to some but not all states (see below), the third column in your data file should be empty. Ambiguity about trait state (you are not sure which trait state to assign a taxon too, or you have no data on trait state for a particular taxon), can be assigned using 'NA'. secsse handles 'NA' differently from a full trait state, in that it assigns probabilities to all trait states for a taxon demarcated with 'NA'.
 
-The second object we need is an ultrametric phylogenetic tree, that is rooted and has labeled tips. One can load it in R by using read.nexus(). In our example we load a prepared phylogeny named "phylo_Vign":
+The second object we need is an ultrametric phylogenetic tree, that is rooted and has labelled tips. One can load it in R by using read.nexus(). In our example we load a prepared phylogeny named "phylo_vignette":
 
 ```{r}
 data("phylo_vignette")
