@@ -67,8 +67,8 @@ get_state_names <- function(state_names, num_concealed_states) {
 #'                                   model = "ETD")
 #' 
 #' @export
-create_lambda_list <- function(state_names,
-                               num_concealed_states,
+create_lambda_list <- function(state_names = c(0, 1),
+                               num_concealed_states = 2,
                                transition_matrix,
                                model = "ETD",
                                concealed_spec_rates = NULL) {
@@ -88,6 +88,7 @@ create_lambda_list <- function(state_names,
     rownames(lambdas[[i]]) <- all_state_names
     colnames(lambdas[[i]]) <- all_state_names
   }
+  names(lambdas) <- all_state_names
   
   transition_list <- convert_transition_list(transition_matrix, state_names)
   
@@ -144,10 +145,10 @@ create_lambda_list <- function(state_names,
 #'                                              shift_matrix = shift_matrix,
 #'                                              diff.conceal = TRUE)
 #' @export
-create_transition_matrix <- function(state_names,
-                                     num_concealed_states,
-                                     shift_matrix,
-                                     diff.conceal = FALSE) {
+create_q_matrix <- function(state_names,
+                            num_concealed_states,
+                            shift_matrix,
+                            diff.conceal = FALSE) {
   
   total_num_states <- length(state_names)
   trans_matrix <- matrix(0, ncol = total_num_states,
@@ -284,6 +285,7 @@ expand_q_matrix <- function(q_matrix,
                                     num_traits, num_concealed_states,
                                     rate_indic)
   }
+  
   return(new_q_matrix)
 }
 
@@ -361,15 +363,15 @@ create_default_lambda_transition_matrix <- function(state_names = c("0", "1"),
 #' @param state_names names of the observed states
 #' @param num_concealed_states number of concealed states
 #' @param model model replicated, available are "CR", "ETD" and "CTD"
-#' @param lambdas previously generated lambda matrices, used to infer the rate
-#' number to start with
+#' @param lambda_list previously generated list of lambda matrices, 
+#' used to infer the rate number to start with
 #' @return mu vector
 #' @export
-create_mus <- function(state_names,
-                       num_concealed_states,
-                       model = "CR",
-                       lambdas) {
-  focal_rate <- 1 + max(unlist(lambdas), na.rm = TRUE)
+create_mu_vector <- function(state_names,
+                             num_concealed_states,
+                             model = "CR",
+                             lambda_list) {
+  focal_rate <- 1 + max(unlist(lambda_list), na.rm = TRUE)
   
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")

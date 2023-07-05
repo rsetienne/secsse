@@ -57,10 +57,11 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
     return(idparslist)
 }
 
-create_q_matrix <- function(masterBlock,
-                            concealnewQMatr,
-                            ntraits,
-                            diff.conceal) {
+#' @keywords internal
+create_q_matrix_int <- function(masterBlock,
+                                concealnewQMatr,
+                                ntraits,
+                                diff.conceal) {
     Q <- NULL
     for (i in 1:ntraits) {
         Qrow <- NULL
@@ -148,10 +149,10 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
         }
         concealnewQMatr <- integersmasterBlock + factorBlock
         
-        Q <- create_q_matrix(masterBlock,
-                             concealnewQMatr,
-                             ntraits,
-                             diff.conceal)
+        Q <- create_q_matrix_int(masterBlock,
+                                 concealnewQMatr,
+                                 ntraits,
+                                 diff.conceal)
     } else {
         ntraits <- length(sort(unique(traits)))
         uniqParQ <- sort(unique(c(masterBlock)))
@@ -163,11 +164,19 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
             concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
         }
         
-        Q <- create_q_matrix(masterBlock,
-                             concealnewQMatr,
-                             ntraits,
-                             diff.conceal)
+        Q <- create_q_matrix_int(masterBlock,
+                                 concealnewQMatr,
+                                 ntraits,
+                                 diff.conceal)
     }
+    
+    uniq_traits <- unique(traits)
+    uniq_traits <- uniq_traits[!is.na(uniq_traits)]
+    all_names <- get_state_names(state_names = uniq_traits,
+                                 num_concealed_states = length(uniq_traits))
+    colnames(Q) <- all_names
+    rownames(Q) <- all_names
+    
     return(Q)
 }
 

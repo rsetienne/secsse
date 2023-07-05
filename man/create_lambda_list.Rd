@@ -5,8 +5,8 @@
 \title{helper function to automatically create lambda matrices, based on input}
 \usage{
 create_lambda_list(
-  state_names,
-  num_concealed_states,
+  state_names = c(0, 1),
+  num_concealed_states = 2,
   transition_matrix,
   model = "ETD",
   concealed_spec_rates = NULL
