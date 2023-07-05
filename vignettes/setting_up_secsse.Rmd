@@ -31,19 +31,19 @@ We assume here that we have a trait with labels "S" and "N", and use the default
 
 ```{r default_trans_list}
 used_states <- c("S", "N")
-focal_list <- secsse::create_default_lambda_list(state_names = used_states,
+lambda_transition_matrix <- secsse::create_default_lambda_transition_matrix(state_names = used_states,
                                                  model = "CR")
-focal_list
+lambda_transition_matrix
 ```
 
 With this list generated, we can now use this to populate our lambda matrices, using a constant rates model and assuming two concealed states (the same number as our observed states):
 ```{r default lambda matrices}
 num_hidden_states <- 2
-lambda_matrices <- secsse::create_lambda_matrices(state_names = used_states,
+lambda_list <- secsse::create_lambda_list(state_names = used_states,
                                                   num_concealed_states = num_hidden_states,
-                                                  transition_list = focal_list,
+                                                  transition_matrix = lambda_transition_matrix,
                                                   model = "CR")
-lambda_matrices
+lambda_list
 ```
 
 We see that there are four lambda matrices, one for each of the combined states (e.g. for each combination of observed and hidden states). So in this case we have our two observed states S and N, and the two hidden states A and B. This results in the four real states SA, NA, SB and NB. 
@@ -56,7 +56,7 @@ We also need to specify an extinction rate:
 mus <- secsse::create_mus(state_names = used_states,
                           num_concealed_states = num_hidden_states,
                           model = "CR",
-                          lambdas = lambda_matrices)
+                          lambdas = lambda_list)
 mus
 ```
 
@@ -65,15 +65,15 @@ mus
 To specify a Q-matrix, we again need to specify the transitions using a transition list. Again, we use the standard settings.
 
 ```{r default_trans} 
-q_list <- secsse::create_default_q_list(state_names = used_states,
+shift_matrix <- secsse::create_default_shift_matrix(state_names = used_states,
                                         num_concealed_states = num_hidden_states,
                                         mus = mus)
 
-q_list
+shift_matrix
 
 trans_matrix <- secsse::create_transition_matrix(state_names = used_states,
                                                  num_concealed_states = num_hidden_states,
-                                                 transition_list = q_list,
+                                                 shift_matrix = shift_matrix,
                                                  diff.conceal = TRUE)
 trans_matrix
 ```
@@ -98,7 +98,7 @@ params <- c(speciation,
             sp_sn, sp_ns,
             q_ab, q_ba)
 
-lambda_matrices_p <- secsse::fill_in(lambda_matrices,
+lambda_list_p <- secsse::fill_in(lambda_list,
                                      params)
 trans_matrix_p <- secsse::fill_in(trans_matrix,
                                   params)
@@ -109,7 +109,7 @@ mus_p <- secsse::fill_in(mus,
 With the values replaced, we can now simulate an "empirical" dataset:
 
 ```{r simulate tree}
-simulated_tree <- secsse::secsse_sim(lambdas = lambda_matrices_p,
+simulated_tree <- secsse::secsse_sim(lambdas = lambda_list_p,
                                      mus = mus_p,
                                      qs = trans_matrix_p,
                                      num_concealed_states = num_hidden_states,
@@ -130,7 +130,7 @@ method, as this has shown to be more reliable.
 
 ```{r maximum likelihood}
 param_posit <- list()
-param_posit[[1]] <- lambda_matrices
+param_posit[[1]] <- lambda_list
 param_posit[[2]] <- mus
 param_posit[[3]] <- trans_matrix
 
@@ -167,24 +167,24 @@ CTD and ETD model. Let's do that semi-automagically! We first define a generic
 function to optimize for a model:
 ```{r define_model_function}
 fit_model <- function(focal_tree, traits, model) {
-  focal_list <- secsse::create_default_lambda_list(state_names = used_states,
+  focal_list <- secsse::create_default_lambda_transition_matrix(state_names = used_states,
                                                    model = model)
-  lambda_matrices <- secsse::create_lambda_matrices(state_names = used_states,
+  lambda_matrices <- secsse::create_lambda_list(state_names = used_states,
                                                     num_concealed_states = num_hidden_states,
-                                                    transition_list =
+                                                    transition_matrix =
                                                         focal_list,
                                                     model = model)
   mus <- secsse::create_mus(state_names = used_states,
                             num_concealed_states = num_hidden_states,
                             model = model,
                             lambdas = lambda_matrices)
-  q_list <- secsse::create_default_q_list(state_names = used_states,
+  q_list <- secsse::create_default_shift_matrix(state_names = used_states,
                                           num_concealed_states = num_hidden_states,
                                           mus = mus)
 
   trans_matrix <- secsse::create_transition_matrix(state_names = used_states,
                                                    num_concealed_states = num_hidden_states,
-                                                   transition_list = q_list,
+                                                   shift_matrix = q_list,
                                                    diff.conceal = TRUE)
 
   param_posit <- list()
