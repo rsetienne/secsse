@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 library(secsse)
 data(traits)
-tail(traits)
+tail(traits) # NOTE: Data file is different? trait columng only has 0 and 1
 
 ## -----------------------------------------------------------------------------
 data("phylo_vignette")

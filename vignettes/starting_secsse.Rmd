@@ -74,8 +74,8 @@ information, for example if a taxon can pertain to multiple states, or if there
 is uncertainty regarding state but one or multiple states can with certainty be
 excluded, secsse offers flexibility to handle ambiguity. In this case, the user
 only needs to supply a trait file, with at least four columns, one for the taxon
-name, and three for trait state. Below, we show an example of what the trai
-info should be like (the column with species' names has been removed).If a taxon
+name, and three for trait state. Below, we show an example of what the trait
+info should be like (the column with species' names has been removed). If a taxon
 may pertain to trait state 1 or 3, but not to 2, the three columns should have
 at least the values 1 and a 3, but never 2 (species in the third row). On the
 other hand, the species in the fifth row can pertain to all states: the first

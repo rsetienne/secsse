@@ -369,7 +369,7 @@ loaded into R using the read.csv() function. and should look like
 this:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(secsse)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">data</span>(traits)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">tail</span>(traits)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">tail</span>(traits) <span class="co"># </span><span class="al">NOTE</span><span class="co">: Data file is different? trait columng only has 0 and 1</span></span></code></pre></div>
 <pre><code>##     species trait
 ## t46     t46     1
 ## t56     t56     1
@@ -387,9 +387,9 @@ using ‘NA’. secsse handles ‘NA’ differently from a full trait state, in
 that it assigns probabilities to all trait states for a taxon demarcated
 with ‘NA’.</p>
 <p>The second object we need is an ultrametric phylogenetic tree, that
-is rooted and has labeled tips. One can load it in R by using
+is rooted and has labelled tips. One can load it in R by using
 read.nexus(). In our example we load a prepared phylogeny named
-“phylo_Vign”:</p>
+“phylo_vignette”:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;phylo_vignette&quot;</span>)</span></code></pre></div>
 <p>For running secsse it is important that tree tip labels agree with
 taxon names in the data file, but also that these are in the same order.
@@ -437,13 +437,13 @@ uncertainty regarding state but one or multiple states can with
 certainty be excluded, secsse offers flexibility to handle ambiguity. In
 this case, the user only needs to supply a trait file, with at least
 four columns, one for the taxon name, and three for trait state. Below,
-we show an example of what the trai info should be like (the column with
-species’ names has been removed).If a taxon may pertain to trait state 1
-or 3, but not to 2, the three columns should have at least the values 1
-and a 3, but never 2 (species in the third row). On the other hand, the
-species in the fifth row can pertain to all states: the first column
-would have a 1, the second a 2, the third a 3 (although if you only have
-this type of ambiguity, it is easier to assign ‘NA’ and use a
+we show an example of what the trait info should be like (the column
+with species’ names has been removed).If a taxon may pertain to trait
+state 1 or 3, but not to 2, the three columns should have at least the
+values 1 and a 3, but never 2 (species in the third row). On the other
+hand, the species in the fifth row can pertain to all states: the first
+column would have a 1, the second a 2, the third a 3 (although if you
+only have this type of ambiguity, it is easier to assign ‘NA’ and use a
 single-column data file).</p>
 </div>
 </div>
