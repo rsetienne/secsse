@@ -191,9 +191,9 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 #' @return Vector of traits
 #' @examples
 #' # Some data we have prepared
-#' data(traitinfo)
-#' data('phylo_Vign')
-#' traits <- sortingtraits(traitinfo,phylo_Vign)
+#' data(traits)
+#' data('phylo_vignette')
+#' traits <- sortingtraits(traits, phylo_vignette)
 #' @export
 sortingtraits <- function(traitinfo, phy) {
     traitinfo <- as.matrix(traitinfo)

@@ -1,70 +1,87 @@
 ---
-title: "Getting started with secsse"
+title: "Using secsse 2"
 author: "Thijs Janzen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with secsse}
+  %\VignetteIndexEntry{Using secsse 2}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  markdown: 
-    wrap: 72
 ---
+## Secsse introduction
 
-------------------------------------------------------------------------
+secsse is an R package designed for multistate data sets under a concealed state and speciation ('hisse') framework. In this sense, it is parallel to the 'MuSSE' functionality implemented in 'diversitree', but it accounts for finding possible spurious relationships between traits and diversification rates ('false positives', Rabosky & Goldberg 2015) by testing against a 'hidden trait' (Beaulieu et al. 2013), which is responsible for more variation in diversification rates than the trait being investigated.
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+### Secsse input files
+
+Similar to the 'diversitree' (Fitzjohn et al. 2012) and 'hisse' (Beaulieu & O'Meara 2016) packages, secsse uses two input files: a rooted, ultrametric tree in nexus format (for conversion of other formats to nexus, we refer to the documentation in package 'ape') and a data file with two columns, the first containing taxa names and the second a numeric code for trait state with a header (usually 0,1,2,3, etc., but notice that 'NA' is a valid code too, if you are not sure what trait state to assign to a taxon). A comma-separated value file (.csv) generated in MsExcel works particularly well. The \*.csv file can be loaded into R using the read.csv() function. and should look like this:
+
+```{r}
+library(secsse)
+data(traits)
+tail(traits)
 ```
 
-## Getting started
+This data set (here we see only the bottom lines of the data frame) has three character states labeled as 1, 2 and 3. Notice that unless you want to assign ambiguity to some but not all states (see below), the third column in your data file should be empty. Ambiguity about trait state (you are not sure which trait state to assign a taxon too, or you have no data on trait state for a particular taxon), can be assigned using 'NA'. secsse handles 'NA' differently from a full trait state, in that it assigns probabilities to all trait states for a taxon demarcated with 'NA'.
 
-Welcome to this tutorial on how to get started with doing a secsse
-analysis. You are the proud owner of a dataset containing a phylogeny
-and tip states, and would like to know whether the observed trait had
-any effect on diversification. As an alternative hypothesis, there might
-be some other trait - unbeknownst to you - that equally well explains
-the observed diversification patterns. Using secsse you can test
-directly for this. Setting up a secsse analysis follows a number of
-distinct steps that may seem overwhelming at first, but in this tutorial
-we will take a joint look at the decisions required to be made and
-perform our own analysis!
+The second object we need is an ultrametric phylogenetic tree, that is rooted and has labeled tips. One can load it in R by using read.nexus(). In our example we load a prepared phylogeny named "phylo_Vign":
 
-### Data
+```{r}
+data("phylo_vignette")
+```
 
-To perform a secsse analysis, we need two sources of data: 1) a
-phylogeny and 2) trait data. Here, we will make use of a pre-simulated
-tree (for now, I won't reveal the model used).
+For running secsse it is important that tree tip labels agree with taxon names in the data file, but also that these are in the same order. For this purpose, we run the following piece of code prior to any analysis:
 
-```{r data}
-focal_tree <- ape::read.tree(text = "((t1:2.586692974,((t13:0.8873239777,(t34:0.7528802927,t44:0.7528802927):0.134443685):1.04055583,t21:1.927879808):0.6588131659):2.413307026,(((((t2:0.5479660671,t49:0.5479660671):1.365717301,((t22:0.6512648145,(t47:0.2049372686,t61:0.2049372686):0.446327546):0.2120207488,((t36:0.1639000795,t62:0.1639000795):0.6477110608,(t40:0.7930189281,t41:0.7930189281):0.01859221218):0.05167442306):1.050397805):0.3472868921,t17:2.26097026):0.06999807465,((t15:0.3772986189,t55:0.3772986189):1.943391575,(t16:1.196137061,((t26:0.9825148624,((t31:0.02350286365,t67:0.02350286365):0.9171104913,(t32:0.7837716587,t42:0.7837716587):0.1568416962):0.04190150739):0.10830946,t28:1.090824322):0.1053127385):1.124553133):0.01027814129):2.38725674,((((t3:1.083671921,(((t29:0.01474991842,t68:0.01474991842):0.07607893188,t66:0.0908288503):0.1671480643,t59:0.2579769146):0.8256950068):1.890217226,((((t8:0.5490733351,(t48:0.297289906,t58:0.297289906):0.2517834291):0.513828506,t30:1.062901841):1.550593154,(((t12:0.7280698912,(((t45:0.2153519103,t60:0.2153519103):0.1016221231,t57:0.3169740334):0.2050447992,t51:0.5220188326):0.2060510586):0.6068040975,(t23:0.09157856985,t65:0.09157856985):1.243295419):0.8042199558,(t18:1.142634904,((t27:0.4159759965,(t54:0.1286255831,t63:0.1286255831):0.2873504134):0.3623222946,t43:0.7782982911):0.3643366127):0.9964590407):0.4744010501):0.01756278112,(t11:1.233211103,(t25:0.09389678922,t64:0.09389678922):1.139314314):1.397846673):0.3428313717):1.179614451,(((t5:1.939201203,((t20:0.510099777,t53:0.510099777):0.008496491915,t52:0.5185962689):1.420604934):0.8473155895,(t9:2.345942038,((t14:0.8336233238,t38:0.8336233238):0.09720732437,t33:0.9308306482):1.41511139):0.4405747545):0.9289638311,((t6:2.048542159,(((t19:0.5446778552,t50:0.5446778552):0.3019110389,(t37:0.8329466556,t39:0.8329466556):0.01364223839):0.02536522407,(t35:0.7210670433,(t46:0.3394466403,t56:0.3394466403):0.381620403):0.1508870748):1.176588041):1.260277226,(t7:2.68471232,(t10:1.267107488,t24:1.267107488):1.417604832):0.6241070654):0.4066612378):0.4380229751):0.1283519611,t4:4.28185556):0.4363695154):0.2817749251):0;")
-focal_traits <- data.frame(trait = c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                                     1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-                                     1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0),
-  row.names = focal_tree$tip.label)
+```{r}
+sorted_traits <- sortingtraits(traits, phylo_vignette)
+```
+
+If there is a mismatch in the number of taxa between data and tree file, you will receive an error message. However, to then identify which taxa are causing issues and if they are in the tree or data file, you can use the name.check function in the 'geiger'(Harmon et al. 2008) package:
+
+```{r}
+library(geiger)
+#pick out all elements that do not agree between tree and data
+mismat <- name.check(phylo_vignette, traits)
+#this will call all taxa that are in the tree, but not the data file
+#mismat$tree_not_data
+#and conversely,
+#mismat$data_not_tree
+```
+
+If you have taxa in your tree file that do not appear in your trait file, it is worth adding them with value 'NA' for trait state. 
+You can visualise the tip states using the package diversitree:
+
+```{r plot_tree}
 if (requireNamespace("diversitree")) {
-diversitree::trait.plot(focal_tree, dat = focal_traits, 
+  for_plot <- data.frame(trait = traits$trait, row.names = phylo_vignette$tip.label)
+diversitree::trait.plot(phylo_vignette, dat = for_plot, 
                         cols = list("trait" = c("blue", "red")),
                         type = "p")
 }
+
 ```
 
-Our dataset is a tree with 68 species that show either the presence (1)
-or absence (0) of having a black spot on their tail (we are focusing
-here on a fish phylogeny, although that is not necessarily important for
-the analysis itself). We observe that there seem to be some speciose
-groups that all do have black spots (red tips), perhaps the black spot
-has some effect on speciation after all. To find this out, we will fit
-three distinct models to the data: 1) a ETD ( Examined Trait
-Diversification) model, where the observed tip trait impacts speciation,
-2) a CTD (Concealed Trait Diversification), where an unobserved trait
-impacts speciation and 3) a CR (Constant Rates) model, where
-diversification is not impacted by a trait at all. We will use Maximum
-Likelihood to obtain LogLikelihood estimates for each model, and can
-then use AIC to compare these models.
+After you are done properly setting up your data, you can proceed to setting parameters and constraints.
+
+#### Note on assigning ambiguity to taxon trait states
+
+If the user wishes to assign a taxon to multiple trait states, because he/she is
+unsure which state best describes the taxon, he/she can use 'NA'. 'NA' is used
+when there is no information on possible state at all; for example when a state
+was not measured or a taxon is unavailable for inspection. 'NA' means a taxon is
+equally likely to pertain to any state. In case the user does have some
+information, for example if a taxon can pertain to multiple states, or if there
+is uncertainty regarding state but one or multiple states can with certainty be
+excluded, secsse offers flexibility to handle ambiguity. In this case, the user
+only needs to supply a trait file, with at least four columns, one for the taxon
+name, and three for trait state. Below, we show an example of what the trai
+info should be like (the column with species' names has been removed).If a taxon
+may pertain to trait state 1 or 3, but not to 2, the three columns should have
+at least the values 1 and a 3, but never 2 (species in the third row). On the
+other hand, the species in the fifth row can pertain to all states: the first
+column would have a 1, the second a 2, the third a 3 (although if you only have
+this type of ambiguity, it is easier to assign 'NA' and use a single-column data
+file).
 
 ## Setting up an analysis
 
@@ -123,9 +140,10 @@ The fourth column indicates the associated rate indicator. In this case
 we choose two different speciation rates. We choose two concealed
 states, as it is good practice to have the same number of concealed
 states as observed states. The resulting lambda_list then contains four
-entries, one for each unique state, that is, for each combination of
-observed and concealed states, where the concealed states are indicates
-with a capital letter. Looking at the first entry in the list, e.g. the
+entries, one for each unique state (see the names of the entries in the list), 
+that is, for each combination of observed and concealed states, where the
+concealed states are indicates with a capital letter.
+Looking at the first entry in the list, e.g. the
 result of a speciation event starting with a parent in state 0A, will
 result with rate 1 in two daughter species of state 0A as well. The way
 to read this, is by looking at the row and column identifiers of the
@@ -159,16 +177,17 @@ associated with our observed traits 0 and 1.
 
 #### Transition matrix
 
-Lastly, we need to specify our transition matrix. Here, we can make use
-of a trick: we can specify the transition matrix for our observed trait,
-and let secsse expand this to the concealed traits. For this, we first,
-like with the lambda list, need to specify the potential transitions and
-their associated rates. For a two-trait system, we need to specify the
-rates of trait change from 0-\>1 and from 1-\>0. Similarly, we also need
-to specify A-\>B and B-\>A. In the Maximum Likelihood approach, we will
-estimate all four of these rates. You can either choose for all these
-rates to be distinct, or alternatively choose to keep some identical
-(e.g. the rate of 0-\>1 equal to the rate of 1-\>0).
+Lastly, we need to specify our transition matrix. Often, q matrices can get
+quite large and complicated, the more states you are analyzing. We have devised
+a tool to more easily put together Q matrices. This tool starts from the
+so-called 'masterBlock', the basic matrix in which we only find information on
+transitions between examined states. The information contained in this
+'masterBlock' is then automatically mimicked for inclusion in the full matrix,
+to ensure that the same complexity in examined state transitions is also found
+in concealed states. 
+Instead of specifying the entire masterBlock, instead we can suffice with only
+specifying the non-zero transitions. In this case these are from state 0 to 1, 
+and vice versa:
 
 ```{r ETD_Q}
 shift_matrix <- c()
@@ -182,15 +201,15 @@ q_matrix <- secsse::create_q_matrix(state_names = c(0, 1),
 q_matrix
 ```
 
-Again, we first specify a matrix containing the potential state
+Thus, we first specify a matrix containing the potential state
 transitions, here 0-\>1 and 1-\>0. Then, we use
-'create_transition_matrix' to create a transition matrix. By setting
+'create_q_matrix' to create the q-matrix. By setting
 'diff.conceal' to TRUE, we ensure that the concealed states will get
 their own rates specified. Setting this to FALSE would set their rates
 equal to the observed rates (5 and 6). The way to read the transition
 matrix is column-row, e.g. starting at state 0A, with rate 5 the species
 will shift to state 1A and with rate 7 it will shift to state 0B. We
-intentially ignore 'double' shifts, e.g. from 0A to 1B, where both the
+intentionially ignore 'double' shifts, e.g. from 0A to 1B, where both the
 observed and the concealed trait shift at the same time. If you have
 good evidence to include such shifts in your model, you can modify the
 trans_matrix by hand of course.
@@ -231,8 +250,8 @@ idparslist[[1]] <- lambda_list
 idparslist[[2]] <- mu_vec
 idparslist[[3]] <- q_matrix
 
-answ <- secsse::cla_secsse_ml(phy = focal_tree,
-                              traits = focal_traits$trait,
+answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
+                              traits = traits$trait,
                               num_concealed_states = 2,
                               idparslist = idparslist,
                               idparsopt = idparsopt,
@@ -350,8 +369,8 @@ idparslist[[1]] <- lambda_list
 idparslist[[2]] <- mu_vec
 idparslist[[3]] <- q_matrix
 
-answ <- secsse::cla_secsse_ml(phy = focal_tree,
-                              traits = focal_traits$trait,
+answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
+                              traits = traits$trait,
                               num_concealed_states = 2,
                               idparslist = idparslist,
                               idparsopt = idparsopt,
@@ -454,8 +473,8 @@ idparslist[[1]] <- lambda_list
 idparslist[[2]] <- mu_vec
 idparslist[[3]] <- q_matrix
 
-answ <- secsse::cla_secsse_ml(phy = focal_tree,
-                              traits = focal_traits$trait,
+answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
+                              traits = traits$trait,
                               num_concealed_states = 2,
                               idparslist = idparslist,
                               idparsopt = idparsopt,
@@ -499,3 +518,24 @@ res
 
 I can now reveal to you that the tree we used was generated using an ETD
 model, which we have correctly recovered!
+
+## Further help
+
+For more advanced settings and shortcut functions to set up a secsse analysis,
+please see the vignette setting_up_secsse.
+
+If after reading these vignettes, you still have questions, please feel free to
+e-mail the authors for help with this R package.
+
+=======
+## References 
+
+Beaulieu, J. M., O'meara, B. C., & Donoghue, M. J. (2013). Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.
+
+Beaulieu, J. M., & O'Meara, B. C. (2016). Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Systematic biology, 65(4), 583-601.
+
+FitzJohn, R. G. (2012). Diversitree: comparative phylogenetic analyses of diversification in R. Methods in Ecology and Evolution, 3(6), 1084-1092.
+
+Harmon, L. J., Weir, J. T., Brock, C. D., Glor, R. E., & Challenger, W. (2008). GEIGER: investigating evolutionary radiations. Bioinformatics, 24(1), 129-131.
+
+Rabosky, D. L., & Goldberg, E. E. (2015). Model inadequacy and mistaken inferences of trait-dependent speciation. Systematic Biology, 64(2), 340-355.
