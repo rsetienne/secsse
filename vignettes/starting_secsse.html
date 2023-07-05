@@ -555,26 +555,27 @@ rates to be different:</p>
 <span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
 <pre><code>## 0A 1A 0B 1B 
 ##  3  4  3  4</code></pre>
-<p>The function create_mus takes the same standard information we
-provided earlier, with as addition our previously made lambda_list. It
-uses the lambda_list to identify the rate indicators (in this case 1 and
-2) that are already used and to thus pick new rates. We see that secsse
-has created a named vector with two extinction rates (3 and 4), which
-are associated with our observed traits 0 and 1.</p>
+<p>The function <code>create_mus()</code> takes the same standard
+information we provided earlier, with as addition our previously made
+lambda_list. It uses the lambda_list to identify the rate indicators (in
+this case 1 and 2) that are already used and to thus pick new rates. We
+see that secsse has created a named vector with two extinction rates (3
+and 4), which are associated with our observed traits 0 and 1.</p>
 </div>
 <div id="transition-matrix" class="section level4">
 <h4>Transition matrix</h4>
-<p>Lastly, we need to specify our transition matrix. Often, q matrices
+<p>Lastly, we need to specify our transition matrix. Often, Q matrices
 can get quite large and complicated, the more states you are analyzing.
 We have devised a tool to more easily put together Q matrices. This tool
-starts from the so-called ‘masterBlock’, the basic matrix in which we
-only find information on transitions between examined states. The
-information contained in this ‘masterBlock’ is then automatically
-mimicked for inclusion in the full matrix, to ensure that the same
-complexity in examined state transitions is also found in concealed
-states. Instead of specifying the entire masterBlock, instead we can
-suffice with only specifying the non-zero transitions. In this case
-these are from state 0 to 1, and vice versa:</p>
+starts from the so-called <code>shift_matrix</code>, the basic matrix in
+which we only find information on transitions between examined states.
+The information contained in this <code>shift_matrix</code> is then
+automatically mimicked for inclusion in the full matrix, to ensure that
+the same complexity in examined state transitions is also found in
+concealed states. Instead of specifying the entire
+<code>shift_matrix</code>, instead we can suffice with only specifying
+the non-zero transitions. In this case these are from state 0 to 1, and
+vice versa:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>

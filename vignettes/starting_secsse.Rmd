@@ -168,7 +168,7 @@ mu_vec <- secsse::create_mu_vector(state_names = c(0, 1),
 mu_vec
 ```
 
-The function create_mus takes the same standard information we provided
+The function `create_mus()` takes the same standard information we provided
 earlier, with as addition our previously made lambda_list. It uses the
 lambda_list to identify the rate indicators (in this case 1 and 2) that
 are already used and to thus pick new rates. We see that secsse has
@@ -177,15 +177,15 @@ associated with our observed traits 0 and 1.
 
 #### Transition matrix
 
-Lastly, we need to specify our transition matrix. Often, q matrices can get
+Lastly, we need to specify our transition matrix. Often, Q matrices can get
 quite large and complicated, the more states you are analyzing. We have devised
 a tool to more easily put together Q matrices. This tool starts from the
-so-called 'masterBlock', the basic matrix in which we only find information on
+so-called `shift_matrix`, the basic matrix in which we only find information on
 transitions between examined states. The information contained in this
-'masterBlock' is then automatically mimicked for inclusion in the full matrix,
+`shift_matrix` is then automatically mimicked for inclusion in the full matrix,
 to ensure that the same complexity in examined state transitions is also found
 in concealed states. 
-Instead of specifying the entire masterBlock, instead we can suffice with only
+Instead of specifying the entire `shift_matrix`, instead we can suffice with only
 specifying the non-zero transitions. In this case these are from state 0 to 1, 
 and vice versa:
 
