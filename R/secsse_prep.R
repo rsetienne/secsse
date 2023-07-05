@@ -64,6 +64,7 @@ get_state_names <- function(state_names, num_concealed_states) {
 #' trans_matrix <- rbind(trans_matrix, c(1, 1, 1, 2))
 #' lambda_list <- create_lambda_list(state_names = c(0, 1),
 #'                                   num_concealed_states = 2,
+#'                                   transition_matrix = trans_matrix,
 #'                                   model = "ETD")
 #' 
 #' @export
@@ -337,10 +338,12 @@ create_default_shift_matrix <- function(state_names = c("0", "1"),
 #' between states, e.g. a species of observed state 0 generates daughter
 #' species with state 0 as well.
 #' @examples
-#' lambda_matrix <- create_deafult_lambda_transition_matrix(
-#' state_names = c(0, 1), model = "ETD")
+#' lambda_matrix <- 
+#'      create_default_lambda_transition_matrix(state_names = c(0, 1),
+#'                                              model = "ETD")
 #' lambda_list <- create_lambda_list(state_names = c(0, 1),
 #'                                   num_concealed_states = 2,
+#'                                   transition_matrix = lambda_matrix,
 #'                                   model = "ETD")
 #' @export
 create_default_lambda_transition_matrix <- function(state_names = c("0", "1"),
@@ -483,7 +486,6 @@ extract_par_vals <- function(param_posit,
   answ <- extract_answ(param_posit[[3]], # Q matrix
                        ml_pars[[3]],
                        answ)
-  
   for (i in seq_along(param_posit[[2]])) {
     if (param_posit[[2]][i] > 0 && !is.na(param_posit[[2]][i])) {
       answ[param_posit[[2]][i]] <- ml_pars[[2]][i]

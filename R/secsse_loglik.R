@@ -95,10 +95,20 @@ secsse_loglik <- function(parameter,
                                                  sampling_fraction,
                                                  is_complete_tree,
                                                  mus)
+  } else {
+    # with a complete tree, we need to re-calculate the states every time we 
+    # run, because they are dependent on mu.
+    if (is_complete_tree) {
+      states <- build_states(phy = phy,
+                             traits = traits,
+                             num_concealed_states = num_concealed_states,
+                             sampling_fraction = sampling_fraction,
+                             is_complete_tree = is_complete_tree,
+                             mus = mus)
+    }
   }
 
   states <- setting_calculation$states
-
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
 

@@ -21,9 +21,11 @@ between states, e.g. a species of observed state 0 generates daughter
 species with state 0 as well.
 }
 \examples{
-lambda_matrix <- create_deafult_lambda_transition_matrix(
-state_names = c(0, 1), model = "ETD")
+lambda_matrix <- 
+     create_default_lambda_transition_matrix(state_names = c(0, 1),
+                                             model = "ETD")
 lambda_list <- create_lambda_list(state_names = c(0, 1),
                                   num_concealed_states = 2,
+                                  transition_matrix = lambda_matrix,
                                   model = "ETD")
 }

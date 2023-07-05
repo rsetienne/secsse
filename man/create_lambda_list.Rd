@@ -40,6 +40,7 @@ trans_matrix <- c(0, 0, 0, 1)
 trans_matrix <- rbind(trans_matrix, c(1, 1, 1, 2))
 lambda_list <- create_lambda_list(state_names = c(0, 1),
                                   num_concealed_states = 2,
+                                  transition_matrix = trans_matrix,
                                   model = "ETD")
 
 }
