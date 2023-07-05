@@ -3,13 +3,12 @@
 \docType{data}
 \name{phylo_vignette}
 \alias{phylo_vignette}
-\alias{phy}
 \title{A phylogenetic reconstuction to run the vignette}
 \format{
 Phylogenetic tree in phy format, rooted, including branch lengths
 }
 \usage{
-phy
+phylo_vignette
 }
 \description{
 An example phylogeny in the right format for secsse

@@ -3,13 +3,12 @@
 \docType{data}
 \name{example_phy_GeoSSE}
 \alias{example_phy_GeoSSE}
-\alias{phy}
 \title{A phylogeny with traits at the tips}
 \format{
 A phylogeny as created by GeoSSE (diversitree)
 }
 \usage{
-phy
+example_phy_GeoSSE
 }
 \description{
 An example phylogeny for testing purposes
