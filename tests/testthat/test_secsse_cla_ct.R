@@ -2,10 +2,8 @@ context("test_secsse_cla_ct")
 
 test_that("the loglik for the complete tree under cla_secsse", {
   Sys.unsetenv("R_TESTS")
-  phy <- NULL
-  rm(phy)
   utils::data("example_phy_GeoSSE", package = "secsse")
-  traits <- as.numeric(phy$tip.state)
+  traits <- as.numeric(example_phy_GeoSSE$tip.state)
   lambdas <- list()
   lambdas[[1]] <- matrix(0, ncol = 9, nrow = 9, byrow = TRUE)
   lambdas[[1]][2, 1] <- 1.5
@@ -25,7 +23,7 @@ test_that("the loglik for the complete tree under cla_secsse", {
   sampling_fraction <- c(1, 1, 1)
 
   secsse_cla_LL3 <- cla_secsse_loglik(parameter = parameter,
-                                      phy = phy,
+                                      phy = example_phy_GeoSSE,
                                       traits = traits,
                                       num_concealed_states =
                                         num_concealed_states,
@@ -38,7 +36,7 @@ test_that("the loglik for the complete tree under cla_secsse", {
                                       is_complete_tree = FALSE)
 
   secsse_cla_LL4 <- cla_secsse_loglik(parameter = parameter,
-                                      phy = phy,
+                                      phy = example_phy_GeoSSE,
                                       traits = traits,
                                       num_concealed_states =
                                         num_concealed_states,
@@ -53,7 +51,7 @@ test_that("the loglik for the complete tree under cla_secsse", {
 
   skip_on_cran()
   secsse_cla_LL5 <- cla_secsse_loglik(parameter = parameter,
-                                      phy = phy,
+                                      phy = example_phy_GeoSSE,
                                       traits = traits,
                                       num_concealed_states =
                                         num_concealed_states,
