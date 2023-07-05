@@ -29,8 +29,9 @@ test_that("trying a short ML search: cla_secsse", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-  testthat::expect_warning( # Expect warning because some transitions are set to 
-    model_R <- cla_secsse_ml( # be impossible
+  # Expect warning because some transitions are set to be impossible
+  testthat::expect_warning(
+    model_R <- cla_secsse_ml(
       phylotree,
       traits,
       num_concealed_states,

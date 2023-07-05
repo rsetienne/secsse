@@ -96,7 +96,7 @@ secsse_loglik <- function(parameter,
                                                  is_complete_tree,
                                                  mus)
   } else {
-    # with a complete tree, we need to re-calculate the states every time we 
+    # with a complete tree, we need to re-calculate the states every time we
     # run, because they are dependent on mu.
     if (is_complete_tree) {
       states <- build_states(phy = phy,

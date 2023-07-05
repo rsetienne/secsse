@@ -71,9 +71,9 @@ You can visualise the tip states using the package diversitree:
 
 ```{r plot_tree}
 if (requireNamespace("diversitree")) {
-  for_plot <- data.frame(trait = traits$trait, 
+  for_plot <- data.frame(trait = traits$trait,
                          row.names = phylo_vignette$tip.label)
-diversitree::trait.plot(phylo_vignette, dat = for_plot, 
+diversitree::trait.plot(phylo_vignette, dat = for_plot,
                         cols = list("trait" = c("blue", "red")),
                         type = "p")
 }
@@ -251,7 +251,7 @@ initial values. We can do so as follows:
 ```{r ETD_ML_init}
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep al zeros at zero
-initparsopt <- rep(0.1, 8) 
+initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 ```

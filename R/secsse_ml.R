@@ -201,9 +201,9 @@ secsse_ml <- function(phy,
                                           atol = atol,
                                           rtol = rtol,
                                           method = method)
-    
+
     print_init_ll(initloglik = initloglik, verbose = verbose)
-    
+
     if (initloglik == -Inf) {
         stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 

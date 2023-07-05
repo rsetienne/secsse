@@ -30,7 +30,7 @@ convert_transition_list_q <- function(transition_list, state_names) {
 #' @keywords internal
 get_state_names <- function(state_names, num_concealed_states) {
   num_obs_states <- length(state_names)
-  
+
   concealed_state_names <- LETTERS[1:num_concealed_states]
   all_state_names <- c()
   cnt <- 1
@@ -66,7 +66,7 @@ get_state_names <- function(state_names, num_concealed_states) {
 #'                                   num_concealed_states = 2,
 #'                                   transition_matrix = trans_matrix,
 #'                                   model = "ETD")
-#' 
+#'
 #' @export
 create_lambda_list <- function(state_names = c(0, 1),
                                num_concealed_states = 2,
@@ -76,12 +76,12 @@ create_lambda_list <- function(state_names = c(0, 1),
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")
   }
-  
+
   num_obs_states <- length(state_names)
   total_num_states <- num_obs_states * num_concealed_states
-  
+
   all_state_names <- get_state_names(state_names, num_concealed_states)
-  
+
   lambdas <- list()
   for (i in 1:total_num_states) {
     lambdas[[i]] <- matrix(0, nrow = total_num_states,
@@ -90,9 +90,9 @@ create_lambda_list <- function(state_names = c(0, 1),
     colnames(lambdas[[i]]) <- all_state_names
   }
   names(lambdas) <- all_state_names
-  
+
   transition_list <- convert_transition_list(transition_matrix, state_names)
-  
+
   if (model == "CTD") {
     if (is.null(concealed_spec_rates)) {
       spec_rates <- unique(transition_list[, 4])
@@ -103,19 +103,19 @@ create_lambda_list <- function(state_names = c(0, 1),
       concealed_spec_rates <- sort(concealed_spec_rates)
     }
   }
-  
+
   # ETD settings
   for (i in seq_len(nrow(transition_list))) {
     focal_state <- transition_list[i, 1]
     daughter1   <- transition_list[i, 2]
     daughter2   <- transition_list[i, 3]
     target_rate <- transition_list[i, 4]
-    
+
     for (j in seq_len(num_concealed_states)) {
       incr <- (j - 1) * num_obs_states
       focal_rate <- target_rate
       if (model == "CTD") focal_rate <- concealed_spec_rates[j]
-      
+
       lambdas[[focal_state + incr]][daughter1 + incr,
                                     daughter2 + incr] <- focal_rate
       lambdas[[focal_state + incr]][daughter2 + incr,
@@ -150,11 +150,11 @@ create_q_matrix <- function(state_names,
                             num_concealed_states,
                             shift_matrix,
                             diff.conceal = FALSE) {
-  
+
   total_num_states <- length(state_names)
   trans_matrix <- matrix(0, ncol = total_num_states,
                          nrow = total_num_states)
-  
+
   transition_list <- convert_transition_list_q(shift_matrix, state_names)
   for (i in seq_len(nrow(transition_list))) {
     parent_state <- transition_list[i, 1]
@@ -162,20 +162,19 @@ create_q_matrix <- function(state_names,
     focal_rate <- transition_list[i, 3]
     trans_matrix[parent_state, daughter_state] <- focal_rate
   }
-  
+
   diag(trans_matrix) <- NA
-  
-  
+
   trans_matrix <- secsse::expand_q_matrix(q_matrix = trans_matrix,
-                                          num_concealed_states = 
+                                          num_concealed_states =
                                             num_concealed_states,
                                           diff.conceal = diff.conceal)
-  
+
   all_state_names <- get_state_names(state_names, num_concealed_states)
   colnames(trans_matrix) <- all_state_names
   rownames(trans_matrix) <- all_state_names
   diag(trans_matrix) <- NA
-  
+
   return(trans_matrix)
 }
 
@@ -221,7 +220,7 @@ get_chosen_rates <- function(q_matrix, num_concealed_states) {
   existing_rates <- existing_rates[existing_rates > 0]
   existing_rates <- existing_rates[!is.na(existing_rates)]
   existing_rates <- sort(existing_rates)
-  
+
   num_transitions <- num_concealed_states * (num_concealed_states - 1)
   chosen_rates <- existing_rates
   while (num_transitions > length(chosen_rates)) {
@@ -235,8 +234,10 @@ get_chosen_rates <- function(q_matrix, num_concealed_states) {
 }
 
 #' @keywords internal
-fill_from_rates <- function(new_q_matrix, chosen_rates, 
-                            num_traits, num_concealed_states,
+fill_from_rates <- function(new_q_matrix,
+                            chosen_rates,
+                            num_traits,
+                            num_concealed_states,
                             rate_indic) {
   for (i in 1:num_concealed_states) {
     for (j in i:num_concealed_states) {
@@ -268,10 +269,10 @@ expand_q_matrix <- function(q_matrix,
                             num_concealed_states,
                             diff.conceal = FALSE) {
   num_traits <- ncol(q_matrix)
-  
+
   # we first fill in the existing q matrix
   new_q_matrix <- initialize_new_q_matrix(q_matrix, num_concealed_states)
-  
+
   # and now we add all forward and reverse transitions
   if (diff.conceal == TRUE) {
     # we need all combinations!
@@ -282,11 +283,13 @@ expand_q_matrix <- function(q_matrix,
     # we now re-use the existing rates
     chosen_rates <- get_chosen_rates(q_matrix, num_concealed_states)
     rate_indic <- 1
-    new_q_matrix <- fill_from_rates(new_q_matrix, chosen_rates, 
-                                    num_traits, num_concealed_states,
+    new_q_matrix <- fill_from_rates(new_q_matrix,
+                                    chosen_rates,
+                                    num_traits,
+                                    num_concealed_states,
                                     rate_indic)
   }
-  
+
   return(new_q_matrix)
 }
 
@@ -321,24 +324,24 @@ create_default_shift_matrix <- function(state_names = c("0", "1"),
         to_add <- c(start_state, end_state, focal_rate)
         transition_list <- rbind(transition_list, to_add)
         focal_rate <- focal_rate + 1
-      }  
+      }
     }
   }
-  
+
   rownames(transition_list) <- rep("", nrow(transition_list))
   return(transition_list)
 }
 
 #' helper function to create a default lambda list
 #' @param state_names names of the observed states
-#' @param model chosen model of interest, either "CR" (Constant Rates), "ETD" 
+#' @param model chosen model of interest, either "CR" (Constant Rates), "ETD"
 #' (Examined Trait Diversification) or "CTD" ("Concealed Trait Diversification).
 #' @description
 #' This function generates a generic lambda list, assuming no transitions
 #' between states, e.g. a species of observed state 0 generates daughter
 #' species with state 0 as well.
 #' @examples
-#' lambda_matrix <- 
+#' lambda_matrix <-
 #'      create_default_lambda_transition_matrix(state_names = c(0, 1),
 #'                                              model = "ETD")
 #' lambda_list <- create_lambda_list(state_names = c(0, 1),
@@ -355,7 +358,7 @@ create_default_lambda_transition_matrix <- function(state_names = c("0", "1"),
     transition_list <- rbind(transition_list,
                              c(state_names[i],
                                state_names[i],
-                               state_names[i], 
+                               state_names[i],
                                focal_rate))
   }
   rownames(transition_list) <- rep("", nrow(transition_list))
@@ -366,7 +369,7 @@ create_default_lambda_transition_matrix <- function(state_names = c("0", "1"),
 #' @param state_names names of the observed states
 #' @param num_concealed_states number of concealed states
 #' @param model model replicated, available are "CR", "ETD" and "CTD"
-#' @param lambda_list previously generated list of lambda matrices, 
+#' @param lambda_list previously generated list of lambda matrices,
 #' used to infer the rate number to start with
 #' @return mu vector
 #' @export
@@ -375,17 +378,17 @@ create_mu_vector <- function(state_names,
                              model = "CR",
                              lambda_list) {
   focal_rate <- 1 + max(unlist(lambda_list), na.rm = TRUE)
-  
+
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")
   }
-  
+
   all_names <- get_state_names(state_names, num_concealed_states)
-  
+
   mus <- rep(focal_rate, length(all_names))
-  
+
   num_obs_states <- length(state_names)
-  
+
   if (model == "ETD") {
     for (i in 1:num_obs_states) {
       indices <- seq(i, length(mus), by = num_concealed_states)
@@ -400,7 +403,7 @@ create_mu_vector <- function(state_names,
       focal_rate <- focal_rate + 1
     }
   }
-  
+
   names(mus) <- all_names
   return(mus)
 }
@@ -475,14 +478,14 @@ extract_par_vals <- function(param_posit,
   if (length(param_posit) != length(ml_pars)) {
     stop("param posit doesn't match ml_pars in structure")
   }
-  
+
   answ <- c()
   for (i in seq_along(param_posit[[1]])) {
     answ <- extract_answ(param_posit[[1]][[i]],
                          ml_pars[[1]][[i]],
                          answ)
   }
-  
+
   answ <- extract_answ(param_posit[[3]], # Q matrix
                        ml_pars[[3]],
                        answ)

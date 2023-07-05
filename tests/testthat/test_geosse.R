@@ -55,9 +55,9 @@ test_that("secsse gives the same result as GeoSSE", {
     parameter[[3]] <- q
 
     num_concealed_states <- 3
-    
+
     num_modeled_traits <- ncol(q) / floor(num_concealed_states)
-    
+
     setting_calculation <- build_initStates_time(example_phy_GeoSSE,
                                                  traits,
                                                  num_concealed_states,
@@ -66,10 +66,10 @@ test_that("secsse gives the same result as GeoSSE", {
                                                  mus,
                                                  num_modeled_traits,
                                                  first_time = TRUE)
-    setting_calculation$states <- 
+    setting_calculation$states <-
          setting_calculation$states[, c(1, 2, 3, 10, 11, 12)]
-    
-    
+
+
     secsse_cla_LL <- cla_secsse_loglik(parameter,
                                        example_phy_GeoSSE,
                                        traits,

@@ -43,7 +43,7 @@ test_that("cla plotting", {
   diff.conceal <- FALSE
 
   idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
-  
+
   testthat::expect_output(
     startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )

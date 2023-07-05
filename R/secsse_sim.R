@@ -89,7 +89,7 @@ secsse_sim <- function(lambdas,
     stop("unknown conditioning, please pick from
          'none', 'obs_states', 'true_states'")
   }
-  
+
   if (is.null(seed)) seed <- -1
 
   res <- secsse_sim_cpp(mus,
