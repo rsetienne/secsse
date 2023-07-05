@@ -66,9 +66,9 @@ After you are done properly setting up your data, you can proceed to setting par
 #### Note on assigning ambiguity to taxon trait states
 
 If the user wishes to assign a taxon to multiple trait states, because he/she is
-unsure which state best describes the taxon, he/she can use 'NA'. 'NA' is used
+unsure which state best describes the taxon, he/she can use `NA`. `NA` is used
 when there is no information on possible state at all; for example when a state
-was not measured or a taxon is unavailable for inspection. 'NA' means a taxon is
+was not measured or a taxon is unavailable for inspection. `NA` means a taxon is
 equally likely to pertain to any state. In case the user does have some
 information, for example if a taxon can pertain to multiple states, or if there
 is uncertainty regarding state but one or multiple states can with certainty be
@@ -80,13 +80,13 @@ may pertain to trait state 1 or 3, but not to 2, the three columns should have
 at least the values 1 and a 3, but never 2 (species in the third row). On the
 other hand, the species in the fifth row can pertain to all states: the first
 column would have a 1, the second a 2, the third a 3 (although if you only have
-this type of ambiguity, it is easier to assign 'NA' and use a single-column data
+this type of ambiguity, it is easier to assign `NA` and use a single-column data
 file).
 
 ## Setting up an analysis
 
 To perform a Maximum Likelihood analysis, secsse makes use of the
-function DDD::optimize, which in turn, typically, uses the subplex
+function `DDD::optimize()`, which in turn, typically, uses the subplex
 package to perform the Maximum Likelihood optimization. In such an
 analysis, we need to specify which parameters we want to optimize, which
 parameters to keep fix, and the initial values per parameter. We do so
@@ -130,7 +130,7 @@ lambda_list <- secsse::create_lambda_list(state_names = c(0, 1),
 lambda_list
 ```
 
-Let's see what the code has done. First, we create a spec_matrix, where
+Let's see what the code has done. First, we create a `spec_matrix`, where
 the first column indicates the parent species (0 or 1) and the second
 and third column indicate the identities of the two daughter species. In
 this case, we choose for symmetric speciation without a change of trait,
@@ -139,16 +139,16 @@ evidence of perhaps asymmetric inheritance, you can specify this here.
 The fourth column indicates the associated rate indicator. In this case
 we choose two different speciation rates. We choose two concealed
 states, as it is good practice to have the same number of concealed
-states as observed states. The resulting lambda_list then contains four
+states as observed states. The resulting `lambda_list` then contains four
 entries, one for each unique state (see the names of the entries in the list), 
 that is, for each combination of observed and concealed states, where the
-concealed states are indicates with a capital letter.
+concealed states are indicated with a capital letter.
 Looking at the first entry in the list, e.g. the
 result of a speciation event starting with a parent in state 0A, will
 result with rate 1 in two daughter species of state 0A as well. The way
 to read this, is by looking at the row and column identifiers of the
 entered rate. Similarly, for a speciation event starting in state 1A
-(lambda_list[[2]]), the two daughter species are 1A as well, but this
+(`lambda_list[[2]]`), the two daughter species are 1A as well, but this
 time with rate 2, as we specified that species with trait 1 will have a
 different speciation rate. Note that here, rates 1 and 2 are ordered
 with the observed trait, we will later explore the CTD model, where the
