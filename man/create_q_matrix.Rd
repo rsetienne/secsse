@@ -37,8 +37,8 @@ concealed states (only observed transitions shown)
 \examples{
 shift_matrix <- c(0, 1, 5)
 shift_matrix <- rbind(shift_matrix, c(1, 0, 6))
-q_matrix <- secsse::create_transition_matrix(state_names = c(0, 1),
-                                             num_concealed_states = 2,
-                                             shift_matrix = shift_matrix,
-                                             diff.conceal = TRUE)
+q_matrix <- secsse::create_q_matrix(state_names = c(0, 1),
+                                    num_concealed_states = 2,
+                                    shift_matrix = shift_matrix,
+                                    diff.conceal = TRUE)
 }

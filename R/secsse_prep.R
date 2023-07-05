@@ -140,10 +140,10 @@ create_lambda_list <- function(state_names = c(0, 1),
 #' @examples
 #' shift_matrix <- c(0, 1, 5)
 #' shift_matrix <- rbind(shift_matrix, c(1, 0, 6))
-#' q_matrix <- secsse::create_transition_matrix(state_names = c(0, 1),
-#'                                              num_concealed_states = 2,
-#'                                              shift_matrix = shift_matrix,
-#'                                              diff.conceal = TRUE)
+#' q_matrix <- secsse::create_q_matrix(state_names = c(0, 1),
+#'                                     num_concealed_states = 2,
+#'                                     shift_matrix = shift_matrix,
+#'                                     diff.conceal = TRUE)
 #' @export
 create_q_matrix <- function(state_names,
                             num_concealed_states,
@@ -300,10 +300,10 @@ expand_q_matrix <- function(q_matrix,
 #' shift_matrix <- create_default_shift_matrix(state_names = c(0, 1),
 #'                                             num_concealed_states = 2,
 #'                                             mus = c(1, 2, 1, 2))
-#' q_matrix <- create_transition_matrix(state_names = c(0, 1),
-#'                                      num_concealed_states = 2,
-#'                                      shift_matrix = shift_matrix,
-#'                                      diff.conceal = FALSE)
+#' q_matrix <- create_q_matrix(state_names = c(0, 1),
+#'                             num_concealed_states = 2,
+#'                             shift_matrix = shift_matrix,
+#'                             diff.conceal = FALSE)
 #' @export
 create_default_shift_matrix <- function(state_names = c("0", "1"),
                                         num_concealed_states = 2,

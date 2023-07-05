@@ -25,8 +25,8 @@ create_transition_matrix.
 shift_matrix <- create_default_shift_matrix(state_names = c(0, 1),
                                             num_concealed_states = 2,
                                             mus = c(1, 2, 1, 2))
-q_matrix <- create_transition_matrix(state_names = c(0, 1),
-                                     num_concealed_states = 2,
-                                     shift_matrix = shift_matrix,
-                                     diff.conceal = FALSE)
+q_matrix <- create_q_matrix(state_names = c(0, 1),
+                            num_concealed_states = 2,
+                            shift_matrix = shift_matrix,
+                            diff.conceal = FALSE)
 }
