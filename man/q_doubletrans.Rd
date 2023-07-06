@@ -23,7 +23,7 @@ be declared as the third element of idparslist.
 }
 \description{
 This function expands the Q_matrix, but it does so assuming
-that the number of concealed traits is equal to the number of examined 
+that the number of concealed traits is equal to the number of examined
 traits, if you have a different number, you should consider looking at
 the function [expand_q_matrix()].
 }

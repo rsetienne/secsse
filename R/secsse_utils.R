@@ -11,6 +11,9 @@
 #' num_concealed_states <- 3
 #' param_posit <- id_paramPos(traits,num_concealed_states)
 #' @export
+#' @rawNamespace useDynLib(secsse, .registration = TRUE)
+#' @rawNamespace import(Rcpp)
+#' @rawNamespace importFrom(RcppParallel, RcppParallelLibs)
 id_paramPos <- function(traits, num_concealed_states) { #noLint
     idparslist <- list()
     if (is.matrix(traits)) {
@@ -374,9 +377,6 @@ prepare_full_lambdas <- function(traits,
     return(full_lambdas)
 }
 
-#' @rawNamespace useDynLib(secsse, .registration = TRUE)
-#' @rawNamespace import(Rcpp)
-#' @rawNamespace importFrom(RcppParallel, RcppParallelLibs)
 #' @keywords internal
 normalize_loglik <- function(probs, loglik) {
     sumabsprobs <- sum(abs(probs))
@@ -408,4 +408,642 @@ calc_mus <- function(is_complete_tree,
         }
     }
     return(mus)
+}
+
+#' @keywords internal
+check_tree <- function(phy, is_complete_tree) {
+    if (ape::is.rooted(phy) == FALSE) {
+        stop("The tree needs to be rooted.")
+    }
+    
+    if (ape::is.binary(phy) == FALSE) {
+        stop("The tree needs to be fully resolved.")
+    }
+    if (ape::is.ultrametric(phy) == FALSE && is_complete_tree == FALSE) {
+        stop("The tree needs to be ultrametric.")
+    }
+    if (any(phy$edge.length == 0)) {
+        stop("The tree must have internode distancs that are all larger than 0.")
+    }
+}
+
+#' @keywords internal
+check_traits <- function(traits, sampling_fraction) {
+    if (is.matrix(traits)) {
+        if (length(sampling_fraction) != length(sort(unique(traits[, 1])))) {
+            stop("Sampling_fraction must have as many elements 
+           as the number of traits.")
+        }
+        
+        if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) ==
+            FALSE) {
+            stop(
+                "Check your trait argument; if you have more than one column,
+        make sure all your states are included in the first column."
+            )
+        }
+    } else {
+        if (length(sampling_fraction) != length(sort(unique(traits)))) {
+            stop("Sampling_fraction must have as many elements as 
+           the number of traits.")
+        }
+    }
+    
+    if (length(sort(unique(as.vector(traits)))) < 2) {
+        stop("The trait has only one state.")
+    }
+}
+
+#' @keywords internal
+check_root_state_weight <- function(root_state_weight, traits) {
+    if (is.numeric(root_state_weight)) {
+        if (length(root_state_weight) != length(sort(unique(traits)))) {
+            stop("There need to be as many elements in root_state_weight 
+           as there are traits.")
+        }
+        if (length(which(root_state_weight == 1)) != 1) {
+            stop("The root_state_weight needs only one 1.")
+        }
+    } else {
+        if (any(root_state_weight == "maddison_weights" |
+                root_state_weight == "equal_weights" |
+                root_state_weight == "proper_weights") == FALSE) {
+            stop("The root_state_weight must be any of 
+           maddison_weights, equal_weights, or proper_weights.")
+        }
+    }
+}
+
+#' @keywords internal
+check_input <- function(traits,
+                        phy,
+                        sampling_fraction,
+                        root_state_weight,
+                        is_complete_tree) {
+    check_root_state_weight(root_state_weight, sampling_fraction)
+    
+    check_tree(phy, is_complete_tree)
+    
+    check_traits(traits, sampling_fraction)
+}
+
+
+#' @keywords internal
+transf_funcdefpar <- function(idparsfuncdefpar,
+                              functions_defining_params,
+                              idfactorsopt,
+                              trparsfix,
+                              trparsopt,
+                              idparsfix,
+                              idparsopt) {
+    trparfuncdefpar <- NULL
+    ids_all <- c(idparsfix, idparsopt)
+    
+    values_all <- c(trparsfix / (1 - trparsfix),
+                    trparsopt / (1 - trparsopt))
+    a_new_envir <- new.env()
+    x <- as.list(values_all)  ## To declare all the ids as variables
+    
+    if (is.null(idfactorsopt)) {
+        names(x) <- paste0("par_", ids_all)
+    } else {
+        names(x) <- c(paste0("par_", ids_all), paste0("factor_", idfactorsopt))
+    }
+    list2env(x, envir = a_new_envir)
+    
+    for (jj in seq_along(functions_defining_params)) {
+        myfunc <- functions_defining_params[[jj]]
+        environment(myfunc) <- a_new_envir
+        value_func_defining_parm <- local(myfunc(), envir = a_new_envir)
+        
+        ## Now, declare the variable that is just calculated, so it is available
+        ## for the next calculation if needed
+        y <- as.list(value_func_defining_parm)
+        names(y) <- paste0("par_", idparsfuncdefpar[jj])
+        list2env(y, envir = a_new_envir)
+        
+        if (is.numeric(value_func_defining_parm) == FALSE) {
+            stop("Something went wrong with the calculation of 
+                 parameters in 'functions_param_struct'")
+        }
+        trparfuncdefpar <- c(trparfuncdefpar, value_func_defining_parm)
+    }
+    trparfuncdefpar <- trparfuncdefpar / (1 + trparfuncdefpar)
+    rm(a_new_envir)
+    return(trparfuncdefpar)
+}
+
+#' @keywords internal
+update_values_transform_cla <- function(trpars,
+                                        idparslist,
+                                        idpars,
+                                        parvals) {
+    for (i in seq_along(idpars)) {
+        for (j in seq_len(nrow(trpars[[3]]))) {
+            id <- which(idparslist[[1]][[j]] == idpars[i])
+            trpars[[1]][[j]][id] <- parvals[i]
+        }
+        for (j in 2:3) {
+            id <- which(idparslist[[j]] == idpars[i])
+            trpars[[j]][id] <- parvals[i]
+        }
+    }
+    return(trpars)
+}
+
+#' @keywords internal
+transform_params_cla <- function(idparslist,
+                                 idparsfix,
+                                 trparsfix,
+                                 idparsopt,
+                                 trparsopt,
+                                 structure_func,
+                                 idparsfuncdefpar,
+                                 trparfuncdefpar) {
+    trpars1 <- idparslist
+    for (j in seq_len(nrow(trpars1[[3]]))) {
+        trpars1[[1]][[j]][, ] <- NA
+    }
+    
+    for (j in 2:3) {
+        trpars1[[j]][] <- NA
+    }
+    
+    if (length(idparsfix) != 0) {
+        trpars1 <- update_values_transform_cla(trpars1,
+                                               idparslist,
+                                               idparsfix,
+                                               trparsfix)
+    }
+    
+    trpars1 <- update_values_transform_cla(trpars1,
+                                           idparslist,
+                                           idparsopt,
+                                           trparsopt)
+    ## structure_func part
+    if (!is.null(structure_func)) {
+        trpars1 <- update_values_transform_cla(trpars1,
+                                               idparslist,
+                                               idparsfuncdefpar,
+                                               trparfuncdefpar)
+    }
+    
+    pre_pars1 <- list()
+    pars1 <- list()
+    
+    for (j in seq_len(nrow(trpars1[[3]]))) {
+        pre_pars1[[j]] <- trpars1[[1]][[j]][, ] / (1 - trpars1[[1]][[j]][, ])
+    }
+    
+    pars1[[1]] <- pre_pars1
+    for (j in 2:3) {
+        pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
+    }
+    
+    return(pars1)
+}
+
+#' @keywords internal
+update_values_transform <- function(trpars,
+                                    idparslist,
+                                    idpars,
+                                    parvals) {
+    for (i in seq_along(idpars)) {
+        for (j in 1:3) {
+            id <- which(idparslist[[j]] == idpars[i])
+            trpars[[j]][id] <- parvals[i]
+        }
+    }
+    return(trpars)
+}
+
+#' @keywords internal
+transform_params_normal <- function(idparslist,
+                                    idparsfix,
+                                    trparsfix,
+                                    idparsopt,
+                                    trparsopt,
+                                    structure_func,
+                                    idparsfuncdefpar,
+                                    trparfuncdefpar) {
+    trpars1 <- idparslist
+    for (j in 1:3) {
+        trpars1[[j]][] <- NA
+    }
+    if (length(idparsfix) != 0) {
+        trpars1 <- update_values_transform(trpars1,
+                                           idparslist,
+                                           idparsfix,
+                                           trparsfix)
+    }
+    
+    trpars1 <- update_values_transform(trpars1,
+                                       idparslist,
+                                       idparsopt,
+                                       trparsopt)
+    
+    ## if structure_func part
+    if (is.null(structure_func) == FALSE) {
+        trpars1 <- update_values_transform(trpars1,
+                                           idparslist,
+                                           idparsfuncdefpar,
+                                           trparfuncdefpar)
+    }
+    pars1 <- list()
+    for (j in 1:3) {
+        pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
+    }
+    return(pars1)
+}
+
+#' @keywords internal
+secsse_transform_parameters <- function(trparsopt,
+                                        trparsfix,
+                                        idparsopt,
+                                        idparsfix,
+                                        idparslist,
+                                        structure_func) {
+    if (!is.null(structure_func)) {
+        idparsfuncdefpar <- structure_func[[1]]
+        functions_defining_params <- structure_func[[2]]
+        
+        if (length(structure_func[[3]]) > 1) {
+            idfactorsopt <- structure_func[[3]]
+        } else {
+            if (structure_func[[3]] == "noFactor") {
+                idfactorsopt <- NULL
+            } else {
+                idfactorsopt <- structure_func[[3]]
+            }
+        }
+        
+        trparfuncdefpar <- transf_funcdefpar(idparsfuncdefpar =
+                                                 idparsfuncdefpar,
+                                             functions_defining_params =
+                                                 functions_defining_params,
+                                             idfactorsopt = idfactorsopt,
+                                             trparsfix = trparsfix,
+                                             trparsopt = trparsopt,
+                                             idparsfix = idparsfix,
+                                             idparsopt = idparsopt)
+    }
+    
+    if (is.list(idparslist[[1]])) {
+        # when the ml function is called from cla_secsse
+        pars1 <- transform_params_cla(idparslist,
+                                      idparsfix,
+                                      trparsfix,
+                                      idparsopt,
+                                      trparsopt,
+                                      structure_func,
+                                      idparsfuncdefpar,
+                                      trparfuncdefpar)
+    } else {
+        # when non-cla option is called
+        pars1 <- transform_params_normal(idparslist,
+                                         idparsfix,
+                                         trparsfix,
+                                         idparsopt,
+                                         trparsopt,
+                                         structure_func,
+                                         idparsfuncdefpar,
+                                         trparfuncdefpar)
+    }
+    return(pars1)
+}
+
+
+#' @keywords internal
+update_using_cpp <- function(ances,
+                             states,
+                             forTime,
+                             lambdas,
+                             mus,
+                             q_matrix,
+                             method,
+                             atol,
+                             rtol,
+                             is_complete_tree,
+                             num_threads) {
+    
+    
+    # This function will be improved later on, when we have a unified
+    # C++ side.
+    
+    calcul <- c()
+    
+    if (is.list(lambdas)) {
+        ancescpp <- ances - 1
+        forTimecpp <- forTime # nolint
+        forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
+        
+        if (num_threads == 1) {
+            calcul <- cla_calThruNodes_cpp(ancescpp,
+                                           states,
+                                           forTimecpp,
+                                           lambdas,
+                                           mus,
+                                           q_matrix,
+                                           method,
+                                           atol,
+                                           rtol,
+                                           is_complete_tree)
+        } else {
+            if (num_threads == -2) {
+                calcul <- calc_cla_ll_threaded(ancescpp,
+                                               states,
+                                               forTimecpp,
+                                               lambdas,
+                                               mus,
+                                               q_matrix,
+                                               1,
+                                               method,
+                                               is_complete_tree)
+            } else {
+                calcul <- calc_cla_ll_threaded(ancescpp,
+                                               states,
+                                               forTimecpp,
+                                               lambdas,
+                                               mus,
+                                               q_matrix,
+                                               num_threads,
+                                               method,
+                                               is_complete_tree)
+            }
+        }
+    } else {
+        RcppParallel::setThreadOptions(numThreads = num_threads)
+        
+        calcul <- calThruNodes_cpp(ances,
+                                   states,
+                                   forTime,
+                                   lambdas,
+                                   mus,
+                                   q_matrix,
+                                   num_threads,
+                                   atol,
+                                   rtol,
+                                   method,
+                                   is_complete_tree)
+    }
+    return(calcul)
+}
+
+condition <- function(cond,
+                      mergeBranch2,
+                      weight_states,
+                      lambdas,
+                      nodeM) {
+    lmb <- length(mergeBranch2)
+    d <- length(lambdas)
+    if (is.list(lambdas)) {
+        if (cond == "maddison_cond") {
+            pre_cond <- rep(NA, lmb) # nolint
+            for (j in 1:lmb) {
+                pre_cond[j] <- sum(weight_states[j] *
+                                       lambdas[[j]] *
+                                       (1 - nodeM[1:d][j]) ^ 2)
+            }
+            mergeBranch2 <- mergeBranch2 / sum(pre_cond) # nolint
+        }
+        
+        if (cond == "proper_cond") {
+            pre_cond <- rep(NA, lmb) # nolint
+            for (j in 1:lmb) {
+                pre_cond[j] <- sum(lambdas[[j]] * ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+            }
+            mergeBranch2 <- mergeBranch2 / pre_cond # nolint
+        }
+        
+    } else {
+        if (cond == "maddison_cond") {
+            mergeBranch2 <-
+                mergeBranch2 / sum(weight_states * lambdas * (1 - nodeM[1:d]) ^ 2)
+        }
+        
+        if (cond == "proper_cond") {
+            mergeBranch2 <- mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)
+        }
+    }
+    return(mergeBranch2)
+}
+
+
+
+#' @keywords internal
+update_complete_tree <- function(phy,
+                                 lambdas,
+                                 mus,
+                                 q_matrix,
+                                 method,
+                                 atol,
+                                 rtol,
+                                 lmb) {
+    time_inte <- max(abs(ape::branching.times(phy))) # nolint
+    
+    if (is.list(lambdas)) {
+        y <- rep(0, lmb)
+        nodeM <- ct_condition_cla(y, # nolint
+                                  time_inte,
+                                  lambdas,
+                                  mus,
+                                  q_matrix,
+                                  method,
+                                  atol,
+                                  rtol)
+        nodeM <- c(nodeM, y) # nolint
+    } else {
+        
+        y <- rep(0, 2 * lmb)
+        
+        nodeM <- ct_condition(y, # nolint
+                              time_inte,
+                              lambdas,
+                              mus,
+                              q_matrix,
+                              method,
+                              atol,
+                              rtol)
+    }
+    return(nodeM)
+}
+
+
+#' @keywords internal
+create_states <- function(usetraits,
+                          traits,
+                          states,
+                          sampling_fraction,
+                          num_concealed_states,
+                          d,
+                          traitStates,
+                          is_complete_tree,
+                          phy,
+                          ly,
+                          mus,
+                          nb_tip) {
+    if (anyNA(usetraits)) {
+        nas <- which(is.na(traits))
+        for (iii in seq_along(nas)) {
+            states[nas[iii], ] <- c(1 - rep(sampling_fraction,
+                                            num_concealed_states),
+                                    rep(sampling_fraction, num_concealed_states))
+        }
+    }
+    
+    for (iii in seq_along(traitStates)) { # Initial state probabilities
+        StatesPresents <- d + iii
+        toPlaceOnes <- StatesPresents +
+            length(traitStates) * (0:(num_concealed_states - 1))
+        tipSampling <- 1 * sampling_fraction
+        states[which(usetraits ==
+                         traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
+    }
+    
+    if (is_complete_tree) {
+        extinct_species <- geiger::is.extinct(phy)
+        if (!is.null(extinct_species)) {
+            for (i in seq_along(extinct_species)) {
+                states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
+                    mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+            }
+        }
+        for (iii in 1:nb_tip) {
+            states[iii, 1:d] <- 0
+        }
+    } else {
+        for (iii in 1:nb_tip) {
+            states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+        }
+    }
+    
+    return(states)
+}
+
+#' @keywords internal
+build_states <- function(phy,
+                         traits,
+                         num_concealed_states,
+                         sampling_fraction,
+                         is_complete_tree = FALSE,
+                         mus = NULL,
+                         num_unique_traits = NULL,
+                         first_time = FALSE) {
+    if (!is.matrix(traits)) {
+        traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
+    }
+    
+    if (length(phy$tip.label) != nrow(traits)) {
+        stop("Number of species in the tree must be the same as in the trait file")
+    }
+    # if there are traits that are not in the observed tree,
+    # the user passes these themselves.
+    # yes, this is a weird use-case
+    
+    traitStates <- sort(unique(traits[, 1]))
+    
+    if (!is.null(num_unique_traits)) {
+        if (num_unique_traits > length(traitStates)) {
+            if (first_time) message("found un-observed traits, expanding state space")
+            traitStates <- 1:num_unique_traits
+        }
+    }
+    
+    nb_tip <- ape::Ntip(phy)
+    nb_node <- phy$Nnode
+    ly <- length(traitStates) * 2 * num_concealed_states
+    states <- matrix(ncol = ly, nrow = nb_tip + nb_node)
+    d <- ly / 2
+    ## In a example of 3 states, the names of the colums would be like:
+    ##
+    ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
+    ##                   "D0A","D1A","D2A","D0B","D1B","D2B")
+    states[1:nb_tip, ] <- 0
+    ## I repeat the process of state assignment as many times as columns I have
+    for (iv in seq_len(ncol(traits))) {
+        states <- create_states(traits[, iv],
+                                traits,
+                                states,
+                                sampling_fraction,
+                                num_concealed_states,
+                                d,
+                                traitStates,
+                                is_complete_tree,
+                                phy,
+                                ly,
+                                mus,
+                                nb_tip)
+    }
+    return(states)
+}
+
+#' @keywords internal
+build_initStates_time <- function(phy,
+                                  traits,
+                                  num_concealed_states,
+                                  sampling_fraction,
+                                  is_complete_tree = FALSE,
+                                  mus = NULL,
+                                  num_unique_traits = NULL,
+                                  first_time = FALSE) {
+    states <- build_states(phy,
+                           traits,
+                           num_concealed_states,
+                           sampling_fraction,
+                           is_complete_tree,
+                           mus,
+                           num_unique_traits,
+                           first_time)
+    phy$node.label <- NULL
+    split_times <- sort(event_times(phy), decreasing = FALSE)
+    ances <- as.numeric(names(split_times))
+    
+    forTime <- cbind(phy$edge, phy$edge.length)
+    
+    return(list(
+        states = states,
+        ances = ances,
+        forTime = forTime
+    ))
+}
+
+#' @keywords internal
+get_weight_states <- function(root_state_weight,
+                              num_concealed_states,
+                              mergeBranch,
+                              lambdas,
+                              nodeM,
+                              d,
+                              is_cla = FALSE) {
+    
+    if (is.numeric(root_state_weight)) {
+        weight_states <- rep(root_state_weight / num_concealed_states,
+                             num_concealed_states)
+    } else {
+        if (root_state_weight == "maddison_weights") {
+            weight_states <- (mergeBranch) / sum((mergeBranch))
+        }
+        
+        if (root_state_weight == "proper_weights") {
+            if (is_cla) {
+                lmb <- length(mergeBranch)
+                numerator <- rep(NA, lmb)
+                for (j in 1:lmb) {
+                    numerator[j] <- mergeBranch[j] / sum(lambdas[[j]] *
+                                                             ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+                }
+                weight_states <- numerator / sum(numerator) # nolint
+            } else {
+                weight_states <- (mergeBranch /
+                                      (lambdas * (1 - nodeM[1:d]) ^ 2)) /
+                    sum((mergeBranch / (lambdas * (1 - nodeM[1:d]) ^ 2)))
+            }
+        }
+        
+        if (root_state_weight == "equal_weights") {
+            weight_states <- rep(1 / length(mergeBranch), length(mergeBranch))
+        }
+    }
+    
+    return(weight_states)
 }

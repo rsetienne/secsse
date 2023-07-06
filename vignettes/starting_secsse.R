@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 library(secsse)
 data(traits)
-tail(traits) # NOTE: Data file is different? trait columng only has 0 and 1
+tail(traits) # NOTE: Data file is different? trait column only has 0 and 1
 
 ## -----------------------------------------------------------------------------
 data("phylo_vignette")
@@ -20,12 +20,21 @@ mismat <- name.check(phylo_vignette, traits)
 
 ## ----plot_tree----------------------------------------------------------------
 if (requireNamespace("diversitree")) {
-  for_plot <- data.frame(trait = traits$trait, row.names = phylo_vignette$tip.label)
-diversitree::trait.plot(phylo_vignette, dat = for_plot, 
+  for_plot <- data.frame(trait = traits$trait,
+                         row.names = phylo_vignette$tip.label)
+diversitree::trait.plot(phylo_vignette, dat = for_plot,
                         cols = list("trait" = c("blue", "red")),
                         type = "p")
 }
 
+
+## -----------------------------------------------------------------------------
+#       traits traits traits
+# [1,]      2      2      2
+# [2,]      1      1      1
+# [3,]      2      2      2
+# [4,]      3      1      1
+# [5,]      1      2      3
 
 ## ----ETD_lambda---------------------------------------------------------------
 spec_matrix <- c()
@@ -58,7 +67,7 @@ q_matrix
 ## ----ETD_ML_init--------------------------------------------------------------
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep al zeros at zero
-initparsopt <- rep(0.1, 8) 
+initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 

@@ -12,7 +12,7 @@ create_default_lambda_transition_matrix(
 \arguments{
 \item{state_names}{names of the observed states}
 
-\item{model}{chosen model of interest, either "CR" (Constant Rates), "ETD" 
+\item{model}{chosen model of interest, either "CR" (Constant Rates), "ETD"
 (Examined Trait Diversification) or "CTD" ("Concealed Trait Diversification).}
 }
 \description{
@@ -21,7 +21,7 @@ between states, e.g. a species of observed state 0 generates daughter
 species with state 0 as well.
 }
 \examples{
-lambda_matrix <- 
+lambda_matrix <-
      create_default_lambda_transition_matrix(state_names = c(0, 1),
                                              model = "ETD")
 lambda_list <- create_lambda_list(state_names = c(0, 1),

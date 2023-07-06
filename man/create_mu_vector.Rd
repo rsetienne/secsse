@@ -13,7 +13,7 @@ create_mu_vector(state_names, num_concealed_states, model = "CR", lambda_list)
 
 \item{model}{model replicated, available are "CR", "ETD" and "CTD"}
 
-\item{lambda_list}{previously generated list of lambda matrices, 
+\item{lambda_list}{previously generated list of lambda matrices,
 used to infer the rate number to start with}
 }
 \value{

@@ -58,7 +58,7 @@ double calc_ll_cla(const Rcpp::List& ll,
   while (max_ances > (*states).size()) {
     (*states).push_back(add);
   }
-  (*states).push_back(add);
+  // (*states).push_back(add);
 
   std::vector< double > logliks(ances.size());
   std::vector<double> y;
