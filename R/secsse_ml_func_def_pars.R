@@ -180,8 +180,7 @@ secsse_ml_func_def_pars <- function(phy,
                    atol = atol,
                    rtol = rtol,
                    method = method))
-} 
-
+}
 
 #' Maximum likehood estimation under cla Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE) where some paramaters are
@@ -371,4 +370,4 @@ cla_secsse_ml_func_def_pars <- function(phy,
                    atol = atol,
                    rtol = rtol,
                    method = method))
-} 
+}

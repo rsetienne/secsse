@@ -123,7 +123,7 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4]))
   }
-  
+
   Ltable        <- res$ltable
 
   speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]

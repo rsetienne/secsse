@@ -198,8 +198,7 @@ master_eval <- function(parameter,
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   q_matrix <- parameter[[3]]
-  
-  
+
   check_input(traits,
               phy,
               sampling_fraction,
@@ -214,7 +213,7 @@ master_eval <- function(parameter,
 
   for_time <- setting_calculation$forTime
   ances <- setting_calculation$ances
-  
+
   if (is.list(lambdas)) {
     calcul <- c()
     ancescpp <- ances - 1
@@ -230,7 +229,9 @@ master_eval <- function(parameter,
                                          atol,
                                          rtol,
                                          is_complete_tree,
-                                         ifelse(is.null(num_steps), 0, num_steps),
+                                         ifelse(is.null(num_steps),
+                                                0,
+                                                num_steps),
                                          verbose)
   } else {
     calcul <- calThruNodes_store_cpp(ances,
@@ -250,9 +251,6 @@ master_eval <- function(parameter,
   # if the number of steps == NULL, pass a 0.
   return(calcul)
 }
-
-
-
 
 #' function to plot the local probability along the tree, including the branches
 #' @param parameters used parameters for the likelihood calculation
@@ -459,7 +457,7 @@ plot_state_exact_cla <- function(parameters,
                                  steps = 10,
                                  prob_func = NULL,
                                  verbose = FALSE) {
-  
+
   master_plot(parameters = parameters,
                      focal_tree = focal_tree,
                      traits = traits,
@@ -491,11 +489,11 @@ master_plot <- function(parameters,
                         steps = 10,
                         prob_func = NULL,
                         verbose = FALSE) {
-  
+
   if (is.null(prob_func)) {
     stop("need to set a probability function, check description to how")
   }
-  
+
   if (verbose) message("collecting all states on nodes")
   ll1 <-  master_loglik(parameter = parameters,
                          phy = focal_tree,
@@ -511,7 +509,7 @@ master_plot <- function(parameters,
                          atol = atol,
                          rtol = rtol,
                          method = method)
-  
+
   if (verbose) message("collecting branch likelihoods\n")
   eval_res <- master_eval(parameter = parameters,
                           phy = focal_tree,
@@ -528,26 +526,26 @@ master_plot <- function(parameters,
                           rtol = rtol,
                           method = method,
                           verbose = verbose)
-  
+
   if (verbose) message("\nconverting collected likelihoods
                        to graph positions:\n")
-  
+
   xs <- ape::node.depth.edgelength(focal_tree)
   ys <- ape::node.height(focal_tree)
   num_tips <- length(focal_tree$tip.label)
   num_nodes <- (1 + num_tips):length(ys)
-  
+
   nodes <- data.frame(x = xs, y = ys, n = c(1:num_tips, num_nodes))
-  
+
   to_plot <- eval_res
   if (is.list(parameters[[1]]))  to_plot[, c(1, 2)] <- to_plot[, c(1, 2)] + 1
-  
+
   for_plot <- collect_branches(to_plot, nodes, prob_func, verbose)
-  
+
   node_bars <- collect_node_bars(to_plot, nodes, prob_func, ll1)
-  
+
   if (verbose) message("\ngenerating ggplot object\n")
-  
+
   focal_plot <- make_ggplot(for_plot, node_bars)
   return(focal_plot)
 }
@@ -575,10 +573,9 @@ make_ggplot <- function(for_plot, node_bars) {
     ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                    axis.ticks.y = ggplot2::element_blank(),
                    axis.line.y = ggplot2::element_blank())
-  
+
   return(ggplot_plot)
 }
-
 
 #' @keywords internal
 collect_branches <- function(to_plot,
@@ -586,7 +583,7 @@ collect_branches <- function(to_plot,
                              prob_func,
                              verbose) {
   num_rows <- length(to_plot[, 1])
-  
+
   for_plot <- matrix(nrow = num_rows, ncol = 6)
   for_plot_cnt <- 1
   if (verbose) pb <- utils::txtProgressBar(max = length(unique(to_plot[, 1])),
@@ -595,7 +592,7 @@ collect_branches <- function(to_plot,
   for (parent in unique(to_plot[, 1])) {
     if (verbose) utils::setTxtProgressBar(pb, cnt)
     cnt <- cnt + 1
-    
+
     to_plot2 <- subset(to_plot, to_plot[, 1] == parent)
     for (daughter in unique(to_plot2[, 2])) {
       indices <- which(to_plot2[, 2] == daughter)
@@ -605,13 +602,12 @@ collect_branches <- function(to_plot,
         start_x <- nodes$x[which(nodes$n == parent)]
         end_x <- nodes$x[which(nodes$n == daughter)]
         y <- nodes$y[which(nodes$n == daughter)]
-        
+
         bl <- end_x - start_x
-        
+
         probs <- apply(focal_branch[, 4:length(focal_branch[1, ])],
                        1,
                        prob_func)
-        
         for (s in 1:(length(focal_branch[, 1]) - 1)) {
           x0 <- start_x + bl - focal_branch[s, 3]
           x1 <- start_x + bl - focal_branch[s + 1, 3]
@@ -624,7 +620,6 @@ collect_branches <- function(to_plot,
   }
   colnames(for_plot) <- c("x0", "x1", "y", "prob", "p", "d")
   for_plot <- tibble::as_tibble(for_plot)
-  
   return(for_plot)
 }
 
@@ -644,18 +639,13 @@ collect_node_bars <- function(to_plot,
       y <- c(y, nodes$y[nodes$n == daughters[i]])
     }
     y <- sort(y)
-    
+
     probs <- ll$states[parent, ]
     rel_prob <- prob_func(probs)
-    new_entry <- c(start_x, y, rel_prob)
-    if (length(new_entry) != 4) {
-      a <- 3 
-      cat(parent, new_entry, "\n")
-    }
     node_bars[node_bars_cnt, ] <- c(start_x, y, rel_prob)
     node_bars_cnt <- node_bars_cnt + 1
   }
-  
+
   colnames(node_bars) <- c("x", "y0", "y1", "prob")
   node_bars <- tibble::as_tibble(node_bars)
   return(node_bars)

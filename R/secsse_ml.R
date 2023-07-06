@@ -25,55 +25,16 @@ master_ml <- function(phy,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::bulirsch_stoer") {
-  
+
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
-    structure_func <- list()
-    structure_func[[1]] <- idparsfuncdefpar
-    structure_func[[2]] <- functions_defining_params
-    
-    # checks specific to when the user has specified factors:
-    
-    if (is.null(idfactorsopt) == FALSE) {
-      if (length(initfactors) != length(idfactorsopt)) {
-        stop("idfactorsopt should have the same length as initfactors.")
-      }
-    }
-    
-    if (is.list(functions_defining_params) == FALSE) {
-      stop(
-        "The argument functions_defining_params should be a list of 
-            functions. See example and vignette"
-      )
-    }
-    
-    if (length(functions_defining_params) != length(idparsfuncdefpar)) {
-      stop(
-        "The argument functions_defining_params should have the same 
-            length than idparsfuncdefpar"
-      )
-    }
-    
-    if (anyDuplicated(c(idparsopt, idparsfix, idparsfuncdefpar)) != 0) {
-      stop("At least one element was asked to be fixed, 
-             estimated or a function at the same time")
-    }
-    
-    if (identical(as.numeric(sort(
-      c(idparsopt, idparsfix, idparsfuncdefpar)
-    )), as.numeric(sort(unique(
-      unlist(idparslist)
-    )))) == FALSE) {
-      stop(
-        "All elements in idparslist must be included in either 
-            idparsopt or idparsfix or idparsfuncdefpar "
-      )
-    }
-    if (is.null(idfactorsopt)) {
-      structure_func[[3]] <- "noFactor"
-    } else {
-      structure_func[[3]] <- idfactorsopt
-    }
+    structure_func <- set_and_check_structure_func(idparsfuncdefpar,
+                                                   functions_defining_params,
+                                                   idparslist,
+                                                   idparsopt,
+                                                   idfactorsopt,
+                                                   idparsfix,
+                                                   initfactors)
   } else {
     if (identical(as.numeric(sort(c(idparsopt, idparsfix))),
                   as.numeric(sort(unique(unlist(idparslist))))) == FALSE) {
@@ -82,53 +43,31 @@ master_ml <- function(phy,
     }
   }
 
-  if (is.matrix(traits)) {
-    warning("you are setting a model where some species have more
-            than one trait state")
-  }
-
-  if (length(initparsopt) != length(idparsopt)) {
-    stop("initparsopt must be the same length as idparsopt.
-             Number of parameters to optimize does not match the number of
-             initial values for the search")
-  }
-
-  if (length(idparsfix) != length(parsfix)) {
-    stop("idparsfix and parsfix must be the same length.
-             Number of fixed elements does not match the fixed figures")
-  }
-
-  if (anyDuplicated(c(idparsopt, idparsfix)) != 0) {
-    stop("at least one element was asked to be both fixed and estimated ")
-  }
-
-  if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
-                      idparsfix[which(parsfix == 0)])) != 0) {
-    warning("Note: you set some transitions as impossible to happen.")
-  }
-
+  check_ml_conditions(traits,
+                      idparslist,
+                      initparsopt,
+                      idparsopt,
+                      idparsfix,
+                      parsfix)
+  
   if (is.matrix(idparslist[[1]])) {
     ## it is a tailor case otherwise
     idparslist[[1]] <- prepare_full_lambdas(traits,
                                             num_concealed_states,
                                             idparslist[[1]])
   }
-  
-  if (min(initparsopt) <= 0.0) {
-    stop("All elements in init_parsopt need to be larger than 0")
-  }
-  
-  see_ancestral_states <- FALSE
 
+ 
+
+  see_ancestral_states <- FALSE
   if (!is.null(structure_func)) {
     initparsopt <- c(initparsopt, initfactors)
   }
-    
+
   trparsopt <- initparsopt / (1 + initparsopt)
   trparsopt[which(initparsopt == Inf)] <- 1
   trparsfix <- parsfix / (1 + parsfix)
   trparsfix[which(parsfix == Inf)] <- 1
-  
 
   mus <- calc_mus(is_complete_tree,
                   idparslist,
@@ -137,9 +76,9 @@ master_ml <- function(phy,
                   idparsopt,
                   initparsopt)
   optimpars <- c(tol, maxiter)
-  
+
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
-  
+
   setting_calculation <- build_initStates_time(phy,
                                                traits,
                                                num_concealed_states,
@@ -147,7 +86,7 @@ master_ml <- function(phy,
                                                is_complete_tree,
                                                mus,
                                                num_modeled_traits)
-  
+
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,
                                         idparsopt = idparsopt,
@@ -340,7 +279,7 @@ secsse_ml <- function(phy,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::bulirsch_stoer") {
-  return(master_ml(phy = phy,
+  master_ml(phy = phy,
                    traits = traits,
                    num_concealed_states = num_concealed_states,
                    idparslist = idparslist,
@@ -348,6 +287,8 @@ secsse_ml <- function(phy,
                    initparsopt = initparsopt,
                    idparsfix = idparsfix,
                    parsfix = parsfix,
+                   initfactors = NULL,
+                   idparsfuncdefpar = NULL,
                    cond = cond,
                    root_state_weight = root_state_weight,
                    sampling_fraction = sampling_fraction,
@@ -361,7 +302,7 @@ secsse_ml <- function(phy,
                    num_threads = num_threads,
                    atol = atol,
                    rtol = rtol,
-                   method = method))   
+                   method = method)
 }
 
 #' @keywords internal
@@ -393,7 +334,7 @@ secsse_loglik_choosepar <- function(trparsopt,
     pars1 <- secsse_transform_parameters(trparsopt, trparsfix,
                                          idparsopt, idparsfix,
                                          idparslist, structure_func)
-    
+
     loglik <- master_loglik(parameter = pars1,
                             phy = phy,
                             traits = traits,
@@ -415,7 +356,7 @@ secsse_loglik_choosepar <- function(trparsopt,
                             method = method,
                             atol = atol,
                             rtol = rtol)
-    
+
     if (is.nan(loglik) || is.na(loglik)) {
       warning("There are parameter values used which cause
                 numerical problems.")
@@ -546,30 +487,26 @@ cla_secsse_ml <- function(phy,
                           atol = 1e-8,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer") {
-  return(master_ml(phy = phy,
-                   traits = traits,
-                   num_concealed_states = num_concealed_states,
-                   idparslist = idparslist,
-                   idparsopt = idparsopt,
-                   initparsopt = initparsopt,
-                   idparsfix = idparsfix,
-                   parsfix = parsfix,
-                   cond = cond,
-                   root_state_weight = root_state_weight,
-                   sampling_fraction = sampling_fraction,
-                   tol = tol,
-                   maxiter = maxiter,
-                   optimmethod = optimmethod,
-                   num_cycles = num_cycles,
-                   loglik_penalty = loglik_penalty,
-                   is_complete_tree = is_complete_tree,
-                   verbose = verbose,
-                   num_threads = num_threads,
-                   atol = atol,
-                   rtol = rtol,
-                   method = method))   
+  master_ml(phy = phy,
+            traits = traits,
+            num_concealed_states = num_concealed_states,
+            idparslist = idparslist,
+            idparsopt = idparsopt,
+            initparsopt = initparsopt,
+            idparsfix = idparsfix,
+            parsfix = parsfix,
+            cond = cond,
+            root_state_weight = root_state_weight,
+            sampling_fraction = sampling_fraction,
+            tol = tol,
+            maxiter = maxiter,
+            optimmethod = optimmethod,
+            num_cycles = num_cycles,
+            loglik_penalty = loglik_penalty,
+            is_complete_tree = is_complete_tree,
+            verbose = verbose,
+            num_threads = num_threads,
+            atol = atol,
+            rtol = rtol,
+            method = method)
 }
-
-
-
-
