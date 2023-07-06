@@ -66,7 +66,7 @@ q_matrix
 
 ## ----ETD_ML_init--------------------------------------------------------------
 idparsopt <- 1:8 # our maximum rate parameter was 8
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -134,7 +134,7 @@ q_matrix
 
 ## ----CTD_ML-------------------------------------------------------------------
 idparsopt <- 1:8 # our maximum rate parameter was 8
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -198,7 +198,7 @@ q_matrix
 
 ## ----CR_ML--------------------------------------------------------------------
 idparsopt <- 1:6 # our maximum rate parameter was 6
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 6)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)

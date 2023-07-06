@@ -138,7 +138,7 @@ speciation, extinction and trait-shifts respectively.
 Speciation in a secsse model is defined using a list of matrices, where
 each matrix highlights the state of the daughter species resulting from
 a speciation event. In our case, we have a trait with two states, and
-thus we will require to specify a list with two matrices, one for each
+thus we will have to specify a list with two matrices, one for each
 state, where each matrix in turn will then specify the daughter states.
 We can do so by hand, but secsse includes functionality to do this in a
 more organized manner - this is especially useful if you have a trait
@@ -196,8 +196,8 @@ mu_vec
 ```
 
 The function `create_mus_vector()` takes the same standard information we
-provided earlier, with as addition our previously made lambda_list. It uses the
-lambda_list to identify the rate indicators (in this case 1 and 2) that
+provided earlier, with as addition our previously made `lambda_list`. It uses the
+`lambda_list` to identify the rate indicators (in this case 1 and 2) that
 are already used and to thus pick new rates. We see that secsse has
 created a named vector with two extinction rates (3 and 4), which are
 associated with our observed traits 0 and 1.
@@ -212,8 +212,8 @@ transitions between examined states. The information contained in this
 `shift_matrix` is then automatically mimicked for inclusion in the full matrix,
 to ensure that the same complexity in examined state transitions is also found
 in concealed states. 
-Instead of specifying the entire `shift_matrix`, instead we can suffice with
-only specifying the non-zero transitions. In this case these are from state 0 
+Instead of specifying the entire `shift_matrix`, instead it suffices to
+only specify the non-zero transitions. In this case these are from state 0 
 to 1, and vice versa:
 
 ```{r ETD_Q}
@@ -230,9 +230,9 @@ q_matrix
 
 Thus, we first specify a matrix containing the potential state
 transitions, here 0-\>1 and 1-\>0. Then, we use
-`create_q_matrix` to create the q-matrix. By setting
-`diff.conceal` to TRUE, we ensure that the concealed states will get
-their own rates specified. Setting this to FALSE would set their rates
+`create_q_matrix*(` to create the q-matrix. By setting
+`diff.conceal` to `TRUE`, we ensure that the concealed states will get
+their own rates specified. Setting this to `FALSE` would set their rates
 equal to the observed rates (5 and 6). The way to read the transition
 matrix is column-row, e.g. starting at state 0A, with rate 5 the species
 will shift to state 1A and with rate 7 it will shift to state 0B. We
@@ -244,13 +244,13 @@ trans_matrix by hand of course.
 #### Maximum Likelihood
 
 We have now specified the required ingredients to perform Maximum
-Likelihood. Prerequisite for performing Maximum Likelihood with secsse
-is that we specify the ids of the rates we want optimized, and provide
+Likelihood analyses. Prerequisites for performing Maximum Likelihood analyses with secsse
+are that we specify the ids of the rates we want optimized, and provide
 initial values. We can do so as follows:
 
 ```{r ETD_ML_init}
 idparsopt <- 1:8 # our maximum rate parameter was 8
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -308,7 +308,7 @@ Q_Examined
 Q_Concealed
 ```
 
-The function `extract_par_vals` goes over the list `answ$MLpars` and
+The function `extract_par_vals()` goes over the list `answ$MLpars` and
 places the found parameter values back in consecutive vector 1:8 in this
 case. Here, we find that the speciation rate of trait 1 is higher than
 the speciation rate of trait 0.
@@ -337,7 +337,7 @@ lambda_list <- secsse::create_lambda_list(state_names = c(0, 1),
 lambda_list
 ```
 
-The resulting lambda_list now has the chosen rates 1 and 2 sorted
+The resulting `lambda_list` now has the chosen rates 1 and 2 sorted
 differently across the matrices, with matrices 1 and 2 containing rate
 1, and matrices 3 and 4 containing rate 2. Looking at the column names
 of the matrices, states 1 and 2 are states 0A and 1A, and states 3 and 4
@@ -386,7 +386,7 @@ used for the ETD model to perform our maximum likelihood:
 
 ```{r CTD_ML}
 idparsopt <- 1:8 # our maximum rate parameter was 8
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -490,7 +490,7 @@ q_matrix
 
 ```{r CR_ML}
 idparsopt <- 1:6 # our maximum rate parameter was 6
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 6)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -548,16 +548,16 @@ model, which we have correctly recovered!
 
 ## Further help
 
-For more advanced settings and shortcut functions to set up a secsse analysis,
-please see the vignette setting_up_secsse.
-
 If after reading these vignettes, you still have questions, please feel free to
-e-mail the authors for help with this R package.
+create an issue at the package's GitHub repository
+https://github.com/rsetienne/secsse/issues or e-mail the authors for help with 
+this R package. Additionally, bug reports and feature requests are welcome by
+the same means.
 
 =======
 ## References 
 
-Beaulieu, J. M., O'meara, B. C., & Donoghue, M. J. (2013). Identifying hidden
+Beaulieu, J. M., O'Meara, B. C., & Donoghue, M. J. (2013). Identifying hidden
 rate changes in the evolution of a binary morphological character: the evolution
 of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.
 
