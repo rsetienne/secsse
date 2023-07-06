@@ -12,7 +12,7 @@ secsse_sim(
   num_concealed_states,
   pool_init_states = NULL,
   maxSpec = 1e+05,
-  conditioning = "none",
+  conditioning = "obs_states",
   non_extinction = TRUE,
   verbose = FALSE,
   max_tries = 1e+06,

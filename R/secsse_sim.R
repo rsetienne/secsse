@@ -48,7 +48,7 @@ secsse_sim <- function(lambdas,
                        num_concealed_states,
                        pool_init_states = NULL,
                        maxSpec = 1e5,
-                       conditioning = "none",
+                       conditioning = "obs_states",
                        non_extinction = TRUE,
                        verbose = FALSE,
                        max_tries = 1e6,
@@ -114,6 +114,16 @@ secsse_sim <- function(lambdas,
                 conditioning = res$tracker[4]))
   }
 
+  if (sum(res$tracker) >= max_tries) {
+    warning("Couldn't simulate a tree in enough tries,
+            try increasing max_tries")
+    return(list(phy = "ds",
+                traits = 0,
+                extinct = res$tracker[2],
+                overshoot = res$tracker[3],
+                conditioning = res$tracker[4]))
+  }
+  
   Ltable        <- res$ltable
 
   speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
