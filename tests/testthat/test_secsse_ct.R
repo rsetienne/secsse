@@ -103,17 +103,17 @@ test_that("the loglik for the complete tree", {
   parameter <- toCheck
   parameter[[1]] <- lambdas
 
-  loglik7 <- cla_secsse_loglik(parameter = parameter,
-                               phy = phy,
-                               traits = traits,
-                               num_concealed_states = num_concealed_states,
-                               cond = cond,
-                               root_state_weight = root_state_weight,
-                               sampling_fraction = sampling_fraction,
-                               setting_calculation = NULL,
-                               see_ancestral_states = FALSE,
-                               loglik_penalty = 0,
-                               is_complete_tree = TRUE)
+  loglik7 <- secsse_loglik(parameter = parameter,
+                           phy = phy,
+                           traits = traits,
+                           num_concealed_states = num_concealed_states,
+                           cond = cond,
+                           root_state_weight = root_state_weight,
+                           sampling_fraction = sampling_fraction,
+                           setting_calculation = NULL,
+                           see_ancestral_states = FALSE,
+                           loglik_penalty = 0,
+                           is_complete_tree = TRUE)
   testthat::expect_equal(loglik7, loglik5) # not true ?
 
   # Parallel code doesn't work on CI
@@ -131,14 +131,14 @@ test_that("the loglik for the complete tree", {
                                       num_threads = 4))
   testthat::expect_equal(loglik6, loglik5, tolerance = 1E-4)
 
-  loglik8 <- cla_secsse_loglik(parameter = parameter,
-                               phy = phy,
-                               traits = traits,
-                               num_concealed_states = num_concealed_states,
-                               cond = cond,
-                               root_state_weight = root_state_weight,
-                               sampling_fraction = sampling_fraction,
-                               is_complete_tree = TRUE,
-                               num_threads = 4)
+  loglik8 <- secsse_loglik(parameter = parameter,
+                           phy = phy,
+                           traits = traits,
+                           num_concealed_states = num_concealed_states,
+                           cond = cond,
+                           root_state_weight = root_state_weight,
+                           sampling_fraction = sampling_fraction,
+                           is_complete_tree = TRUE,
+                           num_threads = 4)
   testthat::expect_equal(loglik8, loglik7, tolerance = 1e-5)
 })

@@ -70,33 +70,33 @@ test_that("secsse gives the same result as GeoSSE", {
          setting_calculation$states[, c(1, 2, 3, 10, 11, 12)]
 
 
-    secsse_cla_LL <- cla_secsse_loglik(parameter,
-                                       example_phy_GeoSSE,
-                                       traits,
-                                       num_concealed_states,
-                                       cond = "maddison_cond",
-                                       root_state_weight = "maddison_weights",
-                                       sampling_fraction = c(1, 1, 1),
-                                      setting_calculation = setting_calculation,
-                                       see_ancestral_states = FALSE,
-                                       loglik_penalty = 0)
+    secsse_cla_LL <- secsse_loglik(parameter,
+                                   example_phy_GeoSSE,
+                                   traits,
+                                   num_concealed_states,
+                                   cond = "maddison_cond",
+                                   root_state_weight = "maddison_weights",
+                                   sampling_fraction = c(1, 1, 1),
+                                   setting_calculation = setting_calculation,
+                                   see_ancestral_states = FALSE,
+                                   loglik_penalty = 0)
 
     testthat::expect_equal(classe_diversitree_LL,  secsse_cla_LL,
                            tolerance = 1e-5)
 
     # Parallel code doesn't work on CI
     testthat::skip_on_cran()
-    secsse_cla_LL3 <- cla_secsse_loglik(parameter,
-                                        example_phy_GeoSSE,
-                                        traits,
-                                        num_concealed_states,
-                                        cond = "maddison_cond",
-                                        root_state_weight = "maddison_weights",
-                                        sampling_fraction = c(1, 1, 1),
-                                      setting_calculation = setting_calculation,
-                                        see_ancestral_states = FALSE,
-                                        loglik_penalty = 0,
-                                        num_threads = 4)
+    secsse_cla_LL3 <- secsse_loglik(parameter,
+                                    example_phy_GeoSSE,
+                                    traits,
+                                    num_concealed_states,
+                                    cond = "maddison_cond",
+                                    root_state_weight = "maddison_weights",
+                                    sampling_fraction = c(1, 1, 1),
+                                    setting_calculation = setting_calculation,
+                                    see_ancestral_states = FALSE,
+                                    loglik_penalty = 0,
+                                    num_threads = 4)
     testthat::expect_equal(classe_diversitree_LL, secsse_cla_LL3,
                            tolerance = 1e-5)
   }

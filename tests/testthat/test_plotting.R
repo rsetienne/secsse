@@ -85,15 +85,15 @@ test_that("cla plotting", {
   }
 
   testthat::expect_silent(
-    px <- secsse::plot_state_exact_cla(parameters = model_R$MLpars,
-                                       focal_tree = phylotree,
-                                       traits = traits,
-                                       num_concealed_states =
-                                         num_concealed_states,
-                                       sampling_fraction = sampling_fraction,
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       prob_func = helper_function)
+    px <- secsse::plot_state_exact(parameters = model_R$MLpars,
+                                   focal_tree = phylotree,
+                                   traits = traits,
+                                   num_concealed_states =
+                                   num_concealed_states,
+                                   sampling_fraction = sampling_fraction,
+                                   cond = cond,
+                                   root_state_weight = root_state_weight,
+                                   prob_func = helper_function)
   )
 
   testthat::expect_true(inherits(px, "ggplot"))
