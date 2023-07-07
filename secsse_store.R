@@ -4,7 +4,7 @@ library(RcppParallel)
 rm(list = ls())
 set.seed(42)
 #set.seed(51)
-out <- DDD::dd_sim(pars = c(0.5 , 0.3, 10000), age = 30)
+out <- DDD::dd_sim(pars = c(0.5 , 0.3, 10000), age = 50)
 num_steps = 100
 
 phy <- out$tes
