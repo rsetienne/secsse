@@ -1,8 +1,7 @@
 # Breaking changes 
 
-* The `num_threads = NULL` is gone. This value defaults to `100` in `secsse_loglik_eval` now.
+* The `num_threads = NULL` is gone. This value defaults to arbitrary `100` in `secsse_loglik_eval` now.
 * `eval_cpp` returns a `List` [[output]],[[states]],[[duration]].
-* Some superfluous wrapper (`master_xyz`) might still lingering in the code.
 
 # Remaining issues
 
