@@ -74,7 +74,7 @@ Default is one thread.}
 The loglikelihood of the data given the parameter.
 }
 \description{
-Logikelihood calculation for the SecSSE model given a set of parameters and
+Loglikelihood calculation for the SecSSE model given a set of parameters and
 data
 }
 \note{

@@ -9,18 +9,17 @@ secsse_loglik_eval(
   phy,
   traits,
   num_concealed_states,
-  ancestral_states,
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   sampling_fraction,
   setting_calculation = NULL,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
+  num_threads = 1,
   atol = 1e-08,
   rtol = 1e-07,
   method = "odeint::bulirsch_stoer",
-  num_steps = NULL,
-  verbose = FALSE
+  num_steps = 100
 )
 }
 \arguments{
@@ -35,9 +34,6 @@ tree tips, for help, see vignette.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to number of examined states.}
-
-\item{ancestral_states}{ancestral states matrix provided by
-secsse_loglik, this is used as starting points for the branch integration}
 
 \item{cond}{condition on the existence of a node root: "maddison_cond",
 "proper_cond"(default). For details, see vignette.}
@@ -58,6 +54,9 @@ It should be left blank (default : setting_calculation = NULL)}
 \item{is_complete_tree}{whether or not a tree with all its extinct species
 is provided}
 
+\item{num_threads}{number of threads. Set to -1 to use all available threads.
+Default is one thread.}
+
 \item{atol}{absolute tolerance of integration}
 
 \item{rtol}{relative tolerance of integration}
@@ -68,9 +67,7 @@ is provided}
 "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
 
 \item{num_steps}{number of substeps to show intermediate likelihoods
-along a branch, if left to NULL, the intermediate likelihoods at every
-integration evaluation are stored, which is more exact, but can lead to
-huge datasets / memory usage.}
+along a branch.}
 
 \item{verbose}{provides intermediate output if TRUE}
 }

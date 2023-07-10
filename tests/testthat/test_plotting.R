@@ -1,7 +1,6 @@
 context("visualisation")
 
 test_that("normal plotting", {
-
    set.seed(5)
    focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
    traits <- c(0, 1, 1, 0)

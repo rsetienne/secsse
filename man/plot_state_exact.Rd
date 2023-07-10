@@ -16,7 +16,7 @@ plot_state_exact(
   method = "odeint::bulirsch_stoer",
   atol = 1e-16,
   rtol = 1e-16,
-  steps = NULL,
+  steps = 100,
   prob_func = NULL,
   verbose = FALSE
 )

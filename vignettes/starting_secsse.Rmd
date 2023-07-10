@@ -27,7 +27,7 @@ read.csv() function. and should look like this:
 ```{r}
 library(secsse)
 data(traits)
-tail(traits) # NOTE: Data file is different? trait column only has 0 and 1
+tail(traits)
 ```
 
 This data set (here we see only the bottom lines of the data frame) has two character states labeled as 0 and 1. Ambiguity about trait state (you are not

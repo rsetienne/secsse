@@ -1,5 +1,3 @@
-library(secsse)
-library(RcppParallel)
 
 rm(list = ls())
 set.seed(42)
