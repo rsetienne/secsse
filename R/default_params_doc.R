@@ -33,7 +33,7 @@
 #'   tolerance, equal to the starting values, with a maximum of 10 cycles. 
 #' @param is_complete_tree logical specifying whether or not a tree with all its
 #'   extinct species is provided. If set to `TRUE`, it also assumes that all 
-#'   \emph{all} extinct lineages are present on the tree. Defaults to `FALSE`.
+#'   *all* extinct lineages are present on the tree. Defaults to `FALSE`.
 #' @param verbose sets verbose output; default is verbose when optimmethod is
 #'   `'subplex'`.
 #' @param num_threads number of threads. Set to -1 to use all available threads.

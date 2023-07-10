@@ -25,7 +25,7 @@ cla_secsse_loglik(
 \arguments{
 \item{parameter}{list where the first is a table where lambdas across
 different modes of speciation are shown, the second mus and the third
- transition rates.}
+transition rates.}
 
 \item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved,
 rooted and with branch lengths.}
@@ -40,7 +40,7 @@ to number of examined states.}
 'proper_cond'(default). For details, see vignette.}
 
 \item{root_state_weight}{the method to weigh the states:'maddison_weights
- or 'proper_weights'(default) oIt can also be specified the
+or 'proper_weights'(default) oIt can also be specified the
 root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per trait
