@@ -76,7 +76,7 @@ secsse_loglik_eval <- function(parameter,
 #' Plot the local probability along the tree, including the branches
 #' 
 #' @details This function will evaluate the log likelihood locally along
-#' all branches and plot the result. When steps is left to `NULL`, all 
+#' all branches and plot the result. When `num_steps` is left to `NULL`, all 
 #' likelihood evaluations during integration are used for plotting. This may 
 #' work for not too large trees, but may become very memory heavy for larger 
 #' trees. Instead, the user can indicate a number of steps, which causes the 
@@ -92,10 +92,10 @@ secsse_loglik_eval <- function(parameter,
 #' `'see_ancestral_states = TRUE'`). Please note that the first N columns of the
 #' states matrix are the extinction rates, and the `(N+1):2N` columns belong to
 #' the speciation rates, where `N = num_obs_states * num_concealed_states`.
-#'  A typical `prob_func` function will look like:
-#'  ```
+#' A typical `prob_func` function will look like:
+#' ```
 #' my_prob_func <- function(x) {
-#'  return(sum(x[5:8]) / sum(x))
+#'   return(sum(x[5:8]) / sum(x))
 #' }
 #' ```
 #' 
@@ -124,7 +124,7 @@ secsse_loglik_eval <- function(parameter,
 #'                              traits = traits,
 #'                              num_concealed_states = 2,
 #'                              sampling_fraction = c(1, 1),
-#'                              steps = 10,
+#'                              num_steps = 10,
 #'                              prob_func = helper_function)
 #' @export
 plot_state_exact <- function(parameters,
@@ -138,7 +138,7 @@ plot_state_exact <- function(parameters,
                              method = "odeint::bulirsch_stoer",
                              atol = 1e-16,
                              rtol = 1e-16,
-                             steps = 100,
+                             num_steps = 100,
                              prob_func = NULL,
                              verbose = FALSE) {
   if (is.null(prob_func)) {
@@ -152,7 +152,7 @@ plot_state_exact <- function(parameters,
                                   num_concealed_states,
                                  cond = cond,
                                  root_state_weight = root_state_weight,
-                                 num_steps = steps,
+                                 num_steps = num_steps,
                                  sampling_fraction = sampling_fraction,
                                  is_complete_tree = is_complete_tree,
                                  atol = atol,

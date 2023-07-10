@@ -84,7 +84,7 @@ the speciation rates, where \code{N = num_obs_states * num_concealed_states}.
 A typical \code{prob_func} function will look like:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{my_prob_func <- function(x) \{
-return(sum(x[5:8]) / sum(x))
+  return(sum(x[5:8]) / sum(x))
 \}
 }\if{html}{\out{</div>}}
 }

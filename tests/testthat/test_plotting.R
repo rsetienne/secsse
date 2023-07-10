@@ -22,7 +22,7 @@ test_that("normal plotting", {
                     traits = traits,
                     num_concealed_states = 2,
                     sampling_fraction = c(1, 1),
-                    steps = 10,
+                    num_steps = 10,
                     prob_func = helper_function)
   )
    testthat::expect_true(inherits(px, "ggplot"))
