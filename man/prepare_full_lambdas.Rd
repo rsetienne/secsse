@@ -7,11 +7,12 @@
 prepare_full_lambdas(traits, num_concealed_states, lambd_and_modeSpe)
 }
 \arguments{
-\item{traits}{vector with trait states, order of states must be the same as
-tree tips, for help, see vignette.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
-to number of examined states.}
+to the number of examined states in the dataset.}
 
 \item{lambd_and_modeSpe}{a matrix with the 4 models of speciation possible.}
 }

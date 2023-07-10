@@ -41,11 +41,6 @@ to the number of examined states in the dataset.}
 \item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
 \code{"proper_cond"} (default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:
-\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
-It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state.}
-
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states.}
 

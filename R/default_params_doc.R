@@ -11,25 +11,18 @@
 #' @param num_concealed_states number of concealed states, generally equivalent
 #'   to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
-#' @param idparsopt a numeric vector with the ID of parameters to be estimated.
 #' @param initparsopt a numeric vector with the initial guess of the parameters 
 #'   to be estimated.
 #' @param idparsfix a numeric vector with the ID of the fixed parameters.
 #' @param parsfix a numeric vector with the value of the fixed parameters.
 #' @param cond condition on the existence of a node root: `"maddison_cond"`,
 #'   `"proper_cond"` (default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:
-#'   `"maddison_weights"`, `"proper_weights"` (default) or `"equal_weights"`.
-#'   It can also be specified for the root state: the vector `c(1, 0, 0)` 
-#'   indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per
 #'   trait state. It must have as many elements as there are trait states.
 #' @param tol A numeric vector with the maximum tolerance of the optimization 
 #'   algorithm. Default is `c(1e-04, 1e-05, 1e-05)`.
 #' @param maxiter max number of iterations. Default is
 #'   `1000 * round((1.25) ^ length(idparsopt))`.
-#' @param optimmethod method used for optimization. Available are simplex and
-#'   subplex, default is `"subplex"`. Simplex should only be used for debugging.
 #' @param num_cycles Number of cycles of the optimization. When set to `Inf`, 
 #'   the optimization will be repeated until the result is, within the 
 #'   tolerance, equal to the starting values, with a maximum of 10 cycles. 
@@ -89,6 +82,12 @@
 #'   examined states.
 #' @param trait_info data frame where first column has species ids and the second
 #'   one is the trait associated information.
+#' @param optimmethod A string with method used for optimization. Default is 
+#'   `"subplex"`. Alternative is `"simplex"` and it shouldn't be used in normal 
+#'   conditions (only for debugging). Both are called from [DDD:optimizer()], 
+#'   simplex is implemented natively in [DDD], while subplex is ultimately
+#'   called from [subplex::subplex()].
+#' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
 #'
 #' @return Nothing
 #' @keywords internal
@@ -105,7 +104,7 @@ default_params_doc <- function(phy,
                                tol,
                                maxiter,
                                optimethod,
-                               num_cyles,
+                               num_cycles,
                                loglik_penalty,
                                is_complete_tree,
                                verbose,
@@ -132,6 +131,7 @@ default_params_doc <- function(phy,
                                parameters,
                                masterBlock,
                                diff.conceal,
-                               trait_info) {
+                               trait_info,
+                               lambd_and_modeSpe) {
   # Nothing
 }

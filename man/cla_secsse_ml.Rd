@@ -44,8 +44,6 @@ to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
 
-\item{idparsopt}{a numeric vector with the ID of parameters to be estimated.}
-
 \item{initparsopt}{a numeric vector with the initial guess of the parameters
 to be estimated.}
 
@@ -56,11 +54,6 @@ to be estimated.}
 \item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
 \code{"proper_cond"} (default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:
-\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
-It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state.}
-
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states.}
 
@@ -70,8 +63,11 @@ algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 \item{maxiter}{max number of iterations. Default is
 \code{1000 * round((1.25) ^ length(idparsopt))}.}
 
-\item{optimmethod}{method used for optimization. Available are simplex and
-subplex, default is \code{"subplex"}. Simplex should only be used for debugging.}
+\item{optimmethod}{A string with method used for optimization. Default is
+\code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
+conditions (only for debugging). Both are called from \code{\link[=DDD:optimizer]{DDD:optimizer()}},
+simplex is implemented natively in \link{DDD}, while subplex is ultimately
+called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
 the optimization will be repeated until the result is, within the

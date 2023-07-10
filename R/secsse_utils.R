@@ -223,18 +223,17 @@ sortingtraits <- function(trait_info, phy) {
     return(traits)
 }
 
-#' It sets the parameters (speciation, extinction and transition)
-#' ids. Needed for ML calculation with cladogenetic options (cla_secsse_ml)
 #' @title Parameter structure setting for cla_secsse
-#' @param traits vector with trait states, order of states must be the same as
-#' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to number of examined states.
+#' It sets the parameters (speciation, extinction and transition)
+#' IDs. Needed for ML calculation with cladogenetic options (cla_secsse_ml)
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return A list that includes the ids of the parameters for ML analysis.
 #' @examples
 #'traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
 #'num_concealed_states <- 3
-#'param_posit <- cla_id_paramPos(traits,num_concealed_states)
+#'param_posit <- cla_id_paramPos(traits, num_concealed_states)
 #' @export
 cla_id_paramPos <- function(traits, num_concealed_states) {
     idparslist <- list()
@@ -288,11 +287,9 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
 
 #' It provides the set of matrices containing all the speciation rates
 #' @title Prepares the entire set of lambda matrices for cla_secsse.
-#' @param traits vector with trait states, order of states must be the same as
-#' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to number of examined states.
-#' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return A list of lambdas, its length would be the same than the number of
 #' trait states * num_concealed_states..
 #' @export

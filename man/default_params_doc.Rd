@@ -17,7 +17,7 @@ default_params_doc(
   tol,
   maxiter,
   optimethod,
-  num_cyles,
+  num_cycles,
   loglik_penalty,
   is_complete_tree,
   verbose,
@@ -44,7 +44,8 @@ default_params_doc(
   parameters,
   masterBlock,
   diff.conceal,
-  trait_info
+  trait_info,
+  lambd_and_modeSpe
 )
 }
 \arguments{
@@ -78,6 +79,10 @@ algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 
 \item{maxiter}{max number of iterations. Default is
 \code{1000 * round((1.25) ^ length(idparsopt))}.}
+
+\item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
+the optimization will be repeated until the result is, within the
+tolerance, equal to the starting values, with a maximum of 10 cycles.}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is
 0 (no penalty).}
@@ -162,19 +167,13 @@ examined states.}
 \item{trait_info}{data frame where first column has species ids and the second
 one is the trait associated information.}
 
-\item{idparsopt}{a numeric vector with the ID of parameters to be estimated.}
+\item{lambd_and_modeSpe}{a matrix with the 4 models of speciation possible.}
 
-\item{root_state_weight}{the method to weigh the states:
-\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
-It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state.}
-
-\item{optimmethod}{method used for optimization. Available are simplex and
-subplex, default is \code{"subplex"}. Simplex should only be used for debugging.}
-
-\item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
-the optimization will be repeated until the result is, within the
-tolerance, equal to the starting values, with a maximum of 10 cycles.}
+\item{optimmethod}{A string with method used for optimization. Default is
+\code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
+conditions (only for debugging). Both are called from \code{\link[=DDD:optimizer]{DDD:optimizer()}},
+simplex is implemented natively in \link{DDD}, while subplex is ultimately
+called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 }
 \value{
 Nothing
