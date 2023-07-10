@@ -1,37 +1,9 @@
+#' @title Likelihood for SecSSE model
 #' Logikelihood calculation for the SecSSE model given a set of parameters and
 #' data, returning also the likelihoods along the branches
-#' @title Likelihood for SecSSE model
-#' @param parameter list where first vector represents lambdas, the second mus
-#' and the third transition rates.
-#' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
-#' rooted and with branch lengths.
-#' @param traits vector with trait states, order of states must be the same as
-#' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to number of examined states.
-#' @param cond condition on the existence of a node root: "maddison_cond",
-#' "proper_cond"(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:"maddison_weights",
-#' "proper_weights"(default) or "equal_weights". It can also be specified the
-#' root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per
-#' trait state. It must have as many elements as trait states.
-#' @param setting_calculation argument used internally to speed up calculation.
-#' It should be left blank (default : setting_calculation = NULL)
-#' @param loglik_penalty the size of the penalty for all parameters; default is
-#' 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species
-#' is provided
-#' @param num_threads number of threads. Set to -1 to use all available threads.
-#' Default is one thread.
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
-#' @param num_steps number of substeps to show intermediate likelihoods
-#' along a branch.
+#'
+#' @inheritParams default_params_doc
+#'
 #' @return A list containing: "output", observed states along evaluated time
 #' points along all branches, used for plotting. "states" all ancestral states
 #' on the nodes and "duration", indicating the time taken for the total
@@ -99,7 +71,7 @@ secsse_loglik_eval <- function(parameter,
            num_steps = num_steps)
 }
 
-#' function to plot the local probability along the tree, including the branches
+#' Plot the local probability along the tree, including the branches
 #' @param parameters used parameters for the likelihood calculation
 #' @param focal_tree used phylogeny
 #' @param traits used traits

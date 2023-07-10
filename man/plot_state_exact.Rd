@@ -2,7 +2,7 @@
 % Please edit documentation in R/seccse_plot.R
 \name{plot_state_exact}
 \alias{plot_state_exact}
-\title{function to plot the local probability along the tree, including the branches}
+\title{Plot the local probability along the tree, including the branches}
 \usage{
 plot_state_exact(
   parameters,

@@ -2,7 +2,9 @@
 % Please edit documentation in R/seccse_plot.R
 \name{secsse_loglik_eval}
 \alias{secsse_loglik_eval}
-\title{Likelihood for SecSSE model}
+\title{Likelihood for SecSSE model
+Logikelihood calculation for the SecSSE model given a set of parameters and
+data, returning also the likelihoods along the branches}
 \usage{
 secsse_loglik_eval(
   parameter,
@@ -23,48 +25,49 @@ secsse_loglik_eval(
 )
 }
 \arguments{
-\item{parameter}{list where first vector represents lambdas, the second mus
-and the third transition rates.}
+\item{parameter}{list where first vector represents lambdas, the second 
+mus and the third transition rates.}
 
-\item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved,
-rooted and with branch lengths.}
+\item{phy}{phylogenetic tree of class `phylo`, ultrametric, rooted and with
+branch lengths.}
 
-\item{traits}{vector with trait states, order of states must be the same as
-tree tips, for help, see vignette.}
+\item{traits}{a vector with trait states for each tip in the phylogeny.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
-to number of examined states.}
+to the number of examined states in the dataset.}
 
-\item{cond}{condition on the existence of a node root: "maddison_cond",
-"proper_cond"(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: `"maddison_cond"`,
+`"proper_cond"` (default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:"maddison_weights",
-"proper_weights"(default) or "equal_weights". It can also be specified the
-root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:
+`"maddison_weights"`, `"proper_weights"` (default) or `"equal_weights"`.
+It can also be specified for the root state: the vector `c(1, 0, 0)` 
+indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
-trait state. It must have as many elements as trait states.}
+trait state. It must have as many elements as there are trait states.}
 
 \item{setting_calculation}{argument used internally to speed up calculation.
-It should be left blank (default : setting_calculation = NULL)}
+It should be left blank (default : `setting_calculation = NULL`).}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is
-0 (no penalty)}
+0 (no penalty).}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species
-is provided}
+\item{is_complete_tree}{logical specifying whether or not a tree with all its
+extinct species is provided. If set to `TRUE`, it also assumes that all 
+\emph{all} extinct lineages are present on the tree. Defaults to `FALSE`.}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
 
-\item{atol}{absolute tolerance of integration}
+\item{atol}{A numeric specifying the absolute tolerance of integration.}
 
-\item{rtol}{relative tolerance of integration}
+\item{rtol}{A numeric specifying the relative tolerance of integration.}
 
 \item{method}{integration method used, available are:
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
+`"odeint::runge_kutta_cash_karp54"`, `"odeint::runge_kutta_fehlberg78"`,
+`"odeint::runge_kutta_dopri5"`, `"odeint::bulirsch_stoer"` and
+`"odeint::runge_kutta4"`. Default method is: `"odeint::bulirsch_stoer"`.}
 
 \item{num_steps}{number of substeps to show intermediate likelihoods
 along a branch.}
@@ -76,6 +79,7 @@ on the nodes and "duration", indicating the time taken for the total
 evaluation
 }
 \description{
+Likelihood for SecSSE model
 Logikelihood calculation for the SecSSE model given a set of parameters and
 data, returning also the likelihoods along the branches
 }
