@@ -6,10 +6,10 @@ library(secsse)
 
 ## ----starting_conditions------------------------------------------------------
 set.seed(5)
-focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
 
-plot(focal_tree)
+plot(phy)
 
 ## ----simple likelihood--------------------------------------------------------
 params <- secsse::id_paramPos(c(0, 1), 2)
@@ -20,7 +20,7 @@ diag(params[[3]]) <- NA
 
 
 ll <- secsse::secsse_loglik(parameter = params,
-                             phy = focal_tree,
+                             phy = phy,
                              traits = traits,
                              num_concealed_states = 2,
                              see_ancestral_states = TRUE,
@@ -37,14 +37,14 @@ helper_function <- function(x) {
 
 ## ----exact--------------------------------------------------------------------
 secsse::plot_state_exact(parameters = params,
-                 focal_tree = focal_tree,
+                 phy = phy,
                  traits = traits,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
                  prob_func = helper_function)
 
 secsse::plot_state_exact(parameters = params,
-                 focal_tree = focal_tree,
+                 phy = phy,
                  traits = traits,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
@@ -52,7 +52,7 @@ secsse::plot_state_exact(parameters = params,
                  prob_func = helper_function)
 
 secsse::plot_state_exact(parameters = params,
-                 focal_tree = focal_tree,
+                 phy = phy,
                  traits = traits,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
@@ -98,7 +98,7 @@ helper_function <- function(x) {
 
 ## ----plot cla-----------------------------------------------------------------
 secsse::plot_state_exact(parameters = parameter,
-                         focal_tree = phy,
+                         phy = phy,
                          traits = traits,
                          num_concealed_states = 3,
                          sampling_fraction = sampling_fraction,
