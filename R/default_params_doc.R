@@ -87,7 +87,7 @@
 #'   different. Normally it should be `FALSE`. E.g. that the transition rates 
 #'   for the concealed states are different from the transition rates for the 
 #'   examined states.
-#' @param traitinfo data frame where first column has species ids and the second
+#' @param trait_info data frame where first column has species ids and the second
 #'   one is the trait associated information.
 #'
 #' @return Nothing

@@ -159,6 +159,9 @@ different. Normally it should be \code{FALSE}. E.g. that the transition rates
 for the concealed states are different from the transition rates for the
 examined states.}
 
+\item{trait_info}{data frame where first column has species ids and the second
+one is the trait associated information.}
+
 \item{idparsopt}{a numeric vector with the ID of parameters to be estimated.}
 
 \item{root_state_weight}{the method to weigh the states:
@@ -172,9 +175,6 @@ subplex, default is \code{"subplex"}. Simplex should only be used for debugging.
 \item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
 the optimization will be repeated until the result is, within the
 tolerance, equal to the starting values, with a maximum of 10 cycles.}
-
-\item{traitinfo}{data frame where first column has species ids and the second
-one is the trait associated information.}
 }
 \value{
 Nothing

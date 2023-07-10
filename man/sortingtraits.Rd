@@ -9,6 +9,9 @@ the tree tips}
 sortingtraits(trait_info, phy)
 }
 \arguments{
+\item{trait_info}{data frame where first column has species ids and the second
+one is the trait associated information.}
+
 \item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
 branch lengths.}
 }
