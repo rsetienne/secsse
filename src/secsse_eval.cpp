@@ -12,7 +12,6 @@
 #include <RcppParallel.h>
 #include "secsse_loglik.h"
 
-
 namespace secsse {
 
   template <typename ODE>

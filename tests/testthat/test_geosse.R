@@ -66,10 +66,15 @@ test_that("secsse gives the same result as GeoSSE", {
                                                  mus,
                                                  num_modeled_traits,
                                                  first_time = TRUE)
+    states <- setting_calculation$states
+    d <- ncol(states) / 2
+    new_states <- states[, c(1, 2, 3, 10, 11, 12)]
+    states <- new_states
+    
     setting_calculation$states <-
-         setting_calculation$states[, c(1, 2, 3, 10, 11, 12)]
+         states
 
-
+    # -191.9567
     secsse_cla_LL <- secsse_loglik(parameter,
                                    example_phy_GeoSSE,
                                    traits,

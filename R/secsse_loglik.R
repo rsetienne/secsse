@@ -130,7 +130,7 @@ master_loglik <- function(parameter,
 #' @param cond condition on the existence of a node root: "maddison_cond",
 #' "proper_cond"(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:
-#' "maddison_weights","proper_weights"(default) or "equal_weights".
+#' "maddison_weights" or "proper_weights"(default).
 #' It can also be specified the root state:the vector c(1, 0, 0)
 #' indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per
@@ -152,9 +152,6 @@ master_loglik <- function(parameter,
 #' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @return The loglikelihood of the data given the parameter.
-#' @note Multithreading might lead to a slightly reduced accuracy
-#' (in the order of 1e-10) and is therefore not enabled by default.
-#' Please use at your own discretion.
 #' @examples
 #' rm(list = ls(all = TRUE))
 #' library(secsse)
@@ -227,8 +224,8 @@ secsse_loglik <- function(parameter,
 #' to number of examined states.
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weigh
-#' ,'proper_weights'(default) or 'equal_weights'. It can also be specified the
+#' @param root_state_weight the method to weigh the states:'maddison_weights
+#'  or 'proper_weights'(default) oIt can also be specified the
 #' root state:the vector c(1,0,0) indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per trait
 #' state. It must have as many elements as trait states.
@@ -249,9 +246,6 @@ secsse_loglik <- function(parameter,
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
 #' @return The loglikelihood of the data given the parameters
-#' @note Multithreading might lead to a slightly reduced accuracy
-#' (in the order of 1e-8) and is therefore not enabled by default.
-#' Please use at your own discretion.
 #' @examples
 #'rm(list=ls(all=TRUE))
 #'library(secsse)

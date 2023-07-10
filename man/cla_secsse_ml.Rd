@@ -102,7 +102,6 @@ States-dependent Speciation and Extinction (SecSSE) with cladogenetic option
 library(secsse)
 library(DDD)
 set.seed(13)
-# Check the vignette for a better working exercise.
 # lambdas for 0A and 1A and 2A are the same but need to be estimated
 # (CTD model, see Syst Biol paper)
 # mus are fixed to zero,
@@ -118,7 +117,7 @@ masterBlock <- matrix(5,ncol = 3,nrow = 3,byrow = TRUE)
 diag(masterBlock) <- NA
 diff.conceal <- FALSE
 idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
-startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
+startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
 intGuessLamba <- startingpoint$lambda0
 intGuessMu <- startingpoint$mu0
 idparsopt <- c(1,2,3)

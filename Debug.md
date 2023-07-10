@@ -33,11 +33,16 @@ Multithreading leads to slightly *different* results due to reordering but
 this has nothing to do with accuracy. In fact, the integration itself is
 not affected at all.
 
+TJ: Removed this note everywhere.
+
+
 * `eval_cpp` must return full states because of `collect_node_bars` (info available in the stored matrix).
-* Too much `state` data (i.e. `ances` NA states) transfered to C++.
+* Too much `state` data (i.e. `ances` NA states) transferred to C++.
 * Inefficient column major matrix memory layout.
 * Some superfluous wrapper (`master_xyz`) might still lingering in the code.
+   ** I have not found anything lingering, should be fine+
 * `num_threads` is not passed through all the layers leading to `eval_cpp`. Should be a global(ish) setting anyhow.
+   ** super nice!
 * The data layout for the `stored` result is cumbersome on the C++ side. Please double-check in `secsse_eval.cpp`.
 * `secsse_sim.h\cpp` could need some tinkering.
 

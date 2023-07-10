@@ -68,18 +68,19 @@ Default is one thread.}
 
 \item{num_steps}{number of substeps to show intermediate likelihoods
 along a branch.}
-
-\item{verbose}{provides intermediate output if TRUE}
 }
 \value{
-The loglikelihood of the data given the parameters
+A list containing: "output", observed states along evaluated time
+points along all branches, used for plotting. "states" all ancestral states
+on the nodes and "duration", indicating the time taken for the total
+evaluation
 }
 \description{
 Logikelihood calculation for the SecSSE model given a set of parameters and
 data, returning also the likelihoods along the branches
 }
 \examples{
-#' set.seed(5)
+set.seed(5)
 focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
 params <- secsse::id_paramPos(c(0, 1), 2)
@@ -87,24 +88,10 @@ params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
 params[[2]][] <- 0.0
 params[[3]][, ] <- 0.1
 diag(params[[3]]) <- NA
-#  Thus, we have for both, rates
-# 0A, 1A, 0B and 1B. If we are interested in the posterior probability of
-# trait 0 we have to provide a helper function that sums the probabilities of
-# 0A and 0B, e.g.:
-helper_function <- function(x) {
-  return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
-}
-ll <- secsse::secsse_loglik(parameter = params,
-                            phy = focal_tree,
-                            traits = traits,
-                            num_concealed_states = 2,
-                            sampling_fraction = c(1, 1),
-                            see_ancestral_states = TRUE)
 
 secsse_loglik_eval(parameter = params,
                    phy = focal_tree,
                    traits = traits,
-                   ancestral_states = ll$states,
                    num_concealed_states = 2,
                    sampling_fraction = c(1, 1),
                    num_steps = 10)

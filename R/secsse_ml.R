@@ -49,15 +49,13 @@ master_ml <- function(phy,
                       idparsopt,
                       idparsfix,
                       parsfix)
-  
+
   if (is.matrix(idparslist[[1]])) {
     ## it is a tailor case otherwise
     idparslist[[1]] <- prepare_full_lambdas(traits,
                                             num_concealed_states,
                                             idparslist[[1]])
   }
-
- 
 
   see_ancestral_states <- FALSE
   if (!is.null(structure_func)) {
@@ -208,7 +206,6 @@ master_ml <- function(phy,
 #'library(secsse)
 #'library(DDD)
 #'set.seed(13)
-#'# Check the vignette for a better working exercise.
 #'# lambdas for 0A and 1A and 2A are the same but need to be estimated
 #'# mus are fixed to
 #'# the transition rates are constrained to be equal and fixed 0.01
@@ -224,7 +221,7 @@ master_ml <- function(phy,
 #'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
 #'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
-#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
+#'startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
 #'idparsopt <- c(1,2,3,5)
@@ -417,7 +414,6 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'library(secsse)
 #'library(DDD)
 #'set.seed(13)
-#'# Check the vignette for a better working exercise.
 #'# lambdas for 0A and 1A and 2A are the same but need to be estimated
 #'# (CTD model, see Syst Biol paper)
 #'# mus are fixed to zero,
@@ -433,7 +429,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
 #'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
-#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
+#'startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
 #'idparsopt <- c(1,2,3)
