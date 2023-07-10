@@ -116,41 +116,11 @@ master_loglik <- function(parameter,
   }
 }
 
+#' @title Likelihood for SecSSE model
 #' Loglikelihood calculation for the SecSSE model given a set of parameters and
 #' data
-#' @title Likelihood for SecSSE model
-#' @param parameter list where first vector represents lambdas, the second mus
-#' and the third transition rates.
-#' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
-#' rooted and with branch lengths.
-#' @param traits vector with trait states, order of states must be the same as
-#' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to number of examined states.
-#' @param cond condition on the existence of a node root: "maddison_cond",
-#' "proper_cond"(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:
-#' "maddison_weights" or "proper_weights"(default).
-#' It can also be specified the root state:the vector c(1, 0, 0)
-#' indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per
-#' trait state. It must have as many elements as trait states.
-#' @param setting_calculation argument used internally to speed up calculation.
-#' It should be left blank (default : setting_calculation = NULL)
-#' @param see_ancestral_states should the ancestral states be shown? Default
-#' FALSE
-#' @param loglik_penalty the size of the penalty for all parameters; default is
-#' 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species
-#' is provided
-#' @param num_threads number of threads. Set to -1 to use all available threads.
-#' Default is one thread.
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#' 
+#' @inheritParams default_params_doc
 #' @return The loglikelihood of the data given the parameter.
 #' @examples
 #' rm(list = ls(all = TRUE))
@@ -210,41 +180,12 @@ secsse_loglik <- function(parameter,
                 method = method)
 }
 
+#' @title Likelihood for SecSSE model, using Rcpp
 #' Loglikelihood calculation for the cla_SecSSE model given a set of parameters
 #' and data using Rcpp
-#' @title Likelihood for SecSSE model, using Rcpp
-#' @param parameter list where the first is a table where lambdas across
-#' different modes of speciation are shown, the second mus and the third
-#'  transition rates.
-#' @param phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
-#' rooted and with branch lengths.
-#' @param traits vector with trait states, order of states must be the same as
-#'  tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to number of examined states.
-#' @param cond condition on the existence of a node root: 'maddison_cond',
-#' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weights
-#'  or 'proper_weights'(default) oIt can also be specified the
-#' root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per trait
-#' state. It must have as many elements as trait states.
-#' @param setting_calculation argument used internally to speed up calculation.
-#' It should be leave blank (default : setting_calculation = NULL)
-#' @param see_ancestral_states should the ancestral states be shown? Deafault
-#' FALSE
-#' @param loglik_penalty the size of the penalty for all parameters; default is
-#' 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species is
-#' provided
-#' @param num_threads number of threads to be used, default is 1. Set to -1 to
-#' use all available threads.
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return The loglikelihood of the data given the parameters
 #' @examples
 #'rm(list=ls(all=TRUE))

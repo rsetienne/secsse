@@ -27,14 +27,33 @@ default_params_doc(
   method,
   parameter,
   setting_calculation,
-  num_steps
+  num_steps,
+  see_ancestral_states,
+  lambdas,
+  mus,
+  qs,
+  crown_age,
+  pool_init_states,
+  maxSpec,
+  conditioning,
+  non_extinction,
+  max_tries,
+  drop_extinct,
+  seed,
+  prob_func,
+  parameters,
+  masterBlock,
+  diff.conceal,
+  trait_info
 )
 }
 \arguments{
 \item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
 branch lengths.}
 
-\item{traits}{a vector with trait states for each tip in the phylogeny.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
@@ -67,8 +86,8 @@ algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
-\item{verbose}{sets verbose output; default is verbose when optimmethod is
-\code{'subplex'}.}
+\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
+\code{"subplex"}.}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
@@ -91,6 +110,55 @@ It should be left blank (default : \code{setting_calculation = NULL}).}
 \item{num_steps}{number of substeps to show intermediate likelihoods
 along a branch.}
 
+\item{see_ancestral_states}{Boolean for whether the ancestral states should
+be shown? Defaults to \code{FALSE}.}
+
+\item{lambdas}{speciation rates, in the form of a list of matrices.}
+
+\item{mus}{extinction rates, in the form of a vector.}
+
+\item{qs}{The Q matrix, for example the result of function q_doubletrans, but
+generally in the form of a matrix.}
+
+\item{crown_age}{crown age of the tree, tree will be simulated conditional
+on non-extinction and this crown age.}
+
+\item{pool_init_states}{pool of initial states at the crown, in case this is
+different from all available states, otherwise leave at NULL}
+
+\item{maxSpec}{Maximum number of species in the tree (please note that the
+tree is not conditioned on this number, but that this is a safeguard
+against generating extremely large trees).}
+
+\item{conditioning}{can be \code{"obs_states"}, \code{"true_states"} or \code{"none"}, the
+tree is simulated until one is generated that contains all observed states
+(\code{"obs_states"}), all true states (e.g. all combinations of obs and hidden
+states), or is always returned (\code{"none"}).}
+
+\item{non_extinction}{boolean stating if the tree should be conditioned on
+non-extinction of the crown lineages. Defaults to \code{TRUE}.}
+
+\item{max_tries}{maximum number of simulations to try to obtain a tree.}
+
+\item{drop_extinct}{boolean stating if extinct species should be dropped from
+the tree. Defaults to \code{TRUE}.}
+
+\item{seed}{pseudo-random number generator seed.}
+
+\item{prob_func}{a function to calculate the probability of interest, see
+description.}
+
+\item{parameters}{list where first vector represents lambdas, the second mus
+and the third transition rates.}
+
+\item{masterBlock}{matrix of transitions among only examined states, \code{NA} in
+the main diagonal, used to build the full transition rates matrix.}
+
+\item{diff.conceal}{Boolean stating if the concealed states should be
+different. Normally it should be \code{FALSE}. E.g. that the transition rates
+for the concealed states are different from the transition rates for the
+examined states.}
+
 \item{idparsopt}{a numeric vector with the ID of parameters to be estimated.}
 
 \item{root_state_weight}{the method to weigh the states:
@@ -104,6 +172,9 @@ subplex, default is \code{"subplex"}. Simplex should only be used for debugging.
 \item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
 the optimization will be repeated until the result is, within the
 tolerance, equal to the starting values, with a maximum of 10 cycles.}
+
+\item{traitinfo}{data frame where first column has species ids and the second
+one is the trait associated information.}
 }
 \value{
 Nothing

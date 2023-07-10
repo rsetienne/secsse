@@ -145,3 +145,5 @@ Changed to phy, confirm if correct
 * `steps` in `plot_state_exact()` vs `num_steps` in `secsse_loglik_eval()`. 
 Changed to `num_steps`, confirm
 
+* Check `num_threads` doc
+

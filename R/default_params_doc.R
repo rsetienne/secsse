@@ -5,7 +5,9 @@
 #'
 #' @param phy phylogenetic tree of class `phylo`, ultrametric, rooted and with
 #'   branch lengths.
-#' @param traits a vector with trait states for each tip in the phylogeny.
+#' @param traits vector with trait states for each tip in the phylogeny. The 
+#'   order of the states must be the same as the tree tips. For help, see 
+#'   `vignette("starting_secsse", package = "secsse")`.
 #' @param num_concealed_states number of concealed states, generally equivalent
 #'   to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
@@ -34,8 +36,8 @@
 #' @param is_complete_tree logical specifying whether or not a tree with all its
 #'   extinct species is provided. If set to `TRUE`, it also assumes that all 
 #'   *all* extinct lineages are present on the tree. Defaults to `FALSE`.
-#' @param verbose sets verbose output; default is verbose when optimmethod is
-#'   `'subplex'`.
+#' @param verbose sets verbose output; default is `TRUE` when `optimmethod` is
+#'   `"subplex"`.
 #' @param num_threads number of threads. Set to -1 to use all available threads.
 #'   Default is one thread.
 #' @param atol A numeric specifying the absolute tolerance of integration.
@@ -52,10 +54,45 @@
 #'   0 (no penalty).
 #' @param num_steps number of substeps to show intermediate likelihoods
 #'   along a branch.
+#' @param see_ancestral_states Boolean for whether the ancestral states should 
+#'   be shown? Defaults to `FALSE`.
+#' @param lambdas speciation rates, in the form of a list of matrices.
+#' @param mus extinction rates, in the form of a vector.
+#' @param qs The Q matrix, for example the result of function q_doubletrans, but
+#'   generally in the form of a matrix.
+#' @param crown_age crown age of the tree, tree will be simulated conditional
+#'   on non-extinction and this crown age.
+#' @param pool_init_states pool of initial states at the crown, in case this is
+#'   different from all available states, otherwise leave at NULL
+#' @param maxSpec Maximum number of species in the tree (please note that the
+#'   tree is not conditioned on this number, but that this is a safeguard 
+#'   against generating extremely large trees).
+#' @param conditioning can be `"obs_states"`, `"true_states"` or `"none"`, the 
+#'   tree is simulated until one is generated that contains all observed states
+#'   (`"obs_states"`), all true states (e.g. all combinations of obs and hidden
+#'   states), or is always returned (`"none"`).
+#' @param non_extinction boolean stating if the tree should be conditioned on 
+#'   non-extinction of the crown lineages. Defaults to `TRUE`.
+#' @param max_tries maximum number of simulations to try to obtain a tree.
+#' @param drop_extinct boolean stating if extinct species should be dropped from
+#'   the tree. Defaults to `TRUE`.
+#' @param seed pseudo-random number generator seed.
+#' @param parameters list where first vector represents lambdas, the second mus
+#' and the third transition rates.
+#' @param prob_func a function to calculate the probability of interest, see
+#' description.
+#' @param masterBlock matrix of transitions among only examined states, `NA` in
+#'   the main diagonal, used to build the full transition rates matrix.
+#' @param diff.conceal Boolean stating if the concealed states should be 
+#'   different. Normally it should be `FALSE`. E.g. that the transition rates 
+#'   for the concealed states are different from the transition rates for the 
+#'   examined states.
+#' @param traitinfo data frame where first column has species ids and the second
+#'   one is the trait associated information.
 #'
 #' @return Nothing
-#' @export
 #' @keywords internal
+#' @export
 default_params_doc <- function(phy,
                                traits,
                                num_concealed_states,
@@ -78,6 +115,23 @@ default_params_doc <- function(phy,
                                method,
                                parameter,
                                setting_calculation,
-                               num_steps) {
+                               num_steps,
+                               see_ancestral_states,
+                               lambdas,
+                               mus,
+                               qs,
+                               crown_age,
+                               pool_init_states,
+                               maxSpec,
+                               conditioning,
+                               non_extinction,
+                               max_tries,
+                               drop_extinct,
+                               seed,
+                               prob_func,
+                               parameters,
+                               masterBlock,
+                               diff.conceal,
+                               trait_info) {
   # Nothing
 }

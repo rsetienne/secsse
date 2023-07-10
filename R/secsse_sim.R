@@ -1,27 +1,7 @@
 #' Function to simulate a tree, conditional on observing all states.
-#' @param lambdas speciation rates, in the form of a list of matrices
-#' @param mus extinction rates, in the form of a vector
-#' @param qs The Q matrix, for example the result of function q_doubletrans, but
-#' generally in the form of a matrix.
-#' @param num_concealed_states number of concealed states
-#' @param crown_age crown age of the tree, tree will be simulated conditional
-#' on non-extinction and this crown age.
-#' @param pool_init_states pool of initial states at the crown, in case this is
-#' different from all available states, otherwise leave at NULL
-#' @param maxSpec Maximum number of species in the tree (please note that the
-#' tree is not conditioned on this number, but that this is a safeguard against
-#' generating extremely large trees).
-#' @param conditioning can be 'obs_states', 'true_states' or 'none', the tree is
-#' simulated until one is generated that contains all observed states
-#' ('obs_states'), all true states (e.g. all combinations of obs and hidden
-#' states), or is always returned ('none').
-#' @param non_extinction should the tree be conditioned on non-extinction of the
-#' crown lineages? Default is TRUE.
-#' @param verbose provide intermediate output.
-#' @param max_tries maximum number of simulations to try to obtain a tree.
-#' @param drop_extinct should extinct species be dropped from the tree? default
-#' is TRUE.
-#' @param seed pseudo-random number generator seed
+#' 
+#' @inheritParams default_params_doc
+#'
 #' @return a list with four properties: phy: reconstructed phylogeny,
 #' true_traits: the true traits in order of tip label, obs_traits: observed
 #' traits, ignoring hidden traits and lastly:
@@ -34,7 +14,7 @@
 #' Simulation is performed with a randomly
 #' sampled initial trait at the crown - if you, however - want a specific,
 #' single, trait used at the crown, you can reduce the possible traits by
-#' modifying 'pool_init_states'.
+#' modifying `pool_init_states`.
 #'
 #' By default, the algorithm keeps simulating until it generates a tree where
 #' both crown lineages survive to the present - this is to ensure that the tree

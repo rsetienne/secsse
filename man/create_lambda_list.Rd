@@ -20,7 +20,7 @@ create_lambda_list(
 \item{transition_matrix}{a matrix containing a description of all speciation
 events, where the first column indicates the source state, the second and
 third column indicate the two daughter states, and the fourth column gives
-the rate indicator used. E.g.: \link{"SA", "S", "A", 1} for a trait state "SA"
+the rate indicator used. E.g.: \verb{["SA", "S", "A", 1]} for a trait state "SA"
 which upon speciation generates two daughter species with traits "S" and "A",
 where the number 1 is used as indicator for optimization of the likelihood.}
 

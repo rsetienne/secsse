@@ -48,7 +48,7 @@ secsse::plot_state_exact(parameters = params,
                  traits = traits,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
-                 steps = 10,
+                 num_steps = 10,
                  prob_func = helper_function)
 
 secsse::plot_state_exact(parameters = params,
@@ -56,7 +56,7 @@ secsse::plot_state_exact(parameters = params,
                  traits = traits,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
-                 steps = 100,
+                 num_steps = 100,
                  prob_func = helper_function)
 
 ## ----cla secsse---------------------------------------------------------------
@@ -106,5 +106,5 @@ secsse::plot_state_exact(parameters = parameter,
                          root_state_weight = "maddison_weights",
                          is_complete_tree = FALSE,
                          prob_func = helper_function,
-                         steps = 10)
+                         num_steps = 10)
 

@@ -1,10 +1,9 @@
-#' It sets the parameters (speciation, extinction and transition)
-#' ids. Needed for ML calculation (secsse_ml)
 #' @title Parameter structure setting
-#' @param traits vector with trait states, order of states must be the same as
-#' tree tips, for help, see vignette.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to number of examined states.
+#' Sets the parameters (speciation, extinction and transition) ids. Needed for 
+#' ML calculation ([secsse_ml()]).
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return A list that includes the ids of the parameters for ML analysis.
 #' @examples
 #' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
@@ -90,15 +89,11 @@ create_q_matrix_int <- function(masterBlock,
 }
 
 
-#' Sets a Q matrix where double transitions are not allowed
 #' @title Basic Qmatrix
-#' @param traits vector with trait states, order of states must be the same as
-#' tree tips, for help, see vignette.
-#' @param masterBlock matrix of transitions among only examined states, NA in
-#' the main diagonal, used to build the full transition rates matrix.
-#' @param diff.conceal should the concealed states be different? Normally it
-#' should be FALSE. E.g. that the transition rates for the concealed states
-#' are different from the transition rates for the examined states.
+#' Sets a Q matrix where double transitions are not allowed
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return Q matrix that includes both examined and concealed states, it should
 #' be declared as the third element of idparslist.
 #' @description This function expands the Q_matrix, but it does so assuming
@@ -181,13 +176,12 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 }
 
 
+#' @title Data checking and trait sorting
 #' In preparation for likelihood calculation, it orders trait data according
 #' the tree tips
-#' @title Data checking and trait sorting
-#' @param traitinfo data frame where first column has species ids and the second
-#' one is the trait associated information.
-#' @param phy phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
-#' rooted and with branch lengths.
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return Vector of traits
 #' @examples
 #' # Some data we have prepared
@@ -195,35 +189,35 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
 #' data('phylo_vignette')
 #' traits <- sortingtraits(traits, phylo_vignette)
 #' @export
-sortingtraits <- function(traitinfo, phy) {
-    traitinfo <- as.matrix(traitinfo)
-    if (length(phy$tip.label) != nrow(traitinfo)) {
+sortingtraits <- function(trait_info, phy) {
+    trait_info <- as.matrix(trait_info)
+    if (length(phy$tip.label) != nrow(trait_info)) {
         stop("Number of species in the tree must be the same as
              in the trait file")
     }
 
     if (identical(as.character(sort(phy$tip.label)),
-                  as.character(sort(traitinfo[, 1]))) == FALSE) {
-        mismatch <- match(as.character(sort(traitinfo[, 1])),
+                  as.character(sort(trait_info[, 1]))) == FALSE) {
+        mismatch <- match(as.character(sort(trait_info[, 1])),
                           as.character(sort(phy$tip.label)))
-        mismatched <- (sort(traitinfo[, 1]))[which(is.na(mismatch))]
+        mismatched <- (sort(trait_info[, 1]))[which(is.na(mismatch))]
         stop(
             paste(c("Mismatch on tip labels and taxa names, check the species:",
                     mismatched), collapse = " ")
         )
     }
 
-    traitinfo <- traitinfo[match(phy$tip.label, traitinfo[, 1]), ]
-    traitinfo[, 1] == phy$tip.label
+    trait_info <- trait_info[match(phy$tip.label, trait_info[, 1]), ]
+    trait_info[, 1] == phy$tip.label
 
-    if (ncol(traitinfo) == 2) {
-        traits <- as.numeric(traitinfo[, 2])
+    if (ncol(trait_info) == 2) {
+        traits <- as.numeric(trait_info[, 2])
     }
 
-    if (ncol(traitinfo) > 2) {
+    if (ncol(trait_info) > 2) {
         traits <- NULL
-        for (i in 1:(ncol(traitinfo) - 1)) {
-            traits <- cbind(traits, as.numeric(traitinfo[, 1 + i]))
+        for (i in 1:(ncol(trait_info) - 1)) {
+            traits <- cbind(traits, as.numeric(trait_info[, 1 + i]))
         }
     }
     return(traits)

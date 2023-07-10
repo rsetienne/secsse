@@ -31,7 +31,9 @@ mus and the third transition rates.}
 \item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
 branch lengths.}
 
-\item{traits}{a vector with trait states for each tip in the phylogeny.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}

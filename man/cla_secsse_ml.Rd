@@ -35,7 +35,9 @@ cla_secsse_ml(
 \item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
 branch lengths.}
 
-\item{traits}{a vector with trait states for each tip in the phylogeny.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
@@ -82,8 +84,8 @@ tolerance, equal to the starting values, with a maximum of 10 cycles.}
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
-\item{verbose}{sets verbose output; default is verbose when optimmethod is
-\code{'subplex'}.}
+\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
+\code{"subplex"}.}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}

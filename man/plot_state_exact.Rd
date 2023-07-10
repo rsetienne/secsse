@@ -16,16 +16,21 @@ plot_state_exact(
   method = "odeint::bulirsch_stoer",
   atol = 1e-16,
   rtol = 1e-16,
-  steps = 100,
+  num_steps = 100,
   prob_func = NULL,
   verbose = FALSE
 )
 }
 \arguments{
+\item{parameters}{list where first vector represents lambdas, the second mus
+and the third transition rates.}
+
 \item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
 branch lengths.}
 
-\item{traits}{a vector with trait states for each tip in the phylogeny.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
@@ -54,8 +59,14 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{verbose}{sets verbose output; default is verbose when optimmethod is
-\code{'subplex'}.}
+\item{num_steps}{number of substeps to show intermediate likelihoods
+along a branch.}
+
+\item{prob_func}{a function to calculate the probability of interest, see
+description.}
+
+\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
+\code{"subplex"}.}
 }
 \value{
 ggplot2 object
@@ -65,7 +76,7 @@ Plot the local probability along the tree, including the branches
 }
 \details{
 This function will evaluate the log likelihood locally along
-all branches and plot the result. When steps is left to \code{NULL}, all
+all branches and plot the result. When \code{num_steps} is left to \code{NULL}, all
 likelihood evaluations during integration are used for plotting. This may
 work for not too large trees, but may become very memory heavy for larger
 trees. Instead, the user can indicate a number of steps, which causes the
@@ -110,6 +121,6 @@ out_plot <- plot_state_exact(parameters = params,
                              traits = traits,
                              num_concealed_states = 2,
                              sampling_fraction = c(1, 1),
-                             steps = 10,
+                             num_steps = 10,
                              prob_func = helper_function)
 }
