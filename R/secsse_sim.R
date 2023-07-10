@@ -146,10 +146,11 @@ secsse_sim <- function(lambdas,
 
   true_traits <- names(mus)[true_traits]
   obs_traits <- c()
+  obs_traits_match <- c()
   for (i in seq_along(true_traits)) {
-    obs_traits[i] <- stringr::str_sub(true_traits[i], 1, -2)
+    obs_traits[i] <- substr(true_traits[i], 1, (nchar(-2) - 1))
   }
-
+  
   if (sum(Ltable[, 4] < 0)) {
       return(list(phy = phy,
                 true_traits = true_traits,
