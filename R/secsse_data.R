@@ -17,3 +17,10 @@
 #' @description An example phylogeny for testing purposes
 #' @format A phylogeny as created by GeoSSE (diversitree)
 "example_phy_GeoSSE"
+
+
+#' @name timing_data
+#' @title Computation time informatino
+#' @description Results of benchmarking different versions of secsse
+#' @format A tibble
+"timing_data"
