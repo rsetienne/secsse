@@ -147,3 +147,5 @@ Changed to `num_steps`, confirm
 
 * Check `num_threads` doc
 
+* mus in `create_default_shift_matrix()`. create_q_matrix() in the link??
+

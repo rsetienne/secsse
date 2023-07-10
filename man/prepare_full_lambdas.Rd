@@ -2,7 +2,8 @@
 % Please edit documentation in R/secsse_utils.R
 \name{prepare_full_lambdas}
 \alias{prepare_full_lambdas}
-\title{Prepares the entire set of lambda matrices for cla_secsse.}
+\title{Prepares the entire set of lambda matrices for cla_secsse.
+It provides the set of matrices containing all the speciation rates}
 \usage{
 prepare_full_lambdas(traits, num_concealed_states, lambd_and_modeSpe)
 }
@@ -21,6 +22,7 @@ A list of lambdas, its length would be the same than the number of
 trait states * num_concealed_states..
 }
 \description{
+Prepares the entire set of lambda matrices for cla_secsse.
 It provides the set of matrices containing all the speciation rates
 }
 \examples{

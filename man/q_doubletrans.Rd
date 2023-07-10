@@ -16,9 +16,10 @@ order of the states must be the same as the tree tips. For help, see
 the main diagonal, used to build the full transition rates matrix.}
 
 \item{diff.conceal}{Boolean stating if the concealed states should be
-different. Normally it should be \code{FALSE}. E.g. that the transition rates
-for the concealed states are different from the transition rates for the
-examined states.}
+different. E.g. that the transition rates for the concealed
+states are different from the transition rates for the examined states.
+Normally it should be \code{FALSE} in order to avoid having a huge number of
+parameters.}
 }
 \value{
 Q matrix that includes both examined and concealed states, it should

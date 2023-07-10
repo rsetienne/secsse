@@ -20,7 +20,7 @@ master_ml <- function(phy,
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
-                      verbose = (optimmethod == "subplex"),
+                      verbose = (optimmethod == "simplex"),
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
@@ -159,10 +159,12 @@ master_ml <- function(phy,
   return(out2)
 }
 
-#' @title Maximum likehood estimation for (SecSSE)
+#' Maximum likehood estimation for (SecSSE)
+#' 
 #' Maximum likehood estimation under Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE)
 #' @inheritParams default_params_doc
+#' 
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -234,7 +236,7 @@ secsse_ml <- function(phy,
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
-                      verbose = (optimmethod == "subplex"),
+                      verbose = (optimmethod == "simplex"),
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
@@ -330,9 +332,11 @@ secsse_loglik_choosepar <- function(trparsopt,
   return(loglik)
 }
 
-#' @title Maximum likehood estimation for (SecSSE)
+#' Maximum likehood estimation for (SecSSE)
+#' 
 #' Maximum likehood estimation under Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE) with cladogenetic option
+#'
 #' @inheritParams default_params_doc
 #' 
 #' @return Parameter estimated and maximum likelihood
@@ -406,7 +410,7 @@ cla_secsse_ml <- function(phy,
                           num_cycles = 1,
                           loglik_penalty = 0,
                           is_complete_tree = FALSE,
-                          verbose = (optimmethod == "subplex"),
+                          verbose = (optimmethod == "simplex"),
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,

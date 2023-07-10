@@ -285,8 +285,8 @@ cla_id_paramPos <- function(traits, num_concealed_states) {
     return(idparslist)
 }
 
-#' It provides the set of matrices containing all the speciation rates
 #' @title Prepares the entire set of lambda matrices for cla_secsse.
+#' It provides the set of matrices containing all the speciation rates
 #' 
 #' @inheritParams default_params_doc
 #' 
@@ -1019,8 +1019,6 @@ event_times <- function(phy) {
 #' Print likelihood for initial parameters
 #'
 #' @inheritParams default_params_doc
-#' @param initloglik A numeric with the value of loglikehood obtained prior to
-#'   optimisation. Only used internally.
 #'
 #' @return Invisible `NULL`. Prints a `message()` to the console with the
 #'   initial loglikelihood if `verbose >= 1`

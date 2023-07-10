@@ -2,7 +2,7 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_default_shift_matrix}
 \alias{create_default_shift_matrix}
-\title{helper function to create a default shift_matrix list}
+\title{Helper function to create a default \code{shift_matrix} list}
 \usage{
 create_default_shift_matrix(
   state_names = c("0", "1"),
@@ -11,15 +11,16 @@ create_default_shift_matrix(
 )
 }
 \arguments{
-\item{state_names}{names of the observed states}
+\item{state_names}{vector of names of all observed states.}
 
-\item{num_concealed_states}{number of concealed states}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
-\item{mus}{previously defined mus - used to choose indicator number}
+\item{mus}{previously defined mus - used to choose indicator number.}
 }
 \description{
 This function generates a generic shift matrix to be used with the function
-create_transition_matrix.
+\code{\link[=create_q_matrix]{create_q_matrix()}}.
 }
 \examples{
 shift_matrix <- create_default_shift_matrix(state_names = c(0, 1),

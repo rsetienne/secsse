@@ -50,7 +50,7 @@ states), or is always returned (\code{"none"}).}
 non-extinction of the crown lineages. Defaults to \code{TRUE}.}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"subplex"}.}
+\code{"simplex"}.}
 
 \item{max_tries}{maximum number of simulations to try to obtain a tree.}
 

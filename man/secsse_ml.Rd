@@ -2,9 +2,7 @@
 % Please edit documentation in R/secsse_ml.R
 \name{secsse_ml}
 \alias{secsse_ml}
-\title{Maximum likehood estimation for (SecSSE)
-Maximum likehood estimation under Several examined and concealed
-States-dependent Speciation and Extinction (SecSSE)}
+\title{Maximum likehood estimation for (SecSSE)}
 \usage{
 secsse_ml(
   phy,
@@ -24,7 +22,7 @@ secsse_ml(
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  verbose = (optimmethod == "subplex"),
+  verbose = (optimmethod == "simplex"),
   num_threads = 1,
   atol = 1e-08,
   rtol = 1e-07,
@@ -44,6 +42,8 @@ to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
 
+\item{idparsopt}{a numeric vector with the ID of parameters to be estimated.}
+
 \item{initparsopt}{a numeric vector with the initial guess of the parameters
 to be estimated.}
 
@@ -53,6 +53,11 @@ to be estimated.}
 
 \item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
 \code{"proper_cond"} (default). For details, see vignette.}
+
+\item{root_state_weight}{the method to weigh the states:
+\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
+It can also be specified for the root state: the vector \code{c(1, 0, 0)}
+indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states.}
@@ -65,7 +70,7 @@ algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
-conditions (only for debugging). Both are called from \code{\link[=DDD:optimizer]{DDD:optimizer()}},
+conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
 simplex is implemented natively in \link{DDD}, while subplex is ultimately
 called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
@@ -81,7 +86,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"subplex"}.}
+\code{"simplex"}.}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
@@ -99,7 +104,6 @@ Default is one thread.}
 Parameter estimated and maximum likelihood
 }
 \description{
-Maximum likehood estimation for (SecSSE)
 Maximum likehood estimation under Several examined and concealed
 States-dependent Speciation and Extinction (SecSSE)
 }

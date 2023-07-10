@@ -11,8 +11,11 @@ default_params_doc(
   idparslist,
   initparsopt,
   idparsfix,
+  idparsopt,
+  idfactorsopt,
   parsfix,
   cond,
+  root_state_weight,
   sampling_fraction,
   tol,
   maxiter,
@@ -45,7 +48,22 @@ default_params_doc(
   masterBlock,
   diff.conceal,
   trait_info,
-  lambd_and_modeSpe
+  lambd_and_modeSpe,
+  initloglik,
+  initfactors,
+  idparsfuncdefpar,
+  functions_defining_params,
+  state_names,
+  transition_matrix,
+  model,
+  concealed_spec_rates,
+  shift_matrix,
+  q_matrix,
+  lambda_list,
+  object,
+  params,
+  param_posit,
+  ml_pars
 )
 }
 \arguments{
@@ -66,10 +84,20 @@ to be estimated.}
 
 \item{idparsfix}{a numeric vector with the ID of the fixed parameters.}
 
+\item{idparsopt}{a numeric vector with the ID of parameters to be estimated.}
+
+\item{idfactorsopt}{id of the factors that will be optimized. There are not
+fixed factors, so use a constant within \code{functions_defining_params}.}
+
 \item{parsfix}{a numeric vector with the value of the fixed parameters.}
 
 \item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
 \code{"proper_cond"} (default). For details, see vignette.}
+
+\item{root_state_weight}{the method to weigh the states:
+\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
+It can also be specified for the root state: the vector \code{c(1, 0, 0)}
+indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states.}
@@ -92,7 +120,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"subplex"}.}
+\code{"simplex"}.}
 
 \item{num_threads}{number of threads. Set to -1 to use all available threads.
 Default is one thread.}
@@ -160,18 +188,85 @@ and the third transition rates.}
 the main diagonal, used to build the full transition rates matrix.}
 
 \item{diff.conceal}{Boolean stating if the concealed states should be
-different. Normally it should be \code{FALSE}. E.g. that the transition rates
-for the concealed states are different from the transition rates for the
-examined states.}
+different. E.g. that the transition rates for the concealed
+states are different from the transition rates for the examined states.
+Normally it should be \code{FALSE} in order to avoid having a huge number of
+parameters.}
 
 \item{trait_info}{data frame where first column has species ids and the second
 one is the trait associated information.}
 
 \item{lambd_and_modeSpe}{a matrix with the 4 models of speciation possible.}
 
+\item{initloglik}{A numeric with the value of loglikehood obtained prior to
+optimisation. Only used internally.}
+
+\item{initfactors}{the initial guess for a factor (it should be set to \code{NULL}
+when no factors).}
+
+\item{idparsfuncdefpar}{id of the parameters which will be a function of
+optimized and/or fixed parameters. The order of id should match
+\code{functions_defining_params}.}
+
+\item{functions_defining_params}{a list of functions. Each element will be a
+function which defines a parameter e.g. \code{id_3 <- (id_1 + id_2) / 2}. See
+example.}
+
+\item{state_names}{vector of names of all observed states.}
+
+\item{transition_matrix}{a matrix containing a description of all speciation
+events, where the first column indicates the source state, the second and
+third column indicate the two daughter states, and the fourth column gives
+the rate indicator used. E.g.: \verb{["SA", "S", "A", 1]} for a trait state
+\code{"SA"} which upon speciation generates two daughter species with traits
+\code{"S"} and \code{"A"}, where the number 1 is used as indicator for optimization
+of the likelihood.}
+
+\item{model}{used model, choice of \code{"ETD"} (Examined Traits Diversification),
+\code{"CTD"} (Concealed Traits Diversification) or \code{"CR"} (Constant Rate).}
+
+\item{concealed_spec_rates}{vector specifying the rate indicators for each
+concealed state, length should be identical to \code{num_concealed_states}. If
+left empty when using the CTD model, it is assumed that all available
+speciation rates are distributed uniformly over the concealed states.}
+
+\item{shift_matrix}{matrix of shifts, indicating in order:
+\enumerate{
+\item starting state (typically the column in the transition matrix)
+\item ending state (typically the row in the transition matrix)
+\item associated rate indicator.
+}}
+
+\item{q_matrix}{\code{q_matrix} with only transitions between observed states.}
+
+\item{lambda_list}{previously generated list of lambda matrices,
+used to infer the rate number to start with.}
+
+\item{object}{lambda matrices, \code{q_matrix} or mu vector.}
+
+\item{params}{parameters in order, where each value reflects the value
+of the parameter at that position, e.g. \code{c(0.3, 0.2, 0.1)} will fill out
+the value 0.3 for the parameter with rate identifier 1, 0.2 for the
+parameter with rate identifier 2 and 0.1 for the parameter with rate
+identifier 3.}
+
+\item{param_posit}{initial parameter structure, consisting of a list with
+three entries:
+\enumerate{
+\item lambda matrices
+\item mus
+\item Q matrix
+}
+
+In each entry, integers numbers (1-n) indicate the parameter to be
+optimized.}
+
+\item{ml_pars}{resulting parameter estimates as returned by for instance
+\code{\link[=cla_secsse_ml]{cla_secsse_ml()}}, having the same structure as \code{param_post}.}
+
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
-conditions (only for debugging). Both are called from \code{\link[=DDD:optimizer]{DDD:optimizer()}},
+conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
 simplex is implemented natively in \link{DDD}, while subplex is ultimately
 called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 }

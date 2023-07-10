@@ -41,6 +41,11 @@ trait state. It must have as many elements as there are trait states.}
 \item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
 \code{"proper_cond"} (default). For details, see vignette.}
 
+\item{root_state_weight}{the method to weigh the states:
+\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
+It can also be specified for the root state: the vector \code{c(1, 0, 0)}
+indicates state 1 was the root state.}
+
 \item{is_complete_tree}{logical specifying whether or not a tree with all its
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
@@ -61,7 +66,7 @@ along a branch.}
 description.}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"subplex"}.}
+\code{"simplex"}.}
 }
 \value{
 ggplot2 object
