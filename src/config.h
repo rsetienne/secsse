@@ -27,5 +27,6 @@
 // The initial dt is calculated as SECSEE_DEFAULT_DTF * (t1 - t0).
 // All used steppers are adaptive, thus the value shouldn't really matter
 #define SECSSE_DEFAULT_DTF 0.01
+#define SECSSE_DEFAULT_DFT_STORE 0.1
 
 #endif  // SRC_CONFIG_H_

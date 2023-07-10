@@ -54,12 +54,6 @@ master_loglik <- function(parameter,
 
   d <- ncol(states) / 2
 
-  if (see_ancestral_states == TRUE && num_threads != 1) {
-    warning("see ancestral states only works with one thread, 
-              setting to one thread")
-    num_threads <- 1
-  }
-
   RcppParallel::setThreadOptions(numThreads = num_threads)
   calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
                         ances = ances,

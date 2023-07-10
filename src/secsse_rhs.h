@@ -110,7 +110,7 @@ namespace secsse {
 
     struct cla_precomp_t {
       std::vector<std::vector<std::vector<double>>> ll;
-      std::vector<std::vector<std::pair<size_t, size_t>>> kb;
+      std::vector<std::vector<std::vector<size_t>>> nzll;      // non zero elements in ll[][]
       std::vector<double> lambda_sum;
     };
 
@@ -120,15 +120,16 @@ namespace secsse {
         // we all love deeply nested loops...
         const_rmatrix<double> mr(Rcpp::as<Rcpp::NumericMatrix>(Rll[i]));
         auto& mc = res.ll.emplace_back();
-        auto& kbm = res.kb.emplace_back();
+        auto& nzll = res.nzll.emplace_back();
         auto& ls = res.lambda_sum.emplace_back(0.0);
         for (size_t j = 0; j < mr.nrow(); ++j) {
           mc.emplace_back(mr.row(j).begin(), mr.row(j).end());
-          auto& b = kbm.emplace_back(0, mc[j].size());
-          for (; (mc[j][b.first] == 0.0) && (b.first <= b.second); ++b.first);        // first non-zero
-          for (; (mc[j][b.second - 1] == 0.0) && (b.second > b.first); --b.second);   // last non-zero
+          nzll.emplace_back();
           for (size_t k = 0; k < mc[j].size(); ++k) {
-            ls += mc[j][k];
+            if (0.0 != mc[j][k]) {
+              nzll[j].push_back(j);
+              ls += mc[j][k];
+            }
           }
         }
       }
@@ -179,9 +180,9 @@ namespace secsse {
           double dx0 = 0.0;
           double dxd = 0.0;
           auto q = q_.row(i);
-          const auto& kb = prec_.kb[i];
+          const auto& nz = prec_.nzll[i];
           for (size_t j = 0; j < d; ++j) {
-            for (size_t k = kb[j].first; k < kb[j].second; ++k) {
+            for (size_t k : nz[j]) {
               const double ll = prec_.ll[i][j][k];
               dx0 += ll * (x[j] * x[k]);
               dxd += ll * (x[j] * x[k + d] + x[j + d] * x[k]);
@@ -208,10 +209,10 @@ namespace secsse {
         for (size_t i = 0; i < d; ++i) {
           double dx0 = m_[i] * (1 - x[i]);
           auto q = q_.row(i);
-          const auto& kb = prec_.kb[i];
+          const auto& nz = prec_.nzll[i];
           for (size_t j = 0; j < d; ++j) {
             dx0 += (x[j] - x[i]) * q[j];
-            for (size_t k = kb[j].first; k < kb[j].second; ++k) {
+            for (size_t k : nz[j]) {
               dx0 += prec_.ll[i][j][k] * (x[j] * x[k] - x[i]);
             }
           }

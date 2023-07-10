@@ -1,15 +1,49 @@
-# Breaking changes 
+# secsse_hanno_dev
 
-* The `num_threads = NULL` is gone. This value defaults to arbitrary `100` in `secsse_loglik_eval` now.
+```R
+> source("secsse_cla.R")
+this tree has:  4126  tips and  4125  internal nodes
+Unit: milliseconds
+        expr      min       lq     mean   median       uq      max neval  cld
+ single thr. 51.45336 51.79697 52.17586 52.14852 52.63214 52.88532    10 a   
+   2 threads 28.44547 28.48321 28.92067 28.66617 29.18035 29.95662    10  b  
+   4 threads 16.77417 16.87427 18.00470 17.02503 18.24348 22.82410    10   c 
+   8 threads 11.23132 11.58550 13.41421 13.44186 14.31095 16.13349    10    d
+```
+
+## Breaking changes 
+
+* The `num_steps = NULL` option is gone. This value defaults to `100` in `secsse_loglik_eval` now.
 * `eval_cpp` returns a `List` [[output]],[[states]],[[duration]].
+* Some superfluous wrapper (`master_xyz`) might still lingering in the code.
 
-# Remaining issues
+## Remaining issues
 
+### misleading comment(s)
+
+This *might* have been an issue for some reasons:
+
+```
+#' @note Multithreading might lead to a slightly reduced accuracy
+#' (in the order of 1e-10) and is therefore not enabled by default.
+#' Please use at your own discretion.
+```
+
+Multithreading leads to slightly *different* results due to reordering but
+this has nothing to do with accuracy. In fact, the integration itself is
+not affected at all.
+
+* `eval_cpp` must return full states because of `collect_node_bars` (info available in the stored matrix).
+* Too much `state` data (i.e. `ances` NA states) transfered to C++.
+* Inefficient column major matrix memory layout.
 * Some superfluous wrapper (`master_xyz`) might still lingering in the code.
 * `num_threads` is not passed through all the layers leading to `eval_cpp`. Should be a global(ish) setting anyhow.
+* The data layout for the `stored` result is cumbersome on the C++ side. Please double-check in `secsse_eval.cpp`.
 * `secsse_sim.h\cpp` could need some tinkering.
 
-# 'store' bench `hanno_dev`
+## Benching `store`
+
+### `hanno_dev`
 
 ```R
 > source("secsse_store.R")
@@ -59,7 +93,7 @@ Unit: milliseconds
    8 threads  897.1503  905.0342  919.0528  909.4819  916.3939  985.9016    10
 ```
 
-# 'store' bench `develop` (note the units)
+### `develop` (note the units)
 
 ```R
 source("secsse_store.R")
