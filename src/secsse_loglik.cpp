@@ -107,18 +107,18 @@ Rcpp::List calc_ll_cpp(const std::string& rhs,
                        bool is_complete_tree,
                        bool see_states)
 {
-  using namespace secsse;  // remove 'secsse::' once deprecated code is removed
+  using namespace secsse;
   if (rhs == "ode_standard") {
     auto ll = Rcpp::as<Rcpp::NumericVector>(lambdas);
     return is_complete_tree 
-      ? calc_ll(std::make_unique<::secsse::ode_standard<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
-      : calc_ll(std::make_unique<::secsse::ode_standard<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
+      ? calc_ll(std::make_unique<ode_standard<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
+      : calc_ll(std::make_unique<ode_standard<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
   } 
   else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
     return is_complete_tree 
-      ? calc_ll(std::make_unique<::secsse::ode_cla<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
-      : calc_ll(std::make_unique<::secsse::ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
+      ? calc_ll(std::make_unique<ode_cla<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
+      : calc_ll(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
   }
   else {
     throw std::runtime_error("calc_ll_cpp: unknown rhs");
@@ -137,18 +137,16 @@ Rcpp::NumericVector ct_condition_cpp(const std::string rhs,
                                      double atol,
                                      double rtol) 
 {
-  using namespace secsse;  // remove '::secsse::' once deprecated code is removed
+  using namespace secsse;
   if (rhs == "ode_standard") {
     auto ll = Rcpp::as<Rcpp::NumericVector>(lambdas);
-    return secsse::ct_condition(std::make_unique<::secsse::ode_standard<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol);
+    return secsse::ct_condition(std::make_unique<ode_standard<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol);
   } 
   else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
-    return ct_condition(std::make_unique<::secsse::ode_cla<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol);
+    return ct_condition(std::make_unique<ode_cla<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol);
   } 
   else {
     throw std::runtime_error("ct_condition_cpp: unknown rhs");
   }
 }
-
-

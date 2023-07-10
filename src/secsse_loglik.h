@@ -32,9 +32,9 @@ namespace secsse {
   // };
   //
   // struct inode_t {
-  //   state_ptr state;       // pointer to state
+  //   state_ptr state;    // pointer to state
   //   dnode_t desc[2];    // descendants
-  //   double loglik;         // calculated loglik
+  //   double loglik;      // calculated loglik
   //   ...
   // };
 
@@ -172,13 +172,15 @@ namespace secsse {
       do_integrate(state, t0, t1);
     }
     
-    void operator()(storing::dnode_t& dnode, size_t num_steps) const {
+    // stores the num_steps + 1 integration results at [t0, t0+dt, ... t0+n*num_steps, t0]
+    // inside `dnode.storage`.
+    void operator()(storing::dnode_t& dnode, size_t num_steps, double sdft = SECSSE_DEFAULT_DFT_STORE) const {
       auto t0 = 0.0;
       const auto dt = dnode.time / num_steps;
       auto y = *dnode.state;
       for (size_t i = 0; i < num_steps; ++i, t0 += dt) {
         dnode.storage.emplace_back(t0, y);
-        do_integrate(y, t0, t0 + dt, 0.1);
+        do_integrate(y, t0, t0 + dt, sdft);
       }
       dnode.storage.emplace_back(dnode.time, y);
     }
