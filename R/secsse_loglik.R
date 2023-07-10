@@ -19,8 +19,7 @@ master_loglik <- function(parameter,
   parameter[[3]][is.na(parameter[[3]])] <- 0
   q_matrix <- parameter[[3]]
 
-  using_cla <- FALSE
-  if (is.list(lambdas)) using_cla <- TRUE
+  using_cla <- is.list(lambdas)
 
   num_modeled_traits <- ncol(q_matrix) / floor(num_concealed_states)
 
@@ -55,27 +54,22 @@ master_loglik <- function(parameter,
 
   d <- ncol(states) / 2
 
-  if (see_ancestral_states == TRUE && num_threads != 1) {
-    warning("see ancestral states only works with one thread, 
-              setting to one thread")
-    num_threads <- 1
-  }
-
-  calcul <- update_using_cpp(ances,
-                             states,
-                             forTime,
-                             lambdas,
-                             mus,
-                             q_matrix,
-                             method,
-                             atol,
-                             rtol,
-                             is_complete_tree,
-                             num_threads)
+  RcppParallel::setThreadOptions(numThreads = num_threads)
+  calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
+                        ances = ances,
+                        states = states,
+                        forTime = forTime,
+                        lambdas = lambdas,
+                        mus = mus,
+                        Q = q_matrix,
+                        method = method,
+                        atol = atol,
+                        rtol = rtol,
+                        is_complete_tree = is_complete_tree,
+                        see_states = see_ancestral_states)
   loglik <- calcul$loglik
-  nodeM <- calcul$nodeM
-  mergeBranch <- calcul$mergeBranch
-  states <- calcul$states
+  nodeM <- calcul$node_M
+  mergeBranch <- calcul$merge_branch
 
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
@@ -110,6 +104,7 @@ master_loglik <- function(parameter,
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
 
   if (see_ancestral_states == TRUE) {
+    states <- calcul$states
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):(nrow(states)), ]
     ancestral_states <-
@@ -121,7 +116,7 @@ master_loglik <- function(parameter,
   }
 }
 
-#' Logikelihood calculation for the SecSSE model given a set of parameters and
+#' Loglikelihood calculation for the SecSSE model given a set of parameters and
 #' data
 #' @title Likelihood for SecSSE model
 #' @param parameter list where first vector represents lambdas, the second mus
@@ -135,7 +130,7 @@ master_loglik <- function(parameter,
 #' @param cond condition on the existence of a node root: "maddison_cond",
 #' "proper_cond"(default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:
-#' "maddison_weights","proper_weights"(default) or "equal_weights".
+#' "maddison_weights" or "proper_weights"(default).
 #' It can also be specified the root state:the vector c(1, 0, 0)
 #' indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per
@@ -157,9 +152,6 @@ master_loglik <- function(parameter,
 #' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
 #' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
 #' @return The loglikelihood of the data given the parameter.
-#' @note Multithreading might lead to a slightly reduced accuracy
-#' (in the order of 1e-10) and is therefore not enabled by default.
-#' Please use at your own discretion.
 #' @examples
 #' rm(list = ls(all = TRUE))
 #' library(secsse)
@@ -232,8 +224,8 @@ secsse_loglik <- function(parameter,
 #' to number of examined states.
 #' @param cond condition on the existence of a node root: 'maddison_cond',
 #' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weigh
-#' ,'proper_weights'(default) or 'equal_weights'. It can also be specified the
+#' @param root_state_weight the method to weigh the states:'maddison_weights
+#'  or 'proper_weights'(default) oIt can also be specified the
 #' root state:the vector c(1,0,0) indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per trait
 #' state. It must have as many elements as trait states.
@@ -254,9 +246,6 @@ secsse_loglik <- function(parameter,
 #' @param atol absolute tolerance of integration
 #' @param rtol relative tolerance of integration
 #' @return The loglikelihood of the data given the parameters
-#' @note Multithreading might lead to a slightly reduced accuracy
-#' (in the order of 1e-8) and is therefore not enabled by default.
-#' Please use at your own discretion.
 #' @examples
 #'rm(list=ls(all=TRUE))
 #'library(secsse)

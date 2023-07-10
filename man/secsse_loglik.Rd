@@ -39,7 +39,7 @@ to number of examined states.}
 "proper_cond"(default). For details, see vignette.}
 
 \item{root_state_weight}{the method to weigh the states:
-"maddison_weights","proper_weights"(default) or "equal_weights".
+"maddison_weights" or "proper_weights"(default).
 It can also be specified the root state:the vector c(1, 0, 0)
 indicates state 1 was the root state.}
 
@@ -74,13 +74,8 @@ Default is one thread.}
 The loglikelihood of the data given the parameter.
 }
 \description{
-Logikelihood calculation for the SecSSE model given a set of parameters and
+Loglikelihood calculation for the SecSSE model given a set of parameters and
 data
-}
-\note{
-Multithreading might lead to a slightly reduced accuracy
-(in the order of 1e-10) and is therefore not enabled by default.
-Please use at your own discretion.
 }
 \examples{
 rm(list = ls(all = TRUE))

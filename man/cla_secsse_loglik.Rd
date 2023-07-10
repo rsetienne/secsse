@@ -39,8 +39,8 @@ to number of examined states.}
 \item{cond}{condition on the existence of a node root: 'maddison_cond',
 'proper_cond'(default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:'maddison_weigh
-,'proper_weights'(default) or 'equal_weights'. It can also be specified the
+\item{root_state_weight}{the method to weigh the states:'maddison_weights
+ or 'proper_weights'(default) oIt can also be specified the
 root state:the vector c(1,0,0) indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per trait
@@ -76,11 +76,6 @@ The loglikelihood of the data given the parameters
 \description{
 Loglikelihood calculation for the cla_SecSSE model given a set of parameters
 and data using Rcpp
-}
-\note{
-Multithreading might lead to a slightly reduced accuracy
-(in the order of 1e-8) and is therefore not enabled by default.
-Please use at your own discretion.
 }
 \examples{
 rm(list=ls(all=TRUE))

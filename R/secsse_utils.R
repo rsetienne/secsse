@@ -713,79 +713,6 @@ secsse_transform_parameters <- function(trparsopt,
 }
 
 
-#' @keywords internal
-update_using_cpp <- function(ances,
-                             states,
-                             forTime,
-                             lambdas,
-                             mus,
-                             q_matrix,
-                             method,
-                             atol,
-                             rtol,
-                             is_complete_tree,
-                             num_threads) {
-    # This function will be improved later on, when we have a unified
-    # C side.
-    calcul <- c()
-
-    if (is.list(lambdas)) {
-        ancescpp <- ances - 1
-        forTimecpp <- forTime # nolint
-        forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1 # nolint
-
-        if (num_threads == 1) {
-            calcul <- cla_calThruNodes_cpp(ancescpp,
-                                           states,
-                                           forTimecpp,
-                                           lambdas,
-                                           mus,
-                                           q_matrix,
-                                           method,
-                                           atol,
-                                           rtol,
-                                           is_complete_tree)
-        } else {
-            if (num_threads == -2) {
-                calcul <- calc_cla_ll_threaded(ancescpp,
-                                               states,
-                                               forTimecpp,
-                                               lambdas,
-                                               mus,
-                                               q_matrix,
-                                               1,
-                                               method,
-                                               is_complete_tree)
-            } else {
-                calcul <- calc_cla_ll_threaded(ancescpp,
-                                               states,
-                                               forTimecpp,
-                                               lambdas,
-                                               mus,
-                                               q_matrix,
-                                               num_threads,
-                                               method,
-                                               is_complete_tree)
-            }
-        }
-    } else {
-        RcppParallel::setThreadOptions(numThreads = num_threads)
-
-        calcul <- calThruNodes_cpp(ances,
-                                   states,
-                                   forTime,
-                                   lambdas,
-                                   mus,
-                                   q_matrix,
-                                   num_threads,
-                                   atol,
-                                   rtol,
-                                   method,
-                                   is_complete_tree)
-    }
-    return(calcul)
-}
-
 condition <- function(cond,
                       mergeBranch2,
                       weight_states,
@@ -840,7 +767,8 @@ update_complete_tree <- function(phy,
 
     if (is.list(lambdas)) {
         y <- rep(0, lmb)
-        nodeM <- ct_condition_cla(y, # nolint
+        nodeM <- ct_condition_cpp(rhs = "ode_cla",
+                                  y, # nolint
                                   time_inte,
                                   lambdas,
                                   mus,
@@ -850,17 +778,16 @@ update_complete_tree <- function(phy,
                                   rtol)
         nodeM <- c(nodeM, y) # nolint
     } else {
-
         y <- rep(0, 2 * lmb)
-
-        nodeM <- ct_condition(y, # nolint
-                              time_inte,
-                              lambdas,
-                              mus,
-                              q_matrix,
-                              method,
-                              atol,
-                              rtol)
+        nodeM <- ct_condition_cpp(rhs = "ode_standard",
+                                  y, # nolint
+                                  time_inte,
+                                  lambdas,
+                                  mus,
+                                  q_matrix,
+                                  method,
+                                  atol,
+                                  rtol)
     }
     return(nodeM)
 }

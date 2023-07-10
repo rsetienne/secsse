@@ -22,47 +22,47 @@ test_that("the loglik for the complete tree under cla_secsse", {
   num_concealed_states <- 3
   sampling_fraction <- c(1, 1, 1)
 
-  secsse_cla_LL3 <- cla_secsse_loglik(parameter = parameter,
-                                      phy = example_phy_GeoSSE,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = "maddison_cond",
-                                      root_state_weight = "maddison_weights",
-                                      sampling_fraction = sampling_fraction,
-                                      setting_calculation = NULL,
-                                      see_ancestral_states = FALSE,
-                                      loglik_penalty = 0,
-                                      is_complete_tree = FALSE)
+  secsse_cla_LL3 <- secsse_loglik(parameter = parameter,
+                                  phy = example_phy_GeoSSE,
+                                  traits = traits,
+                                  num_concealed_states =
+                                    num_concealed_states,
+                                  cond = "maddison_cond",
+                                  root_state_weight = "maddison_weights",
+                                  sampling_fraction = sampling_fraction,
+                                  setting_calculation = NULL,
+                                  see_ancestral_states = FALSE,
+                                  loglik_penalty = 0,
+                                  is_complete_tree = FALSE)
 
-  secsse_cla_LL4 <- cla_secsse_loglik(parameter = parameter,
-                                      phy = example_phy_GeoSSE,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = "maddison_cond",
-                                      root_state_weight = "maddison_weights",
-                                      sampling_fraction = sampling_fraction,
-                                      setting_calculation = NULL,
-                                      see_ancestral_states = FALSE,
-                                      loglik_penalty = 0,
-                                      is_complete_tree = TRUE)
+  secsse_cla_LL4 <- secsse_loglik(parameter = parameter,
+                                  phy = example_phy_GeoSSE,
+                                  traits = traits,
+                                  num_concealed_states =
+                                    num_concealed_states,
+                                  cond = "maddison_cond",
+                                  root_state_weight = "maddison_weights",
+                                  sampling_fraction = sampling_fraction,
+                                  setting_calculation = NULL,
+                                  see_ancestral_states = FALSE,
+                                  loglik_penalty = 0,
+                                  is_complete_tree = TRUE)
   testthat::expect_equal(secsse_cla_LL3, secsse_cla_LL4)
 
   skip_on_cran()
-  secsse_cla_LL5 <- cla_secsse_loglik(parameter = parameter,
-                                      phy = example_phy_GeoSSE,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = "maddison_cond",
-                                      root_state_weight = "maddison_weights",
-                                      sampling_fraction = sampling_fraction,
-                                      setting_calculation = NULL,
-                                      see_ancestral_states = FALSE,
-                                      loglik_penalty = 0,
-                                      is_complete_tree = TRUE,
-                                      num_threads = 4)
+  secsse_cla_LL5 <- secsse_loglik(parameter = parameter,
+                                  phy = example_phy_GeoSSE,
+                                  traits = traits,
+                                  num_concealed_states =
+                                    num_concealed_states,
+                                  cond = "maddison_cond",
+                                  root_state_weight = "maddison_weights",
+                                  sampling_fraction = sampling_fraction,
+                                  setting_calculation = NULL,
+                                  see_ancestral_states = FALSE,
+                                  loglik_penalty = 0,
+                                  is_complete_tree = TRUE,
+                                  num_threads = 4)
   testthat::expect_equal(secsse_cla_LL5, secsse_cla_LL4,
                          tolerance = 1e-5)
 
@@ -92,18 +92,18 @@ test_that("the loglik for the complete tree under cla_secsse", {
   num_concealed_states <- 3
   sampling_fraction <- c(1, 1, 1)
 
-  secsse_cla_LL6 <- cla_secsse_loglik(parameter = parameter,
-                                      phy = phy,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = "maddison_cond",
-                                      root_state_weight = "maddison_weights",
-                                      sampling_fraction = sampling_fraction,
-                                      setting_calculation = NULL,
-                                      see_ancestral_states = FALSE,
-                                      loglik_penalty = 0,
-                                      is_complete_tree = TRUE)
+  secsse_cla_LL6 <- secsse_loglik(parameter = parameter,
+                                  phy = phy,
+                                  traits = traits,
+                                  num_concealed_states =
+                                    num_concealed_states,
+                                  cond = "maddison_cond",
+                                  root_state_weight = "maddison_weights",
+                                  sampling_fraction = sampling_fraction,
+                                  setting_calculation = NULL,
+                                  see_ancestral_states = FALSE,
+                                  loglik_penalty = 0,
+                                  is_complete_tree = TRUE)
 
   # hardcoded LL, don't know where the value comes from!
   # pauze this test until reply from Rampal, seems to be carry-over from
