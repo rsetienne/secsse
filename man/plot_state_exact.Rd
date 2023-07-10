@@ -2,11 +2,11 @@
 % Please edit documentation in R/seccse_plot.R
 \name{plot_state_exact}
 \alias{plot_state_exact}
-\title{Plot the local probability along the tree, including the branches}
+\title{Plot the local probability along a tree}
 \usage{
 plot_state_exact(
   parameters,
-  focal_tree,
+  phy,
   traits,
   num_concealed_states,
   sampling_fraction,
@@ -22,71 +22,75 @@ plot_state_exact(
 )
 }
 \arguments{
-\item{parameters}{used parameters for the likelihood calculation}
+\item{phy}{phylogenetic tree of class `phylo`, ultrametric, rooted and with
+branch lengths.}
 
-\item{focal_tree}{used phylogeny}
+\item{traits}{a vector with trait states for each tip in the phylogeny.}
 
-\item{traits}{used traits}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
-\item{num_concealed_states}{number of concealed states}
+\item{sampling_fraction}{vector that states the sampling proportion per
+trait state. It must have as many elements as there are trait states.}
 
-\item{sampling_fraction}{sampling fraction}
+\item{cond}{condition on the existence of a node root: `"maddison_cond"`,
+`"proper_cond"` (default). For details, see vignette.}
 
-\item{cond}{condition on the existence of a node root: 'maddison_cond',
-'proper_cond'(default). For details, see vignette.}
+\item{root_state_weight}{the method to weigh the states:
+`"maddison_weights"`, `"proper_weights"` (default) or `"equal_weights"`.
+It can also be specified for the root state: the vector `c(1, 0, 0)` 
+indicates state 1 was the root state.}
 
-\item{root_state_weight}{the method to weigh the states:'maddison_weigh
-,'proper_weights'(default) or 'equal_weights'. It can also be specified the
-root state:the vector c(1,0,0) indicates state 1 was the root state.}
-
-\item{is_complete_tree}{whether or not a tree with all its extinct species is
-provided}
+\item{is_complete_tree}{logical specifying whether or not a tree with all its
+extinct species is provided. If set to `TRUE`, it also assumes that all 
+\emph{all} extinct lineages are present on the tree. Defaults to `FALSE`.}
 
 \item{method}{integration method used, available are:
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
+`"odeint::runge_kutta_cash_karp54"`, `"odeint::runge_kutta_fehlberg78"`,
+`"odeint::runge_kutta_dopri5"`, `"odeint::bulirsch_stoer"` and
+`"odeint::runge_kutta4"`. Default method is: `"odeint::bulirsch_stoer"`.}
 
-\item{atol}{absolute tolerance of integration}
+\item{atol}{A numeric specifying the absolute tolerance of integration.}
 
-\item{rtol}{relative tolerance of integration}
+\item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{steps}{number of substeps evaluated per branch, see description.}
-
-\item{prob_func}{a function to calculate the probability of interest, see
-description}
-
-\item{verbose}{provides intermediate output (progressbars etc) when TRUE.}
+\item{verbose}{sets verbose output; default is verbose when optimmethod is
+`'subplex'`.}
 }
 \value{
 ggplot2 object
 }
 \description{
-this function will evaluate the log likelihood locally along
-all branches and plot the result. When steps is left to NULL, all likelihood
-evaluations during integration are used for plotting. This may work for not
-too large trees, but may become very memory heavy for larger trees. Instead,
-the user can indicate a number of steps, which causes the probabilities to be
-evaluated at a distinct amount of steps along each branch (and the
-probabilities to be properly integrated in between these steps). This
-provides an approximation, but generally results look very similar to using
-the full evaluation.
-The function used for prob_func will be highly dependent on your system.
+Plot the local probability along the tree, including the branches
+}
+\details{
+This function will evaluate the log likelihood locally along
+all branches and plot the result. When steps is left to `NULL`, all 
+likelihood evaluations during integration are used for plotting. This may 
+work for not too large trees, but may become very memory heavy for larger 
+trees. Instead, the user can indicate a number of steps, which causes the 
+probabilities to be evaluated at a distinct amount of steps along each branch
+(and the probabilities to be properly integrated in between these steps). 
+This provides an approximation, but generally results look very similar to 
+using the full evaluation.
+The function used for `prob_func` will be highly dependent on your system.
 for instance, for a 3 observed, 2 hidden states model, the probability
-of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
-prob_func will be applied to each row of the 'states' matrix (you can thus
+of state A is `prob[1] + prob[2] + prob[3]`, normalized by the row sum.
+`prob_func` will be applied to each row of the 'states' matrix (you can thus
 test your function on the states matrix returned when
-'see_ancestral_states = TRUE'). Please note that the first N columns of the
-states matrix are the extinction rates, and the (N+1):2N columns belong to
-the speciation rates, where N = num_obs_states * num_concealed_states.
- A typical probfunc function will look like:
+`'see_ancestral_states = TRUE'`). Please note that the first N columns of the
+states matrix are the extinction rates, and the `(N+1):2N` columns belong to
+the speciation rates, where `N = num_obs_states * num_concealed_states`.
+ A typical `prob_func` function will look like:
+ ```
 my_prob_func <- function(x) {
  return(sum(x[5:8]) / sum(x))
 }
+```
 }
 \examples{
 set.seed(5)
-focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
 params <- secsse::id_paramPos(c(0, 1), 2)
 params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
@@ -102,7 +106,7 @@ helper_function <- function(x) {
 }
 
 out_plot <- plot_state_exact(parameters = params,
-                             focal_tree = focal_tree,
+                             phy = phy,
                              traits = traits,
                              num_concealed_states = 2,
                              sampling_fraction = c(1, 1),

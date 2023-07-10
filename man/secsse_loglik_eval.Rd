@@ -85,7 +85,7 @@ data, returning also the likelihoods along the branches
 }
 \examples{
 set.seed(5)
-focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
 params <- secsse::id_paramPos(c(0, 1), 2)
 params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
@@ -94,7 +94,7 @@ params[[3]][, ] <- 0.1
 diag(params[[3]]) <- NA
 
 secsse_loglik_eval(parameter = params,
-                   phy = focal_tree,
+                   phy = phy,
                    traits = traits,
                    num_concealed_states = 2,
                    sampling_fraction = c(1, 1),

@@ -10,7 +10,7 @@
 #' evaluation
 #' @examples
 #' set.seed(5)
-#' focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+#' phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 #' traits <- c(0, 1, 1, 0)
 #' params <- secsse::id_paramPos(c(0, 1), 2)
 #' params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
@@ -19,7 +19,7 @@
 #' diag(params[[3]]) <- NA
 #'
 #' secsse_loglik_eval(parameter = params,
-#'                    phy = focal_tree,
+#'                    phy = phy,
 #'                    traits = traits,
 #'                    num_concealed_states = 2,
 #'                    sampling_fraction = c(1, 1),
@@ -71,54 +71,40 @@ secsse_loglik_eval <- function(parameter,
            num_steps = num_steps)
 }
 
+#' Plot the local probability along a tree
+#' 
 #' Plot the local probability along the tree, including the branches
-#' @param parameters used parameters for the likelihood calculation
-#' @param focal_tree used phylogeny
-#' @param traits used traits
-#' @param num_concealed_states number of concealed states
-#' @param sampling_fraction sampling fraction
-#' @param cond condition on the existence of a node root: 'maddison_cond',
-#' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weigh
-#' ,'proper_weights'(default) or 'equal_weights'. It can also be specified the
-#' root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
-#' @param steps number of substeps evaluated per branch, see description.
-#' @param prob_func a function to calculate the probability of interest, see
-#' description
-#' @param is_complete_tree whether or not a tree with all its extinct species is
-#' provided
-#' @param verbose provides intermediate output (progressbars etc) when TRUE.
-#' @return ggplot2 object
-#' @description this function will evaluate the log likelihood locally along
-#' all branches and plot the result. When steps is left to NULL, all likelihood
-#' evaluations during integration are used for plotting. This may work for not
-#' too large trees, but may become very memory heavy for larger trees. Instead,
-#' the user can indicate a number of steps, which causes the probabilities to be
-#' evaluated at a distinct amount of steps along each branch (and the
-#' probabilities to be properly integrated in between these steps). This
-#' provides an approximation, but generally results look very similar to using
-#' the full evaluation.
-#' The function used for prob_func will be highly dependent on your system.
+#' 
+#' @details This function will evaluate the log likelihood locally along
+#' all branches and plot the result. When steps is left to `NULL`, all 
+#' likelihood evaluations during integration are used for plotting. This may 
+#' work for not too large trees, but may become very memory heavy for larger 
+#' trees. Instead, the user can indicate a number of steps, which causes the 
+#' probabilities to be evaluated at a distinct amount of steps along each branch
+#' (and the probabilities to be properly integrated in between these steps). 
+#' This provides an approximation, but generally results look very similar to 
+#' using the full evaluation.
+#' The function used for `prob_func` will be highly dependent on your system.
 #' for instance, for a 3 observed, 2 hidden states model, the probability
-#' of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
-#' prob_func will be applied to each row of the 'states' matrix (you can thus
+#' of state A is `prob[1] + prob[2] + prob[3]`, normalized by the row sum.
+#' `prob_func` will be applied to each row of the 'states' matrix (you can thus
 #' test your function on the states matrix returned when
-#' 'see_ancestral_states = TRUE'). Please note that the first N columns of the
-#' states matrix are the extinction rates, and the (N+1):2N columns belong to
-#' the speciation rates, where N = num_obs_states * num_concealed_states.
-#'  A typical probfunc function will look like:
+#' `'see_ancestral_states = TRUE'`). Please note that the first N columns of the
+#' states matrix are the extinction rates, and the `(N+1):2N` columns belong to
+#' the speciation rates, where `N = num_obs_states * num_concealed_states`.
+#'  A typical `prob_func` function will look like:
+#'  ```
 #' my_prob_func <- function(x) {
 #'  return(sum(x[5:8]) / sum(x))
 #' }
+#' ```
+#' 
+#' @inheritParams default_params_doc
+#' 
+#' @return ggplot2 object
 #' @examples
 #' set.seed(5)
-#' focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+#' phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 #' traits <- c(0, 1, 1, 0)
 #' params <- secsse::id_paramPos(c(0, 1), 2)
 #' params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
@@ -134,7 +120,7 @@ secsse_loglik_eval <- function(parameter,
 #' }
 #'
 #' out_plot <- plot_state_exact(parameters = params,
-#'                              focal_tree = focal_tree,
+#'                              phy = phy,
 #'                              traits = traits,
 #'                              num_concealed_states = 2,
 #'                              sampling_fraction = c(1, 1),
@@ -142,7 +128,7 @@ secsse_loglik_eval <- function(parameter,
 #'                              prob_func = helper_function)
 #' @export
 plot_state_exact <- function(parameters,
-                             focal_tree,
+                             phy,
                              traits,
                              num_concealed_states,
                              sampling_fraction,
@@ -160,7 +146,7 @@ plot_state_exact <- function(parameters,
   }
 
   eval_res <- secsse_loglik_eval(parameter = parameters,
-                                 phy = focal_tree,
+                                 phy = phy,
                                  traits = traits,
                                  num_concealed_states =
                                   num_concealed_states,
@@ -176,9 +162,9 @@ plot_state_exact <- function(parameters,
   if (verbose) message("\nconverting collected likelihoods
                        to graph positions:\n")
 
-  xs <- ape::node.depth.edgelength(focal_tree)
-  ys <- ape::node.height(focal_tree)
-  num_tips <- length(focal_tree$tip.label)
+  xs <- ape::node.depth.edgelength(phy)
+  ys <- ape::node.height(phy)
+  num_tips <- length(phy$tip.label)
   num_nodes <- (1 + num_tips):length(ys)
 
   nodes <- data.frame(x = xs, y = ys, n = c(1:num_tips, num_nodes))
