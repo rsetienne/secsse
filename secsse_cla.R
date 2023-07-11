@@ -4,7 +4,7 @@ library(RcppParallel)
 rm(list = ls())
 set.seed(42)
 #set.seed(51)
-out <- DDD::dd_sim(pars = c(0.5 , 0.3, 1000), age = 30)
+out <- DDD::dd_sim(pars = c(0.5 , 0.3, 10000), age = 40)
 phy <- out$tes
 cat("this tree has: ", phy$Nnode + 1, " tips and ", phy$Nnode, " internal nodes\n")
 
@@ -31,16 +31,16 @@ parameter[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
 
 
 run_secsse <- function(num_threads) {
-  as.numeric(secsse::cla_secsse_loglik(parameter = parameter,
-                                       phy = phy,
-                                       traits = traits,
-                                       num_concealed_states = num_concealed_states,
-                                       sampling_fraction = sampling_fraction,
-                                       is_complete_tree = FALSE,
-                                       num_threads = num_threads,
-                                       method = "odeint::runge_kutta_fehlberg78",
-                                       atol = 1e-8,
-                                       rtol = 1e-6))
+  as.numeric(secsse::secsse_loglik(parameter = parameter,
+                                   phy = phy,
+                                   traits = traits,
+                                   num_concealed_states = num_concealed_states,
+                                   sampling_fraction = sampling_fraction,
+                                   is_complete_tree = FALSE,
+                                   num_threads = num_threads,
+                                   method = "odeint::runge_kutta_fehlberg78",
+                                   atol = 1e-8,
+                                   rtol = 1e-6))
 }
 
 rr <- microbenchmark::microbenchmark("single thr." = run_secsse(1),

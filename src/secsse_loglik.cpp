@@ -80,7 +80,7 @@ namespace secsse {
     auto init_state = std::vector<double>(y.begin(), y.end());
     odeintcpp::integrate(method,
                          std::move(od),
-                         &init_state,          // state vector
+                         &init_state,         // state vector
                          0.0,                 // t0
                          t,                   // t1
                          t * 0.01,

@@ -17,7 +17,9 @@
 namespace secsse {
 
 
-  extern size_t get_rcpp_num_threads();
+  // retreives value set by RcppParallel::setThreadOptions(numThreads)
+  // or tbb::task_arena::automatic if missing.
+  size_t get_rcpp_num_threads();
 
   
   using state_ptr = std::vector<double>*;

@@ -24,6 +24,23 @@ namespace secsse {
   template <typename T> using mutable_rmatrix_row = typename mutable_rmatrix<T>::Row;
   template <typename T> using mutable_rmatrix_col = typename mutable_rmatrix<T>::Column;
 
+  
+  template <typename T>
+  class vector_view_t {
+  public:
+    vector_view_t(T* data, size_t n) : first_(data), n_(n) {};
+
+    size_t size() const noexcept { return n_; }
+    T* begin() noexcept { return first_; }
+    T* end() noexcept { return first_ + n_; }
+    T& operator[](size_t i) { return *(first_ + i); }
+    void advance(size_t s) noexcept { first_ += s; }
+
+  private:
+    T* first_ = nullptr;
+    size_t n_ = 0;
+  };
+
 
   // some SFINAE magic
   template <typename, template <typename> class, typename = std::void_t<>>
@@ -88,7 +105,7 @@ namespace secsse {
           dxdt[i + d] = dxd;
         }
       }
-      else if constexpr (variant == OdeVariant::complete_tree || variant == OdeVariant::ct_condition) {
+      else if constexpr ((variant == OdeVariant::complete_tree) || (variant == OdeVariant::ct_condition)) {
         // complete tree including extinct branches or conditioning
         for (size_t i = 0; i < d; ++i) {
           double dx0 = (m_[i] - (l_[i] * x[i])) * (1 - x[i]);
@@ -106,36 +123,35 @@ namespace secsse {
   };
 
 
-  namespace {
+  struct cla_precomp_t {
+    std::vector<double> ll;     // flattened ll matrices
+    std::vector<std::vector<size_t>> nz;
+    std::vector<double> lambda_sum;
 
-    struct cla_precomp_t {
-      std::vector<std::vector<std::vector<double>>> ll;
-      std::vector<std::vector<std::pair<size_t, size_t>>> kb;
-      std::vector<double> lambda_sum;
-    };
-
-    auto ode_cla_precomp(const Rcpp::List& Rll) {
-      auto res = cla_precomp_t{};
+    explicit cla_precomp_t(const Rcpp::List& Rll) {
+      const auto n = Rll.size();
+      auto probe = Rcpp::as<Rcpp::NumericMatrix>(Rll[0]);
+      assert(probe.nrow() == probe.ncol());
+      const auto d = static_cast<size_t>(probe.nrow());
+      ll.resize(n * d * d, 0.0);
+      nz.resize(n * d, {});
+      auto llv = vector_view_t<double>{ll.data(), d};
+      auto nzv =nz.begin();
       for (int i = 0; i < Rll.size(); ++i) {
         // we all love deeply nested loops...
         const_rmatrix<double> mr(Rcpp::as<Rcpp::NumericMatrix>(Rll[i]));
-        auto& mc = res.ll.emplace_back();
-        auto& kbm = res.kb.emplace_back();
-        auto& ls = res.lambda_sum.emplace_back(0.0);
-        for (size_t j = 0; j < mr.nrow(); ++j) {
-          mc.emplace_back(mr.row(j).begin(), mr.row(j).end());
-          auto& b = kbm.emplace_back(0, mc[j].size());
-          for (; (mc[j][b.first] == 0.0) && (b.first <= b.second); ++b.first);        // first non-zero
-          for (; (mc[j][b.second - 1] == 0.0) && (b.second > b.first); --b.second);   // last non-zero
-          for (size_t k = 0; k < mc[j].size(); ++k) {
-            ls += mc[j][k];
+        auto& ls = lambda_sum.emplace_back(0.0);
+        for (size_t j = 0; j < mr.nrow(); ++j, llv.advance(d), ++nzv) {
+          for (auto k = 0; k < d; ++k) {
+            if (0.0 != (llv[k] = mr.row(j)[k])) {
+              nzv->push_back(k);
+              ls += llv[k];
+            }
           }
         }
       }
-      return res;
     }
-
-  }
+  };
 
 
   template <OdeVariant variant>
@@ -149,7 +165,7 @@ namespace secsse {
     ode_cla(const Rcpp::List ll,
             const Rcpp::NumericVector& m,
             const Rcpp::NumericMatrix& q)
-    : m_(m), q_(q), prec_(ode_cla_precomp(ll)) {
+    : m_(m), q_(q), prec_(ll) {
     }
 
     size_t size() const noexcept { return m_.size(); }
@@ -157,12 +173,13 @@ namespace secsse {
     void mergebranch(const std::vector<double>& N, const std::vector<double>& M, std::vector<double>& out) const {
       const auto d = size();
       assert(2 * d == out.size());
+      auto llv = vector_view_t<const double>(prec_.ll.data(), d);
       for (size_t i = 0; i < d; ++i) {
         out[i] = M[i];
         out[i + d] = 0.0;
-        for (size_t j = 0; j < d; ++j) {
+        for (size_t j = 0; j < d; ++j, llv.advance(d)) {
           for (size_t k = 0; k < d; ++k) {
-            out[i + d] += prec_.ll[i][j][k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
+            out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
           }
         }
         out[i + d] *= 0.5;
@@ -175,16 +192,16 @@ namespace secsse {
     {
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
+        auto llv = vector_view_t<const double>(prec_.ll.data(), d);
+        auto nzv = prec_.nz.begin();
         for (size_t i = 0; i < d; ++i) {
           double dx0 = 0.0;
           double dxd = 0.0;
           auto q = q_.row(i);
-          const auto& kb = prec_.kb[i];
-          for (size_t j = 0; j < d; ++j) {
-            for (size_t k = kb[j].first; k < kb[j].second; ++k) {
-              const double ll = prec_.ll[i][j][k];
-              dx0 += ll * (x[j] * x[k]);
-              dxd += ll * (x[j] * x[k + d] + x[j + d] * x[k]);
+          for (size_t j = 0; j < d; ++j, llv.advance(d), ++nzv) {
+            for (auto k : *nzv) {
+              dx0 += llv[k] * (x[j] * x[k]);
+              dxd += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
             }
             dx0 += (x[j] - x[i]) * q[j];
             dxd += (x[j + d] - x[i + d]) * q[j];
@@ -205,14 +222,15 @@ namespace secsse {
         }
       }
       else if constexpr (variant == OdeVariant::ct_condition) {
+        auto llv = vector_view_t<const double>(prec_.ll.data(), d);
+        auto nzv = prec_.nz.begin();
         for (size_t i = 0; i < d; ++i) {
           double dx0 = m_[i] * (1 - x[i]);
           auto q = q_.row(i);
-          const auto& kb = prec_.kb[i];
-          for (size_t j = 0; j < d; ++j) {
+          for (size_t j = 0; j < d; ++j, llv.advance(d), ++nzv) {
             dx0 += (x[j] - x[i]) * q[j];
-            for (size_t k = kb[j].first; k < kb[j].second; ++k) {
-              dx0 += prec_.ll[i][j][k] * (x[j] * x[k] - x[i]);
+            for (auto k : *nzv) {
+              dx0 += llv[k] * (x[j] * x[k] - x[i]);
             }
           }
           dxdt[i] = dx0;
