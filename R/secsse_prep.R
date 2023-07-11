@@ -280,8 +280,6 @@ expand_q_matrix <- function(q_matrix,
 #' 
 #' @inheritParams default_params_doc
 #' 
-#' @param mus previously defined mus - used to choose indicator number.
-#' 
 #' @examples
 #' shift_matrix <- create_default_shift_matrix(state_names = c(0, 1),
 #'                                             num_concealed_states = 2,
@@ -293,8 +291,8 @@ expand_q_matrix <- function(q_matrix,
 #' @export
 create_default_shift_matrix <- function(state_names = c("0", "1"),
                                         num_concealed_states = 2,
-                                        mus = NULL) {
-  lm <- unlist(mus)
+                                        mu_vector = NULL) {
+  lm <- unlist(mu_vector)
   focal_rate <- max(lm) + 1
   num_obs_states <- length(state_names)
   transition_list <- c()

@@ -63,11 +63,12 @@ default_params_doc(
   object,
   params,
   param_posit,
-  ml_pars
+  ml_pars,
+  mu_vector
 )
 }
 \arguments{
-\item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
 branch lengths.}
 
 \item{traits}{vector with trait states for each tip in the phylogeny. The
@@ -120,10 +121,10 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"simplex"}.}
+\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
+\code{FALSE}, optimizer output will be shown.}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads.
-Default is one thread.}
+\item{num_threads}{number of threads to be used. Default is one thread.}
 
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 
@@ -263,6 +264,8 @@ optimized.}
 
 \item{ml_pars}{resulting parameter estimates as returned by for instance
 \code{\link[=cla_secsse_ml]{cla_secsse_ml()}}, having the same structure as \code{param_post}.}
+
+\item{mu_vector}{previously defined mus - used to choose indicator number.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal

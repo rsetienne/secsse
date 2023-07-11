@@ -3,7 +3,7 @@
 #' This function's purpose is to list all parameter documentation to be 
 #' inherited by the relevant functions.
 #'
-#' @param phy phylogenetic tree of class `phylo`, ultrametric, rooted and with
+#' @param phy phylogenetic tree of class `phylo`, rooted and with
 #'  branch lengths.
 #' @param traits vector with trait states for each tip in the phylogeny. The 
 #'  order of the states must be the same as the tree tips. For help, see 
@@ -45,9 +45,9 @@
 #'  extinct species is provided. If set to `TRUE`, it also assumes that all 
 #'  *all* extinct lineages are present on the tree. Defaults to `FALSE`.
 #' @param verbose sets verbose output; default is `TRUE` when `optimmethod` is
-#'  `"simplex"`.
-#' @param num_threads number of threads. Set to -1 to use all available threads.
-#'  Default is one thread.
+#'  `"simplex"`. If `optimmethod` is set to `"simplex"`, then even if set to 
+#'  `FALSE`, optimizer output will be shown.
+#' @param num_threads number of threads to be used. Default is one thread.
 #' @param atol A numeric specifying the absolute tolerance of integration.
 #' @param rtol A numeric specifying the relative tolerance of integration.
 #' @param method integration method used, available are:
@@ -143,6 +143,7 @@
 #'  optimized.
 #' @param ml_pars resulting parameter estimates as returned by for instance
 #'  [cla_secsse_ml()], having the same structure as `param_post`.
+#' @param mu_vector previously defined mus - used to choose indicator number.
 #'
 #' @return Nothing
 #' @keywords internal
@@ -205,6 +206,7 @@ default_params_doc <- function(phy,
                                object,
                                params,
                                param_posit,
-                               ml_pars) {
+                               ml_pars,
+                               mu_vector) {
   # Nothing
 }

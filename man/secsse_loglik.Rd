@@ -28,7 +28,7 @@ secsse_loglik(
 \item{parameter}{list where first vector represents lambdas, the second
 mus and the third transition rates.}
 
-\item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
 branch lengths.}
 
 \item{traits}{vector with trait states for each tip in the phylogeny. The
@@ -62,8 +62,7 @@ be shown? Defaults to \code{FALSE}.}
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads.
-Default is one thread.}
+\item{num_threads}{number of threads to be used. Default is one thread.}
 
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 

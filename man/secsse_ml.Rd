@@ -30,7 +30,7 @@ secsse_ml(
 )
 }
 \arguments{
-\item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
 branch lengths.}
 
 \item{traits}{vector with trait states for each tip in the phylogeny. The
@@ -86,10 +86,10 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"simplex"}.}
+\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
+\code{FALSE}, optimizer output will be shown.}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads.
-Default is one thread.}
+\item{num_threads}{number of threads to be used. Default is one thread.}
 
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 

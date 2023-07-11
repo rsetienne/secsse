@@ -7,7 +7,7 @@
 create_default_shift_matrix(
   state_names = c("0", "1"),
   num_concealed_states = 2,
-  mus = NULL
+  mu_vector = NULL
 )
 }
 \arguments{
@@ -16,7 +16,7 @@ create_default_shift_matrix(
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
 
-\item{mus}{previously defined mus - used to choose indicator number.}
+\item{mu_vector}{previously defined mus - used to choose indicator number.}
 }
 \description{
 This function generates a generic shift matrix to be used with the function

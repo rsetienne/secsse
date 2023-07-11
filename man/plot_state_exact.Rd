@@ -25,7 +25,7 @@ plot_state_exact(
 \item{parameters}{list where first vector represents lambdas, the second mus
 and the third transition rates.}
 
-\item{phy}{phylogenetic tree of class \code{phylo}, ultrametric, rooted and with
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
 branch lengths.}
 
 \item{traits}{vector with trait states for each tip in the phylogeny. The
@@ -66,7 +66,8 @@ along a branch.}
 description.}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"simplex"}.}
+\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
+\code{FALSE}, optimizer output will be shown.}
 }
 \value{
 ggplot2 object
