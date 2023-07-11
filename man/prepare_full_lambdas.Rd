@@ -2,16 +2,18 @@
 % Please edit documentation in R/secsse_utils.R
 \name{prepare_full_lambdas}
 \alias{prepare_full_lambdas}
-\title{Prepares the entire set of lambda matrices for cla_secsse.}
+\title{Prepares the entire set of lambda matrices for cla_secsse.
+It provides the set of matrices containing all the speciation rates}
 \usage{
 prepare_full_lambdas(traits, num_concealed_states, lambd_and_modeSpe)
 }
 \arguments{
-\item{traits}{vector with trait states, order of states must be the same as
-tree tips, for help, see vignette.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
-to number of examined states.}
+to the number of examined states in the dataset.}
 
 \item{lambd_and_modeSpe}{a matrix with the 4 models of speciation possible.}
 }
@@ -20,6 +22,7 @@ A list of lambdas, its length would be the same than the number of
 trait states * num_concealed_states..
 }
 \description{
+Prepares the entire set of lambda matrices for cla_secsse.
 It provides the set of matrices containing all the speciation rates
 }
 \examples{

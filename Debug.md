@@ -133,3 +133,19 @@ Unit: seconds
  single thr. 30.77723 30.86942 31.02351 30.94320 31.18533 31.50008    10
 ```
 
+### docs
+
+* `phy` doc in most cases documented as: 
+#' @param phy phylogenetic tree of class `phylo`, ultrametric, rooted and with
+#'   branch lengths.
+yet in plots `plot_state_exact()` it is 
+#' @param focal_tree used phylogeny
+Changed to phy, confirm if correct
+
+* `steps` in `plot_state_exact()` vs `num_steps` in `secsse_loglik_eval()`. 
+Changed to `num_steps`, confirm
+
+* Check `num_threads` doc
+
+* mus in `create_default_shift_matrix()`. create_q_matrix() in the link??
+

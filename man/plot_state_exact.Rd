@@ -2,11 +2,11 @@
 % Please edit documentation in R/seccse_plot.R
 \name{plot_state_exact}
 \alias{plot_state_exact}
-\title{function to plot the local probability along the tree, including the branches}
+\title{Plot the local probability along a tree}
 \usage{
 plot_state_exact(
   parameters,
-  focal_tree,
+  phy,
   traits,
   num_concealed_states,
   sampling_fraction,
@@ -16,77 +16,93 @@ plot_state_exact(
   method = "odeint::bulirsch_stoer",
   atol = 1e-16,
   rtol = 1e-16,
-  steps = 100,
+  num_steps = 100,
   prob_func = NULL,
   verbose = FALSE
 )
 }
 \arguments{
-\item{parameters}{used parameters for the likelihood calculation}
+\item{parameters}{list where first vector represents lambdas, the second mus
+and the third transition rates.}
 
-\item{focal_tree}{used phylogeny}
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
+branch lengths.}
 
-\item{traits}{used traits}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
-\item{num_concealed_states}{number of concealed states}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
-\item{sampling_fraction}{sampling fraction}
+\item{sampling_fraction}{vector that states the sampling proportion per
+trait state. It must have as many elements as there are trait states.}
 
-\item{cond}{condition on the existence of a node root: 'maddison_cond',
-'proper_cond'(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
+\code{"proper_cond"} (default). For details, see vignette.}
 
-\item{root_state_weight}{the method to weigh the states:'maddison_weigh
-,'proper_weights'(default) or 'equal_weights'. It can also be specified the
-root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:
+\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
+It can also be specified for the root state: the vector \code{c(1, 0, 0)}
+indicates state 1 was the root state.}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species is
-provided}
+\item{is_complete_tree}{logical specifying whether or not a tree with all its
+extinct species is provided. If set to \code{TRUE}, it also assumes that all
+\emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
 \item{method}{integration method used, available are:
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
+\code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
+\code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
 
-\item{atol}{absolute tolerance of integration}
+\item{atol}{A numeric specifying the absolute tolerance of integration.}
 
-\item{rtol}{relative tolerance of integration}
+\item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{steps}{number of substeps evaluated per branch, see description.}
+\item{num_steps}{number of substeps to show intermediate likelihoods
+along a branch.}
 
 \item{prob_func}{a function to calculate the probability of interest, see
-description}
+description.}
 
-\item{verbose}{provides intermediate output (progressbars etc) when TRUE.}
+\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
+\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
+\code{FALSE}, optimizer output will be shown.}
 }
 \value{
 ggplot2 object
 }
 \description{
-this function will evaluate the log likelihood locally along
-all branches and plot the result. When steps is left to NULL, all likelihood
-evaluations during integration are used for plotting. This may work for not
-too large trees, but may become very memory heavy for larger trees. Instead,
-the user can indicate a number of steps, which causes the probabilities to be
-evaluated at a distinct amount of steps along each branch (and the
-probabilities to be properly integrated in between these steps). This
-provides an approximation, but generally results look very similar to using
-the full evaluation.
-The function used for prob_func will be highly dependent on your system.
-for instance, for a 3 observed, 2 hidden states model, the probability
-of state A is prob[1] + prob[2] + prob[3], normalized by the row sum.
-prob_func will be applied to each row of the 'states' matrix (you can thus
-test your function on the states matrix returned when
-'see_ancestral_states = TRUE'). Please note that the first N columns of the
-states matrix are the extinction rates, and the (N+1):2N columns belong to
-the speciation rates, where N = num_obs_states * num_concealed_states.
- A typical probfunc function will look like:
-my_prob_func <- function(x) {
- return(sum(x[5:8]) / sum(x))
+Plot the local probability along the tree, including the branches
 }
+\details{
+This function will evaluate the log likelihood locally along
+all branches and plot the result. When \code{num_steps} is left to \code{NULL}, all
+likelihood evaluations during integration are used for plotting. This may
+work for not too large trees, but may become very memory heavy for larger
+trees. Instead, the user can indicate a number of steps, which causes the
+probabilities to be evaluated at a distinct amount of steps along each branch
+(and the probabilities to be properly integrated in between these steps).
+This provides an approximation, but generally results look very similar to
+using the full evaluation.
+The function used for \code{prob_func} will be highly dependent on your system.
+for instance, for a 3 observed, 2 hidden states model, the probability
+of state A is \code{prob[1] + prob[2] + prob[3]}, normalized by the row sum.
+\code{prob_func} will be applied to each row of the 'states' matrix (you can thus
+test your function on the states matrix returned when
+\code{'see_ancestral_states = TRUE'}). Please note that the first N columns of the
+states matrix are the extinction rates, and the \verb{(N+1):2N} columns belong to
+the speciation rates, where \code{N = num_obs_states * num_concealed_states}.
+A typical \code{prob_func} function will look like:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{my_prob_func <- function(x) \{
+  return(sum(x[5:8]) / sum(x))
+\}
+}\if{html}{\out{</div>}}
 }
 \examples{
 set.seed(5)
-focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
 params <- secsse::id_paramPos(c(0, 1), 2)
 params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
@@ -102,10 +118,10 @@ helper_function <- function(x) {
 }
 
 out_plot <- plot_state_exact(parameters = params,
-                             focal_tree = focal_tree,
+                             phy = phy,
                              traits = traits,
                              num_concealed_states = 2,
                              sampling_fraction = c(1, 1),
-                             steps = 10,
+                             num_steps = 10,
                              prob_func = helper_function)
 }

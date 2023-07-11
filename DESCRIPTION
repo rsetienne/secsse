@@ -50,13 +50,11 @@ Imports:
  RcppParallel,
  ggplot2,
  tibble,
- rlang,
- stringr
+ rlang
 Suggests: 
  diversitree,
  phytools,
  testthat,
- testit,
  knitr,
  rmarkdown
 LinkingTo: 
@@ -71,3 +69,4 @@ URL: https://github.com/rsetienne/secsse
 BugReports: https://github.com/rsetienne/secsse/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_q_matrix}
 \alias{create_q_matrix}
-\title{helper function to neatly setup a Q matrix, without transitions to
+\title{Helper function to neatly setup a Q matrix, without transitions to
 concealed states (only observed transitions shown)}
 \usage{
 create_q_matrix(
@@ -13,25 +13,29 @@ create_q_matrix(
 )
 }
 \arguments{
-\item{state_names}{names of observed states}
+\item{state_names}{vector of names of all observed states.}
 
-\item{num_concealed_states}{number of concealed states}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
-\item{shift_matrix}{matrix of shifts, indicating in order: 1)
-starting state (typically the column in the transition matrix), 2) ending
-state (typically the row in the transition matrix) and 3) associated rate
-indicator}
+\item{shift_matrix}{matrix of shifts, indicating in order:
+\enumerate{
+\item starting state (typically the column in the transition matrix)
+\item ending state (typically the row in the transition matrix)
+\item associated rate indicator.
+}}
 
-\item{diff.conceal}{should we use the same number of rates for the
-concealed state transitions, or should all concealed state transitions
-have separate rates? Typically, FALSE is fine and should be used in order
-to avoid having a huge number of parameters.}
+\item{diff.conceal}{Boolean stating if the concealed states should be
+different. E.g. that the transition rates for the concealed
+states are different from the transition rates for the examined states.
+Normally it should be \code{FALSE} in order to avoid having a huge number of
+parameters.}
 }
 \value{
 transition matrix
 }
 \description{
-helper function to neatly setup a Q matrix, without transitions to
+Helper function to neatly setup a Q matrix, without transitions to
 concealed states (only observed transitions shown)
 }
 \examples{
