@@ -98,18 +98,18 @@ Rcpp::List eval_cpp(const std::string& rhs,
                     bool is_complete_tree,
                     size_t num_steps)
 {
-  using namespace secsse;  // remove 'secsse::' once deprecated code is removed
+  using namespace secsse;
   if (rhs == "ode_standard") {
     auto ll = Rcpp::as<Rcpp::NumericVector>(lambdas);
     return is_complete_tree 
-      ? eval(std::make_unique<::secsse::ode_standard<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps)
-      : eval(std::make_unique<::secsse::ode_standard<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps);
+      ? eval(std::make_unique<ode_standard<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps)
+      : eval(std::make_unique<ode_standard<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps);
   } 
   else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
     return is_complete_tree 
-      ? eval(std::make_unique<::secsse::ode_cla<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps)
-      : eval(std::make_unique<::secsse::ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps);
+      ? eval(std::make_unique<ode_cla<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps)
+      : eval(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, num_steps);
   }
   else {
     throw std::runtime_error("eval_cpp: unknown rhs");

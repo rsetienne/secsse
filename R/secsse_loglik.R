@@ -14,6 +14,7 @@ master_loglik <- function(parameter,
                           atol = 1e-8,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer") {
+  RcppParallel::setThreadOptions(numThreads = num_threads)
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
