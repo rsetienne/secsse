@@ -121,7 +121,7 @@ test_that("setup", {
   # and the q matrices
   t_CR <- secsse::create_default_shift_matrix(state_names = c("S", "N"),
                                               num_concealed_states = 2,
-                                              mus = mus_CR)
+                                              mu_vector = mus_CR)
   q_CR <- secsse::create_q_matrix(state_names = c("S", "N"),
                                   num_concealed_states = 2,
                                   shift_matrix = t_CR,
@@ -130,7 +130,7 @@ test_that("setup", {
 
   t_CTD <- secsse::create_default_shift_matrix(state_names = c("S", "N"),
                                                num_concealed_states = 2,
-                                               mus = mus_CTD)
+                                               mu_vector = mus_CTD)
   q_CTD <- secsse::create_q_matrix(state_names = c("S", "N"),
                                    num_concealed_states = 2,
                                    shift_matrix = t_CTD,
@@ -140,7 +140,7 @@ test_that("setup", {
 
   t_ETD <- secsse::create_default_shift_matrix(state_names = c("S", "N"),
                                                num_concealed_states = 2,
-                                               mus = mus_ETD)
+                                               mu_vector = mus_ETD)
   q_ETD <- secsse::create_q_matrix(state_names = c("S", "N"),
                                    num_concealed_states = 2,
                                    shift_matrix = t_ETD,
