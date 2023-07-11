@@ -12,7 +12,7 @@
 
 <meta name="author" content="Thijs Janzen" />
 
-<meta name="date" content="2023-07-07" />
+<meta name="date" content="2023-07-11" />
 
 <title>Starting secsse</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Starting secsse</h1>
 <h4 class="author">Thijs Janzen</h4>
-<h4 class="date">2023-07-07</h4>
+<h4 class="date">2023-07-11</h4>
 
 
 
@@ -370,7 +370,7 @@ particularly well. The *.csv file can be loaded into R using the
 read.csv() function. and should look like this:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(secsse)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">data</span>(traits)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">tail</span>(traits) <span class="co"># </span><span class="al">NOTE</span><span class="co">: Data file is different? trait column only has 0 and 1</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">tail</span>(traits)</span></code></pre></div>
 <pre><code>##     species trait
 ## t46     t46     1
 ## t56     t56     1
@@ -411,8 +411,9 @@ package:</p>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#and conversely,</span></span>
 <span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#mismat$data_not_tree</span></span></code></pre></div>
 <p>If you have taxa in your tree file that do not appear in your trait
-file, it is worth adding them with value ‘NA’ for trait state. You can
-visualise the tip states using the package diversitree:</p>
+file, it is worth adding them with value <code>NA</code> for trait
+state. You can visualise the tip states using the package
+diversitree:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;diversitree&quot;</span>)) {</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  for_plot <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">trait =</span> traits<span class="sc">$</span>trait,</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                         <span class="at">row.names =</span> phylo_vignette<span class="sc">$</span>tip.label)</span>
@@ -650,7 +651,7 @@ traits.</p>
 <span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
 <span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
 <span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">4</span>)</span></code></pre></div>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
 <pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
 ## Note: you set some transitions as impossible to happen.</code></pre>
 <p>We can now extract several pieces of information from the returned
@@ -660,20 +661,20 @@ answer:</p>
 <span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>ML_ETD</span></code></pre></div>
 <pre><code>## [1] -96.32138</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>ETD_par</span></code></pre></div>
-<pre><code>## [1] 4.429928e-01 8.810607e-01 5.201400e-07 7.764175e-07 7.770646e-02
-## [6] 1.570195e-09 1.410943e-01 6.555976e-02</code></pre>
+<pre><code>## [1] 4.429929e-01 8.810607e-01 5.201400e-07 7.764175e-07 7.770646e-02
+## [6] 1.570195e-09 1.410419e-01 6.549122e-02</code></pre>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
 <span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> ETD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
 <span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> ETD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
 <span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
-<pre><code>## [1] 0.4429928 0.8810607</code></pre>
+<pre><code>## [1] 0.4429929 0.8810607</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
 <pre><code>## [1] 5.201400e-07 7.764175e-07</code></pre>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
 <pre><code>## [1] 7.770646e-02 1.570195e-09</code></pre>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
-<pre><code>## [1] 0.14109429 0.06555976</code></pre>
+<pre><code>## [1] 0.14104187 0.06549122</code></pre>
 <p>The function <code>extract_par_vals()</code> goes over the list
 <code>answ$MLpars</code> and places the found parameter values back in
 consecutive vector 1:8 in this case. Here, we find that the speciation
@@ -794,28 +795,28 @@ used for the ETD model to perform our maximum likelihood:</p>
 <span id="cb40-19"><a href="#cb40-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
 <span id="cb40-20"><a href="#cb40-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
 <span id="cb40-21"><a href="#cb40-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb40-22"><a href="#cb40-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">4</span>)</span></code></pre></div>
+<span id="cb40-22"><a href="#cb40-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
 <pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
 ## Note: you set some transitions as impossible to happen.</code></pre>
 <div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a>ML_CTD <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
 <span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a>CTD_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
 <span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a>ML_CTD</span></code></pre></div>
-<pre><code>## [1] -98.41316</code></pre>
+<pre><code>## [1] -98.41269</code></pre>
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>CTD_par</span></code></pre></div>
-<pre><code>## [1] 1.964848e+00 2.925688e-01 2.074523e-08 2.541744e-06 7.760227e-02
-## [6] 2.385729e-09 1.319120e+01 3.736903e+00</code></pre>
+<pre><code>## [1] 1.967792e+00 2.939082e-01 3.637021e-04 4.716578e-05 7.756585e-02
+## [6] 6.941423e-07 1.319752e+01 3.715673e+00</code></pre>
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
 <span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
 <span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> CTD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
 <span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> CTD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
 <span id="cb46-5"><a href="#cb46-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
-<pre><code>## [1] 1.9648481 0.2925688</code></pre>
+<pre><code>## [1] 1.9677916 0.2939082</code></pre>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
-<pre><code>## [1] 2.074523e-08 2.541744e-06</code></pre>
+<pre><code>## [1] 3.637021e-04 4.716578e-05</code></pre>
 <div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
-<pre><code>## [1] 7.760227e-02 2.385729e-09</code></pre>
+<pre><code>## [1] 7.756585e-02 6.941423e-07</code></pre>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
-<pre><code>## [1] 13.191202  3.736903</code></pre>
+<pre><code>## [1] 13.197515  3.715673</code></pre>
 <p>Here we now find that state A has a very low speciation rate, in
 contrast to a much higher speciation rate for state B (remember that
 speciation rate 1 is now associated with A, and not with state 0!).
@@ -929,7 +930,7 @@ all rates in the transition matrix are the same).</p>
 <span id="cb60-19"><a href="#cb60-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
 <span id="cb60-20"><a href="#cb60-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
 <span id="cb60-21"><a href="#cb60-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb60-22"><a href="#cb60-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">4</span>)</span></code></pre></div>
+<span id="cb60-22"><a href="#cb60-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
 <pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
 ## Note: you set some transitions as impossible to happen.</code></pre>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a>ML_CR <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
@@ -968,7 +969,7 @@ Likelihood, we can calculate this as follows:</p>
 <span id="cb74-5"><a href="#cb74-5" tabindex="-1"></a>res</span></code></pre></div>
 <pre><code>##          ll k model      AIC
 ## 1 -96.32138 8   ETD 208.6428
-## 2 -98.41316 8   CTD 212.8263
+## 2 -98.41269 8   CTD 212.8254
 ## 3 -99.64176 6    CR 211.2835</code></pre>
 <p>I can now reveal to you that the tree we used was generated using an
 ETD model, which we have correctly recovered!</p>
@@ -981,7 +982,7 @@ feel free to create an issue at the package’s GitHub repository <a href="https
 authors for help with this R package. Additionally, bug reports and
 feature requests are welcome by the same means.</p>
 <p>======= ## References</p>
-<p>Beaulieu, J. M., O’meara, B. C., &amp; Donoghue, M. J. (2013).
+<p>Beaulieu, J. M., O’Meara, B. C., &amp; Donoghue, M. J. (2013).
 Identifying hidden rate changes in the evolution of a binary
 morphological character: the evolution of plant habit in campanulid
 angiosperms. Systematic biology, 62(5), 725-737.</p>
