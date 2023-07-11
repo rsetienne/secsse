@@ -42,6 +42,8 @@ master_loglik <- function(parameter,
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
   
+  d <- ncol(states) / 2
+  
   # with a complete tree, we need to re-calculate the states every time we
   # run, because they are dependent on mu.
   if (is_complete_tree) {
@@ -50,10 +52,9 @@ master_loglik <- function(parameter,
                            num_concealed_states = num_concealed_states,
                            sampling_fraction = sampling_fraction,
                            is_complete_tree = is_complete_tree,
-                           mus = mus)
+                           mus = mus,
+                           num_unique_traits = num_modeled_traits)
   }
-
-  d <- ncol(states) / 2
 
   RcppParallel::setThreadOptions(numThreads = num_threads)
   calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",

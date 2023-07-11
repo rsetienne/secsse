@@ -824,23 +824,22 @@ create_states <- function(usetraits,
                          traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
     }
 
-    if (is_complete_tree) {
-        extinct_species <- geiger::is.extinct(phy)
-        if (!is.null(extinct_species)) {
-            for (i in seq_along(extinct_species)) {
-              states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
-                    mus *
-                 states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
-            }
-        }
-        for (iii in 1:nb_tip) {
-            states[iii, 1:d] <- 0
-        }
-    } else {
-        for (iii in 1:nb_tip) {
-            states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
-        }
+  if (is_complete_tree) {
+    extinct_species <- geiger::is.extinct(phy)
+    if (!is.null(extinct_species)) {
+      for (i in seq_along(extinct_species)) {
+        states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
+          mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+      }
     }
+    for (iii in 1:nb_tip) {
+      states[iii, 1:d] <- 0
+    }
+  } else {
+    for (iii in 1:nb_tip) {
+      states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+    }
+  }
     return(states)
 }
 
