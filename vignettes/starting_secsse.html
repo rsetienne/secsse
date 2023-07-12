@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Thijs Janzen" />
+
+<meta name="date" content="2023-07-12" />
+
+<title>Starting secsse</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Starting secsse</h1>
+<h4 class="author">Thijs Janzen</h4>
+<h4 class="date">2023-07-12</h4>
+
+
+
+<div id="secsse-introduction" class="section level2">
+<h2>Secsse introduction</h2>
+<p>secsse is an R package designed for multistate data sets under a
+concealed state and speciation (‘hisse’) framework. In this sense, it is
+parallel to the ‘MuSSE’ functionality implemented in ‘diversitree’, but
+it accounts for finding possible spurious relationships between traits
+and diversification rates (‘false positives’, Rabosky &amp; Goldberg
+2015) by testing against a ‘hidden trait’ (Beaulieu et al. 2013), which
+is responsible for more variation in diversification rates than the
+trait being investigated.</p>
+<div id="secsse-input-files" class="section level3">
+<h3>Secsse input files</h3>
+<p>Similar to the ‘diversitree’ (Fitzjohn et al. 2012) and ‘hisse’
+(Beaulieu &amp; O’Meara 2016) packages, secsse uses two input files: a
+rooted, ultrametric tree in nexus format (for conversion of other
+formats to nexus, we refer to the documentation in package ‘ape’) and a
+data file with two columns, the first containing taxa names and the
+second a numeric code for trait state with a header (usually 0, 1, 2, 3,
+etc., but notice that ‘NA’ is a valid code too, if you are not sure what
+trait state to assign to a taxon). Here, we will use a simple trait
+dataset with only values 0 and 1, indicating presence and absence of a
+trait. A comma-separated value file (.csv) generated in MsExcel works
+particularly well. The *.csv file can be loaded into R using the
+read.csv() function. and should look like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(secsse)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">data</span>(traits)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">tail</span>(traits)</span></code></pre></div>
+<pre><code>##     species trait
+## t46     t46     1
+## t56     t56     1
+## t7       t7     0
+## t10     t10     0
+## t24     t24     0
+## t4       t4     0</code></pre>
+<p>This data set (here we see only the bottom lines of the data frame)
+has two character states labeled as 0 and 1. Ambiguity about trait state
+(you are not sure which trait state to assign a taxon too, or you have
+no data on trait state for a particular taxon), can be assigned using
+‘NA’. secsse handles ‘NA’ differently from a full trait state, in that
+it assigns probabilities to all trait states for a taxon demarcated with
+‘NA’.</p>
+<p>The second object we need is an ultrametric phylogenetic tree, that
+is rooted and has labelled tips. One can load it in R by using
+read.nexus(). In our example we load a prepared phylogeny named
+“phylo_vignette”:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;phylo_vignette&quot;</span>)</span></code></pre></div>
+<p>For running secsse it is important that tree tip labels agree with
+taxon names in the data file, but also that these are in the same order.
+For this purpose, we run the following piece of code prior to any
+analysis:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>sorted_traits <span class="ot">&lt;-</span> <span class="fu">sortingtraits</span>(traits, phylo_vignette)</span></code></pre></div>
+<p>If there is a mismatch in the number of taxa between data and tree
+file, you will receive an error message. However, to then identify which
+taxa are causing issues and if they are in the tree or data file, you
+can use the name.check function in the ‘geiger’(Harmon et al. 2008)
+package:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">library</span>(geiger)</span></code></pre></div>
+<pre><code>## Loading required package: ape</code></pre>
+<pre><code>## Loading required package: phytools</code></pre>
+<pre><code>## Loading required package: maps</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co">#pick out all elements that do not agree between tree and data</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>mismat <span class="ot">&lt;-</span> <span class="fu">name.check</span>(phylo_vignette, traits)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#this will call all taxa that are in the tree, but not the data file</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#mismat$tree_not_data</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#and conversely,</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#mismat$data_not_tree</span></span></code></pre></div>
+<p>If you have taxa in your tree file that do not appear in your trait
+file, it is worth adding them with value ‘NA’ for trait state. You can
+visualise the tip states using the package diversitree:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;diversitree&quot;</span>)) {</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  for_plot <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">trait =</span> traits<span class="sc">$</span>trait,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                         <span class="at">row.names =</span> phylo_vignette<span class="sc">$</span>tip.label)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>diversitree<span class="sc">::</span><span class="fu">trait.plot</span>(phylo_vignette, <span class="at">dat =</span> for_plot,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>                        <span class="at">cols =</span> <span class="fu">list</span>(<span class="st">&quot;trait&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>)),</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>                        <span class="at">type =</span> <span class="st">&quot;p&quot;</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>After you are done properly setting up your data, you can proceed to
+setting parameters and constraints.</p>
+<div id="note-on-assigning-ambiguity-to-taxon-trait-states" class="section level4">
+<h4>Note on assigning ambiguity to taxon trait states</h4>
+<p>If the user wishes to assign a taxon to multiple trait states,
+because he/she is unsure which state best describes the taxon, he/she
+can use <code>NA</code>. <code>NA</code> is used when there is no
+information on possible state at all; for example when a state was not
+measured or a taxon is unavailable for inspection. <code>NA</code> means
+a taxon is equally likely to pertain to any state. In case the user does
+have some information, for example if a taxon can pertain to multiple
+states, or if there is uncertainty regarding state but one or multiple
+states can with certainty be excluded, secsse offers flexibility to
+handle ambiguity. In this case, the user only needs to supply a trait
+file, with at least four columns, one for the taxon name, and three for
+trait state. Below, we show an example of what the trait info should be
+like (the column with species’ names has been removed). If a taxon may
+pertain to trait state 1 or 3, but not to 2, the three columns should
+have at least the values 1 and a 3, but never 2 (species in the third
+row). On the other hand, the species in the fifth row can pertain to all
+states: the first column would have a 1, the second a 2, the third a 3
+(although if you only have this type of ambiguity, it is easier to
+assign <code>NA</code> and use a single-column data file).</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co">#       traits traits traits</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co"># [1,]      2      2      2</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co"># [2,]      1      1      1</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co"># [3,]      2      2      2</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co"># [4,]      3      1      1</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co"># [5,]      1      2      3</span></span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="setting-up-an-analysis" class="section level2">
+<h2>Setting up an analysis</h2>
+<p>To perform a Maximum Likelihood analysis, secsse makes use of the
+function <code>DDD::optimize()</code>, which in turn, typically, uses
+the subplex package to perform the Maximum Likelihood optimization. In
+such an analysis, we need to specify which parameters we want to
+optimize, which parameters to keep fix, and the initial values per
+parameter. We do so by providing the structure of the input parameters
+(e.g. in vector, matrix or list form), and within this structure we
+highlight values that stay at zero with a 0, and parameters to be
+inferred with indexes 1, 2, … n. The optimizer will then use these
+indexes to fill in the associated parameters and perform the
+optimization. If this all seems a bit unclear, please continue reading
+and look at the fully set up parameterization for the maximum likelihood
+below to gain more insight.</p>
+<div id="etd" class="section level3">
+<h3>ETD</h3>
+<p>In the ETD model, we assume that the examined trait affects
+diversification. In a secsse analysis we need to specify the structure
+of three distinct properties: the lambda list, the mu vector and the
+transition (Q) matrix. Each of these informs properties of the model of
+speciation, extinction and trait-shifts respectively.</p>
+<div id="lambda-matrices" class="section level4">
+<h4>Lambda matrices</h4>
+<p>Speciation in a secsse model is defined using a list of matrices,
+where each matrix highlights the state of the daughter species resulting
+from a speciation event. In our case, we have a trait with two states,
+and thus we will have to specify a list with two matrices, one for each
+state, where each matrix in turn will then specify the daughter states.
+We can do so by hand, but secsse includes functionality to do this in a
+more organized manner - this is especially useful if you have a trait
+with more than two states for instance. In this more organized manner,
+we can provide secsse with a matrix specifying the potential speciation
+results, and secsse will construct the lambda list accordingly:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;ETD&quot;</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
+<pre><code>## $`0A`
+##    0A 1A 0B 1B
+## 0A  1  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  0
+## 
+## $`1A`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  2  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  0
+## 
+## $`0B`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  1  0
+## 1B  0  0  0  0
+## 
+## $`1B`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  2</code></pre>
+<p>Let’s see what the code has done. First, we create a
+<code>spec_matrix</code>, where the first column indicates the parent
+species (0 or 1) and the second and third column indicate the identities
+of the two daughter species. In this case, we choose for symmetric
+speciation without a change of trait, e.g. the daughters have the same
+trait as the parent. If you have evidence of perhaps asymmetric
+inheritance, you can specify this here. The fourth column indicates the
+associated rate indicator. In this case we choose two different
+speciation rates. We choose two concealed states, as it is good practice
+to have the same number of concealed states as observed states. The
+resulting <code>lambda_list</code> then contains four entries, one for
+each unique state (see the names of the entries in the list), that is,
+for each combination of observed and concealed states, where the
+concealed states are indicated with a capital letter. Looking at the
+first entry in the list, e.g. the result of a speciation event starting
+with a parent in state 0A, will result with rate 1 in two daughter
+species of state 0A as well. The way to read this, is by looking at the
+row and column identifiers of the entered rate. Similarly, for a
+speciation event starting in state 1A (<code>lambda_list[[2]]</code>),
+the two daughter species are 1A as well, but this time with rate 2, as
+we specified that species with trait 1 will have a different speciation
+rate. Note that here, rates 1 and 2 are ordered with the observed trait,
+we will later explore the CTD model, where the rates will be sorted
+according to the concealed state.</p>
+</div>
+<div id="mu-vector" class="section level4">
+<h4>Mu vector</h4>
+<p>Having the speciation rates set, we can move on to extinction rates.
+Since we are using the ETD model, here we also expect the extinction
+rates to be different:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;ETD&quot;</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
+<pre><code>## 0A 1A 0B 1B 
+##  3  4  3  4</code></pre>
+<p>The function <code>create_mus_vector()</code> takes the same standard
+information we provided earlier, with as addition our previously made
+<code>lambda_list</code>. It uses the <code>lambda_list</code> to
+identify the rate indicators (in this case 1 and 2) that are already
+used and to thus pick new rates. We see that secsse has created a named
+vector with two extinction rates (3 and 4), which are associated with
+our observed traits 0 and 1.</p>
+</div>
+<div id="transition-matrix" class="section level4">
+<h4>Transition matrix</h4>
+<p>Lastly, we need to specify our transition matrix. Often, Q matrices
+can get quite large and complicated, the more states you are analyzing.
+We have devised a tool to more easily put together Q matrices. This tool
+starts from the so-called <code>shift_matrix</code>, the basic matrix in
+which we only find information on transitions between examined states.
+The information contained in this <code>shift_matrix</code> is then
+automatically mimicked for inclusion in the full matrix, to ensure that
+the same complexity in examined state transitions is also found in
+concealed states. Instead of specifying the entire
+<code>shift_matrix</code>, instead it suffices to only specify the
+non-zero transitions. In this case these are from state 0 to 1, and vice
+versa:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
+<pre><code>##    0A 1A 0B 1B
+## 0A NA  5  7  0
+## 1A  6 NA  0  7
+## 0B  8  0 NA  5
+## 1B  0  8  6 NA</code></pre>
+<p>Thus, we first specify a matrix containing the potential state
+transitions, here 0-&gt;1 and 1-&gt;0. Then, we use
+<code>create_q_matrix()</code> to create the q-matrix. By setting
+<code>diff.conceal</code> to <code>TRUE</code>, we ensure that the
+concealed states will get their own rates specified. Setting this to
+<code>FALSE</code> would set their rates equal to the observed rates (5
+and 6). The way to read the transition matrix is column-row,
+e.g. starting at state 0A, with rate 5 the species will shift to state
+1A and with rate 7 it will shift to state 0B. We intentionally ignore
+‘double’ shifts, e.g. from 0A to 1B, where both the observed and the
+concealed trait shift at the same time. If you have good evidence to
+include such shifts in your model, you can modify the trans_matrix by
+hand of course.</p>
+</div>
+<div id="maximum-likelihood" class="section level4">
+<h4>Maximum Likelihood</h4>
+<p>We have now specified the required ingredients to perform Maximum
+Likelihood analyses. Prerequisites for performing Maximum Likelihood
+analyses with secsse are that we specify the ids of the rates we want
+optimized, and provide initial values. We can do so as follows:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># our maximum rate parameter was 8</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep all zeros at zero</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">8</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
+<p>Here, we specify that we want to optimize all parameters with rates
+1, 2, …, 8. We set these at initial values at 0.1 for all parameters.
+Here, we will only use one starting point, but in practice it is often
+advisable to explore multiple different initial values to avoid getting
+stuck in a local optimum and missing the global optimum.
+<code>idparsfix</code> and <code>initparsfix</code> indicate that all
+entries with a zero are to be kept at the value zero. Lastly, we set the
+sampling fraction to be c(1, 1), this indicates to secsse that we have
+sampled per trait all species with that trait in our dataset.
+Alternatively, if we know that perhaps some species with trait 0 are
+missing, we could specify that as c(0.8, 1.0). Thus, note that the
+sampling fraction does not add up to 1 across traits, but within
+traits.</p>
+<p>And now we can perform maximum likelihood:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
+<pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
+## Note: you set some transitions as impossible to happen.</code></pre>
+<p>We can now extract several pieces of information from the returned
+answer:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>ML_ETD <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>ETD_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>ML_ETD</span></code></pre></div>
+<pre><code>## [1] -96.32138</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>ETD_par</span></code></pre></div>
+<pre><code>## [1] 4.429929e-01 8.810607e-01 5.201400e-07 7.764175e-07 7.770646e-02
+## [6] 1.570195e-09 1.410419e-01 6.549122e-02</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> ETD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> ETD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
+<pre><code>## [1] 0.4429929 0.8810607</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
+<pre><code>## [1] 5.201400e-07 7.764175e-07</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
+<pre><code>## [1] 7.770646e-02 1.570195e-09</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
+<pre><code>## [1] 0.14104187 0.06549122</code></pre>
+<p>The function <code>extract_par_vals()</code> goes over the list
+<code>answ$MLpars</code> and places the found parameter values back in
+consecutive vector 1:8 in this case. Here, we find that the speciation
+rate of trait 1 is higher than the speciation rate of trait 0.</p>
+</div>
+</div>
+<div id="ctd" class="section level3">
+<h3>CTD</h3>
+<p>Let’s compare our findings with a CTD model, e.g. a model centered
+around the concealed trait. Again, we need to specify our lambda list,
+mu vector and transition matrix. We will see that this is quite
+straightforward now that we have gotten the hang of how this works.</p>
+<div id="lambda-matrices-1" class="section level4">
+<h4>Lambda matrices</h4>
+<p>Again, we specify two distinct rates, indicating that the observed
+state inherits faithfully to the daughter species. However, this time,
+we set the model indicator to “CTD”:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;CTD&quot;</span>)</span>
+<span id="cb33-8"><a href="#cb33-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
+<pre><code>## $`0A`
+##    0A 1A 0B 1B
+## 0A  1  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  0
+## 
+## $`1A`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  1  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  0
+## 
+## $`0B`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  2  0
+## 1B  0  0  0  0
+## 
+## $`1B`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  2</code></pre>
+<p>The resulting <code>lambda_list</code> now has the chosen rates 1 and
+2 sorted differently across the matrices, with matrices 1 and 2
+containing rate 1, and matrices 3 and 4 containing rate 2. Looking at
+the column names of the matrices, states 1 and 2 are states 0A and 1A,
+and states 3 and 4 are states 0B and 1B, in other words, speciation rate
+1 is now associated with all states with concealed state A, and
+speciation rate 2 is now associated with all states with concealed state
+B.</p>
+</div>
+<div id="mu-vector-1" class="section level4">
+<h4>Mu vector</h4>
+<p>For the mu vector, we repeat the same we did for the ETD model:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;CTD&quot;</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
+<pre><code>## 0A 1A 0B 1B 
+##  3  3  4  4</code></pre>
+<p>Here, again, we see that whereas previously extinction rate 3 was
+associated with states 0A and 0B (e.g. all states with state 0), it is
+now associated with states 0A and 1A, e.g. all states associated with
+concealed state A.</p>
+</div>
+<div id="transition-matrix-1" class="section level4">
+<h4>Transition matrix</h4>
+<p>Setting up the transition matrix is not different from the ETD model,
+the same transitions are possible:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))</span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
+<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
+<pre><code>##    0A 1A 0B 1B
+## 0A NA  5  7  0
+## 1A  6 NA  0  7
+## 0B  8  0 NA  5
+## 1B  0  8  6 NA</code></pre>
+</div>
+<div id="maximum-likelihood-1" class="section level4">
+<h4>Maximum Likelihood</h4>
+<p>Now that we have specified our matrices, we can use the same code we
+used for the ETD model to perform our maximum likelihood:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># our maximum rate parameter was 8</span></span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep all zeros at zero</span></span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">8</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb39-8"><a href="#cb39-8" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
+<span id="cb39-9"><a href="#cb39-9" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
+<span id="cb39-10"><a href="#cb39-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
+<span id="cb39-11"><a href="#cb39-11" tabindex="-1"></a></span>
+<span id="cb39-12"><a href="#cb39-12" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
+<span id="cb39-13"><a href="#cb39-13" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
+<span id="cb39-14"><a href="#cb39-14" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb39-15"><a href="#cb39-15" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
+<span id="cb39-16"><a href="#cb39-16" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
+<span id="cb39-17"><a href="#cb39-17" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
+<span id="cb39-18"><a href="#cb39-18" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
+<span id="cb39-19"><a href="#cb39-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
+<span id="cb39-20"><a href="#cb39-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
+<span id="cb39-21"><a href="#cb39-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb39-22"><a href="#cb39-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
+<pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
+## Note: you set some transitions as impossible to happen.</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>ML_CTD <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
+<span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a>CTD_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
+<span id="cb41-3"><a href="#cb41-3" tabindex="-1"></a>ML_CTD</span></code></pre></div>
+<pre><code>## [1] -98.41269</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a>CTD_par</span></code></pre></div>
+<pre><code>## [1] 1.967792e+00 2.939082e-01 3.637021e-04 4.716578e-05 7.756585e-02
+## [6] 6.941423e-07 1.319752e+01 3.715673e+00</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> CTD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> CTD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
+<span id="cb45-5"><a href="#cb45-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
+<pre><code>## [1] 1.9677916 0.2939082</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
+<pre><code>## [1] 3.637021e-04 4.716578e-05</code></pre>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
+<pre><code>## [1] 7.756585e-02 6.941423e-07</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
+<pre><code>## [1] 13.197515  3.715673</code></pre>
+<p>Here we now find that state A has a very low speciation rate, in
+contrast to a much higher speciation rate for state B (remember that
+speciation rate 1 is now associated with A, and not with state 0!).
+Similarly, extinction rates for both states are also quite different,
+with state A having a much lower extinction rate than state B. Examined
+trait shifts (<code>Q_Examined</code>) are quite low, whereas concealed
+trait shifts seem to be quite high. The LogLikelihood seems to be lower
+than what we found for the ETD model.</p>
+</div>
+</div>
+<div id="cr" class="section level3">
+<h3>CR</h3>
+<p>As a check, we will also fit a model where there is no trait effect -
+perhaps we are looking for an effect when there is none. This is always
+a good sanity check.</p>
+<div id="lambda-matrices-2" class="section level4">
+<h4>Lambda matrices</h4>
+<p>To specify the lambda matrices, this time we choose the same rate
+indicator across both states.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb53-4"><a href="#cb53-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb53-5"><a href="#cb53-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb53-6"><a href="#cb53-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
+<span id="cb53-7"><a href="#cb53-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>)</span>
+<span id="cb53-8"><a href="#cb53-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
+<pre><code>## $`0A`
+##    0A 1A 0B 1B
+## 0A  1  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  0
+## 
+## $`1A`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  1  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  0
+## 
+## $`0B`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  1  0
+## 1B  0  0  0  0
+## 
+## $`1B`
+##    0A 1A 0B 1B
+## 0A  0  0  0  0
+## 1A  0  0  0  0
+## 0B  0  0  0  0
+## 1B  0  0  0  1</code></pre>
+</div>
+<div id="mu-vector-2" class="section level4">
+<h4>Mu vector</h4>
+<p>The mu vector follows closely from this, having a shared extinction
+rate across all states:</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb55-3"><a href="#cb55-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>,</span>
+<span id="cb55-4"><a href="#cb55-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
+<span id="cb55-5"><a href="#cb55-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
+<pre><code>## 0A 1A 0B 1B 
+##  2  2  2  2</code></pre>
+</div>
+<div id="transition-matrix-2" class="section level4">
+<h4>Transition matrix</h4>
+<p>We will use the same transition matrix as used before, although one
+could perhaps argue that without a trait effect, all rates in the
+transition matrix (both forward and reverse trait shifts) should share
+the same rate. Here, we will choose the more parameter-rich version
+(Home assignment: try to modify the code to perform an analysis in which
+all rates in the transition matrix are the same).</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb57-2"><a href="#cb57-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb57-3"><a href="#cb57-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">4</span>))</span>
+<span id="cb57-4"><a href="#cb57-4" tabindex="-1"></a></span>
+<span id="cb57-5"><a href="#cb57-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb57-6"><a href="#cb57-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb57-7"><a href="#cb57-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
+<span id="cb57-8"><a href="#cb57-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb57-9"><a href="#cb57-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
+<pre><code>##    0A 1A 0B 1B
+## 0A NA  3  5  0
+## 1A  4 NA  0  5
+## 0B  6  0 NA  3
+## 1B  0  6  4 NA</code></pre>
+</div>
+<div id="maximum-likelihood-2" class="section level4">
+<h4>Maximum Likelihood</h4>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span> <span class="co"># our maximum rate parameter was 6</span></span>
+<span id="cb59-2"><a href="#cb59-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep all zeros at zero</span></span>
+<span id="cb59-3"><a href="#cb59-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">6</span>)</span>
+<span id="cb59-4"><a href="#cb59-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
+<span id="cb59-5"><a href="#cb59-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb59-6"><a href="#cb59-6" tabindex="-1"></a></span>
+<span id="cb59-7"><a href="#cb59-7" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb59-8"><a href="#cb59-8" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
+<span id="cb59-9"><a href="#cb59-9" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
+<span id="cb59-10"><a href="#cb59-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
+<span id="cb59-11"><a href="#cb59-11" tabindex="-1"></a></span>
+<span id="cb59-12"><a href="#cb59-12" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
+<span id="cb59-13"><a href="#cb59-13" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
+<span id="cb59-14"><a href="#cb59-14" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb59-15"><a href="#cb59-15" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
+<span id="cb59-16"><a href="#cb59-16" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
+<span id="cb59-17"><a href="#cb59-17" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
+<span id="cb59-18"><a href="#cb59-18" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
+<span id="cb59-19"><a href="#cb59-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
+<span id="cb59-20"><a href="#cb59-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
+<span id="cb59-21"><a href="#cb59-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb59-22"><a href="#cb59-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
+<pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
+## Note: you set some transitions as impossible to happen.</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a>ML_CR <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
+<span id="cb61-2"><a href="#cb61-2" tabindex="-1"></a>CR_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
+<span id="cb61-3"><a href="#cb61-3" tabindex="-1"></a>ML_CR</span></code></pre></div>
+<pre><code>## [1] -99.64176</code></pre>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a>CR_par</span></code></pre></div>
+<pre><code>## [1] 6.923591e-01 1.444426e-07 7.760335e-02 5.258368e-10 1.000000e-01
+## [6] 1.000000e-01</code></pre>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" tabindex="-1"></a>spec_rate <span class="ot">&lt;-</span> CR_par[<span class="dv">1</span>]</span>
+<span id="cb65-2"><a href="#cb65-2" tabindex="-1"></a>ext_rate <span class="ot">&lt;-</span>  CR_par[<span class="dv">2</span>]</span>
+<span id="cb65-3"><a href="#cb65-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> CR_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb65-4"><a href="#cb65-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> CR_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb65-5"><a href="#cb65-5" tabindex="-1"></a>spec_rate</span></code></pre></div>
+<pre><code>## [1] 0.6923591</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" tabindex="-1"></a>ext_rate</span></code></pre></div>
+<pre><code>## [1] 1.444426e-07</code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
+<pre><code>## [1] 7.760335e-02 5.258368e-10</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
+<pre><code>## [1] 0.1 0.1</code></pre>
+<p>We now recover a non-zero extinction rate, and much higher transition
+rates for the concealed than for the observed states.</p>
+</div>
+</div>
+<div id="model-comparisong-using-aic" class="section level3">
+<h3>Model comparisong using AIC</h3>
+<p>Having collected the different log likelihoods, we can directly
+compare the models using AIC. Remembering that the AIC is 2k - 2LL,
+where k is the number of parameters of each model and LL is the Log
+Likelihood, we can calculate this as follows:</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">ll =</span> <span class="fu">c</span>(ML_ETD, ML_CTD, ML_CR),</span>
+<span id="cb73-2"><a href="#cb73-2" tabindex="-1"></a>                  <span class="at">k  =</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">6</span>),</span>
+<span id="cb73-3"><a href="#cb73-3" tabindex="-1"></a>                  <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;ETD&quot;</span>, <span class="st">&quot;CTD&quot;</span>, <span class="st">&quot;CR&quot;</span>))</span>
+<span id="cb73-4"><a href="#cb73-4" tabindex="-1"></a>res<span class="sc">$</span>AIC <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> res<span class="sc">$</span>k <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> res<span class="sc">$</span>ll</span>
+<span id="cb73-5"><a href="#cb73-5" tabindex="-1"></a>res</span></code></pre></div>
+<pre><code>##          ll k model      AIC
+## 1 -96.32138 8   ETD 208.6428
+## 2 -98.41269 8   CTD 212.8254
+## 3 -99.64176 6    CR 211.2835</code></pre>
+<p>I can now reveal to you that the tree we used was generated using an
+ETD model, which we have correctly recovered!</p>
+</div>
+</div>
+<div id="further-help" class="section level2">
+<h2>Further help</h2>
+<p>If after reading these vignettes, you still have questions, please
+feel free to create an issue at the package’s GitHub repository <a href="https://github.com/rsetienne/secsse/issues" class="uri">https://github.com/rsetienne/secsse/issues</a> or e-mail the
+authors for help with this R package. Additionally, bug reports and
+feature requests are welcome by the same means.</p>
+<p>======= ## References</p>
+<p>Beaulieu, J. M., O’Meara, B. C., &amp; Donoghue, M. J. (2013).
+Identifying hidden rate changes in the evolution of a binary
+morphological character: the evolution of plant habit in campanulid
+angiosperms. Systematic biology, 62(5), 725-737.</p>
+<p>Beaulieu, J. M., &amp; O’Meara, B. C. (2016). Detecting hidden
+diversification shifts in models of trait-dependent speciation and
+extinction. Systematic biology, 65(4), 583-601.</p>
+<p>FitzJohn, R. G. (2012). Diversitree: comparative phylogenetic
+analyses of diversification in R. Methods in Ecology and Evolution,
+3(6), 1084-1092.</p>
+<p>Harmon, L. J., Weir, J. T., Brock, C. D., Glor, R. E., &amp;
+Challenger, W. (2008). GEIGER: investigating evolutionary radiations.
+Bioinformatics, 24(1), 129-131.</p>
+<p>Rabosky, D. L., &amp; Goldberg, E. E. (2015). Model inadequacy and
+mistaken inferences of trait-dependent speciation. Systematic Biology,
+64(2), 340-355.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

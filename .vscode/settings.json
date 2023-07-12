@@ -75,6 +75,12 @@
         "__verbose_abort": "cpp",
         "ios": "cpp",
         "locale": "cpp",
-        "version": "cpp"
+        "version": "cpp",
+        "__tree": "cpp",
+        "queue": "cpp",
+        "span": "cpp",
+        "charconv": "cpp",
+        "__errc": "cpp",
+        "__mutex_base": "cpp"
     }
 }

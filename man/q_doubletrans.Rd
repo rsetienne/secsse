@@ -2,20 +2,24 @@
 % Please edit documentation in R/secsse_utils.R
 \name{q_doubletrans}
 \alias{q_doubletrans}
-\title{Basic Qmatrix}
+\title{Basic Qmatrix
+Sets a Q matrix where double transitions are not allowed}
 \usage{
 q_doubletrans(traits, masterBlock, diff.conceal)
 }
 \arguments{
-\item{traits}{vector with trait states, order of states must be the same as
-tree tips, for help, see vignette.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
-\item{masterBlock}{matrix of transitions among only examined states, NA in
+\item{masterBlock}{matrix of transitions among only examined states, \code{NA} in
 the main diagonal, used to build the full transition rates matrix.}
 
-\item{diff.conceal}{should the concealed states be different? Normally it
-should be FALSE. E.g. that the transition rates for the concealed states
-are different from the transition rates for the examined states.}
+\item{diff.conceal}{Boolean stating if the concealed states should be
+different. E.g. that the transition rates for the concealed
+states are different from the transition rates for the examined states.
+Normally it should be \code{FALSE} in order to avoid having a huge number of
+parameters.}
 }
 \value{
 Q matrix that includes both examined and concealed states, it should
@@ -23,12 +27,9 @@ be declared as the third element of idparslist.
 }
 \description{
 This function expands the Q_matrix, but it does so assuming
-that the number of concealed traits is equal to the number of examined 
+that the number of concealed traits is equal to the number of examined
 traits, if you have a different number, you should consider looking at
-the function [expand_q_matrix()].
-}
-\details{
-Sets a Q matrix where double transitions are not allowed
+the function \code{\link[=expand_q_matrix]{expand_q_matrix()}}.
 }
 \examples{
 traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits

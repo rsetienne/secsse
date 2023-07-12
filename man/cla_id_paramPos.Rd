@@ -2,26 +2,30 @@
 % Please edit documentation in R/secsse_utils.R
 \name{cla_id_paramPos}
 \alias{cla_id_paramPos}
-\title{Parameter structure setting for cla_secsse}
+\title{Parameter structure setting for cla_secsse
+It sets the parameters (speciation, extinction and transition)
+IDs. Needed for ML calculation with cladogenetic options (cla_secsse_ml)}
 \usage{
 cla_id_paramPos(traits, num_concealed_states)
 }
 \arguments{
-\item{traits}{vector with trait states, order of states must be the same as
-tree tips, for help, see vignette.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
-to number of examined states.}
+to the number of examined states in the dataset.}
 }
 \value{
 A list that includes the ids of the parameters for ML analysis.
 }
 \description{
+Parameter structure setting for cla_secsse
 It sets the parameters (speciation, extinction and transition)
-ids. Needed for ML calculation with cladogenetic options (cla_secsse_ml)
+IDs. Needed for ML calculation with cladogenetic options (cla_secsse_ml)
 }
 \examples{
 traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
 num_concealed_states <- 3
-param_posit <- cla_id_paramPos(traits,num_concealed_states)
+param_posit <- cla_id_paramPos(traits, num_concealed_states)
 }

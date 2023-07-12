@@ -61,12 +61,12 @@ test_that("test secsse_sim", {
   max_time <- 1
 
   tree1 <- secsse::secsse_sim(lambdas = lambdas,
-                             mus = mus,
-                             qs = qs,
-                             num_concealed_states = num_concealed_states,
-                             crown_age = max_time,
-                             maxSpec = maxSpec,
-                             conditioning = "obs_states")
+                              mus = mus,
+                              qs = qs,
+                              num_concealed_states = num_concealed_states,
+                              crown_age = max_time,
+                              maxSpec = maxSpec,
+                              conditioning = "obs_states")
 
   all_obs_present <- c(0, 1, 2) %in% tree1$obs_traits
   testthat::expect_equal(sum(all_obs_present), 3)

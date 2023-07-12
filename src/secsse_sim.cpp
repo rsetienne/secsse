@@ -4,12 +4,61 @@
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
+
+
 #include <Rcpp.h>
-
 #include "secsse_sim.h"   // NOLINT [build/include_subdir]
-#include "util.h"         // NOLINT [build/include_subdir]
-
 #include <string>
+#include <algorithm>
+#include <numeric>
+
+
+namespace util {  // collection of left-overs
+
+// Transpose Rcpp::NumericMatrix into
+// std::vector<std::vector<double>>
+void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
+                             std::vector< std::vector< double >>* v) {
+  (*v) = std::vector< std::vector< double> >(m.nrow(),
+   std::vector<double>(m.ncol(), 0.0));
+  for (int i = 0; i < m.nrow(); ++i) {
+    std::vector<double> row(m.ncol(), 0.0);
+    for (int j = 0; j < m.ncol(); ++j) {
+      row[j] = m(i, j);
+    }
+    (*v)[i] = row;
+  }
+  return;
+}
+
+
+void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
+                             Rcpp::NumericMatrix* m) {
+  size_t n_rows = v.size();
+  size_t n_cols = v[0].size();
+  (*m) = Rcpp::NumericMatrix(n_rows, n_cols);
+  for (size_t i = 0; i < n_rows; ++i) {
+    for (size_t j = 0; j < n_cols; ++j) {
+      (*m)(i, j) = v[i][j];
+    }
+  }
+  return;
+}
+
+
+void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
+                    std::vector< std::vector< std::vector<double >>>* v) {
+  size_t n = l.size();
+  (*v) = std::vector< std::vector< std::vector<double>>>(n);
+  for (size_t i = 0; i < n; ++i) {
+    std::vector< std::vector< double >> entry;
+    Rcpp::NumericMatrix temp = l[i];
+    util::numericmatrix_to_vector(temp, &entry);
+    (*v).push_back(entry);
+  }
+  return;
+}
+
 
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
@@ -26,6 +75,8 @@ num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   return out;
 }
 
+}  // namespace util
+
 // [[Rcpp::export]]
 Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::List& lambdas_R,
@@ -40,11 +91,9 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           int max_tries,
                           int seed) {
   num_mat q;
-  numericmatrix_to_vector(q_R, &q);
-
-  num_mat_mat lambdas = list_to_nummatmat(lambdas_R);
-
-  // if (conditioning_vec[0] == -1) conditioning_vec.clear();   // "none"
+  util::numericmatrix_to_vector(q_R, &q);
+  
+  num_mat_mat lambdas = util::list_to_nummatmat(lambdas_R);
 
   secsse_sim sim(m_R,
                  lambdas,
@@ -54,43 +103,42 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  init_states,
                  non_extinction,
                  seed);
-
   std::array<int, 5> tracker = {0, 0, 0, 0, 0};
   int cnt = 0;
   while (true) {
-        sim.run();
-        // sim.check_num_traits(conditioning_vec);
-        sim.check_conditioning(condition,
-                               num_concealed_states,
-                               m_R.size());
-
-        if (sim.run_info != done) {
-          cnt++;
-          tracker[ sim.run_info ]++;
-           if (verbose) {
-             if (cnt % 1000 == 0) {
-              Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
-                          << "large: "   << tracker[overshoot] << " "
-                          << "cond: "    << tracker[conditioning] << "\n";
-            }
-          }
-        } else {
-          break;
+    sim.run();
+    // sim.check_num_traits(conditioning_vec);
+    sim.check_conditioning(condition,
+                           num_concealed_states,
+                           m_R.size());
+    
+    if (sim.run_info != done) {
+      cnt++;
+      tracker[ sim.run_info ]++;
+      if (verbose) {
+        if (cnt % 1000 == 0) {
+          Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
+                      << "large: "   << tracker[overshoot] << " "
+                      << "cond: "    << tracker[conditioning] << "\n";
         }
-
-        if (cnt > max_tries) {
-          break;
-        }
-        Rcpp::checkUserInterrupt();
-        if (!non_extinction && sim.run_info == extinct) break;
+      }
+    } else {
+      break;
+    }
+    
+    if (cnt > max_tries) {
+      break;
+    }
+    Rcpp::checkUserInterrupt();
+    if (!non_extinction && sim.run_info == extinct) break;
   }
   // extract and return
   Rcpp::NumericMatrix ltable_for_r;
-  vector_to_numericmatrix(sim.extract_ltable(), &ltable_for_r);
-
+  util::vector_to_numericmatrix(sim.extract_ltable(), &ltable_for_r);
+  
   auto traits = sim.get_traits();
   auto init = sim.get_initial_state();
-
+  
   Rcpp::List output = Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
                                          Rcpp::Named("traits") = traits,
                                          Rcpp::Named("initial_state") = init,

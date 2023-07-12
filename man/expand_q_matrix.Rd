@@ -2,25 +2,28 @@
 % Please edit documentation in R/secsse_prep.R
 \name{expand_q_matrix}
 \alias{expand_q_matrix}
-\title{function to expand an existing q_matrix to a number of
-concealed states}
+\title{Function to expand an existing q_matrix to a number of concealed states}
 \usage{
 expand_q_matrix(q_matrix, num_concealed_states, diff.conceal = FALSE)
 }
 \arguments{
-\item{q_matrix}{q_matrix with only transitions between observed states}
+\item{q_matrix}{\code{q_matrix} with only transitions between observed states.}
 
-\item{num_concealed_states}{number of concealed states}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
-\item{diff.conceal}{should we use the same number of rates for the
-concealed state transitions, or should all concealed state transitions
-have separate rates? Typically, FALSE is fine and should be used in order
-to avoid having a huge number of parameters.}
+\item{diff.conceal}{Boolean stating if the concealed states should be
+different. E.g. that the transition rates for the concealed
+states are different from the transition rates for the examined states.
+Normally it should be \code{FALSE} in order to avoid having a huge number of
+parameters.}
 }
 \value{
 updated q matrix
 }
 \description{
-function to expand an existing q_matrix to a number of
-concealed states
+Function to expand an existing q_matrix to a number of concealed states
+}
+\note{
+This is highly similar to \code{\link[=q_doubletrans]{q_doubletrans()}}.
 }
