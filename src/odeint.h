@@ -22,7 +22,7 @@
 #include <boost/units/quantity.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 
-using bstime_t = boost::units::quantity<boost::units::si::dimensionless, double>;
+using bstime_t = boost::units::quantity<boost::units::si::dimensionless,double>;
 
 #else   // USE_BULRISCH_STOER_PATCH
 
@@ -42,9 +42,11 @@ namespace odeintcpp {
     typename ODE,
     typename STATE
   >
-  void integrate(STEPPER&& stepper, ODE& ode, STATE* y, double t0, double t1, double dt) {
+  void integrate(STEPPER&& stepper, ODE& ode, STATE* y,
+                 double t0, double t1, double dt) {
     using time_type = typename STEPPER::time_type;
-    bno::integrate_adaptive(stepper, std::ref(ode), (*y), time_type{t0}, time_type{t1}, time_type{dt});
+    bno::integrate_adaptive(stepper, std::ref(ode), (*y),
+                            time_type{t0}, time_type{t1}, time_type{dt});
   }
 
   namespace {
@@ -53,7 +55,7 @@ namespace odeintcpp {
     struct is_unique_ptr : std::false_type {};
 
     template <typename T, typename D>
-    struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type {};    
+    struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type {};
 
   }
 
@@ -64,20 +66,30 @@ namespace odeintcpp {
   void integrate(const std::string& stepper_name,
                  ODE ode,
                  STATE* y,
-                 double t0, 
+                 double t0,
                  double t1,
-                 double dt, 
+                 double dt,
                  double atol, double rtol) {
-    static_assert(is_unique_ptr<ODE>::value || std::is_pointer_v<ODE>, "ODE shall be pointer or unique_ptr type");
+    static_assert(is_unique_ptr<ODE>::value ||
+                  std::is_pointer_v<ODE>, 
+                  "ODE shall be pointer or unique_ptr type");
     if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
-      integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
+      integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, 
+                                                                          rtol), 
+                *ode, y, t0, t1, dt);
     } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
-      integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
+      integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol,
+                                                                         rtol),
+                                                          *ode, y, t0, t1, dt);
     } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
-      integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol, rtol), *ode, y, t0, t1, dt);
+      integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol,
+                                                                     rtol),
+                                                          *ode, y, t0, t1, dt);
     } else if ("odeint::bulirsch_stoer" == stepper_name) {
       // no controlled stepper for bulrisch stoer
-      integrate(bno::bulirsch_stoer<STATE, double, STATE, bstime_t>(atol, rtol), *ode, y, t0, t1, dt);
+      integrate(bno::bulirsch_stoer<STATE, double, STATE, bstime_t>(atol,
+                                                                    rtol), 
+                                                           *ode, y, t0, t1, dt);
     } else if ("odeint::runge_kutta4" == stepper_name) {
       integrate(bno::runge_kutta4<STATE>(), *ode, y, t0, t1, dt);
     } else {
