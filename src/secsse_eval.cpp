@@ -36,8 +36,8 @@ namespace secsse {
     for (int i = 0; i < states.nrow(); ++i) {
       tstates.emplace_back(states.row(i).begin(), states.row(i).end());
     }
-    const auto phy_edge = make_phy_edge_vector(const_rmatrix<double>(forTime));
-    auto inodes = find_inte_nodes(phy_edge, const_rvector<int>(ances), tstates);
+    const auto phy_edge = make_phy_edge_vector(rmatrix<const double>(forTime));
+    auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates);
     auto integrator = Integrator<ODE>(std::move(od), method, atol, rtol);
     calc_ll(integrator, inodes, tstates);
 
@@ -49,7 +49,7 @@ namespace secsse {
       });
     });
     // convert to Thijs's data layout:
-    // ances, focal, t, [probs]
+    // rows of [ances, focal, t, [probs]]
     const size_t nrow = 2 * snodes.size() * (num_steps + 1);
     const size_t ncol = 3 + 2 * integrator.size();
     Rcpp::NumericMatrix out(nrow, ncol);

@@ -46,8 +46,8 @@ namespace secsse {
     for (int i = 0; i < states.nrow(); ++i) {
       tstates.emplace_back(states.row(i).begin(), states.row(i).end());
     }
-    const auto phy_edge = make_phy_edge_vector(const_rmatrix<double>(forTime));
-    auto inodes = find_inte_nodes(phy_edge, const_rvector<int>(ances), tstates);
+    const auto phy_edge = make_phy_edge_vector(rmatrix<const double>(forTime));
+    auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates);
     auto ll_res = calc_ll(Integrator<ODE>(std::move(od), method, atol, rtol),
                                           inodes,
                                           tstates);

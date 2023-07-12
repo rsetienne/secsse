@@ -14,15 +14,11 @@
 
 namespace secsse {
 
-  template <typename T> using const_rvector = RcppParallel::RVector<const T>;
-  template <typename T> using const_rmatrix = RcppParallel::RMatrix<const T>;
-  template <typename T> using const_rmatrix_row = typename const_rmatrix<T>::Row;
-  template <typename T> using const_rmatrix_col = typename const_rmatrix<T>::Column;
+  template <typename T>
+  using rvector = RcppParallel::RVector<T>;
 
-  template <typename T> using mutable_rvector = RcppParallel::RVector<T>;
-  template <typename T> using mutable_rmatrix = RcppParallel::RMatrix<T>;
-  template <typename T> using mutable_rmatrix_row = typename mutable_rmatrix<T>::Row;
-  template <typename T> using mutable_rmatrix_col = typename mutable_rmatrix<T>::Column;
+  template <typename T>
+  using rmatrix = RcppParallel::RMatrix<T>;
 
   
   template <typename T>
@@ -65,9 +61,9 @@ namespace secsse {
     const auto d = static_cast<size_t>(rq.nrow());
     auto q = std::vector<double>(d * d);
     auto qv = vector_view_t<double>{q.data(), d};
-    for (auto i = 0; i < d; ++i, qv.advance(d)) {
+    for (size_t i = 0; i < d; ++i, qv.advance(d)) {
       auto qrow = rq.row(i);
-      for (auto j = 0; j < d; ++j) {
+      for (size_t j = 0; j < d; ++j) {
         qv[j] = qrow[j];
       }
     }
@@ -77,8 +73,8 @@ namespace secsse {
 
   template <OdeVariant variant>
   class ode_standard {
-    const_rvector<double> l_;
-    const_rvector<double> m_;
+    rvector<const double> l_;
+    rvector<const double> m_;
     const std::vector<double> q_;
 
   public:
@@ -139,8 +135,8 @@ namespace secsse {
 
 
   struct ode_cla_precomp_t {
-    std::vector<double> ll;     // flat, transposed ll matrices
-    std::vector<std::vector<size_t>> nz;
+    std::vector<double> ll;               // flat, transposed ll matrices
+    std::vector<std::vector<size_t>> nz;  // indices of non-zero values
     std::vector<double> lambda_sum;
 
     explicit ode_cla_precomp_t(const Rcpp::List& Rll) {
@@ -154,10 +150,10 @@ namespace secsse {
       auto nzv =nz.begin();
       for (int i = 0; i < Rll.size(); ++i) {
         // we all love deeply nested loops...
-        const_rmatrix<double> mr(Rcpp::as<Rcpp::NumericMatrix>(Rll[i]));
+        rmatrix<const double> mr(Rcpp::as<Rcpp::NumericMatrix>(Rll[i]));
         auto& ls = lambda_sum.emplace_back(0.0);
         for (size_t j = 0; j < mr.nrow(); ++j, llv.advance(d), ++nzv) {
-          for (auto k = 0; k < d; ++k) {
+          for (size_t k = 0; k < d; ++k) {
             if (0.0 != (llv[k] = mr.row(j)[k])) {
               nzv->push_back(k);
               ls += llv[k];
@@ -172,7 +168,7 @@ namespace secsse {
   template <OdeVariant variant>
   class ode_cla {
     // used for normal tree
-    const const_rvector<double> m_;
+    const rvector<const double> m_;
     const std::vector<double> q_;   // flat, transposed q matrix
     const ode_cla_precomp_t prec_;
 

@@ -93,11 +93,11 @@ namespace secsse {
 
 
   // returns phy_edge_t vector sorted by 'N'
-  inline std::vector<phy_edge_t> make_phy_edge_vector(const_rmatrix<double> forTime) {
+  inline std::vector<phy_edge_t> make_phy_edge_vector(rmatrix<const double> forTime) {
     auto res = std::vector<phy_edge_t>{forTime.nrow()};
     for (size_t i = 0; i < forTime.nrow(); ++i) {
       auto row = forTime.row(i);
-      res[i] = { .n = static_cast<size_t>(row[0]), .m = static_cast<size_t>(row[1]), .time = row[2] };
+      res[i] = { static_cast<size_t>(row[0]), static_cast<size_t>(row[1]), row[2] };
     }
     std::sort(std::begin(res), std::end(res), [](auto& a, auto& b) {
       return a.n < b.n;
@@ -106,7 +106,7 @@ namespace secsse {
   }
 
 
-  inline inodes_t<terse::inode_t> find_inte_nodes(const std::vector<phy_edge_t>& phy_edge, const_rvector<int> ances, std::vector<std::vector<double>>& states) {
+  inline inodes_t<terse::inode_t> find_inte_nodes(const std::vector<phy_edge_t>& phy_edge, rvector<const int> ances, std::vector<std::vector<double>>& states) {
     auto res = inodes_t<terse::inode_t>{ances.size()};
     auto comp = [](auto& edge, size_t val) { return edge.n < val; };
     tbb::parallel_for<int>(0, ances.size(), 1, [&](int i) {
