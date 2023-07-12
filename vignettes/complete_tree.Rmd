@@ -145,7 +145,7 @@ Q_Concealed_complete
 
 It would be interesting to see how they compare with the same tree without any
 extant species. Let's follow the standard procedure using a similar phylogeny -
-the same tree we used before, but where all the extinct lineages have been 
+the same tree we used before - but where all the extinct lineages have been 
 removed. We'll keep all other model specification the same.
 
 ```{r fitting_ml_reconstructed_tree}
@@ -194,7 +194,7 @@ knitr::kable(data.frame(
 ))
 ```
 
-We see that including extinct species results in higher estimated values of transition rates for the examined states, which are now also estimated to be approximately symetrical, in contrast with the reconstructed tree. Additionally, the concealed trait transition rates are low for both traits when using the complete tree, while the reconstructed tree has a higher transition rate for concealed trait 0. Finally, and unsurprisingly, some degree of extinction is recovered when the complete tree is used.
+We see that including extinct species results in higher estimated values of transition rates for the examined states, which are now also estimated to be approximately symmetrical, in contrast with the reconstructed tree. Additionally, the concealed trait transition rates are low for both traits when using the complete tree, while the reconstructed tree has a higher transition rate for concealed trait 0. Finally, and unsurprisingly, some degree of extinction is recovered when the complete tree is used.
 
 ## References
 

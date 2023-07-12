@@ -569,7 +569,6 @@ https://github.com/rsetienne/secsse/issues or e-mail the authors for help with
 this R package. Additionally, bug reports and feature requests are welcome by
 the same means.
 
-=======
 ## References 
 
 Beaulieu, J. M., O'Meara, B. C., & Donoghue, M. J. (2013). Identifying hidden
