@@ -88,7 +88,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
                               verbose = FALSE,
-                              num_threads = 4)
+                              num_threads = 8)
 
 ## ----ETD_res------------------------------------------------------------------
 ML_ETD <- answ$ML
@@ -154,7 +154,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
                               verbose = FALSE,
-                              num_threads = 4)
+                              num_threads = 8)
 ML_CTD <- answ$ML
 CTD_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CTD
@@ -218,7 +218,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
                               verbose = FALSE,
-                              num_threads = 4)
+                              num_threads = 8)
 ML_CR <- answ$ML
 CR_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CR
