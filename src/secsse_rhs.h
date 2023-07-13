@@ -38,17 +38,6 @@ namespace secsse {
   };
 
 
-  // some SFINAE magic
-  template <typename, template <typename> class, typename = std::void_t<>>
-  struct detect : std::false_type {};
-                
-  template <typename T, template <typename> class Op>
-  struct detect<T, Op, std::void_t<Op<T>>> : std::true_type {};
-  
-  template <typename ODE>
-  using const_rhs_callop = decltype(static_cast<void(ODE::*)(const std::vector<double>&, std::vector<double>&, const double) const>(&ODE::operator()));
-  
-
   enum class OdeVariant {
     normal_tree,
     complete_tree,
@@ -95,9 +84,9 @@ namespace secsse {
       }
     }
 
-    void operator()(const std::vector<double> &x,
-                   std::vector<double> &dxdt,   // NOLINT [runtime/references]
-                   const double /* t */) const
+    void operator()(const std::vector<double>& x,
+                    std::vector<double>& dxdt,   // NOLINT [runtime/references]
+                    const double /* t */) const
     {
       const auto d = size();
       if  constexpr (variant == OdeVariant::normal_tree) {
@@ -167,9 +156,8 @@ namespace secsse {
 
   template <OdeVariant variant>
   class ode_cla {
-    // used for normal tree
     const rvector<const double> m_;
-    const std::vector<double> q_;   // flat, transposed q matrix
+    const std::vector<double> q_;   // flat, transposed q matrices
     const ode_cla_precomp_t prec_;
 
   public:
@@ -197,9 +185,9 @@ namespace secsse {
       }
     }
 
-    void operator()(const std::vector<double> &x,
-                  std::vector<double> &dxdt,
-                  const double /* t */) const
+    void operator()(const std::vector<double>& x,
+                    std::vector<double>& dxdt,
+                    const double /* t */) const
     {
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {

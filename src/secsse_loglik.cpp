@@ -36,9 +36,7 @@ namespace secsse {
                      double rtol,
                      bool see_states)
   {
-    auto num_threads = detect<ODE, const_rhs_callop>::value 
-      ? get_rcpp_num_threads() 
-      : size_t(1);              // prevent multithreading for mutable rhs
+    auto num_threads = get_rcpp_num_threads();
     auto global_control = tbb::global_control(tbb::global_control::max_allowed_parallelism, num_threads);
 
     auto T0 = std::chrono::high_resolution_clock::now();
