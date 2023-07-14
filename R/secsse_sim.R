@@ -108,7 +108,6 @@ secsse_sim <- function(lambdas,
 
   
 
-  speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
   initialState  <- res$initial_state
   Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
                                            # not at crown age
@@ -118,17 +117,26 @@ secsse_sim <- function(lambdas,
 
   # indices       <- seq(1, length(res$traits), by = 2)
   speciesTraits <- 1 + Ltable[, 5]
+  used_id <- abs(Ltable[, 3])
 
   phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
+  
+ 
+  if (drop_extinct) {
+    to_drop <- which(Ltable[, 4] != -1)
+    if (length(to_drop) > 0) {
+      used_id <- used_id[-to_drop]
+      speciesTraits <- speciesTraits[-to_drop]
+    }
+  }
 
-  true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
+  true_traits <- sortingtraits(data.frame(cbind(paste0("t", used_id),
                                              speciesTraits),
-                                       row.names = NULL),
-                            phy)
+                                          row.names = NULL),
+                               phy)
 
   true_traits <- names(mus)[true_traits]
   obs_traits <- c()
-  obs_traits_match <- c()
   for (i in seq_along(true_traits)) {
     obs_traits[i] <- substr(true_traits[i], 1, (nchar(-2) - 1))
   }
