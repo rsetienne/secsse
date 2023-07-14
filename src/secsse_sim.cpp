@@ -107,7 +107,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   int cnt = 0;
   while (true) {
     sim.run();
-    // sim.check_num_traits(conditioning_vec);
+
     sim.check_conditioning(condition,
                            num_concealed_states,
                            m_R.size());

@@ -85,7 +85,9 @@ secsse_sim <- function(lambdas,
                         max_tries,
                         seed)
 
-  if (length(res$traits) < 1) {
+  Ltable        <- res$ltable
+  
+  if (sum(Ltable[, 4] == -1) < 2) {
     warning("crown lineages died out")
     return(list(phy = "ds",
                 traits = 0,
@@ -104,7 +106,7 @@ secsse_sim <- function(lambdas,
                 conditioning = res$tracker[4]))
   }
 
-  Ltable        <- res$ltable
+  
 
   speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
   initialState  <- res$initial_state
@@ -114,8 +116,8 @@ secsse_sim <- function(lambdas,
   Ltable[notmin1, 4] <- crown_age - c(Ltable[notmin1, 4])
   Ltable[which(Ltable[, 4] == crown_age + 1), 4] <- -1
 
-  indices       <- seq(1, length(res$traits), by = 2)
-  speciesTraits <- 1 + res$traits[indices]
+  # indices       <- seq(1, length(res$traits), by = 2)
+  speciesTraits <- 1 + Ltable[, 5]
 
   phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
 
