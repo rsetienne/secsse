@@ -245,7 +245,7 @@ q_matrix
 
 Thus, we first specify a matrix containing the potential state
 transitions, here 0-\>1 and 1-\>0. Then, we use
-`create_q_matrix*(` to create the q-matrix. By setting
+`create_q_matrix()` to create the q-matrix. By setting
 `diff.conceal` to `TRUE`, we ensure that the concealed states will get
 their own rates specified. Setting this to `FALSE` would set their rates
 equal to the observed rates (5 and 6). The way to read the transition
@@ -569,7 +569,6 @@ https://github.com/rsetienne/secsse/issues or e-mail the authors for help with
 this R package. Additionally, bug reports and feature requests are welcome by
 the same means.
 
-=======
 ## References 
 
 Beaulieu, J. M., O'Meara, B. C., & Donoghue, M. J. (2013). Identifying hidden

@@ -1,12 +1,14 @@
 ---
 title: "Using secsse with complete phylogenies (with extinction)"
 output: rmarkdown::html_vignette
-author: "Pedro Santos Neves"
 date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using secsse with complete phylogenies (with extinction)}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -16,78 +18,207 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
+## Introduction
 
-secsse allows the use of phylogenies that contain extinct species (that is, not all tips reach the present). This can be particularly useful if the system in study has a very complete fossil record, allowing for the information of extinct lineages be included.
+Most current studies of evolutionary dynamics make use of molecular phylogenies,
+which, for most groups, contain only information on extant species. However,
+when data on extinct species is available, usually through the presence of 
+fossil data, we can use complete trees. Thus, we can leverage the data
+from extinct lineages for maximum-likelihood estimation with secsse.
 
-In this vignette, we detail how to set-up and run a secsse maximum-likelihood analysis using a complete tree. Note that complete tree in this sense does not relate with the concept of sampling fraction (that is, the fraction of sampled species in the phylogenies as opposed to the fraction of known species for which phylogenetic species is not available).
+Note that here "complete tree" should not be taken as a complete sampling 
+fraction, that is, all known species being present in the phylogeny and there 
+being no missing data, but rather the assumption that all currently extinct 
+species are included. This follows the nomenclature of Nee et al. (1994), 
+who also coined the term "reconstructed tree" for phylogenies for which there
+is no information on extinct lineages.
+
+## Set-up
+
+Like all ML analyses with secsse, we first need a few things to start with, 
+starting with a dated phylogeny. For the purpose of this vignette, we are going
+to use the DDD package to simulate a complete tree, and the ape package to add
+mock traits.
+
+```{r sim_plot_tree}
+library(secsse)
+
+spec_matrix <- c(0, 0, 0, 1)
+spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 1))
+lambda_list <- secsse::create_lambda_list(state_names = c(0, 1),
+                                          num_concealed_states = 2,
+                                          transition_matrix = spec_matrix,
+                                          model = "CR")
+
+mu_vector <- secsse::create_mu_vector(state_names = c(0, 1),
+                                   num_concealed_states = 2,
+                                   model = "CR",
+                                   lambda_list = lambda_list)
+
+shift_matrix <- c(0, 1, 3)
+shift_matrix <- rbind(shift_matrix, c(1, 0, 4))
+
+q_matrix <- secsse::create_q_matrix(state_names = c(0, 1),
+                                    num_concealed_states = 2,
+                                    shift_matrix = shift_matrix,
+                                    diff.conceal = FALSE)
 
 
-# Setting up the analyses
+speciation_rate <- 0.5
+extinction_rate <- 0.05
+q_ab <- 0.1
+q_ba <- 0.1
+used_params <- c(speciation_rate, extinction_rate, q_ab, q_ba)
 
-As with most secsse analysis, we need to specify a lambda 
+sim_lambda_list <- secsse::fill_in(lambda_list, used_params)
+sim_mu_vector   <- secsse::fill_in(mu_vector, used_params)
+sim_q_matrix    <- secsse::fill_in(q_matrix, used_params)
 
-```{r setup}
-# library(secsse)
-# 
-# traits <- sample(c(0, 1), ape::Ntip(phy), replace = TRUE)
-# b <- c(0.04, 0.04)  # lambda
-# d <- rep(0, 2)
-# userTransRate <- 0.2 # transition rate among trait states
-# num_concealed_states <- 2
-# sampling_fraction <- c(1, 1)
-# toCheck <- secsse::id_paramPos(traits, num_concealed_states)
-# toCheck[[1]][] <- b
-# toCheck[[2]][] <- d
-# toCheck[[3]][, ] <- userTransRate
-# diag(toCheck[[3]]) <- NA
-# root_state_weight <- "maddison_weights"
-# cond <- "noCondit"
-# 
-# 
-# parenthesis <- "((t1:13.27595158,(((t7:3.890382947,t44:3.890382947):1.853160984,((t28:1.711947644,t52:0.4956923013):1.025240512,t49:2.737188156):3.006355775):8.137718231,t8:0.505931684):0.03852050838):1.080217329,(((((((t2:1.223724296,t54:1.223724296):2.937627297,(t43:1.877801583,t51:1.477270763):2.283550009):0.3267835885,t39:4.488135181):3.978299002,(t20:5.332776925,t33:1.090685514):3.133657257):0.6198399825,(t17:2.592728197,t21:8.418528959):0.6677452056):0.5788113411,((t13:9.543568307,t15:4.657699849):0.03128867016,(((t14:0.2753485556,((t27:1.893882667,t34:4.969412207):0.4876873725,t31:5.45709958):0.2968375929):2.956689195,((t18:3.089806926,t47:3.089806926):3.812406896,(t23:4.616705952,t37:3.696779257):2.28550787):1.808412546):0.6634713591,t16:4.343870947):0.2007592503):0.09022852898):5.130443554,((t3:3.025694309,(((t5:0.6527575809,((t10:8.190240586,t22:4.624901141):1.973824751,((t12:4.230710001,(t42:0.2233137827,t55:0.2233137827):4.007396218):4.263802978,((((t19:4.431551413,t40:4.431551413):1.104239624,t30:0.1129381496):1.083744321,t26:1.989902921):0.2782431807,t24:0.2097131009):1.596734441):1.669552358):1.61638294):1.700092275,((t9:1.444919643,t53:1.444919643):5.416788797,(((t25:4.956186112,(t35:0.07136896428,((t41:2.961601359,(t48:0.04657504123,t56:0.04657504123):2.915026317):0.6168912293,t45:3.578492588):0.7569031841):0.6207903395):0.4454730422,(t32:3.460649902,t46:3.460649902):1.941009252):0.3114551734,t29:4.364985142):1.148594113):6.618832112):0.9318119344,((((t6:2.605426467,t50:0.4317387896):2.002392571,t38:4.607819038):0.207438208,t36:4.815257246):6.619291453,t11:11.4345487):2.977803786):0.1895024879):0.1670130749,t4:0.903839228):0.026661011):0.20447094):0;" # nolint
-# phy <- ape::read.tree(file = "", parenthesis)
-# traits <- c(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1,
-#             0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-#             0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0,
-#             0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0)
-# # produced locally by
-# # set.seed(42)
-# # out <- DDD::dd_sim(pars = c(0.4, 0.1, 40), age = 15)
-# # phy <- out$tas
-# # traits <- sample(c(0,1),ape::Ntip(phy),replace = T)
-# loglik5 <- as.numeric(secsse_loglik(parameter = toCheck,
-#                                     phy = phy,
-#                                     traits = traits,
-#                                     num_concealed_states =
-#                                       num_concealed_states,
-#                                     cond = cond,
-#                                     root_state_weight = root_state_weight,
-#                                     sampling_fraction = sampling_fraction,
-#                                     is_complete_tree = TRUE))
-# testthat::expect_equal(loglik5,
-#                        -303.4003,
-#                        tolerance = 1E-4) # TJ: hardcoded modified LL
-# 
-# lambdas <- list()
-# for (i in 1:4) {
-#   lambdas[[i]] <- matrix(0, ncol = 4, nrow = 4, byrow = TRUE)
-#   lambdas[[i]][i, i] <- toCheck$lambdas[i]
-# }
-# 
-# parameter <- toCheck
-# parameter[[1]] <- lambdas
-# 
-# loglik7 <- secsse_loglik(parameter = parameter,
-#                          phy = phy,
-#                          traits = traits,
-#                          num_concealed_states = num_concealed_states,
-#                          cond = cond,
-#                          root_state_weight = root_state_weight,
-#                          sampling_fraction = sampling_fraction,
-#                          setting_calculation = NULL,
-#                          see_ancestral_states = FALSE,
-#                          loglik_penalty = 0,
-#                          is_complete_tree = TRUE)
-# testthat::expect_equal(loglik7, loglik5) # not true ?
+# sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list,
+#                                mus = sim_mu_vector,
+#                                qs = sim_q_matrix,
+#                                crown_age = 5,
+#                                num_concealed_states = 2,
+#                                seed = 5, drop_extinct = FALSE)
+
+
+
 ```
+
+Now that we have our phylogeny, let's specify our model. We are going to specify
+the same ETD model as in the _Starting secsse_ vignette. For the full details,
+consult it with `vignette("starting_secsse", package = "secsse")`.
+
+``` {r, set-up_ETD, eval=FALSE}
+spec_matrix <- c()
+spec_matrix <- rbind(spec_matrix, c(0, 0, 0, 1))
+spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 2))
+lambda_list <- secsse::create_lambda_list(state_names = c(0, 1),
+                                          num_concealed_states = 2,
+                                          transition_matrix = spec_matrix,
+                                          model = "ETD")
+
+mu_vec <- secsse::create_mu_vector(state_names = c(0, 1),
+                                   num_concealed_states = 2,
+                                   model = "ETD",
+                                   lambda_list = lambda_list)
+
+shift_matrix <- c()
+shift_matrix <- rbind(shift_matrix, c(0, 1, 5))
+shift_matrix <- rbind(shift_matrix, c(1, 0, 6))
+
+q_matrix <- secsse::create_q_matrix(state_names = c(0, 1),
+                                    num_concealed_states = 2,
+                                    shift_matrix = shift_matrix,
+                                    diff.conceal = TRUE)
+q_matrix
+
+idparsopt <- 1:8 # our maximum rate parameter was 8
+idparsfix <- c(0) # we want to keep all zeros at zero
+initparsopt <- rep(0.1, 8)
+initparsfix <- c(0.0) # all zeros remain at zero.
+sampling_fraction <- c(1, 1)
+
+idparslist <- list()
+idparslist[[1]] <- lambda_list
+idparslist[[2]] <- mu_vec
+idparslist[[3]] <- q_matrix
+```
+
+## Fitting the model
+
+Finally, we run `secsse_ml()` on our complete tree, much in the same way as we 
+would for one with extant species. However, this time we make sure to set the 
+`is_complete_tree` argument to `TRUE` (defaults to `FALSE` if omitted). This
+enables secsse to use the information present in extinct lineages.
+
+```{r fitting_model_complete_tree, eval=FALSE}
+complete_tree_ml <- secsse_ml(phy = phy,
+                              traits = spec_traits,
+                              num_concealed_states = 2,
+                              idparslist = idparslist,
+                              idparsopt = idparsopt,
+                              initparsopt = initparsopt,
+                              idparsfix = idparsfix,
+                              parsfix = initparsfix,
+                              sampling_fraction = sampling_fraction,
+                              verbose = FALSE,
+                              num_threads = 8,
+                              is_complete_tree = TRUE)
+```
+
+Now we can see what our results look like.
+
+```{r complete_tree_res, eval=FALSE}
+complete_tree_ml_etd <- complete_tree_ml$ML
+ETD_par_complete <- secsse::extract_par_vals(idparslist, complete_tree_ml$MLpars)
+complete_tree_ml_etd
+ETD_par_complete
+spec_rates_complete <- ETD_par_complete[1:2]
+ext_rates_complete <- ETD_par_complete[3:4]
+Q_Examined_complete <- ETD_par_complete[5:6]
+Q_Concealed_complete <- ETD_par_complete[7:8]
+spec_rates_complete
+ext_rates_complete
+Q_Examined_complete
+Q_Concealed_complete
+```
+
+## Comparing with reconstructed trees
+
+It would be interesting to see how they compare with the same tree without any
+extant species. Let's follow the standard procedure using a similar phylogeny -
+the same tree we used before - but where all the extinct lineages have been 
+removed. We'll keep all other model specification the same.
+
+```{r fitting_ml_reconstructed_tree, eval=FALSE}
+phy_reconstructed <- out$tes
+
+# Grab the correct traits of the extant lineages
+extant_traits <- traits[phy_reconstructed$tip.label, ]$trait
+
+if (requireNamespace("diversitree")) {
+  for_plot <- data.frame(trait = extant_traits,
+                         row.names = phy_reconstructed$tip.label)
+  diversitree::trait.plot(phy_reconstructed, dat = for_plot,
+                          cols = list("trait" = c("blue", "red")),
+                          type = "p")
+}
+
+reconstructed_tree_ml <- secsse_ml(phy = phy_reconstructed,
+                                   traits = extant_traits,
+                                   num_concealed_states = 2,
+                                   idparslist = idparslist,
+                                   idparsopt = idparsopt,
+                                   initparsopt = initparsopt,
+                                   idparsfix = idparsfix,
+                                   parsfix = initparsfix,
+                                   sampling_fraction = sampling_fraction,
+                                   verbose = FALSE,
+                                   num_threads = 8,
+                                   is_complete_tree = FALSE)
+
+```
+
+
+```{r reconstructed_tree_res_comparison, eval=FALSE}
+reconstructed_tree_ml_etd <- reconstructed_tree_ml$ML
+ETD_par_reconstructed <- secsse::extract_par_vals(idparslist, reconstructed_tree_ml$MLpars)
+reconstructed_tree_ml
+ETD_par_reconstructed
+spec_rates_reconstructed <- ETD_par_reconstructed[1:2]
+ext_rates_reconstructed <- ETD_par_reconstructed[3:4]
+Q_Examined_reconstructed <- ETD_par_reconstructed[5:6]
+Q_Concealed_reconstructed <- ETD_par_reconstructed[7:8]
+
+knitr::kable(data.frame(
+  Reconstructed = c(spec_rates_reconstructed, ext_rates_reconstructed, Q_Examined_reconstructed, Q_Concealed_reconstructed),
+    Complete = c(spec_rates_complete, ext_rates_complete, Q_Examined_complete, Q_Concealed_complete), row.names = c("Speciation rate 0", "Speciation rate 1", "Extinction rate 0", "Extinction rate 1", "Transition examined rate 0", "Transition examined rate 1", "Transition concealed rate 0", "Transition concealed rate 1")
+))
+```
+
+We see that including extinct species results in higher estimated values of transition rates for the examined states, which are now also estimated to be approximately symmetrical, in contrast with the reconstructed tree. Additionally, the concealed trait transition rates are low for both traits when using the complete tree, while the reconstructed tree has a higher transition rate for concealed trait 0. Finally, and unsurprisingly, some degree of extinction is recovered when the complete tree is used.
+
+## References
+
+Nee S, May RM, Harvey PH. The reconstructed evolutionary process. Philos Trans R Soc Lond B Biol Sci. 1994 May 28;344(1309):305-11. doi: 10.1098/rstb.1994.0068.

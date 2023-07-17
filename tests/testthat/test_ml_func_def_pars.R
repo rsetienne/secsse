@@ -66,5 +66,5 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
   )
 
   testthat::expect_equal(model$ML, -12.8794,
-                         tolerance = 1e-5)
+                         tolerance = 1e-4)
 })

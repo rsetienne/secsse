@@ -27,7 +27,8 @@ and Q matrix, and this time we also need to populate these with actual values.
 #### Creating parameter structure
 
 For a more detailed description of how the Lambda List, Mu vector and Q matrix
-work, we refer to the vignette `starting_secsse`. We will here first simulate
+work, we refer to the vignette 
+`vignette("starting_secsse", package = "secsse")`. We will here first simulate
 using the CR model:
 
 ```{r setup_params}

@@ -17,7 +17,9 @@
 namespace secsse {
 
 
-  extern size_t get_rcpp_num_threads();
+  // retreives value set by RcppParallel::setThreadOptions(numThreads)
+  // or tbb::task_arena::automatic if missing.
+  size_t get_rcpp_num_threads();
 
   
   using state_ptr = std::vector<double>*;
@@ -32,9 +34,9 @@ namespace secsse {
   // };
   //
   // struct inode_t {
-  //   state_ptr state;    // pointer to state
+  //   state_ptr state;       // pointer to state
   //   dnode_t desc[2];    // descendants
-  //   double loglik;      // calculated loglik
+  //   double loglik;         // calculated loglik
   //   ...
   // };
 
@@ -91,11 +93,11 @@ namespace secsse {
 
 
   // returns phy_edge_t vector sorted by 'N'
-  inline std::vector<phy_edge_t> make_phy_edge_vector(const_rmatrix<double> forTime) {
+  inline std::vector<phy_edge_t> make_phy_edge_vector(rmatrix<const double> forTime) {
     auto res = std::vector<phy_edge_t>{forTime.nrow()};
     for (size_t i = 0; i < forTime.nrow(); ++i) {
       auto row = forTime.row(i);
-      res[i] = { .n = static_cast<size_t>(row[0]), .m = static_cast<size_t>(row[1]), .time = row[2] };
+      res[i] = { static_cast<size_t>(row[0]), static_cast<size_t>(row[1]), row[2] };
     }
     std::sort(std::begin(res), std::end(res), [](auto& a, auto& b) {
       return a.n < b.n;
@@ -104,7 +106,7 @@ namespace secsse {
   }
 
 
-  inline inodes_t<terse::inode_t> find_inte_nodes(const std::vector<phy_edge_t>& phy_edge, const_rvector<int> ances, std::vector<std::vector<double>>& states) {
+  inline inodes_t<terse::inode_t> find_inte_nodes(const std::vector<phy_edge_t>& phy_edge, rvector<const int> ances, std::vector<std::vector<double>>& states) {
     auto res = inodes_t<terse::inode_t>{ances.size()};
     auto comp = [](auto& edge, size_t val) { return edge.n < val; };
     tbb::parallel_for<int>(0, ances.size(), 1, [&](int i) {
@@ -172,15 +174,13 @@ namespace secsse {
       do_integrate(state, t0, t1);
     }
     
-    // stores the num_steps + 1 integration results at [t0, t0+dt, ... t0+n*num_steps, t0]
-    // inside `dnode.storage`.
-    void operator()(storing::dnode_t& dnode, size_t num_steps, double sdft = SECSSE_DEFAULT_DFT_STORE) const {
+    void operator()(storing::dnode_t& dnode, size_t num_steps) const {
       auto t0 = 0.0;
       const auto dt = dnode.time / num_steps;
       auto y = *dnode.state;
       for (size_t i = 0; i < num_steps; ++i, t0 += dt) {
         dnode.storage.emplace_back(t0, y);
-        do_integrate(y, t0, t0 + dt, sdft);
+        do_integrate(y, t0, t0 + dt, 0.1);
       }
       dnode.storage.emplace_back(dnode.time, y);
     }
