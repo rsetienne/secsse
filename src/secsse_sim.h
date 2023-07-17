@@ -24,13 +24,15 @@ enum finish_type {done, extinct, overshoot, conditioning, not_run_yet,
                   max_types};
 
 struct ltab_species {
-  enum info_index {time, p_id, self_id, extinct_time};
+  enum info_index {time, p_id, self_id, extinct_time, trait_val};
 
-  ltab_species(double brts, int parent, int ID, double death) {
+  ltab_species(double brts, int parent, int ID, double death,
+               double trait) {
     data_[time] = brts;
     data_[p_id] = static_cast<double>(parent);
     data_[self_id] = static_cast<double>(ID);
     data_[extinct_time] = death;
+    data_[trait_val] = trait;
   }
 
   double get_id() const {
@@ -39,6 +41,10 @@ struct ltab_species {
 
   double get_parent() const  {
     return(data_[p_id]);
+  }
+  
+  double get_trait() const {
+    return(data_[trait_val]);
   }
 
   void set_death(double d) {
@@ -55,22 +61,21 @@ struct ltab_species {
     data_[p_id] = -1e6;
     data_[self_id] = -1e6;
     data_[extinct_time] = -1e6;
+    data_[trait_val] = -1;
   }
 
-  std::array<double, 4>& get_data() {
+  std::array<double, 5>& get_data() {
     return data_;
   }
 
  private:
-  std::array<double, 4> data_;
+  std::array<double, 5> data_;
 };
 
 struct ltable {
   std::vector< ltab_species > data_;
 
   ltable() {
-    data_.emplace_back(ltab_species(0.0,  0, -1, -1));
-    data_.emplace_back(ltab_species(0.0, -1,  2, -1));
   }
 
   void clear() {
@@ -303,7 +308,7 @@ struct secsse_sim {
     run_info = not_run_yet;
 
     pop.clear();
-    L.clear();
+   
 
     auto crown_states = root_speciation(init_state);
 
@@ -312,8 +317,10 @@ struct secsse_sim {
 
     track_crowns = {1, 1};
 
-    L = ltable();
-
+    L.clear();
+    L.data_.emplace_back(ltab_species(0.0, 0, -1, -1, pop.get_trait(0)));
+    L.data_.emplace_back(ltab_species(0.0, -1, 2, -1, pop.get_trait(1)));
+ 
     while (true) {
       double dt = draw_dt();
       t += dt;
@@ -331,28 +338,6 @@ struct secsse_sim {
       }
       if (pop.size() > max_spec) {
         run_info = overshoot; break;
-      }
-    }
-  }
-
-  void check_rates() {
-    // for debugging
-    std::vector<double> check_rates(3);
-    check_rates[shift] = std::accumulate(pop.pop.begin(), pop.pop.end(),
-                    0.0,
-                    [](double x, const species& s){return x + s.shiftprob_;});
-    check_rates[extinction] = std::accumulate(pop.pop.begin(), pop.pop.end(),
-                    0.0,
-                    [](double x, const species& s){return x + s.mu_;});
-    check_rates[speciation] = std::accumulate(pop.pop.begin(), pop.pop.end(),
-                    0.0,
-                    [](double x, const species& s){return x + s.lambda_;});
-
-    for (int i = shift; i != max_num; ++i) {
-      if (std::abs(check_rates[i] - pop.rates[i]) > 1e-3) {
-        std::cerr << t << " " << i << " " <<
-                     pop.rates[i] << " " << check_rates[i] << "\n";
-        exit(0);
       }
     }
   }
@@ -424,7 +409,7 @@ struct secsse_sim {
     }
 
     pop.add(species(trait_to_daughter, new_id, trait_info));
-    L.data_.emplace_back(ltab_species(t, pop.get_id(mother), new_id, -1));
+    L.data_.emplace_back(ltab_species(t, pop.get_id(mother), new_id, -1, trait_to_daughter));
   }
 
   std::tuple<int, int> root_speciation(int root_state) {
@@ -550,77 +535,42 @@ struct secsse_sim {
     }
     return index;
   }
+  
+  void check_states(size_t num_traits,
+                    size_t num_concealed_states) {
+    
+    auto total_num_traits = num_concealed_states > 0 ? num_traits / num_concealed_states : num_traits;
 
-  size_t get_num_traits() {
-    std::vector<int> hist(mus.size(), 0);
+    std::vector<int> focal_traits;
+    for (size_t i = 0; i < total_num_traits; ++i) focal_traits.push_back(0);
+
+    for (const auto& i : L.data_) {
+      int trait = static_cast<int>(i.get_trait());
+      if (num_concealed_states > 0) trait %= num_concealed_states;
+      focal_traits[trait]++;
+    }
+    
+    auto min_val = *std::min_element(focal_traits.begin(), 
+                                     focal_traits.end());
+    if (min_val == 0) {
+      run_info = conditioning;
+    } else {
+      run_info = done;
+    }
+    
+    return;
+  }
+  
+  std::vector<int> get_traits() {
+    std::vector<int> traits(pop.size() * 2);
     for (size_t i = 0; i < pop.size(); ++i) {
-      auto trait = pop.get_trait(i);
-      hist[trait]++;
+      auto index = i * 2;
+      traits[index] = pop.get_trait(i);
+      traits[index + 1] = pop.pop[i].id_;
     }
-    size_t cnt = 0;
-    for (const auto& i : hist) {
-      if (i > 0) cnt++;
-    }
-    return cnt;
+    return traits;
   }
-
-  void check_true_states(size_t num_traits) {
-      std::vector<int> focal_traits(num_traits);
-      std::iota(focal_traits.begin(), focal_traits.end(), 0);
-      for (size_t i = 0; i < pop.size(); ++i) {
-        auto trait = static_cast<int>(pop.get_trait(i));
-        for (size_t j = 0; j < focal_traits.size(); ++j) {
-          if (focal_traits[j] == trait) {
-            focal_traits[j] = focal_traits.back();
-            focal_traits.pop_back();
-            break;
-          }
-        }
-        if (focal_traits.empty()) {
-          break;
-        }
-      }
-      if (focal_traits.empty()) {
-        run_info = done;
-        return;
-      }
-
-      // otherwise, conditioning is a reason to reject:
-      run_info = conditioning;
-
-      return;
-  }
-
-  void check_obs_states(size_t num_concealed_states,
-                        size_t num_observed_states) {
-      std::vector<int> focal_traits;
-      for (size_t i = 0; i < num_observed_states; ++i)  {
-        focal_traits.push_back(i);
-      }
-
-      for (size_t i = 0; i < pop.size(); ++i) {
-        auto trait = static_cast<int>(pop.get_trait(i) % num_concealed_states);
-        for (size_t j = 0; j < focal_traits.size(); ++j) {
-          if (focal_traits[j] == trait) {
-            focal_traits[j] = focal_traits.back();
-            focal_traits.pop_back();
-            break;
-          }
-        }
-        if (focal_traits.empty()) {
-          break;
-        }
-      }
-      if (focal_traits.empty()) {
-        run_info = done;
-        return;
-      }
-
-      // otherwise, conditioning is a reason to reject:
-      run_info = conditioning;
-      return;
-  }
-
+  
   void check_conditioning(std::string conditioning_type,
                           size_t num_concealed_states,
                           size_t num_states) {
@@ -631,58 +581,14 @@ struct secsse_sim {
     }
 
     if (conditioning_type == "true_states") {
-        check_true_states(num_states);
+        check_states(num_states, 0); 
     }
 
     if (conditioning_type == "obs_states") {
-      check_obs_states(num_concealed_states,
-                       num_states / num_concealed_states);
+      check_states(num_states, num_concealed_states);
     }
 
     return;
-  }
-
-  void check_num_traits(const std::vector<double>& input_traits) {
-    std::vector<double> focal_traits = input_traits;
-    if (run_info != done) return;
-
-    // check if all focal traits are there
-    if (focal_traits.empty()) return;  // no conditioning
-
-    // now check if each trait to be checked is present:
-    for (size_t i = 0; i < pop.size(); ++i) {
-      auto trait = pop.get_trait(i);
-      for (size_t j = 0; j < focal_traits.size(); ++j) {
-        if (focal_traits[j] == trait) {
-          focal_traits[j] = focal_traits.back();
-          focal_traits.pop_back();
-          break;
-        }
-      }
-      if (focal_traits.empty()) {
-        break;
-      }
-    }
-    // if traits is empty, all traits were found:
-    if (focal_traits.empty()) {
-      run_info = done;
-      return;
-    }
-
-    // otherwise, conditioning is a reason to reject:
-    run_info = conditioning;
-
-    return;
-  }
-
-  std::vector<int> get_traits() {
-    std::vector<int> traits(pop.size() * 2);
-    for (size_t i = 0; i < pop.size(); ++i) {
-      auto index = i * 2;
-      traits[index] = pop.get_trait(i);
-      traits[index + 1] = pop.pop[i].id_;
-    }
-    return traits;
   }
 
   size_t get_initial_state() {
@@ -690,7 +596,7 @@ struct secsse_sim {
   }
 
   num_mat extract_ltable() {
-    num_mat extracted_ltable(L.data_.size(), std::vector<double>(4));
+    num_mat extracted_ltable(L.data_.size(), std::vector<double>(5));
     for (size_t i = 0; i < L.data_.size(); ++i) {
       auto temp = L.data_[i].get_data();
       std::vector<double> row(temp.begin(), temp.end());
