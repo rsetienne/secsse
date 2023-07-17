@@ -54,8 +54,8 @@ q_matrix <- secsse::create_q_matrix(state_names = c(0, 1),
 ```
 
 In order for secsse to be able to use these to simulate a tree, we need to 
-provide actual starting parameters. secsse has a helping function for that as
-well!
+provide actual starting parameters. secsse has a helping function (`fil_in()`) 
+for that as well!
 
 ```{r enter parameters}
 speciation_rate <- 0.5
@@ -69,7 +69,7 @@ sim_mu_vector   <- secsse::fill_in(mu_vector, used_params)
 sim_q_matrix    <- secsse::fill_in(q_matrix, used_params)
 ```
 
-The function `fill_in` will go over the different objects and fill in the 
+The function `fill_in()` will go over the different objects and fill in the 
 appropriate parameter value from the `used_params` vector, e.g. when it finds a
 `1` as rate indicator, it enters the value at position `used_params[1]`, when 
 it encounters a `2` as rate indicator, it enters the value at position 
@@ -100,7 +100,7 @@ if (requireNamespace("diversitree")) {
 
 ### Conditioning
 
-Notice that `secsse::sim_tree` can simulate a tree conditioning on different
+Notice that `secsse_sim()` can simulate a tree conditioning on different
 tip-states: either it uses the conditioning `obs_states`, in which case secsse
 will keep simulating until it simulates a tree that has all observed states. 
 This is usually advised, as typically the observed states are the starting point
