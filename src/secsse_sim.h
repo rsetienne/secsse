@@ -7,12 +7,15 @@
 
 #pragma once
 
+#include <cassert>
 #include <memory>
 #include <vector>
 #include <array>
 #include <random>
 #include <tuple>
 #include <string>
+#include <numeric>
+#include <algorithm>
 
 using num_mat = std::vector< std::vector<double >>;
 using num_mat_mat = std::vector<num_mat>;
@@ -320,7 +323,9 @@ struct secsse_sim {
     L.clear();
     L.data_.emplace_back(ltab_species(0.0, 0, -1, -1, pop.get_trait(0)));
     L.data_.emplace_back(ltab_species(0.0, -1, 2, -1, pop.get_trait(1)));
- 
+
+    const auto event_handler = { &secsse_sim::event_traitshift, &secsse_sim::event_speciation, &secsse_sim::event_extinction };
+
     while (true) {
       double dt = draw_dt();
       t += dt;
@@ -330,7 +335,8 @@ struct secsse_sim {
       }
 
       event_type event = draw_event();
-      apply_event(event);
+      //apply_event(event);
+      (this->*std::data(event_handler)[event])();
 
       if (track_crowns[0] < 1 || track_crowns[1] < 1) {
         run_info = extinct;
@@ -506,6 +512,7 @@ struct secsse_sim {
     qs_dist.resize(qs.size());
     for (size_t i = 0; i < qs.size(); ++i) {
       qs_row_sums[i] = std::accumulate(qs[i].begin(), qs[i].end(), 0.0);
+      assert(qs_row_sums[i] > 0.0);
       qs_dist[i] = std::discrete_distribution<>(qs[i].begin(), qs[i].end());
     }
     return qs_row_sums;
@@ -538,7 +545,6 @@ struct secsse_sim {
   
   void check_states(size_t num_traits,
                     size_t num_concealed_states) {
-    
     auto total_num_traits = num_concealed_states > 0 ? num_traits / num_concealed_states : num_traits;
 
     std::vector<int> focal_traits;
@@ -557,7 +563,6 @@ struct secsse_sim {
     } else {
       run_info = done;
     }
-    
     return;
   }
   
