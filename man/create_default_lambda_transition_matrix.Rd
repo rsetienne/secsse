@@ -2,7 +2,7 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_default_lambda_transition_matrix}
 \alias{create_default_lambda_transition_matrix}
-\title{helper function to create a default lambda list}
+\title{Helper function to create a default lambda list}
 \usage{
 create_default_lambda_transition_matrix(
   state_names = c("0", "1"),
@@ -10,10 +10,10 @@ create_default_lambda_transition_matrix(
 )
 }
 \arguments{
-\item{state_names}{names of the observed states}
+\item{state_names}{vector of names of all observed states.}
 
-\item{model}{chosen model of interest, either "CR" (Constant Rates), "ETD"
-(Examined Trait Diversification) or "CTD" ("Concealed Trait Diversification).}
+\item{model}{used model, choice of \code{"ETD"} (Examined Traits Diversification),
+\code{"CTD"} (Concealed Traits Diversification) or \code{"CR"} (Constant Rate).}
 }
 \description{
 This function generates a generic lambda list, assuming no transitions

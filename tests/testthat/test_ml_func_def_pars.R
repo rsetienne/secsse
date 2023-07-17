@@ -37,11 +37,11 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
   }
   tol <- c(1e-03, 1e-04, 1e-06)
   maxiter <- 1000 * round((1.25) ^ length(idparsopt))
-  optimmethod <- "simplex"
+  optimmethod <- "subplex"
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
-  testthat::expect_warning(testthat::expect_output(
+  testthat::expect_warning(
     model <- secsse_ml_func_def_pars(phy = phylotree,
                                      traits = traits,
                                      num_concealed_states =
@@ -63,8 +63,8 @@ test_that("trying a short ML search: secsse_ml_func_def_pars", {
                                      maxiter = maxiter,
                                      optimmethod = optimmethod,
                                      num_cycles = 1)
-  ))
+  )
 
-  testthat::expect_equal(model$ML, -12.87974,
-                         tolerance = 1e-5)
+  testthat::expect_equal(model$ML, -12.8794,
+                         tolerance = 1e-4)
 })

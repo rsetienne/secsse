@@ -2,23 +2,30 @@
 % Please edit documentation in R/secsse_prep.R
 \name{extract_par_vals}
 \alias{extract_par_vals}
-\title{function to extract parameter values out of the result of a maximum
-likelihood inference run.}
+\title{Extract parameter values out of the result of a maximum likelihood inference
+run}
 \usage{
 extract_par_vals(param_posit, ml_pars)
 }
 \arguments{
 \item{param_posit}{initial parameter structure, consisting of a list with
-three entries: 1) lambda matrices, 2) mus and 3) Q matrix. In each entry,
-integers numbers (1-n) indicate the parameter to be optimized}
+three entries:
+\enumerate{
+\item lambda matrices
+\item mus
+\item Q matrix
+}
+
+In each entry, integers numbers (1-n) indicate the parameter to be
+optimized.}
 
 \item{ml_pars}{resulting parameter estimates as returned by for instance
-cla_secsse_ml, having the same structure as param_post}
+\code{\link[=cla_secsse_ml]{cla_secsse_ml()}}, having the same structure as \code{param_post}.}
 }
 \value{
-vector of parameter estimates
+Vector of parameter estimates.
 }
 \description{
-function to extract parameter values out of the result of a maximum
-likelihood inference run.
+Extract parameter values out of the result of a maximum likelihood inference
+run
 }

@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 library(secsse)
 data(traits)
-tail(traits) # NOTE: Data file is different? trait column only has 0 and 1
+tail(traits)
 
 ## -----------------------------------------------------------------------------
 data("phylo_vignette")
@@ -66,7 +66,7 @@ q_matrix
 
 ## ----ETD_ML_init--------------------------------------------------------------
 idparsopt <- 1:8 # our maximum rate parameter was 8
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -88,7 +88,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
                               verbose = FALSE,
-                              num_threads = 4)
+                              num_threads = 8)
 
 ## ----ETD_res------------------------------------------------------------------
 ML_ETD <- answ$ML
@@ -134,7 +134,7 @@ q_matrix
 
 ## ----CTD_ML-------------------------------------------------------------------
 idparsopt <- 1:8 # our maximum rate parameter was 8
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -154,7 +154,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
                               verbose = FALSE,
-                              num_threads = 4)
+                              num_threads = 8)
 ML_CTD <- answ$ML
 CTD_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CTD
@@ -198,7 +198,7 @@ q_matrix
 
 ## ----CR_ML--------------------------------------------------------------------
 idparsopt <- 1:6 # our maximum rate parameter was 6
-idparsfix <- c(0) # we want to keep al zeros at zero
+idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.1, 6)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
@@ -218,7 +218,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
                               verbose = FALSE,
-                              num_threads = 4)
+                              num_threads = 8)
 ML_CR <- answ$ML
 CR_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CR

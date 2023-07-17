@@ -8,8 +8,8 @@ master_ml <- function(phy,
                       idparsfix,
                       parsfix,
                       idfactorsopt = NULL,
-                      initfactors,
-                      idparsfuncdefpar,
+                      initfactors = NULL,
+                      idparsfuncdefpar = NULL,
                       functions_defining_params = NULL,
                       cond = "proper_cond",
                       root_state_weight = "proper_weights",
@@ -20,7 +20,7 @@ master_ml <- function(phy,
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
-                      verbose = (optimmethod == "subplex"),
+                      verbose = (optimmethod == "simplex"),
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
@@ -49,15 +49,13 @@ master_ml <- function(phy,
                       idparsopt,
                       idparsfix,
                       parsfix)
-  
+
   if (is.matrix(idparslist[[1]])) {
     ## it is a tailor case otherwise
     idparslist[[1]] <- prepare_full_lambdas(traits,
                                             num_concealed_states,
                                             idparslist[[1]])
   }
-
- 
 
   see_ancestral_states <- FALSE
   if (!is.null(structure_func)) {
@@ -161,54 +159,18 @@ master_ml <- function(phy,
   return(out2)
 }
 
+#' Maximum likehood estimation for (SecSSE)
+#' 
 #' Maximum likehood estimation under Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE)
-#' @title Maximum likehood estimation for (SecSSE)
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
-#' branch lengths.
-#' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to the number of examined states in the dataset.
-#' @param idparslist overview of parameters and their values.
-#' @param idparsopt id of parameters to be estimated.
-#' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idparsfix id of the fixed parameters.
-#' @param parsfix value of the fixed parameters.
-#' @param cond condition on the existence of a node root: 'maddison_cond',
-#' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:
-#' 'maddison_weights','proper_weights'(default) or 'equal_weights'.
-#' It can also be specified the
-#' root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per
-#' trait state. It must have as many elements as there are trait states.
-#' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
-#' @param maxiter max number of iterations.
-#' Default is '1000 *round((1.25)^length(idparsopt))'.
-#' @param optimmethod method used for optimization. Available are simplex and
-#' subplex, default is 'subplex'. Simplex should only be used for debugging.
-#' @param num_cycles number of cycles of the optimization (default is 1).
-#' @param loglik_penalty the size of the penalty for all parameters; default
-#' is 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species
-#' is provided
-#' @param verbose sets verbose output; default is verbose when optimmethod is
-#' 'simplex'
-#' @param num_threads number of threads. Set to -1 to use all available threads.
-#' Default is one thread.
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#' @inheritParams default_params_doc
+#' 
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
 #'library(secsse)
 #'library(DDD)
 #'set.seed(13)
-#'# Check the vignette for a better working exercise.
 #'# lambdas for 0A and 1A and 2A are the same but need to be estimated
 #'# mus are fixed to
 #'# the transition rates are constrained to be equal and fixed 0.01
@@ -224,7 +186,7 @@ master_ml <- function(phy,
 #'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
 #'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
-#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
+#'startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
 #'intGuessLamba <- startingpoint$lambda0
 #'intGuessMu <- startingpoint$mu0
 #'idparsopt <- c(1,2,3,5)
@@ -274,7 +236,7 @@ secsse_ml <- function(phy,
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
-                      verbose = (optimmethod == "subplex"),
+                      verbose = (optimmethod == "simplex"),
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
@@ -370,47 +332,13 @@ secsse_loglik_choosepar <- function(trparsopt,
   return(loglik)
 }
 
+#' Maximum likehood estimation for (SecSSE)
+#' 
 #' Maximum likehood estimation under Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE) with cladogenetic option
-#' @title Maximum likehood estimation for (SecSSE)
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
-#' branch lengths.
-#' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to the number of examined states in the dataset.
-#' @param idparslist overview of parameters and their values.
-#' @param idparsopt id of parameters to be estimated.
-#' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idparsfix id of the fixed parameters.
-#' @param parsfix value of the fixed parameters.
-#' @param cond condition on the existence of a node root: 'maddison_cond',
-#' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:
-#' 'maddison_weights','proper_weights'(default) or 'equal_weights'.
-#' It can also be specified the
-#' root state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per
-#' trait state. It must have as many elements as there are trait states.
-#' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
-#' @param maxiter max number of iterations. Default is
-#' '1000*round((1.25)^length(idparsopt))'.
-#' @param optimmethod method used for optimization. Available are simplex and
-#' subplex, default is 'subplex'. Simplex should only be used for debugging.
-#' @param num_cycles number of cycles of the optimization (default is 1).
-#' @param loglik_penalty the size of the penalty for all parameters; default is
-#'  0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species
-#' is provided
-#' @param verbose sets verbose output; default is verbose when optimmethod is
-#' 'subplex'
-#' @param num_threads number of threads. Set to -1 to use all available threads.
-#' Default is one thread.
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
+#'
+#' @inheritParams default_params_doc
+#' 
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -482,7 +410,7 @@ cla_secsse_ml <- function(phy,
                           num_cycles = 1,
                           loglik_penalty = 0,
                           is_complete_tree = FALSE,
-                          verbose = (optimmethod == "subplex"),
+                          verbose = (optimmethod == "simplex"),
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,

@@ -2,23 +2,25 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_mu_vector}
 \alias{create_mu_vector}
-\title{function to generate mus vector}
+\title{Generate mus vector}
 \usage{
 create_mu_vector(state_names, num_concealed_states, model = "CR", lambda_list)
 }
 \arguments{
-\item{state_names}{names of the observed states}
+\item{state_names}{vector of names of all observed states.}
 
-\item{num_concealed_states}{number of concealed states}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
-\item{model}{model replicated, available are "CR", "ETD" and "CTD"}
+\item{model}{used model, choice of \code{"ETD"} (Examined Traits Diversification),
+\code{"CTD"} (Concealed Traits Diversification) or \code{"CR"} (Constant Rate).}
 
 \item{lambda_list}{previously generated list of lambda matrices,
-used to infer the rate number to start with}
+used to infer the rate number to start with.}
 }
 \value{
 mu vector
 }
 \description{
-function to generate mus vector
+Generate mus vector
 }

@@ -5,12 +5,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 
-#include <cstdlib>    // std::getenv, std::atoi
+#include <cstdlib>    // std::getenv, std::atoi 
 #include <vector>
-#include "config.h"
+#include "config.h"    // NOLINT [build/include_subdir]
 #include <Rcpp.h>
 #include <RcppParallel.h>
-#include "secsse_loglik.h"
+#include "secsse_loglik.h"    // NOLINT [build/include_subdir]
 
 
 namespace secsse {
@@ -41,10 +41,12 @@ namespace secsse {
     calc_ll(integrator, inodes, tstates);
 
     // integrate over each edge
-    auto snodes = inodes_t<storing::inode_t>(std::begin(inodes), std::end(inodes));
-    tbb::parallel_for_each(std::begin(snodes), std::end(snodes), [&](auto& snode) {
+    auto snodes = inodes_t<storing::inode_t>(std::begin(inodes),
+                                             std::end(inodes));
+    tbb::parallel_for_each(std::begin(snodes), std::end(snodes), 
+                           [&](auto& snode) {
       tbb::parallel_for(0, 2, [&](size_t i) {
-       integrator(snode.desc[i], num_steps);
+        integrator(snode.desc[i], num_steps);
       });
     });
     // convert to Thijs's data layout:
@@ -53,7 +55,8 @@ namespace secsse {
     const size_t ncol = 3 + 2 * integrator.size();
     Rcpp::NumericMatrix out(nrow, ncol);
     size_t row_index = 0;
-    auto sptr_to_ridx = [&](state_ptr sptr) { return static_cast<double>(std::distance(tstates.data(), sptr) + 1); };
+    auto sptr_to_ridx = [&](state_ptr sptr) { 
+      return static_cast<double>(std::distance(tstates.data(), sptr) + 1); };
     for (size_t i = 0; i < snodes.size(); ++i) {
       for (auto d : {0, 1}) {
         for (size_t j = 0; j < (num_steps + 1); ++j, ++row_index) {
@@ -71,7 +74,8 @@ namespace secsse {
     Rcpp::NumericMatrix states_out;
     states_out = Rcpp::NumericMatrix(states.nrow(), states.ncol());
     for (int i = 0; i < states.nrow(); ++i) {
-      std::copy(std::begin(tstates[i]), std::end(tstates[i]), states_out.row(i).begin());
+      std::copy(std::begin(tstates[i]), std::end(tstates[i]), 
+                states_out.row(i).begin());
     }
     auto T1 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> DT = (T1 - T0);

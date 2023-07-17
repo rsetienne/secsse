@@ -75,7 +75,9 @@ namespace secsse {
 
     size_t size() const noexcept { return l_.size(); }
 
-    void mergebranch(const std::vector<double>& N, const std::vector<double>& M, std::vector<double>& out) const {
+    void mergebranch(const std::vector<double>& N,
+                     const std::vector<double>& M,
+                     std::vector<double>& out) const {
       const auto d = size();
       assert(2 * d == out.size());
       for (size_t i = 0; i < d; ++i) {
@@ -105,7 +107,8 @@ namespace secsse {
           dxdt[i + d] = dxd;
         }
       }
-      else if constexpr ((variant == OdeVariant::complete_tree) || (variant == OdeVariant::ct_condition)) {
+      else if constexpr ((variant == OdeVariant::complete_tree) || 
+                         (variant == OdeVariant::ct_condition)) {
         // complete tree including extinct branches or conditioning
         auto qv = vector_view_t<const double>{q_.data(), d};
         for (size_t i = 0; i < d; ++i, qv.advance(d)) {
@@ -121,7 +124,6 @@ namespace secsse {
       }
     }
   };
-
 
   struct ode_cla_precomp_t {
     std::vector<double> ll;               // flat, transposed ll matrices
@@ -157,7 +159,7 @@ namespace secsse {
   template <OdeVariant variant>
   class ode_cla {
     const rvector<const double> m_;
-    const std::vector<double> q_;   // flat, transposed q matrices
+    const std::vector<double> q_;   // flat, transposed q matrix
     const ode_cla_precomp_t prec_;
 
   public:
@@ -169,7 +171,9 @@ namespace secsse {
 
     size_t size() const noexcept { return m_.size(); }
 
-    void mergebranch(const std::vector<double>& N, const std::vector<double>& M, std::vector<double>& out) const {
+    void mergebranch(const std::vector<double>& N,
+                     const std::vector<double>& M,
+                     std::vector<double>& out) const {
       const auto d = size();
       assert(2 * d == out.size());
       auto llv = vector_view_t<const double>(prec_.ll.data(), d);

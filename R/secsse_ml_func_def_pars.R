@@ -1,55 +1,12 @@
+#' Maximum likehood estimation for (SecSSE) with parameter as complex
+#' functions.
+#' 
 #' Maximum likehood estimation under Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE) where some paramaters
 #' are functions of other parameters and/or factors.
-#' @title Maximum likehood estimation for (SecSSE) with parameter as complex
-#' functions.
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
-#' branch lengths.
-#' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to the number of examined states in the dataset.
-#' @param idparslist overview of parameters and their values.
-#' @param idparsopt id of parameters to be estimated.
-#' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idfactorsopt id of the factors that will be optimized. There are not
-#' fixed factors, so use a constant within 'functions_defining_params'.
-#' @param initfactors the initial guess for a factor (it should be set to NULL
-#' when no factors).
-#' @param idparsfix id of the fixed parameters (it should be set to NULL when
-#' there are no factors).
-#' @param parsfix value of the fixed parameters.
-#' @param idparsfuncdefpar id of the parameters which will be a function of
-#' optimized and/or fixed parameters. The order of id should match
-#' functions_defining_params
-#' @param functions_defining_params a list of functions. Each element will be a
-#' function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example
-#' and vigenette
-#' @param cond condition on the existence of a node root:
-#' "maddison_cond","proper_cond"(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:
-#' "maddison_weights","proper_weights"(default) or "equal_weights". It can also
-#' be specified the root state:the vector c(1, 0, 0) indicates state
-#' 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per trait
-#' state. It must have as many elements as there are trait states.
-#' @param tol maximum tolerance. Default is "c(1e-04, 1e-05, 1e-05)".
-#' @param maxiter max number of iterations. Default is
-#' "1000 *round((1.25)^length(idparsopt))".
-#' @param optimmethod method used for optimization. Default is "subplex".
-#' @param num_cycles number of cycles of the optimization (default is 1).
-#' @param loglik_penalty the size of the penalty for all parameters;
-#' default is 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species
-#' is provided
-#' @param num_threads number of threads. Set to -1 to use all available threads.
-#' Default is one thread.
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
-#' @return Parameter estimated and maximum likelihood
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -182,61 +139,16 @@ secsse_ml_func_def_pars <- function(phy,
                    method = method))
 }
 
+#' Maximum likehood estimation for (SecSSE) with parameter as complex
+#' functions. Cladogenetic version
+#' 
 #' Maximum likehood estimation under cla Several examined and concealed
 #' States-dependent Speciation and Extinction (SecSSE) where some paramaters are
 #' functions of other parameters and/or factors. Offers the option of
 #' cladogenesis
-#' @title Maximum likehood estimation for (SecSSE) with parameter as complex
-#' functions. Cladogenetic version
-#' @param phy phylogenetic tree of class phylo, ultrametric, rooted and with
-#' branch lengths.
-#' @param traits a vector with trait states for each tip in the phylogeny.
-#' @param num_concealed_states number of concealed states, generally equivalent
-#' to the number of examined states in the dataset.
-#' @param idparslist overview of parameters and their values.
-#' @param idparsopt id of parameters to be estimated.
-#' @param initparsopt initial guess of the parameters to be estimated.
-#' @param idfactorsopt id of the factors that will be optimized. There are not
-#' fixed factors, so use a constant within 'functions_defining_params'.
-#' @param initfactors the initial guess for a factor (it should be set to NULL
-#' when no factors).
-#' @param idparsfix id of the fixed parameters (it should be set to NULL when
-#' no factors).
-#' @param parsfix value of the fixed parameters.
-#' @param idparsfuncdefpar id of the parameters which will be a function of
-#' optimized and/or fixed parameters. The order of id should match
-#' functions_defining_params
-#' @param functions_defining_params a list of functions. Each element will be a
-#' function which defines a parameter e.g. id_3 <- (id_1+id_2)/2. See example
-#' and vigenette
-#' @param cond condition on the existence of a node root: 'maddison_cond',
-#' 'proper_cond'(default). For details, see vignette.
-#' @param root_state_weight the method to weigh the states:'maddison_weights',
-#' 'proper_weights'(default) or 'equal_weights'. It can also be specified the
-#' root
-#' state:the vector c(1,0,0) indicates state 1 was the root state.
-#' @param sampling_fraction vector that states the sampling proportion per trait
-#' state. It must have as many elements as there are trait states.
-#' @param tol maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.
-#' @param maxiter max number of iterations. Default is
-#' '1000*round((1.25)^length(idparsopt))'.
-#' @param optimmethod method used for optimization. Default is 'simplex'.
-#' @param num_cycles number of cycles of the optimization (default is 1).
-#' @param loglik_penalty the size of the penalty for all parameters; default
-#' is 0 (no penalty)
-#' @param is_complete_tree whether or not a tree with all its extinct species
-#' is provided
-#' @param verbose sets verbose output; default is verbose when optimmethod is
-#' 'subplex'
-#' @param num_threads number of threads. Set to -1 to use all available
-#' threads. Default is one thread.
-#' @param atol absolute tolerance of integration
-#' @param rtol relative tolerance of integration
-#' @param method integration method used, available are:
-#' "odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-#' "odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-#' "odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".
-#' @return Parameter estimated and maximum likelihood
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
@@ -336,11 +248,11 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                         tol = c(1e-04, 1e-05, 1e-07),
                                         maxiter = 1000 *
                                           round((1.25) ^ length(idparsopt)),
-                                        optimmethod = "simplex",
+                                        optimmethod = "subplex",
                                         num_cycles = 1,
                                         loglik_penalty = 0,
                                         is_complete_tree = FALSE,
-                                        verbose = (optimmethod == "subplex"),
+                                        verbose = (optimmethod == "simplex"),
                                         num_threads = 1,
                                         atol = 1e-12,
                                         rtol = 1e-12,
@@ -366,6 +278,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
                    num_cycles = num_cycles,
                    loglik_penalty = loglik_penalty,
                    is_complete_tree = is_complete_tree,
+                   verbose = verbose,
                    num_threads = num_threads,
                    atol = atol,
                    rtol = rtol,

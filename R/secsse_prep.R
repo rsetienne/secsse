@@ -44,21 +44,10 @@ get_state_names <- function(state_names, num_concealed_states) {
   return(all_state_names)
 }
 
-#' helper function to automatically create lambda matrices, based on input
-#' @param state_names vector of names of all observed states
-#' @param num_concealed_states number of hidden states
-#' @param transition_matrix a matrix containing a description of all speciation
-#' events, where the first column indicates the source state, the second and
-#' third column indicate the two daughter states, and the fourth column gives
-#' the rate indicator used. E.g.: ["SA", "S", "A", 1] for a trait state "SA"
-#' which upon speciation generates two daughter species with traits "S" and "A",
-#' where the number 1 is used as indicator for optimization of the likelihood.
-#' @param model used model, choice of "ETD" (Examined Traits Diversification) or
-#' "CTD" (Concealed Traits Diversification).
-#' @param concealed_spec_rates vector specifying the rate indicators for each
-#' concealed state, length should be identical to num_concealed_states. If left
-#' empty when using the CTD model, it is assumed that all available speciation
-#' rates are distributed uniformly over the concealed states.
+#' Helper function to automatically create lambda matrices, based on input
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @examples
 #' trans_matrix <- c(0, 0, 0, 1)
 #' trans_matrix <- rbind(trans_matrix, c(1, 1, 1, 2))
@@ -125,18 +114,11 @@ create_lambda_list <- function(state_names = c(0, 1),
   return(lambdas)
 }
 
-#' helper function to neatly setup a Q matrix, without transitions to
+#' Helper function to neatly setup a Q matrix, without transitions to
 #' concealed states (only observed transitions shown)
-#' @param state_names names of observed states
-#' @param num_concealed_states number of concealed states
-#' @param shift_matrix matrix of shifts, indicating in order: 1)
-#' starting state (typically the column in the transition matrix), 2) ending
-#' state (typically the row in the transition matrix) and 3) associated rate
-#' indicator
-#' @param diff.conceal should we use the same number of rates for the
-#' concealed state transitions, or should all concealed state transitions
-#' have separate rates? Typically, FALSE is fine and should be used in order
-#' to avoid having a huge number of parameters.
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return transition matrix
 #' @examples
 #' shift_matrix <- c(0, 1, 5)
@@ -255,14 +237,12 @@ fill_from_rates <- function(new_q_matrix,
   return(new_q_matrix)
 }
 
-#' function to expand an existing q_matrix to a number of
-#' concealed states, highly similar to q_doubletrans.
-#' @param q_matrix q_matrix with only transitions between observed states
-#' @param num_concealed_states number of concealed states
-#' @param diff.conceal should we use the same number of rates for the
-#' concealed state transitions, or should all concealed state transitions
-#' have separate rates? Typically, FALSE is fine and should be used in order
-#' to avoid having a huge number of parameters.
+#' Function to expand an existing q_matrix to a number of concealed states
+#' 
+#' @inheritParams default_params_doc
+#' 
+#' @note This is highly similar to [q_doubletrans()].
+#' 
 #' @return updated q matrix
 #' @export
 expand_q_matrix <- function(q_matrix,
@@ -293,17 +273,17 @@ expand_q_matrix <- function(q_matrix,
   return(new_q_matrix)
 }
 
-#' helper function to create a default shift_matrix list
-#' @param state_names names of the observed states
-#' @param num_concealed_states number of concealed states
-#' @param mus previously defined mus - used to choose indicator number
-#' @description
+#' Helper function to create a default `shift_matrix` list
+#' 
 #' This function generates a generic shift matrix to be used with the function
-#' create_transition_matrix.
+#' [create_q_matrix()].
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @examples
 #' shift_matrix <- create_default_shift_matrix(state_names = c(0, 1),
 #'                                             num_concealed_states = 2,
-#'                                             mus = c(1, 2, 1, 2))
+#'                                             mu_vector = c(1, 2, 1, 2))
 #' q_matrix <- create_q_matrix(state_names = c(0, 1),
 #'                             num_concealed_states = 2,
 #'                             shift_matrix = shift_matrix,
@@ -311,8 +291,8 @@ expand_q_matrix <- function(q_matrix,
 #' @export
 create_default_shift_matrix <- function(state_names = c("0", "1"),
                                         num_concealed_states = 2,
-                                        mus = NULL) {
-  lm <- unlist(mus)
+                                        mu_vector = NULL) {
+  lm <- unlist(mu_vector)
   focal_rate <- max(lm) + 1
   num_obs_states <- length(state_names)
   transition_list <- c()
@@ -332,14 +312,14 @@ create_default_shift_matrix <- function(state_names = c("0", "1"),
   return(transition_list)
 }
 
-#' helper function to create a default lambda list
-#' @param state_names names of the observed states
-#' @param model chosen model of interest, either "CR" (Constant Rates), "ETD"
-#' (Examined Trait Diversification) or "CTD" ("Concealed Trait Diversification).
-#' @description
+#' Helper function to create a default lambda list
+#' 
 #' This function generates a generic lambda list, assuming no transitions
 #' between states, e.g. a species of observed state 0 generates daughter
 #' species with state 0 as well.
+#'
+#' @inheritParams default_params_doc
+#' 
 #' @examples
 #' lambda_matrix <-
 #'      create_default_lambda_transition_matrix(state_names = c(0, 1),
@@ -365,12 +345,10 @@ create_default_lambda_transition_matrix <- function(state_names = c("0", "1"),
   return(transition_list)
 }
 
-#' function to generate mus vector
-#' @param state_names names of the observed states
-#' @param num_concealed_states number of concealed states
-#' @param model model replicated, available are "CR", "ETD" and "CTD"
-#' @param lambda_list previously generated list of lambda matrices,
-#' used to infer the rate number to start with
+#' Generate mus vector
+#'
+#' @inheritParams default_params_doc
+#'
 #' @return mu vector
 #' @export
 create_mu_vector <- function(state_names,
@@ -422,13 +400,11 @@ replace_matrix <- function(focal_matrix,
   return(focal_matrix)
 }
 
-#' helper function to enter parameter value on their right place
-#' @param object lambda matrices, q_matrix or mu vector
-#' @param params parameters in order, where each value reflects the value
-#' of the parameter at that position, e.g. c(0.3, 0.2, 0.1) will fill out
-#' the value 0.3 for the parameter with rate indentifier 1, 0.2 for the
-#' parameter with rate identifier 2 and 0.1 for the parameter with rate
-#' identifier 3
+#' Helper function to enter parameter value on their right place
+#' 
+#' @inheritParams default_params_doc
+#' @return lambda matrices, `q_matrix` or mu vector with the correct values in
+#'   their right place.
 #' @export
 fill_in <- function(object,
                     params) {
@@ -464,14 +440,12 @@ extract_answ <- function(indic_mat,
 }
 
 
-#' function to extract parameter values out of the result of a maximum
-#' likelihood inference run.
-#' @param param_posit initial parameter structure, consisting of a list with
-#' three entries: 1) lambda matrices, 2) mus and 3) Q matrix. In each entry,
-#' integers numbers (1-n) indicate the parameter to be optimized
-#' @param ml_pars resulting parameter estimates as returned by for instance
-#' cla_secsse_ml, having the same structure as param_post
-#' @return vector of parameter estimates
+#' Extract parameter values out of the result of a maximum likelihood inference 
+#' run
+#' 
+#' @inheritParams default_params_doc
+
+#' @return Vector of parameter estimates.
 #' @export
 extract_par_vals <- function(param_posit,
                              ml_pars) {

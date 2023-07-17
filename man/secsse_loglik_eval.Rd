@@ -2,112 +2,101 @@
 % Please edit documentation in R/seccse_plot.R
 \name{secsse_loglik_eval}
 \alias{secsse_loglik_eval}
-\title{Likelihood for SecSSE model}
+\title{Likelihood for SecSSE model
+Logikelihood calculation for the SecSSE model given a set of parameters and
+data, returning also the likelihoods along the branches}
 \usage{
 secsse_loglik_eval(
   parameter,
   phy,
   traits,
   num_concealed_states,
-  ancestral_states,
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   sampling_fraction,
   setting_calculation = NULL,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
+  num_threads = 1,
   atol = 1e-08,
   rtol = 1e-07,
   method = "odeint::bulirsch_stoer",
-  num_steps = NULL,
-  verbose = FALSE
+  num_steps = 100
 )
 }
 \arguments{
-\item{parameter}{list where first vector represents lambdas, the second mus
-and the third transition rates.}
+\item{parameter}{list where first vector represents lambdas, the second
+mus and the third transition rates.}
 
-\item{phy}{phylogenetic tree of class phylo, ultrametric, fully-resolved,
-rooted and with branch lengths.}
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
+branch lengths.}
 
-\item{traits}{vector with trait states, order of states must be the same as
-tree tips, for help, see vignette.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
-to number of examined states.}
+to the number of examined states in the dataset.}
 
-\item{ancestral_states}{ancestral states matrix provided by
-secsse_loglik, this is used as starting points for the branch integration}
+\item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
+\code{"proper_cond"} (default). For details, see vignette.}
 
-\item{cond}{condition on the existence of a node root: "maddison_cond",
-"proper_cond"(default). For details, see vignette.}
-
-\item{root_state_weight}{the method to weigh the states:"maddison_weights",
-"proper_weights"(default) or "equal_weights". It can also be specified the
-root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\item{root_state_weight}{the method to weigh the states:
+\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
+It can also be specified for the root state: the vector \code{c(1, 0, 0)}
+indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
-trait state. It must have as many elements as trait states.}
+trait state. It must have as many elements as there are trait states.}
 
 \item{setting_calculation}{argument used internally to speed up calculation.
-It should be left blank (default : setting_calculation = NULL)}
+It should be left blank (default : \code{setting_calculation = NULL}).}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is
-0 (no penalty)}
+0 (no penalty).}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species
-is provided}
+\item{is_complete_tree}{logical specifying whether or not a tree with all its
+extinct species is provided. If set to \code{TRUE}, it also assumes that all
+\emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
-\item{atol}{absolute tolerance of integration}
+\item{num_threads}{number of threads to be used. Default is one thread.}
 
-\item{rtol}{relative tolerance of integration}
+\item{atol}{A numeric specifying the absolute tolerance of integration.}
+
+\item{rtol}{A numeric specifying the relative tolerance of integration.}
 
 \item{method}{integration method used, available are:
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
+\code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
+\code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
 
 \item{num_steps}{number of substeps to show intermediate likelihoods
-along a branch, if left to NULL, the intermediate likelihoods at every
-integration evaluation are stored, which is more exact, but can lead to
-huge datasets / memory usage.}
-
-\item{verbose}{provides intermediate output if TRUE}
+along a branch.}
 }
 \value{
-The loglikelihood of the data given the parameters
+A list containing: "output", observed states along evaluated time
+points along all branches, used for plotting. "states" all ancestral states
+on the nodes and "duration", indicating the time taken for the total
+evaluation
 }
 \description{
+Likelihood for SecSSE model
 Logikelihood calculation for the SecSSE model given a set of parameters and
 data, returning also the likelihoods along the branches
 }
 \examples{
-#' set.seed(5)
-focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+set.seed(5)
+phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
 params <- secsse::id_paramPos(c(0, 1), 2)
 params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
 params[[2]][] <- 0.0
 params[[3]][, ] <- 0.1
 diag(params[[3]]) <- NA
-#  Thus, we have for both, rates
-# 0A, 1A, 0B and 1B. If we are interested in the posterior probability of
-# trait 0 we have to provide a helper function that sums the probabilities of
-# 0A and 0B, e.g.:
-helper_function <- function(x) {
-  return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
-}
-ll <- secsse::secsse_loglik(parameter = params,
-                            phy = focal_tree,
-                            traits = traits,
-                            num_concealed_states = 2,
-                            sampling_fraction = c(1, 1),
-                            see_ancestral_states = TRUE)
 
 secsse_loglik_eval(parameter = params,
-                   phy = focal_tree,
+                   phy = phy,
                    traits = traits,
-                   ancestral_states = ll$states,
                    num_concealed_states = 2,
                    sampling_fraction = c(1, 1),
                    num_steps = 10)

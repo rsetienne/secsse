@@ -12,7 +12,7 @@
 
 <meta name="author" content="Thijs Janzen" />
 
-<meta name="date" content="2023-07-06" />
+<meta name="date" content="2023-07-12" />
 
 <title>Starting secsse</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Starting secsse</h1>
 <h4 class="author">Thijs Janzen</h4>
-<h4 class="date">2023-07-06</h4>
+<h4 class="date">2023-07-12</h4>
 
 
 
@@ -370,7 +370,7 @@ particularly well. The *.csv file can be loaded into R using the
 read.csv() function. and should look like this:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(secsse)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">data</span>(traits)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">tail</span>(traits) <span class="co"># </span><span class="al">NOTE</span><span class="co">: Data file is different? trait column only has 0 and 1</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">tail</span>(traits)</span></code></pre></div>
 <pre><code>##     species trait
 ## t46     t46     1
 ## t56     t56     1
@@ -420,8 +420,7 @@ visualise the tip states using the package diversitree:</p>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>                        <span class="at">cols =</span> <span class="fu">list</span>(<span class="st">&quot;trait&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>)),</span>
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>                        <span class="at">type =</span> <span class="st">&quot;p&quot;</span>)</span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>}</span></code></pre></div>
-<pre><code>## Loading required namespace: diversitree</code></pre>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>After you are done properly setting up your data, you can proceed to
 setting parameters and constraints.</p>
 <div id="note-on-assigning-ambiguity-to-taxon-trait-states" class="section level4">
@@ -445,12 +444,12 @@ row). On the other hand, the species in the fifth row can pertain to all
 states: the first column would have a 1, the second a 2, the third a 3
 (although if you only have this type of ambiguity, it is easier to
 assign <code>NA</code> and use a single-column data file).</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co">#       traits traits traits</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co"># [1,]      2      2      2</span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co"># [2,]      1      1      1</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># [3,]      2      2      2</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co"># [4,]      3      1      1</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co"># [5,]      1      2      3</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co">#       traits traits traits</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co"># [1,]      2      2      2</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co"># [2,]      1      1      1</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co"># [3,]      2      2      2</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co"># [4,]      3      1      1</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co"># [5,]      1      2      3</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -481,22 +480,21 @@ speciation, extinction and trait-shifts respectively.</p>
 <p>Speciation in a secsse model is defined using a list of matrices,
 where each matrix highlights the state of the daughter species resulting
 from a speciation event. In our case, we have a trait with two states,
-and thus we will require to specify a list with two matrices, one for
-each state, where each matrix in turn will then specify the daughter
-states. We can do so by hand, but secsse includes functionality to do
-this in a more organized manner - this is especially useful if you have
-a trait with more than two states for instance. In this more organized
-manner, we can provide secsse with a matrix specifying the potential
-speciation results, and secsse will construct the lambda list
-accordingly:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;ETD&quot;</span>)</span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
+and thus we will have to specify a list with two matrices, one for each
+state, where each matrix in turn will then specify the daughter states.
+We can do so by hand, but secsse includes functionality to do this in a
+more organized manner - this is especially useful if you have a trait
+with more than two states for instance. In this more organized manner,
+we can provide secsse with a matrix specifying the potential speciation
+results, and secsse will construct the lambda list accordingly:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;ETD&quot;</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
 <pre><code>## $`0A`
 ##    0A 1A 0B 1B
 ## 0A  1  0  0  0
@@ -554,19 +552,20 @@ according to the concealed state.</p>
 <p>Having the speciation rates set, we can move on to extinction rates.
 Since we are using the ETD model, here we also expect the extinction
 rates to be different:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;ETD&quot;</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;ETD&quot;</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
 <pre><code>## 0A 1A 0B 1B 
 ##  3  4  3  4</code></pre>
 <p>The function <code>create_mus_vector()</code> takes the same standard
 information we provided earlier, with as addition our previously made
-lambda_list. It uses the lambda_list to identify the rate indicators (in
-this case 1 and 2) that are already used and to thus pick new rates. We
-see that secsse has created a named vector with two extinction rates (3
-and 4), which are associated with our observed traits 0 and 1.</p>
+<code>lambda_list</code>. It uses the <code>lambda_list</code> to
+identify the rate indicators (in this case 1 and 2) that are already
+used and to thus pick new rates. We see that secsse has created a named
+vector with two extinction rates (3 and 4), which are associated with
+our observed traits 0 and 1.</p>
 </div>
 <div id="transition-matrix" class="section level4">
 <h4>Transition matrix</h4>
@@ -579,18 +578,18 @@ The information contained in this <code>shift_matrix</code> is then
 automatically mimicked for inclusion in the full matrix, to ensure that
 the same complexity in examined state transitions is also found in
 concealed states. Instead of specifying the entire
-<code>shift_matrix</code>, instead we can suffice with only specifying
-the non-zero transitions. In this case these are from state 0 to 1, and
-vice versa:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
+<code>shift_matrix</code>, instead it suffices to only specify the
+non-zero transitions. In this case these are from state 0 to 1, and vice
+versa:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
 <pre><code>##    0A 1A 0B 1B
 ## 0A NA  5  7  0
 ## 1A  6 NA  0  7
@@ -598,28 +597,29 @@ vice versa:</p>
 ## 1B  0  8  6 NA</code></pre>
 <p>Thus, we first specify a matrix containing the potential state
 transitions, here 0-&gt;1 and 1-&gt;0. Then, we use
-<code>create_q_matrix</code> to create the q-matrix. By setting
-<code>diff.conceal</code> to TRUE, we ensure that the concealed states
-will get their own rates specified. Setting this to FALSE would set
-their rates equal to the observed rates (5 and 6). The way to read the
-transition matrix is column-row, e.g. starting at state 0A, with rate 5
-the species will shift to state 1A and with rate 7 it will shift to
-state 0B. We intentionally ignore ‘double’ shifts, e.g. from 0A to 1B,
-where both the observed and the concealed trait shift at the same time.
-If you have good evidence to include such shifts in your model, you can
-modify the trans_matrix by hand of course.</p>
+<code>create_q_matrix()</code> to create the q-matrix. By setting
+<code>diff.conceal</code> to <code>TRUE</code>, we ensure that the
+concealed states will get their own rates specified. Setting this to
+<code>FALSE</code> would set their rates equal to the observed rates (5
+and 6). The way to read the transition matrix is column-row,
+e.g. starting at state 0A, with rate 5 the species will shift to state
+1A and with rate 7 it will shift to state 0B. We intentionally ignore
+‘double’ shifts, e.g. from 0A to 1B, where both the observed and the
+concealed trait shift at the same time. If you have good evidence to
+include such shifts in your model, you can modify the trans_matrix by
+hand of course.</p>
 </div>
 <div id="maximum-likelihood" class="section level4">
 <h4>Maximum Likelihood</h4>
 <p>We have now specified the required ingredients to perform Maximum
-Likelihood. Prerequisite for performing Maximum Likelihood with secsse
-is that we specify the ids of the rates we want optimized, and provide
-initial values. We can do so as follows:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># our maximum rate parameter was 8</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep al zeros at zero</span></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">8</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
+Likelihood analyses. Prerequisites for performing Maximum Likelihood
+analyses with secsse are that we specify the ids of the rates we want
+optimized, and provide initial values. We can do so as follows:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># our maximum rate parameter was 8</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep all zeros at zero</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">8</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
 <p>Here, we specify that we want to optimize all parameters with rates
 1, 2, …, 8. We set these at initial values at 0.1 for all parameters.
 Here, we will only use one starting point, but in practice it is often
@@ -634,46 +634,46 @@ missing, we could specify that as c(0.8, 1.0). Thus, note that the
 sampling fraction does not add up to 1 across traits, but within
 traits.</p>
 <p>And now we can perform maximum likelihood:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
-<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
-<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
-<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">4</span>)</span></code></pre></div>
-<pre><code>## Warning in master_ml(phy = phy, traits = traits, num_concealed_states =
-## num_concealed_states, : Note: you set some transitions as impossible to happen.</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
+<pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
+## Note: you set some transitions as impossible to happen.</code></pre>
 <p>We can now extract several pieces of information from the returned
 answer:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>ML_ETD <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>ETD_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>ML_ETD</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>ML_ETD <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>ETD_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>ML_ETD</span></code></pre></div>
 <pre><code>## [1] -96.32138</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>ETD_par</span></code></pre></div>
-<pre><code>## [1] 4.429928e-01 8.810607e-01 5.201400e-07 7.764175e-07 7.770646e-02
-## [6] 1.570195e-09 1.411729e-01 6.558261e-02</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> ETD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
-<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> ETD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
-<pre><code>## [1] 0.4429928 0.8810607</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>ETD_par</span></code></pre></div>
+<pre><code>## [1] 4.429929e-01 8.810607e-01 5.201400e-07 7.764175e-07 7.770646e-02
+## [6] 1.570195e-09 1.410419e-01 6.549122e-02</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> ETD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> ETD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> ETD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
+<pre><code>## [1] 0.4429929 0.8810607</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
 <pre><code>## [1] 5.201400e-07 7.764175e-07</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
 <pre><code>## [1] 7.770646e-02 1.570195e-09</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
-<pre><code>## [1] 0.14117292 0.06558261</code></pre>
-<p>The function <code>extract_par_vals</code> goes over the list
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
+<pre><code>## [1] 0.14104187 0.06549122</code></pre>
+<p>The function <code>extract_par_vals()</code> goes over the list
 <code>answ$MLpars</code> and places the found parameter values back in
 consecutive vector 1:8 in this case. Here, we find that the speciation
 rate of trait 1 is higher than the speciation rate of trait 0.</p>
@@ -690,14 +690,14 @@ straightforward now that we have gotten the hang of how this works.</p>
 <p>Again, we specify two distinct rates, indicating that the observed
 state inherits faithfully to the daughter species. However, this time,
 we set the model indicator to “CTD”:</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
-<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;CTD&quot;</span>)</span>
-<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;CTD&quot;</span>)</span>
+<span id="cb33-8"><a href="#cb33-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
 <pre><code>## $`0A`
 ##    0A 1A 0B 1B
 ## 0A  1  0  0  0
@@ -725,22 +725,23 @@ we set the model indicator to “CTD”:</p>
 ## 1A  0  0  0  0
 ## 0B  0  0  0  0
 ## 1B  0  0  0  2</code></pre>
-<p>The resulting lambda_list now has the chosen rates 1 and 2 sorted
-differently across the matrices, with matrices 1 and 2 containing rate
-1, and matrices 3 and 4 containing rate 2. Looking at the column names
-of the matrices, states 1 and 2 are states 0A and 1A, and states 3 and 4
-are states 0B and 1B, in other words, speciation rate 1 is now
-associated with all states with concealed state A, and speciation rate 2
-is now associated with all states with concealed state B.</p>
+<p>The resulting <code>lambda_list</code> now has the chosen rates 1 and
+2 sorted differently across the matrices, with matrices 1 and 2
+containing rate 1, and matrices 3 and 4 containing rate 2. Looking at
+the column names of the matrices, states 1 and 2 are states 0A and 1A,
+and states 3 and 4 are states 0B and 1B, in other words, speciation rate
+1 is now associated with all states with concealed state A, and
+speciation rate 2 is now associated with all states with concealed state
+B.</p>
 </div>
 <div id="mu-vector-1" class="section level4">
 <h4>Mu vector</h4>
 <p>For the mu vector, we repeat the same we did for the ETD model:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;CTD&quot;</span>,</span>
-<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
-<span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;CTD&quot;</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
 <pre><code>## 0A 1A 0B 1B 
 ##  3  3  4  4</code></pre>
 <p>Here, again, we see that whereas previously extinction rate 3 was
@@ -752,15 +753,15 @@ concealed state A.</p>
 <h4>Transition matrix</h4>
 <p>Setting up the transition matrix is not different from the ETD model,
 the same transitions are possible:</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))</span>
-<span id="cb38-3"><a href="#cb38-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
-<span id="cb38-4"><a href="#cb38-4" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb38-6"><a href="#cb38-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb38-7"><a href="#cb38-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
-<span id="cb38-8"><a href="#cb38-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb38-9"><a href="#cb38-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))</span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
+<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
 <pre><code>##    0A 1A 0B 1B
 ## 0A NA  5  7  0
 ## 1A  6 NA  0  7
@@ -771,49 +772,49 @@ the same transitions are possible:</p>
 <h4>Maximum Likelihood</h4>
 <p>Now that we have specified our matrices, we can use the same code we
 used for the ETD model to perform our maximum likelihood:</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># our maximum rate parameter was 8</span></span>
-<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep al zeros at zero</span></span>
-<span id="cb40-3"><a href="#cb40-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">8</span>)</span>
-<span id="cb40-4"><a href="#cb40-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
-<span id="cb40-5"><a href="#cb40-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb40-6"><a href="#cb40-6" tabindex="-1"></a></span>
-<span id="cb40-7"><a href="#cb40-7" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb40-8"><a href="#cb40-8" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
-<span id="cb40-9"><a href="#cb40-9" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
-<span id="cb40-10"><a href="#cb40-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
-<span id="cb40-11"><a href="#cb40-11" tabindex="-1"></a></span>
-<span id="cb40-12"><a href="#cb40-12" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
-<span id="cb40-13"><a href="#cb40-13" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
-<span id="cb40-14"><a href="#cb40-14" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb40-15"><a href="#cb40-15" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
-<span id="cb40-16"><a href="#cb40-16" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
-<span id="cb40-17"><a href="#cb40-17" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
-<span id="cb40-18"><a href="#cb40-18" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
-<span id="cb40-19"><a href="#cb40-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
-<span id="cb40-20"><a href="#cb40-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
-<span id="cb40-21"><a href="#cb40-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb40-22"><a href="#cb40-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">4</span>)</span></code></pre></div>
-<pre><code>## Warning in master_ml(phy = phy, traits = traits, num_concealed_states =
-## num_concealed_states, : Note: you set some transitions as impossible to happen.</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a>ML_CTD <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
-<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a>CTD_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
-<span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a>ML_CTD</span></code></pre></div>
-<pre><code>## [1] -98.41316</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>CTD_par</span></code></pre></div>
-<pre><code>## [1] 2.917621e-01 1.961454e+00 8.449145e-07 4.491798e-06 7.760243e-02
-## [6] 3.332554e-08 3.749871e+00 1.317278e+01</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> CTD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
-<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> CTD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
-<span id="cb46-5"><a href="#cb46-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
-<pre><code>## [1] 0.2917621 1.9614540</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
-<pre><code>## [1] 8.449145e-07 4.491798e-06</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
-<pre><code>## [1] 7.760243e-02 3.332554e-08</code></pre>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
-<pre><code>## [1]  3.749871 13.172782</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># our maximum rate parameter was 8</span></span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep all zeros at zero</span></span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">8</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb39-8"><a href="#cb39-8" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
+<span id="cb39-9"><a href="#cb39-9" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
+<span id="cb39-10"><a href="#cb39-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
+<span id="cb39-11"><a href="#cb39-11" tabindex="-1"></a></span>
+<span id="cb39-12"><a href="#cb39-12" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
+<span id="cb39-13"><a href="#cb39-13" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
+<span id="cb39-14"><a href="#cb39-14" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb39-15"><a href="#cb39-15" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
+<span id="cb39-16"><a href="#cb39-16" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
+<span id="cb39-17"><a href="#cb39-17" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
+<span id="cb39-18"><a href="#cb39-18" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
+<span id="cb39-19"><a href="#cb39-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
+<span id="cb39-20"><a href="#cb39-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
+<span id="cb39-21"><a href="#cb39-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb39-22"><a href="#cb39-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
+<pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
+## Note: you set some transitions as impossible to happen.</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>ML_CTD <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
+<span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a>CTD_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
+<span id="cb41-3"><a href="#cb41-3" tabindex="-1"></a>ML_CTD</span></code></pre></div>
+<pre><code>## [1] -98.41269</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a>CTD_par</span></code></pre></div>
+<pre><code>## [1] 1.967792e+00 2.939082e-01 3.637021e-04 4.716578e-05 7.756585e-02
+## [6] 6.941423e-07 1.319752e+01 3.715673e+00</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a>spec_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>ext_rates <span class="ot">&lt;-</span> CTD_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> CTD_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> CTD_par[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>]</span>
+<span id="cb45-5"><a href="#cb45-5" tabindex="-1"></a>spec_rates</span></code></pre></div>
+<pre><code>## [1] 1.9677916 0.2939082</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a>ext_rates</span></code></pre></div>
+<pre><code>## [1] 3.637021e-04 4.716578e-05</code></pre>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
+<pre><code>## [1] 7.756585e-02 6.941423e-07</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
+<pre><code>## [1] 13.197515  3.715673</code></pre>
 <p>Here we now find that state A has a very low speciation rate, in
 contrast to a much higher speciation rate for state B (remember that
 speciation rate 1 is now associated with A, and not with state 0!).
@@ -833,14 +834,14 @@ a good sanity check.</p>
 <h4>Lambda matrices</h4>
 <p>To specify the lambda matrices, this time we choose the same rate
 indicator across both states.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
-<span id="cb54-7"><a href="#cb54-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>)</span>
-<span id="cb54-8"><a href="#cb54-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>spec_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(spec_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb53-4"><a href="#cb53-4" tabindex="-1"></a>lambda_list <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_lambda_list</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb53-5"><a href="#cb53-5" tabindex="-1"></a>                                          <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb53-6"><a href="#cb53-6" tabindex="-1"></a>                                          <span class="at">transition_matrix =</span> spec_matrix,</span>
+<span id="cb53-7"><a href="#cb53-7" tabindex="-1"></a>                                          <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>)</span>
+<span id="cb53-8"><a href="#cb53-8" tabindex="-1"></a>lambda_list</span></code></pre></div>
 <pre><code>## $`0A`
 ##    0A 1A 0B 1B
 ## 0A  1  0  0  0
@@ -873,11 +874,11 @@ indicator across both states.</p>
 <h4>Mu vector</h4>
 <p>The mu vector follows closely from this, having a shared extinction
 rate across all states:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>,</span>
-<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
-<span id="cb56-5"><a href="#cb56-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a>mu_vec <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_mu_vector</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a>                                   <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb55-3"><a href="#cb55-3" tabindex="-1"></a>                                   <span class="at">model =</span> <span class="st">&quot;CR&quot;</span>,</span>
+<span id="cb55-4"><a href="#cb55-4" tabindex="-1"></a>                                   <span class="at">lambda_list =</span> lambda_list)</span>
+<span id="cb55-5"><a href="#cb55-5" tabindex="-1"></a>mu_vec</span></code></pre></div>
 <pre><code>## 0A 1A 0B 1B 
 ##  2  2  2  2</code></pre>
 </div>
@@ -889,15 +890,15 @@ transition matrix (both forward and reverse trait shifts) should share
 the same rate. Here, we will choose the more parameter-rich version
 (Home assignment: try to modify the code to perform an analysis in which
 all rates in the transition matrix are the same).</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">3</span>))</span>
-<span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">4</span>))</span>
-<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a></span>
-<span id="cb58-5"><a href="#cb58-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb58-6"><a href="#cb58-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb58-7"><a href="#cb58-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
-<span id="cb58-8"><a href="#cb58-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb58-9"><a href="#cb58-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb57-2"><a href="#cb57-2" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb57-3"><a href="#cb57-3" tabindex="-1"></a>shift_matrix <span class="ot">&lt;-</span> <span class="fu">rbind</span>(shift_matrix, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">4</span>))</span>
+<span id="cb57-4"><a href="#cb57-4" tabindex="-1"></a></span>
+<span id="cb57-5"><a href="#cb57-5" tabindex="-1"></a>q_matrix <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">create_q_matrix</span>(<span class="at">state_names =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb57-6"><a href="#cb57-6" tabindex="-1"></a>                                    <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb57-7"><a href="#cb57-7" tabindex="-1"></a>                                    <span class="at">shift_matrix =</span> shift_matrix,</span>
+<span id="cb57-8"><a href="#cb57-8" tabindex="-1"></a>                                    <span class="at">diff.conceal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb57-9"><a href="#cb57-9" tabindex="-1"></a>q_matrix</span></code></pre></div>
 <pre><code>##    0A 1A 0B 1B
 ## 0A NA  3  5  0
 ## 1A  4 NA  0  5
@@ -906,48 +907,48 @@ all rates in the transition matrix are the same).</p>
 </div>
 <div id="maximum-likelihood-2" class="section level4">
 <h4>Maximum Likelihood</h4>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span> <span class="co"># our maximum rate parameter was 6</span></span>
-<span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep al zeros at zero</span></span>
-<span id="cb60-3"><a href="#cb60-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">6</span>)</span>
-<span id="cb60-4"><a href="#cb60-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
-<span id="cb60-5"><a href="#cb60-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb60-6"><a href="#cb60-6" tabindex="-1"></a></span>
-<span id="cb60-7"><a href="#cb60-7" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb60-8"><a href="#cb60-8" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
-<span id="cb60-9"><a href="#cb60-9" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
-<span id="cb60-10"><a href="#cb60-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
-<span id="cb60-11"><a href="#cb60-11" tabindex="-1"></a></span>
-<span id="cb60-12"><a href="#cb60-12" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
-<span id="cb60-13"><a href="#cb60-13" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
-<span id="cb60-14"><a href="#cb60-14" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
-<span id="cb60-15"><a href="#cb60-15" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
-<span id="cb60-16"><a href="#cb60-16" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
-<span id="cb60-17"><a href="#cb60-17" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
-<span id="cb60-18"><a href="#cb60-18" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
-<span id="cb60-19"><a href="#cb60-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
-<span id="cb60-20"><a href="#cb60-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
-<span id="cb60-21"><a href="#cb60-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb60-22"><a href="#cb60-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">4</span>)</span></code></pre></div>
-<pre><code>## Warning in master_ml(phy = phy, traits = traits, num_concealed_states =
-## num_concealed_states, : Note: you set some transitions as impossible to happen.</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a>ML_CR <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
-<span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a>CR_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
-<span id="cb62-3"><a href="#cb62-3" tabindex="-1"></a>ML_CR</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a>idparsopt <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span> <span class="co"># our maximum rate parameter was 6</span></span>
+<span id="cb59-2"><a href="#cb59-2" tabindex="-1"></a>idparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>) <span class="co"># we want to keep all zeros at zero</span></span>
+<span id="cb59-3"><a href="#cb59-3" tabindex="-1"></a>initparsopt <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.1</span>, <span class="dv">6</span>)</span>
+<span id="cb59-4"><a href="#cb59-4" tabindex="-1"></a>initparsfix <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>) <span class="co"># all zeros remain at zero.</span></span>
+<span id="cb59-5"><a href="#cb59-5" tabindex="-1"></a>sampling_fraction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb59-6"><a href="#cb59-6" tabindex="-1"></a></span>
+<span id="cb59-7"><a href="#cb59-7" tabindex="-1"></a>idparslist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb59-8"><a href="#cb59-8" tabindex="-1"></a>idparslist[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> lambda_list</span>
+<span id="cb59-9"><a href="#cb59-9" tabindex="-1"></a>idparslist[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> mu_vec</span>
+<span id="cb59-10"><a href="#cb59-10" tabindex="-1"></a>idparslist[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> q_matrix</span>
+<span id="cb59-11"><a href="#cb59-11" tabindex="-1"></a></span>
+<span id="cb59-12"><a href="#cb59-12" tabindex="-1"></a>answ <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">cla_secsse_ml</span>(<span class="at">phy =</span> phylo_vignette,</span>
+<span id="cb59-13"><a href="#cb59-13" tabindex="-1"></a>                              <span class="at">traits =</span> traits<span class="sc">$</span>trait,</span>
+<span id="cb59-14"><a href="#cb59-14" tabindex="-1"></a>                              <span class="at">num_concealed_states =</span> <span class="dv">2</span>,</span>
+<span id="cb59-15"><a href="#cb59-15" tabindex="-1"></a>                              <span class="at">idparslist =</span> idparslist,</span>
+<span id="cb59-16"><a href="#cb59-16" tabindex="-1"></a>                              <span class="at">idparsopt =</span> idparsopt,</span>
+<span id="cb59-17"><a href="#cb59-17" tabindex="-1"></a>                              <span class="at">initparsopt =</span> initparsopt,</span>
+<span id="cb59-18"><a href="#cb59-18" tabindex="-1"></a>                              <span class="at">idparsfix =</span> idparsfix,</span>
+<span id="cb59-19"><a href="#cb59-19" tabindex="-1"></a>                              <span class="at">parsfix =</span> initparsfix,</span>
+<span id="cb59-20"><a href="#cb59-20" tabindex="-1"></a>                              <span class="at">sampling_fraction =</span> sampling_fraction,</span>
+<span id="cb59-21"><a href="#cb59-21" tabindex="-1"></a>                              <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb59-22"><a href="#cb59-22" tabindex="-1"></a>                              <span class="at">num_threads =</span> <span class="dv">8</span>)</span></code></pre></div>
+<pre><code>## Warning in check_ml_conditions(traits, idparslist, initparsopt, idparsopt, :
+## Note: you set some transitions as impossible to happen.</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a>ML_CR <span class="ot">&lt;-</span> answ<span class="sc">$</span>ML</span>
+<span id="cb61-2"><a href="#cb61-2" tabindex="-1"></a>CR_par <span class="ot">&lt;-</span> secsse<span class="sc">::</span><span class="fu">extract_par_vals</span>(idparslist, answ<span class="sc">$</span>MLpars)</span>
+<span id="cb61-3"><a href="#cb61-3" tabindex="-1"></a>ML_CR</span></code></pre></div>
 <pre><code>## [1] -99.64176</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a>CR_par</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a>CR_par</span></code></pre></div>
 <pre><code>## [1] 6.923591e-01 1.444426e-07 7.760335e-02 5.258368e-10 1.000000e-01
 ## [6] 1.000000e-01</code></pre>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" tabindex="-1"></a>spec_rate <span class="ot">&lt;-</span> CR_par[<span class="dv">1</span>]</span>
-<span id="cb66-2"><a href="#cb66-2" tabindex="-1"></a>ext_rate <span class="ot">&lt;-</span>  CR_par[<span class="dv">2</span>]</span>
-<span id="cb66-3"><a href="#cb66-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> CR_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb66-4"><a href="#cb66-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> CR_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
-<span id="cb66-5"><a href="#cb66-5" tabindex="-1"></a>spec_rate</span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" tabindex="-1"></a>spec_rate <span class="ot">&lt;-</span> CR_par[<span class="dv">1</span>]</span>
+<span id="cb65-2"><a href="#cb65-2" tabindex="-1"></a>ext_rate <span class="ot">&lt;-</span>  CR_par[<span class="dv">2</span>]</span>
+<span id="cb65-3"><a href="#cb65-3" tabindex="-1"></a>Q_Examined <span class="ot">&lt;-</span> CR_par[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb65-4"><a href="#cb65-4" tabindex="-1"></a>Q_Concealed <span class="ot">&lt;-</span> CR_par[<span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb65-5"><a href="#cb65-5" tabindex="-1"></a>spec_rate</span></code></pre></div>
 <pre><code>## [1] 0.6923591</code></pre>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" tabindex="-1"></a>ext_rate</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" tabindex="-1"></a>ext_rate</span></code></pre></div>
 <pre><code>## [1] 1.444426e-07</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" tabindex="-1"></a>Q_Examined</span></code></pre></div>
 <pre><code>## [1] 7.760335e-02 5.258368e-10</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" tabindex="-1"></a>Q_Concealed</span></code></pre></div>
 <pre><code>## [1] 0.1 0.1</code></pre>
 <p>We now recover a non-zero extinction rate, and much higher transition
 rates for the concealed than for the observed states.</p>
@@ -959,14 +960,14 @@ rates for the concealed than for the observed states.</p>
 compare the models using AIC. Remembering that the AIC is 2k - 2LL,
 where k is the number of parameters of each model and LL is the Log
 Likelihood, we can calculate this as follows:</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">ll =</span> <span class="fu">c</span>(ML_ETD, ML_CTD, ML_CR),</span>
-<span id="cb74-2"><a href="#cb74-2" tabindex="-1"></a>                  <span class="at">k  =</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">6</span>),</span>
-<span id="cb74-3"><a href="#cb74-3" tabindex="-1"></a>                  <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;ETD&quot;</span>, <span class="st">&quot;CTD&quot;</span>, <span class="st">&quot;CR&quot;</span>))</span>
-<span id="cb74-4"><a href="#cb74-4" tabindex="-1"></a>res<span class="sc">$</span>AIC <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> res<span class="sc">$</span>k <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> res<span class="sc">$</span>ll</span>
-<span id="cb74-5"><a href="#cb74-5" tabindex="-1"></a>res</span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">ll =</span> <span class="fu">c</span>(ML_ETD, ML_CTD, ML_CR),</span>
+<span id="cb73-2"><a href="#cb73-2" tabindex="-1"></a>                  <span class="at">k  =</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">6</span>),</span>
+<span id="cb73-3"><a href="#cb73-3" tabindex="-1"></a>                  <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;ETD&quot;</span>, <span class="st">&quot;CTD&quot;</span>, <span class="st">&quot;CR&quot;</span>))</span>
+<span id="cb73-4"><a href="#cb73-4" tabindex="-1"></a>res<span class="sc">$</span>AIC <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> res<span class="sc">$</span>k <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> res<span class="sc">$</span>ll</span>
+<span id="cb73-5"><a href="#cb73-5" tabindex="-1"></a>res</span></code></pre></div>
 <pre><code>##          ll k model      AIC
 ## 1 -96.32138 8   ETD 208.6428
-## 2 -98.41316 8   CTD 212.8263
+## 2 -98.41269 8   CTD 212.8254
 ## 3 -99.64176 6    CR 211.2835</code></pre>
 <p>I can now reveal to you that the tree we used was generated using an
 ETD model, which we have correctly recovered!</p>
@@ -974,12 +975,14 @@ ETD model, which we have correctly recovered!</p>
 </div>
 <div id="further-help" class="section level2">
 <h2>Further help</h2>
-<p>For more advanced settings and shortcut functions to set up a secsse
-analysis, please see the vignette setting_up_secsse.</p>
 <p>If after reading these vignettes, you still have questions, please
-feel free to e-mail the authors for help with this R package.</p>
-<p>======= ## References</p>
-<p>Beaulieu, J. M., O’meara, B. C., &amp; Donoghue, M. J. (2013).
+feel free to create an issue at the package’s GitHub repository <a href="https://github.com/rsetienne/secsse/issues" class="uri">https://github.com/rsetienne/secsse/issues</a> or e-mail the
+authors for help with this R package. Additionally, bug reports and
+feature requests are welcome by the same means.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Beaulieu, J. M., O’Meara, B. C., &amp; Donoghue, M. J. (2013).
 Identifying hidden rate changes in the evolution of a binary
 morphological character: the evolution of plant habit in campanulid
 angiosperms. Systematic biology, 62(5), 725-737.</p>
