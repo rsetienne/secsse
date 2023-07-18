@@ -83,13 +83,15 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::NumericMatrix& q_R,
                           double max_time,
                           double max_species,
+                          double min_species,
                           const std::vector<double>& init_states,
                           std::string condition,
                           int num_concealed_states,
                           bool non_extinction,
                           bool verbose,
                           int max_tries,
-                          int seed) {
+                          int seed,
+                          const std::vector<double>& conditioning_vec) {
   num_mat q;
   util::numericmatrix_to_vector(q_R, &q);
   
@@ -107,30 +109,34 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   int cnt = 0;
   while (true) {
     sim.run();
+    
+    if (sim.num_species() >= min_species) {
 
-    sim.check_conditioning(condition,
-                           num_concealed_states,
-                           m_R.size());
-    
-    if (sim.run_info != done) {
-      cnt++;
-      tracker[ sim.run_info ]++;
-      if (verbose) {
-        if (cnt % 1000 == 0) {
-          Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
-                      << "large: "   << tracker[overshoot] << " "
-                      << "cond: "    << tracker[conditioning] << "\n";
+      sim.check_conditioning(condition,
+                             num_concealed_states,
+                             m_R.size(),
+                             conditioning_vec);
+      
+      if (sim.run_info != done) {
+        cnt++;
+        tracker[ sim.run_info ]++;
+        if (verbose) {
+          if (cnt % 1000 == 0) {
+            Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
+                        << "large: "   << tracker[overshoot] << " "
+                        << "cond: "    << tracker[conditioning] << "\n";
+          }
         }
+      } else {
+        break;
       }
-    } else {
-      break;
+      
+      if (cnt > max_tries) {
+        break;
+      }
+      Rcpp::checkUserInterrupt();
+      if (!non_extinction && sim.run_info == extinct) break;
     }
-    
-    if (cnt > max_tries) {
-      break;
-    }
-    Rcpp::checkUserInterrupt();
-    if (!non_extinction && sim.run_info == extinct) break;
   }
   // extract and return
   Rcpp::NumericMatrix ltable_for_r;

@@ -74,8 +74,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // secsse_sim_cpp
-Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, const std::vector<double>& init_states, std::string condition, int num_concealed_states, bool non_extinction, bool verbose, int max_tries, int seed);
-RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP init_statesSEXP, SEXP conditionSEXP, SEXP num_concealed_statesSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP, SEXP seedSEXP) {
+Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, double min_species, const std::vector<double>& init_states, std::string condition, int num_concealed_states, bool non_extinction, bool verbose, int max_tries, int seed, const std::vector<double>& conditioning_vec);
+RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP min_speciesSEXP, SEXP init_statesSEXP, SEXP conditionSEXP, SEXP num_concealed_statesSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP, SEXP seedSEXP, SEXP conditioning_vecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -84,6 +84,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type q_R(q_RSEXP);
     Rcpp::traits::input_parameter< double >::type max_time(max_timeSEXP);
     Rcpp::traits::input_parameter< double >::type max_species(max_speciesSEXP);
+    Rcpp::traits::input_parameter< double >::type min_species(min_speciesSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type init_states(init_statesSEXP);
     Rcpp::traits::input_parameter< std::string >::type condition(conditionSEXP);
     Rcpp::traits::input_parameter< int >::type num_concealed_states(num_concealed_statesSEXP);
@@ -91,7 +92,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
     Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
-    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed));
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type conditioning_vec(conditioning_vecSEXP);
+    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, min_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed, conditioning_vec));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -100,7 +102,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_eval_cpp", (DL_FUNC) &_secsse_eval_cpp, 12},
     {"_secsse_calc_ll_cpp", (DL_FUNC) &_secsse_calc_ll_cpp, 12},
     {"_secsse_ct_condition_cpp", (DL_FUNC) &_secsse_ct_condition_cpp, 9},
-    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 12},
+    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 14},
     {NULL, NULL, 0}
 };
 

@@ -13,6 +13,7 @@
 #include <random>
 #include <tuple>
 #include <string>
+#include <map>
 
 using num_mat = std::vector< std::vector<double >>;
 using num_mat_mat = std::vector<num_mat>;
@@ -309,7 +310,6 @@ struct secsse_sim {
 
     pop.clear();
    
-
     auto crown_states = root_speciation(init_state);
 
     pop.add(species(std::get<0>(crown_states), -1, trait_info));
@@ -336,7 +336,7 @@ struct secsse_sim {
         run_info = extinct;
         break;
       }
-      if (pop.size() > max_spec) {
+      if (pop.size() >= max_spec) {
         run_info = overshoot; break;
       }
     }
@@ -561,6 +561,30 @@ struct secsse_sim {
     return;
   }
   
+  void check_custom_conditioning(const std::vector<double>& condition_vec, int num_concealed_traits) {
+    std::map<int, int> histogram;
+    for (const auto& c : condition_vec) {
+      histogram[c] = 0;
+    }
+    
+    for (const auto& i : L.data_) {
+      int trait = static_cast<int>(i.get_trait()) % num_concealed_traits;
+      if (histogram.find(trait) != histogram.end()) {
+        histogram[trait]++;
+      }
+    }
+    
+    for (const auto& h : histogram) {
+      if (h.second == 0) {
+        run_info = conditioning;
+        return;
+      }
+    }
+    
+    run_info = done;
+    return;
+  }
+  
   std::vector<int> get_traits() {
     std::vector<int> traits(pop.size() * 2);
     for (size_t i = 0; i < pop.size(); ++i) {
@@ -573,7 +597,8 @@ struct secsse_sim {
   
   void check_conditioning(std::string conditioning_type,
                           size_t num_concealed_states,
-                          size_t num_states) {
+                          size_t num_states,
+                          const std::vector<double>& condition_vec) {
     if (run_info == extinct) return;
 
     if (conditioning_type == "none") {
@@ -585,7 +610,12 @@ struct secsse_sim {
     }
 
     if (conditioning_type == "obs_states") {
-      check_states(num_states, num_concealed_states);
+        check_states(num_states, num_concealed_states);
+    }
+    
+    if (conditioning_type == "custom") {
+      // do something
+      check_custom_conditioning(condition_vec, num_concealed_states);
     }
 
     return;
@@ -595,6 +625,10 @@ struct secsse_sim {
     return init_state;
   }
 
+  size_t num_species() {
+    return pop.size();
+  }
+  
   num_mat extract_ltable() {
     num_mat extracted_ltable(L.data_.size(), std::vector<double>(5));
     for (size_t i = 0; i < L.data_.size(); ++i) {
