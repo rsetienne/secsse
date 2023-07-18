@@ -21,9 +21,9 @@ secsse_sim(
 )
 }
 \arguments{
-\item{lambdas}{speciation rates, in the form of a list of matrices}
+\item{lambdas}{speciation rates, in the form of a list of matrices.}
 
-\item{mus}{extinction rates, in the form of a vector}
+\item{mus}{extinction rates, in the form of a vector.}
 
 \item{qs}{The Q matrix, for example the result of function q_doubletrans, but
 generally in the form of a matrix.}
@@ -31,31 +31,34 @@ generally in the form of a matrix.}
 \item{crown_age}{crown age of the tree, tree will be simulated conditional
 on non-extinction and this crown age.}
 
-\item{num_concealed_states}{number of concealed states}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
 \item{pool_init_states}{pool of initial states at the crown, in case this is
 different from all available states, otherwise leave at NULL}
 
 \item{maxSpec}{Maximum number of species in the tree (please note that the
-tree is not conditioned on this number, but that this is a safeguard against
-generating extremely large trees).}
+tree is not conditioned on this number, but that this is a safeguard
+against generating extremely large trees).}
 
-\item{conditioning}{can be 'obs_states', 'true_states' or 'none', the tree is
-simulated until one is generated that contains all observed states
-('obs_states'), all true states (e.g. all combinations of obs and hidden
-states), or is always returned ('none').}
+\item{conditioning}{can be \code{"obs_states"}, \code{"true_states"} or \code{"none"}, the
+tree is simulated until one is generated that contains all observed states
+(\code{"obs_states"}), all true states (e.g. all combinations of obs and hidden
+states), or is always returned (\code{"none"}).}
 
-\item{non_extinction}{should the tree be conditioned on non-extinction of the
-crown lineages? Default is TRUE.}
+\item{non_extinction}{boolean stating if the tree should be conditioned on
+non-extinction of the crown lineages. Defaults to \code{TRUE}.}
 
-\item{verbose}{provide intermediate output.}
+\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
+\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
+\code{FALSE}, optimizer output will be shown.}
 
 \item{max_tries}{maximum number of simulations to try to obtain a tree.}
 
-\item{drop_extinct}{should extinct species be dropped from the tree? default
-is TRUE.}
+\item{drop_extinct}{boolean stating if extinct species should be dropped from
+the tree. Defaults to \code{TRUE}.}
 
-\item{seed}{pseudo-random number generator seed}
+\item{seed}{pseudo-random number generator seed.}
 }
 \value{
 a list with four properties: phy: reconstructed phylogeny,
@@ -72,7 +75,7 @@ is typically a list of matrices.
 Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying 'pool_init_states'.
+modifying \code{pool_init_states}.
 
 By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree

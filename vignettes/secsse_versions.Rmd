@@ -1,10 +1,10 @@
 ---
-title: "secsse versions"
+title: "Secsse versions"
 author: "Thijs Janzen"
 date: "2023-07-10"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{secsse versions}
+  %\VignetteIndexEntry{Secsse versions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,6 +20,8 @@ library(ggplot2)
 secsse has gone over many versions since it's first appearance on CRAN in 2019.
 Here, we would like to shortly go over the main versions of secsse, and compare
 their computational performance.
+
+## Secsse Versions
 
 ### 1.0.0
 The first version of secsse appeared in January of 2019 on CRAN. It used the

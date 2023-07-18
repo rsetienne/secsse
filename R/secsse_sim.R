@@ -1,27 +1,7 @@
 #' Function to simulate a tree, conditional on observing all states.
-#' @param lambdas speciation rates, in the form of a list of matrices
-#' @param mus extinction rates, in the form of a vector
-#' @param qs The Q matrix, for example the result of function q_doubletrans, but
-#' generally in the form of a matrix.
-#' @param num_concealed_states number of concealed states
-#' @param crown_age crown age of the tree, tree will be simulated conditional
-#' on non-extinction and this crown age.
-#' @param pool_init_states pool of initial states at the crown, in case this is
-#' different from all available states, otherwise leave at NULL
-#' @param maxSpec Maximum number of species in the tree (please note that the
-#' tree is not conditioned on this number, but that this is a safeguard against
-#' generating extremely large trees).
-#' @param conditioning can be 'obs_states', 'true_states' or 'none', the tree is
-#' simulated until one is generated that contains all observed states
-#' ('obs_states'), all true states (e.g. all combinations of obs and hidden
-#' states), or is always returned ('none').
-#' @param non_extinction should the tree be conditioned on non-extinction of the
-#' crown lineages? Default is TRUE.
-#' @param verbose provide intermediate output.
-#' @param max_tries maximum number of simulations to try to obtain a tree.
-#' @param drop_extinct should extinct species be dropped from the tree? default
-#' is TRUE.
-#' @param seed pseudo-random number generator seed
+#' 
+#' @inheritParams default_params_doc
+#'
 #' @return a list with four properties: phy: reconstructed phylogeny,
 #' true_traits: the true traits in order of tip label, obs_traits: observed
 #' traits, ignoring hidden traits and lastly:
@@ -34,7 +14,7 @@
 #' Simulation is performed with a randomly
 #' sampled initial trait at the crown - if you, however - want a specific,
 #' single, trait used at the crown, you can reduce the possible traits by
-#' modifying 'pool_init_states'.
+#' modifying `pool_init_states`.
 #'
 #' By default, the algorithm keeps simulating until it generates a tree where
 #' both crown lineages survive to the present - this is to ensure that the tree
@@ -112,7 +92,9 @@ secsse_sim <- function(lambdas,
                         seed,
                         condition_vec)
 
-  if (length(res$traits) < 1) {
+  Ltable        <- res$ltable
+  
+  if (sum(Ltable[, 4] == -1) < 2) {
     warning("crown lineages died out")
     return(list(phy = "ds",
                 traits = 0,
@@ -131,9 +113,8 @@ secsse_sim <- function(lambdas,
                 conditioning = res$tracker[4]))
   }
 
-  Ltable        <- res$ltable
+  
 
-  speciesID     <- res$traits[seq(2, length(res$traits), by = 2)]
   initialState  <- res$initial_state
   Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
                                            # not at crown age
@@ -141,12 +122,14 @@ secsse_sim <- function(lambdas,
   Ltable[notmin1, 4] <- crown_age - c(Ltable[notmin1, 4])
   Ltable[which(Ltable[, 4] == crown_age + 1), 4] <- -1
 
-  indices       <- seq(1, length(res$traits), by = 2)
-  speciesTraits <- 1 + res$traits[indices]
+  # indices       <- seq(1, length(res$traits), by = 2)
+  speciesTraits <- 1 + Ltable[, 5]
+  used_id <- abs(Ltable[, 3])
 
   phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
-
-  if (drop_extinct == TRUE) {
+  
+ 
+  if (drop_extinct) {
     to_drop <- which(Ltable[, 4] != -1)
     if (length(to_drop) > 0) {
       used_id <- used_id[-to_drop]
@@ -154,18 +137,17 @@ secsse_sim <- function(lambdas,
     }
   }
 
-
-  true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
+  true_traits <- sortingtraits(data.frame(cbind(paste0("t", used_id),
                                              speciesTraits),
-                                       row.names = NULL),
-                            phy)
+                                          row.names = NULL),
+                               phy)
 
   true_traits <- names(mus)[true_traits]
   obs_traits <- c()
   for (i in seq_along(true_traits)) {
-    obs_traits[i] <- stringr::str_sub(true_traits[i], 1, -2)
+    obs_traits[i] <- substr(true_traits[i], 1, (nchar(-2) - 1))
   }
-
+  
   if (sum(Ltable[, 4] < 0)) {
       return(list(phy = phy,
                 true_traits = true_traits,

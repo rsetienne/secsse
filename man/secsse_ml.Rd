@@ -22,7 +22,7 @@ secsse_ml(
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  verbose = (optimmethod == "subplex"),
+  verbose = (optimmethod == "simplex"),
   num_threads = 1,
   atol = 1e-08,
   rtol = 1e-07,
@@ -30,65 +30,75 @@ secsse_ml(
 )
 }
 \arguments{
-\item{phy}{phylogenetic tree of class phylo, ultrametric, rooted and with
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
 branch lengths.}
 
-\item{traits}{a vector with trait states for each tip in the phylogeny.}
+\item{traits}{vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+\code{vignette("starting_secsse", package = "secsse")}.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
 
 \item{idparslist}{overview of parameters and their values.}
 
-\item{idparsopt}{id of parameters to be estimated.}
+\item{idparsopt}{a numeric vector with the ID of parameters to be estimated.}
 
-\item{initparsopt}{initial guess of the parameters to be estimated.}
+\item{initparsopt}{a numeric vector with the initial guess of the parameters
+to be estimated.}
 
-\item{idparsfix}{id of the fixed parameters.}
+\item{idparsfix}{a numeric vector with the ID of the fixed parameters.}
 
-\item{parsfix}{value of the fixed parameters.}
+\item{parsfix}{a numeric vector with the value of the fixed parameters.}
 
-\item{cond}{condition on the existence of a node root: 'maddison_cond',
-'proper_cond'(default). For details, see vignette.}
+\item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
+\code{"proper_cond"} (default). For details, see vignette.}
 
 \item{root_state_weight}{the method to weigh the states:
-'maddison_weights','proper_weights'(default) or 'equal_weights'.
-It can also be specified the
-root state:the vector c(1,0,0) indicates state 1 was the root state.}
+\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
+It can also be specified for the root state: the vector \code{c(1, 0, 0)}
+indicates state 1 was the root state.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states.}
 
-\item{tol}{maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.}
+\item{tol}{A numeric vector with the maximum tolerance of the optimization
+algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 
-\item{maxiter}{max number of iterations.
-Default is '1000 *round((1.25)^length(idparsopt))'.}
+\item{maxiter}{max number of iterations. Default is
+\code{1000 * round((1.25) ^ length(idparsopt))}.}
 
-\item{optimmethod}{method used for optimization. Available are simplex and
-subplex, default is 'subplex'. Simplex should only be used for debugging.}
+\item{optimmethod}{A string with method used for optimization. Default is
+\code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
+conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
+simplex is implemented natively in \link{DDD}, while subplex is ultimately
+called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
-\item{num_cycles}{number of cycles of the optimization (default is 1).}
+\item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
+the optimization will be repeated until the result is, within the
+tolerance, equal to the starting values, with a maximum of 10 cycles.}
 
-\item{loglik_penalty}{the size of the penalty for all parameters; default
-is 0 (no penalty)}
+\item{loglik_penalty}{the size of the penalty for all parameters; default is
+0 (no penalty).}
 
-\item{is_complete_tree}{whether or not a tree with all its extinct species
-is provided}
+\item{is_complete_tree}{logical specifying whether or not a tree with all its
+extinct species is provided. If set to \code{TRUE}, it also assumes that all
+\emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
-\item{verbose}{sets verbose output; default is verbose when optimmethod is
-'simplex'}
+\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
+\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
+\code{FALSE}, optimizer output will be shown.}
 
-\item{num_threads}{number of threads. Set to -1 to use all available threads.
-Default is one thread.}
+\item{num_threads}{number of threads to be used. Default is one thread.}
 
-\item{atol}{absolute tolerance of integration}
+\item{atol}{A numeric specifying the absolute tolerance of integration.}
 
-\item{rtol}{relative tolerance of integration}
+\item{rtol}{A numeric specifying the relative tolerance of integration.}
 
 \item{method}{integration method used, available are:
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".}
+\code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
+\code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
 }
 \value{
 Parameter estimated and maximum likelihood

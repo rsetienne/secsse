@@ -2,21 +2,24 @@
 % Please edit documentation in R/secsse_utils.R
 \name{sortingtraits}
 \alias{sortingtraits}
-\title{Data checking and trait sorting}
+\title{Data checking and trait sorting
+In preparation for likelihood calculation, it orders trait data according
+the tree tips}
 \usage{
-sortingtraits(traitinfo, phy)
+sortingtraits(trait_info, phy)
 }
 \arguments{
-\item{traitinfo}{data frame where first column has species ids and the second
+\item{trait_info}{data frame where first column has species ids and the second
 one is the trait associated information.}
 
-\item{phy}{phy phylogenetic tree of class phylo, ultrametric, fully-resolved,
-rooted and with branch lengths.}
+\item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
+branch lengths.}
 }
 \value{
 Vector of traits
 }
 \description{
+Data checking and trait sorting
 In preparation for likelihood calculation, it orders trait data according
 the tree tips
 }

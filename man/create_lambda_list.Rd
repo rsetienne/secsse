@@ -2,7 +2,7 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_lambda_list}
 \alias{create_lambda_list}
-\title{helper function to automatically create lambda matrices, based on input}
+\title{Helper function to automatically create lambda matrices, based on input}
 \usage{
 create_lambda_list(
   state_names = c(0, 1),
@@ -13,27 +13,29 @@ create_lambda_list(
 )
 }
 \arguments{
-\item{state_names}{vector of names of all observed states}
+\item{state_names}{vector of names of all observed states.}
 
-\item{num_concealed_states}{number of hidden states}
+\item{num_concealed_states}{number of concealed states, generally equivalent
+to the number of examined states in the dataset.}
 
 \item{transition_matrix}{a matrix containing a description of all speciation
 events, where the first column indicates the source state, the second and
 third column indicate the two daughter states, and the fourth column gives
-the rate indicator used. E.g.: ["SA", "S", "A", 1] for a trait state "SA"
-which upon speciation generates two daughter species with traits "S" and "A",
-where the number 1 is used as indicator for optimization of the likelihood.}
+the rate indicator used. E.g.: \verb{["SA", "S", "A", 1]} for a trait state
+\code{"SA"} which upon speciation generates two daughter species with traits
+\code{"S"} and \code{"A"}, where the number 1 is used as indicator for optimization
+of the likelihood.}
 
-\item{model}{used model, choice of "ETD" (Examined Traits Diversification) or
-"CTD" (Concealed Traits Diversification).}
+\item{model}{used model, choice of \code{"ETD"} (Examined Traits Diversification),
+\code{"CTD"} (Concealed Traits Diversification) or \code{"CR"} (Constant Rate).}
 
 \item{concealed_spec_rates}{vector specifying the rate indicators for each
-concealed state, length should be identical to num_concealed_states. If left
-empty when using the CTD model, it is assumed that all available speciation
-rates are distributed uniformly over the concealed states.}
+concealed state, length should be identical to \code{num_concealed_states}. If
+left empty when using the CTD model, it is assumed that all available
+speciation rates are distributed uniformly over the concealed states.}
 }
 \description{
-helper function to automatically create lambda matrices, based on input
+Helper function to automatically create lambda matrices, based on input
 }
 \examples{
 trans_matrix <- c(0, 0, 0, 1)

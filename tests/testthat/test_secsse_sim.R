@@ -66,22 +66,24 @@ test_that("test secsse_sim", {
                               num_concealed_states = num_concealed_states,
                               crown_age = max_time,
                               maxSpec = maxSpec,
-                              conditioning = "obs_states")
+                              conditioning = "obs_states",
+                              seed = 42)
 
   all_obs_present <- c(0, 1, 2) %in% tree1$obs_traits
   testthat::expect_equal(sum(all_obs_present), 3)
-
+  
   tree2 <- secsse::secsse_sim(lambdas = lambdas,
-                             mus = mus,
-                             qs = qs,
-                             num_concealed_states = num_concealed_states,
-                             crown_age = max_time,
-                             maxSpec = maxSpec,
-                             conditioning = "true_states")
-
+                              mus = mus,
+                              qs = qs,
+                              num_concealed_states = num_concealed_states,
+                              crown_age = max_time,
+                              maxSpec = maxSpec,
+                              conditioning = "true_states",
+                              seed = 43)
+  
   all_obs_present <- names(mus) %in% tree2$true_traits
   testthat::expect_equal(sum(all_obs_present), 9)
-
+  
   if (requireNamespace("ape")) {
     testthat::expect_equal(max(ape::branching.times(tree1$phy)), 1)
   }

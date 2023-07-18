@@ -9,7 +9,6 @@ test_that("secsse gives the same result as GeoSSE", {
     names(pars) <- c("sA", "sB", "sAB", "xA", "xB", "dA", "dB")
     utils::data("example_phy_GeoSSE", package = "secsse")
     traits <- as.numeric(example_phy_GeoSSE$tip.state)
-    testit::assert(!is.null(example_phy_GeoSSE))
     lik.g <- diversitree::make.geosse(example_phy_GeoSSE,
                                       example_phy_GeoSSE$tip.state)
     pars.g <- c(1.5, 0.5, 1.0, 0.7, 0.7, 1.4, 1.3)
