@@ -92,6 +92,12 @@ secsse_sim <- function(lambdas,
 
   if (is.null(seed)) seed <- -1
 
+  condition_vec <- c()
+  if (is.vector(conditioning)) {
+    condition_vec <- conditioning
+    conditioning <- "custom"
+  } 
+  
   res <- secsse_sim_cpp(mus,
                         lambdas,
                         qs,
@@ -103,7 +109,8 @@ secsse_sim <- function(lambdas,
                         non_extinction,
                         verbose,
                         max_tries,
-                        seed)
+                        seed,
+                        condition_vec)
 
   if (length(res$traits) < 1) {
     warning("crown lineages died out")
@@ -138,6 +145,15 @@ secsse_sim <- function(lambdas,
   speciesTraits <- 1 + res$traits[indices]
 
   phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
+
+  if (drop_extinct == TRUE) {
+    to_drop <- which(Ltable[, 4] != -1)
+    if (length(to_drop) > 0) {
+      used_id <- used_id[-to_drop]
+      speciesTraits <- speciesTraits[-to_drop]
+    }
+  }
+
 
   true_traits <- sortingtraits(data.frame(cbind(paste0("t", abs(speciesID)),
                                              speciesTraits),
