@@ -28,6 +28,11 @@
 // All used steppers are adaptive, thus the value shouldn't really matter
 #define SECSSE_DEFAULT_DTF 0.01
 
+// Default initial dt factor for interation stepper in iterative 'store' mode.
+// The initial dt is calculated as SECSEE_DEFAULT_EVAL_DTF * (t1 - t0).
+// All used steppers are adaptive, thus the value shouldn't really matter
+#define SECSSE_DEFAULT_EVAL_DTF 0.1
+
 // Uncomment to enable nested parallelism.
 // This feature may improve or may deterioate performance.
 // Default is disabled.

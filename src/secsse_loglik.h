@@ -164,7 +164,7 @@ namespace secsse {
 #endif
         auto& dnode = inode.desc[i];
         std::copy_n(std::begin(*dnode.state), 2 * d, std::begin(y[i]));
-        do_integrate(y[i], 0.0, dnode.time);
+        do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF);
         dnode.loglik = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
       }
 #ifdef SECSSE_NESTED_PARALLELISM
@@ -178,7 +178,7 @@ namespace secsse {
     }
 
     void operator()(std::vector<double>& state, double t0, double t1) const {
-      do_integrate(state, t0, t1);
+      do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF);
     }
     
     void operator()(storing::dnode_t& dnode, size_t num_steps) const {
@@ -187,13 +187,13 @@ namespace secsse {
       auto y = *dnode.state;
       for (size_t i = 0; i < num_steps; ++i, t0 += dt) {
         dnode.storage.emplace_back(t0, y);
-        do_integrate(y, t0, t0 + dt, 0.1);
+        do_integrate(y, t0, t0 + dt, SECSSE_DEFAULT_EVAL_DTF);
       }
       dnode.storage.emplace_back(dnode.time, y);
     }
 
   private:
-    void do_integrate(std::vector<double>& state, double t0, double t1, double dtf = SECSSE_DEFAULT_DTF) const {
+    void do_integrate(std::vector<double>& state, double t0, double t1, double dtf) const {
       odeintcpp::integrate(method_,
                            od_.get(),
                            &state,
