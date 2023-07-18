@@ -249,6 +249,7 @@ particularly of the extinction rate. This effect is especially noticeable if
 there are many extinct species present in the tree.
 Additionally, we see that the estimation of the transition rate from state 1 to 
 0 also improved.
+
 As a final note, do note that this is just a simple simulation example and
 care should be exercised with model selection and specification when fitting
 secsse to empirical datasets to make predictions about evolutionary patterns.
