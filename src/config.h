@@ -28,4 +28,9 @@
 // All used steppers are adaptive, thus the value shouldn't really matter
 #define SECSSE_DEFAULT_DTF 0.01
 
+// Uncomment to enable nested parallelism.
+// This feature may improve or may deterioate performance.
+// Default is disabled.
+//#define SECSSE_NESTED_PARALLELISM
+
 #endif  // SRC_CONFIG_H_

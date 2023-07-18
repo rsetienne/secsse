@@ -157,12 +157,19 @@ namespace secsse {
     void operator()(terse::inode_t& inode) const {
       const auto d = size();
       std::vector<double> y[2] = { std::vector<double>(2 * d), std::vector<double>(2 * d) };
+#ifdef SECSSE_NESTED_PARALLELISM      
       tbb::parallel_for(0, 2, [&](size_t i) {
+#else
+      for (size_t i = 0; i < 2; ++i) {
+#endif
         auto& dnode = inode.desc[i];
         std::copy_n(std::begin(*dnode.state), 2 * d, std::begin(y[i]));
         do_integrate(y[i], 0.0, dnode.time);
         dnode.loglik = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
-      });
+      }
+#ifdef SECSSE_NESTED_PARALLELISM
+      );
+#endif      
       inode.state->resize(2 * d);
       od_->mergebranch(y[0], y[1], *inode.state);
       inode.loglik = inode.desc[0].loglik 

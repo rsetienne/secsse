@@ -44,9 +44,9 @@ run_secsse <- function(num_threads) {
 }
 
 gc(full = TRUE)
-rr <- microbenchmark::microbenchmark("single thr." = run_secsse(1),
-                                     "2 threads" = run_secsse(2),
-                                     "4 threads" = run_secsse(4),
+rr <- microbenchmark::microbenchmark(#"single thr." = run_secsse(1),
+                                     #"2 threads" = run_secsse(2),
+                                     #"4 threads" = run_secsse(4),
                                      "8 threads" = run_secsse(8),
                                      times = 10)
 print(rr)

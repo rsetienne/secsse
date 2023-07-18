@@ -45,9 +45,14 @@ namespace secsse {
                                              std::end(inodes));
     tbb::parallel_for_each(std::begin(snodes), std::end(snodes), 
                            [&](auto& snode) {
+#ifdef SECSSE_NESTED_PARALLELISM      
       tbb::parallel_for(0, 2, [&](size_t i) {
         integrator(snode.desc[i], num_steps);
       });
+#else
+      integrator(snode.desc[0], num_steps);
+      integrator(snode.desc[1], num_steps);
+#endif      
     });
     // convert to Thijs's data layout:
     // rows of [ances, focal, t, [probs]]

@@ -1,5 +1,7 @@
 ## secsse_sim.h
 
+No need to improve performance but still...
+
 * Missing includes
 
 ```C++
@@ -24,12 +26,15 @@ rndgen_.seed((seed < 0) ? std::random_device{}() : seed);
 
 * Use `std::mt19937_64` for drawing `doubles` (64 Bit).
 * Setter/getter pattern is rather useless for structs.
-* `draw_event` is `std::discrete_distribution` re-invented.
+* `draw_event` is `std::discrete_distribution` re-invented ;)
+* Are all instances of std::discrete_distribution<> hardened againts 'all-zero' and 'empty' (both UB)?<br>
+i.e. `secsse_sim::qs_dist` are copied from 'user-space' -- and users are evil.
 * `size_t sample_from_pop(double (*getvalfrom_species)(const species&))` prevents inlining of the lambda.
 * `lambda_dist::probs` is unused member.
 * `L.data_.emplace_back(ltab_species(0.0, 0, -1, -1, pop.get_trait(0)));` undermines the purpose of `emplace_back`.
 * `lambda_distributions.emplace_back(lambda_dist(indices, probs));` undermines the purpose of `emplace_back`.
 * `lambda_dist::lambda_dist()` use move-construction.
+* `secsse_sim::secsse_sim()` and other ctors: move member initialization out of body.
 * `secsse_sim::apply_event()` could be replaced by a call table:
 
 ```C++
@@ -90,3 +95,6 @@ Ja, I know - ugly. But only syntax-wise ;)
                : done;
   }
 ```
+
+* `population::add(const species& s)` shall accept RValues and shall use `pop.push_back(std::move(...))`.
+* RValue/move semantic underused in general.

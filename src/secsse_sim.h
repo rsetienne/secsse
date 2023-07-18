@@ -512,7 +512,6 @@ struct secsse_sim {
     qs_dist.resize(qs.size());
     for (size_t i = 0; i < qs.size(); ++i) {
       qs_row_sums[i] = std::accumulate(qs[i].begin(), qs[i].end(), 0.0);
-      assert(qs_row_sums[i] > 0.0);
       qs_dist[i] = std::discrete_distribution<>(qs[i].begin(), qs[i].end());
     }
     return qs_row_sums;
