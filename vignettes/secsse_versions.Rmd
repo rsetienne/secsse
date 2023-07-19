@@ -62,7 +62,7 @@ unloaded. Hence, here we do not actually perform the benchmark, but load the
 results directly from file:
 
 ```{r plot_results}
-data(timing_data)
+data(timing_data, package = "secsse")
 
 ggplot(timing_data, aes(x = version, y = time, col = as.factor(num_threads))) +
   geom_boxplot() +

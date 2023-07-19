@@ -6,7 +6,7 @@ library(secsse)
 library(ggplot2)
 
 ## ----plot_results-------------------------------------------------------------
-data(timing_data)
+data(timing_data, package = "secsse")
 
 ggplot(timing_data, aes(x = version, y = time, col = as.factor(num_threads))) +
   geom_boxplot() +

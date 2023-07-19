@@ -397,7 +397,7 @@ inevitably requires restarting R in between to clear cache memory and
 avoid using parts of code not completely unloaded. Hence, here we do not
 actually perform the benchmark, but load the results directly from
 file:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(timing_data)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(timing_data, <span class="at">package =</span> <span class="st">&quot;secsse&quot;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">ggplot</span>(timing_data, <span class="fu">aes</span>(<span class="at">x =</span> version, <span class="at">y =</span> time, <span class="at">col =</span> <span class="fu">as.factor</span>(num_threads))) <span class="sc">+</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
