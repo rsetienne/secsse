@@ -563,10 +563,7 @@ struct secsse_sim {
   
   void check_custom_conditioning(const std::vector<double>& condition_vec, int num_concealed_traits) {
     std::map<int, int> histogram;
-    for (const auto& c : condition_vec) {
-      histogram[c] = 0;
-    }
-    
+       
     for (const auto& i : L.data_) {
       int trait = static_cast<int>(i.get_trait()) % num_concealed_traits;
       if (histogram.find(trait) != histogram.end()) {
@@ -574,8 +571,8 @@ struct secsse_sim {
       }
     }
     
-    for (const auto& h : histogram) {
-      if (h.second == 0) {
+    for (const auto& c : condition_vec) {
+      if (histogram.find(c) == histogram.end()) {
         run_info = conditioning;
         return;
       }

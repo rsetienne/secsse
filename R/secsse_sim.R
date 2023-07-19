@@ -68,8 +68,8 @@ secsse_sim <- function(lambdas,
 
   if (is.null(seed)) seed <- -1
 
-  condition_vec <- c()
-  if (is.vector(conditioning)) {
+  condition_vec <- vector()
+  if (length(conditioning) > 1) {
     condition_vec <- conditioning
     conditioning <- "custom"
     true_traits <- names(mus)
