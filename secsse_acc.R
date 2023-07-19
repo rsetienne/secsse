@@ -3,7 +3,7 @@ library(RcppParallel)
 
 set.seed(42)
 #set.seed(51)
-out <- DDD::dd_sim(pars = c(0.5, 0.3, 1000), age = 30)
+out <- DDD::dd_sim(pars = c(0.5, 0.3, 10000), age = 40)
 phy <- out$tes
 #plot(phy)
 cat("this tree has: ", phy$Nnode + 1, " tips and ", phy$Nnode, " internal nodes\n")
@@ -37,7 +37,7 @@ run_secsse <- function(nt) {
                            is_complete_tree = FALSE))
 }
 
-
+cat("Starting bench...\n")
 control <- list("inorder", 2)
 names(control) <- c("order", "warmup")
 rr <- microbenchmark::microbenchmark(
