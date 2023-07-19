@@ -5,8 +5,8 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef SRC_CONFIG_H_
-#define SRC_CONFIG_H_
+#ifndef SECSSE_CONFIG_H_
+#define SECSSE_CONFIG_H_
 
 // Special case to make use of some steppers that would include
 // boost/get_pointer.hpp
@@ -38,4 +38,4 @@
 // Default is disabled.
 //#define SECSSE_NESTED_PARALLELISM
 
-#endif  // SRC_CONFIG_H_
+#endif  // SECSSE_CONFIG_H_
