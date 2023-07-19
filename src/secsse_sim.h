@@ -86,17 +86,17 @@ struct ltable {
 
 struct lambda_dist {
   std::vector<size_t> indices;
-  std::vector<double> probs;
+// std::vector<double> probs;
   std::discrete_distribution<size_t> d;
 
-  size_t draw_from_dist(std::mt19937* rndgen) {
+  size_t draw_from_dist(std::mt19937_64* rndgen) {
     auto index = d(*rndgen);
     return indices[index];
   }
 
   lambda_dist(const std::vector<size_t>& i,
-              const std::vector<double>& p) : indices(i), probs(p) {
-    d = std::discrete_distribution<size_t>(probs.begin(), probs.end());
+              const std::vector<double>& p) : indices(i) {
+    d = std::discrete_distribution<size_t>(p.begin(), p.end());
   }
 };
 
@@ -244,7 +244,7 @@ struct population {
 };
 
 struct secsse_sim {
-  std::mt19937 rndgen_;
+  std::mt19937_64 rndgen_;
 
   ltable L;
   double t;
@@ -255,10 +255,12 @@ struct secsse_sim {
 
   population pop;
 
-  species_info trait_info;
-
   std::vector< lambda_dist > lambda_distributions;
   vec_dist qs_dist;
+  const species_info trait_info;
+
+  
+
 
   std::array<int, 2> track_crowns;
 
@@ -278,24 +280,17 @@ struct secsse_sim {
              const std::vector<double>& init,
              const bool& ne,
              int seed) :
+             trait_info(m, update_lambdas(l), update_qs_row_sums(q)), 
              mus(m),
              num_states(m.size()), max_t(mt),
              max_spec(max_s),
              init_states(init),
-             non_extinction(ne) {
-    auto l_sums = update_lambdas(l);
-    auto q_sums = update_qs_row_sums(q);
-    trait_info = species_info(mus, l_sums, q_sums);
-
+             non_extinction(ne),
+             run_info(not_run_yet),
+             t(0.0),
+             init_state(0) {
     // randomize randomizer
-    std::random_device rd;
-    if (seed < 0) seed = rd();
-    std::mt19937 rndgen_t(seed);
-    rndgen_ = rndgen_t;
-
-    run_info = not_run_yet;
-    t = 0.0;
-    init_state = 0;
+    rndgen_.seed((seed < 0) ? std::random_device{}() : seed);
   }
 
   void run() {
@@ -318,8 +313,8 @@ struct secsse_sim {
     track_crowns = {1, 1};
 
     L.clear();
-    L.data_.emplace_back(ltab_species(0.0, 0, -1, -1, pop.get_trait(0)));
-    L.data_.emplace_back(ltab_species(0.0, -1, 2, -1, pop.get_trait(1)));
+    L.data_.emplace_back(0.0, 0, -1, -1, pop.get_trait(0));
+    L.data_.emplace_back(0.0, -1, 2, -1, pop.get_trait(1));
  
     while (true) {
       double dt = draw_dt();
@@ -409,7 +404,7 @@ struct secsse_sim {
     }
 
     pop.add(species(trait_to_daughter, new_id, trait_info));
-    L.data_.emplace_back(ltab_species(t, pop.get_id(mother), new_id, -1, trait_to_daughter));
+    L.data_.emplace_back(t, pop.get_id(mother), new_id, -1, trait_to_daughter);
   }
 
   std::tuple<int, int> root_speciation(int root_state) {
@@ -477,7 +472,6 @@ struct secsse_sim {
   std::vector<double> update_lambdas(const num_mat_mat& lambdas) {
     std::vector<double> lambda_sums(lambdas.size(), 0.0);
 
-    lambda_distributions.clear();
     std::vector<size_t> indices;
     std::vector<double> probs;
 
@@ -495,7 +489,7 @@ struct secsse_sim {
           index++;
         }
       }
-      lambda_distributions.emplace_back(lambda_dist(indices, probs));
+      lambda_distributions.emplace_back(indices, probs);
     }
 
     return lambda_sums;
@@ -506,6 +500,7 @@ struct secsse_sim {
     qs_dist.resize(qs.size());
     for (size_t i = 0; i < qs.size(); ++i) {
       qs_row_sums[i] = std::accumulate(qs[i].begin(), qs[i].end(), 0.0);
+      // qs_dist[i] is not accessed if qs_row_sums[i] == 0.0
       qs_dist[i] = std::discrete_distribution<>(qs[i].begin(), qs[i].end());
     }
     return qs_row_sums;
