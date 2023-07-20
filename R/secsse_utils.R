@@ -369,15 +369,6 @@ prepare_full_lambdas <- function(traits,
 }
 
 #' @keywords internal
-normalize_loglik <- function(probs, loglik) {
-    sumabsprobs <- sum(abs(probs))
-    probs <- probs / sumabsprobs
-    loglik <- loglik + log(sumabsprobs)
-    message(paste(c(probs, loglik), collapse = " "))
-    return(list(probs = probs, loglik = loglik))
-}
-
-#' @keywords internal
 penalty <- function(pars, loglik_penalty = 0) {
     pars <- unlist(unlist(pars))
     return(loglik_penalty * sum(pars^2) / (2 * length(pars)))

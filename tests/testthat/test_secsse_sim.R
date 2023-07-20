@@ -1,7 +1,6 @@
 context("test_secsse_sim")
 
 test_that("test secsse_sim", {
-  testthat::skip_on_cran()
 
   parenthesis <- "(((6:0.2547423371,(1:0.0496153503,4:0.0496153503):0.2051269868):0.1306304758,(9:0.2124135406,5:0.2124135406):0.1729592723):1.151205247,(((7:0.009347664296,3:0.009347664296):0.2101416075,10:0.2194892718):0.1035186448,(2:0.2575886319,8:0.2575886319):0.06541928469):1.213570144);" # nolint
   phylotree <- ape::read.tree(file = "", parenthesis)
@@ -55,7 +54,7 @@ test_that("test secsse_sim", {
 
   lambdas <- model_R$MLpars[[1]]
   mus <- model_R$MLpars[[2]]
-  maxSpec <- 10000
+  max_spec <- 10000
   num_repl <- 100
 
   max_time <- 1
@@ -65,7 +64,7 @@ test_that("test secsse_sim", {
                               qs = qs,
                               num_concealed_states = num_concealed_states,
                               crown_age = max_time,
-                              maxSpec = maxSpec,
+                              max_spec = max_spec,
                               conditioning = "obs_states",
                               seed = 42)
 
@@ -77,7 +76,7 @@ test_that("test secsse_sim", {
                               qs = qs,
                               num_concealed_states = num_concealed_states,
                               crown_age = max_time,
-                              maxSpec = maxSpec,
+                              max_spec = max_spec,
                               conditioning = "true_states",
                               seed = 43)
   
