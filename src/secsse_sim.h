@@ -559,9 +559,7 @@ struct secsse_sim {
        
     for (const auto& i : L.data_) {
       int trait = static_cast<int>(i.get_trait()) % num_concealed_traits;
-      if (histogram.find(trait) != histogram.end()) {
         histogram[trait]++;
-      }
     }
     
     for (const auto& c : condition_vec) {
