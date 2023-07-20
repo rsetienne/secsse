@@ -65,6 +65,11 @@ Version 2.5.0 appeared in 2021 on GitHub and was published in May 2023 on CRAN.
 Version 2.5.0 marks the first version using C++ to perform the integration,
 and it used tbb (from the RcppParallel package) to perform multithreading. This
 marks a ten fold increase in speed over previous versions.
+Secondly, 2.5.0 introduces the function `secsse_sim()` to simulate a 
+diversification process using the (cla) secsse framework.
+Lastly, in version 2.5.0 functions were added to allow visualisation of 
+inferred rates of speciation across the tree (e.g. `plot_state_exact()` and
+`secsse_loglik_eval()`).
 
 # 2.0.0
 Version 2.0.0 appeared in June of 2019 on CRAN and extended the package with the
