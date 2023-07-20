@@ -282,8 +282,9 @@ struct secsse_sim {
              init_states(init),
              non_extinction(ne),
              run_info(not_run_yet),
-             t(0.0),
-             init_state(0) {
+             init_state(0),
+             t(0.0)
+              {
     // randomize randomizer
     rndgen_.seed((seed < 0) ? std::random_device{}() : seed);
   }
@@ -427,7 +428,6 @@ struct secsse_sim {
     size_t index_chosen_species = 0;
     if (pop.size() > 1) {
       // sample one at randomly following shiftprob
-      auto get_val = [](const species& s) { return s.shiftprob_;};
       index_chosen_species = sample_from_pop(event_type::shift);
     }
 
