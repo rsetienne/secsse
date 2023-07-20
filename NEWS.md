@@ -59,7 +59,8 @@ parallelization, this marks another 10-fold increase in speed.
 issue with the boost odeint library uninitialized variable 
 (see https://github.com/boostorg/odeint/issues/59 and more details at 
 https://github.com/rsetienne/DAISIE/pull/158)
-* Updated Copyright license to the Boost Software License, Version 1.0.
+* Updated Copyright license to the Boost Software License, Version 1.0 for 
+included C++ code (R code remains GPL>=3).
 
 ## Bug fixes
 * Fix memory leaks
