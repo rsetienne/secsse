@@ -72,13 +72,15 @@
 #'  on non-extinction and this crown age.
 #' @param pool_init_states pool of initial states at the crown, in case this is
 #'  different from all available states, otherwise leave at NULL
-#' @param maxSpec Maximum number of species in the tree (please note that the
+#' @param max_spec Maximum number of species in the tree (please note that the
 #'  tree is not conditioned on this number, but that this is a safeguard 
 #'  against generating extremely large trees).
+#' @param min_spec Minimum number of species in the tree.
 #' @param conditioning can be `"obs_states"`, `"true_states"` or `"none"`, the 
 #'  tree is simulated until one is generated that contains all observed states
 #'  (`"obs_states"`), all true states (e.g. all combinations of obs and hidden
-#'  states), or is always returned (`"none"`).
+#'  states), or is always returned (`"none"`). Alternatively, a vector with
+#'  the names of required observed states can be provided, e.g. c("S", "N").
 #' @param non_extinction boolean stating if the tree should be conditioned on 
 #'  non-extinction of the crown lineages. Defaults to `TRUE`.
 #' @param max_tries maximum number of simulations to try to obtain a tree.

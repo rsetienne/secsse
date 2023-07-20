@@ -13,7 +13,7 @@ ct_condition_cpp <- function(rhs, state, t, lambdas, mus, Q, method, atol, rtol)
     .Call(`_secsse_ct_condition_cpp`, rhs, state, t, lambdas, mus, Q, method, atol, rtol)
 }
 
-secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed) {
-    .Call(`_secsse_secsse_sim_cpp`, m_R, lambdas_R, q_R, max_time, max_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed)
+secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, min_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed, conditioning_vec) {
+    .Call(`_secsse_secsse_sim_cpp`, m_R, lambdas_R, q_R, max_time, max_species, min_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed, conditioning_vec)
 }
 

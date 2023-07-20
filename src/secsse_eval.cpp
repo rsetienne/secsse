@@ -23,13 +23,11 @@ namespace secsse {
                   const std::string& method,
                   double atol,
                   double rtol,
-                  size_t num_steps) {
-    auto num_threads = detect<ODE, const_rhs_callop>::value 
-      ? get_rcpp_num_threads() 
-      : size_t(1);              // prevent multithreading for mutable rhs
-    auto global_control = 
-      tbb::global_control(tbb::global_control::max_allowed_parallelism,
-                          num_threads);
+                  size_t num_steps)
+  {
+    auto num_threads = get_rcpp_num_threads();
+    auto global_control = tbb::global_control(tbb::global_control::max_allowed_parallelism, num_threads);
+
     auto T0 = std::chrono::high_resolution_clock::now();
 
     // calculate valid (ancestral) states by means of calc_ll
@@ -47,9 +45,14 @@ namespace secsse {
                                              std::end(inodes));
     tbb::parallel_for_each(std::begin(snodes), std::end(snodes), 
                            [&](auto& snode) {
+#ifdef SECSSE_NESTED_PARALLELISM      
       tbb::parallel_for(0, 2, [&](size_t i) {
-       integrator(snode.desc[i], num_steps);
+        integrator(snode.desc[i], num_steps);
       });
+#else
+      integrator(snode.desc[0], num_steps);
+      integrator(snode.desc[1], num_steps);
+#endif      
     });
     // convert to Thijs's data layout:
     // rows of [ances, focal, t, [probs]]

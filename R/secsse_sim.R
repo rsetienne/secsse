@@ -27,7 +27,8 @@ secsse_sim <- function(lambdas,
                        crown_age,
                        num_concealed_states,
                        pool_init_states = NULL,
-                       maxSpec = 1e5,
+                       max_spec = 1e5,
+                       min_spec = 2,
                        conditioning = "obs_states",
                        non_extinction = TRUE,
                        verbose = FALSE,
@@ -65,25 +66,37 @@ secsse_sim <- function(lambdas,
     pool_init_states <- -1 + indices
   }
 
-  if (!conditioning %in% c("none", "true_states", "obs_states")) {
-    stop("unknown conditioning, please pick from
-         'none', 'obs_states', 'true_states'")
-  }
-
   if (is.null(seed)) seed <- -1
 
+  condition_vec <- vector()
+  if (length(conditioning) > 1) {
+    condition_vec <- conditioning
+    conditioning <- "custom"
+    true_traits <- names(mus)
+    all_states <- c()
+    for (i in seq_along(true_traits)) {
+      all_states[i] <- substr(true_traits[i], 1, (nchar(true_traits[i]) - 1))
+    }
+    all_states <- unique(all_states)
+    
+    indices <- which(all_states %in% condition_vec)
+    condition_vec <- -1 + indices
+  } 
+  
   res <- secsse_sim_cpp(mus,
                         lambdas,
                         qs,
                         crown_age,
-                        maxSpec,
+                        max_spec,
+                        min_spec,
                         pool_init_states,
                         conditioning,
                         num_concealed_states,
                         non_extinction,
                         verbose,
                         max_tries,
-                        seed)
+                        seed,
+                        condition_vec)
 
   Ltable        <- res$ltable
   
@@ -138,7 +151,7 @@ secsse_sim <- function(lambdas,
   true_traits <- names(mus)[true_traits]
   obs_traits <- c()
   for (i in seq_along(true_traits)) {
-    obs_traits[i] <- substr(true_traits[i], 1, (nchar(-2) - 1))
+    obs_traits[i] <- substr(true_traits[i], 1, (nchar(true_traits[i]) - 1))
   }
   
   if (sum(Ltable[, 4] < 0)) {

@@ -160,14 +160,11 @@ on non-extinction and this crown age.}
 \item{pool_init_states}{pool of initial states at the crown, in case this is
 different from all available states, otherwise leave at NULL}
 
-\item{maxSpec}{Maximum number of species in the tree (please note that the
-tree is not conditioned on this number, but that this is a safeguard
-against generating extremely large trees).}
-
 \item{conditioning}{can be \code{"obs_states"}, \code{"true_states"} or \code{"none"}, the
 tree is simulated until one is generated that contains all observed states
 (\code{"obs_states"}), all true states (e.g. all combinations of obs and hidden
-states), or is always returned (\code{"none"}).}
+states), or is always returned (\code{"none"}). Alternatively, a vector with
+the names of required observed states can be provided, e.g. c("S", "N").}
 
 \item{non_extinction}{boolean stating if the tree should be conditioned on
 non-extinction of the crown lineages. Defaults to \code{TRUE}.}
@@ -266,6 +263,12 @@ optimized.}
 \code{\link[=cla_secsse_ml]{cla_secsse_ml()}}, having the same structure as \code{param_post}.}
 
 \item{mu_vector}{previously defined mus - used to choose indicator number.}
+
+\item{max_spec}{Maximum number of species in the tree (please note that the
+tree is not conditioned on this number, but that this is a safeguard
+against generating extremely large trees).}
+
+\item{min_spec}{Minimum number of species in the tree.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal

@@ -1,7 +1,4 @@
-context("test_secsse_sim")
-
 test_that("test secsse_sim", {
-  testthat::skip_on_cran()
   
   parenthesis <- "(((6:0.2547423371,(1:0.0496153503,4:0.0496153503):0.2051269868):0.1306304758,(9:0.2124135406,5:0.2124135406):0.1729592723):1.151205247,(((7:0.009347664296,3:0.009347664296):0.2101416075,10:0.2194892718):0.1035186448,(2:0.2575886319,8:0.2575886319):0.06541928469):1.213570144);" # nolint
   phylotree <- ape::read.tree(file = "", parenthesis)
@@ -55,7 +52,7 @@ test_that("test secsse_sim", {
   
   lambdas <- model_R$MLpars[[1]]
   mus <- model_R$MLpars[[2]]
-  maxSpec <- 10000
+  max_spec <- 10000
   num_repl <- 100
   
   max_time <- 1
@@ -65,7 +62,7 @@ test_that("test secsse_sim", {
                               qs = qs,
                               num_concealed_states = num_concealed_states,
                               crown_age = max_time,
-                              maxSpec = maxSpec,
+                              max_spec = max_spec,
                               conditioning = "obs_states",
                               seed = 42)
   
@@ -77,7 +74,7 @@ test_that("test secsse_sim", {
                               qs = qs,
                               num_concealed_states = num_concealed_states,
                               crown_age = max_time,
-                              maxSpec = maxSpec,
+                              max_spec = max_spec,
                               conditioning = "true_states",
                               seed = 43)
   
@@ -87,4 +84,47 @@ test_that("test secsse_sim", {
   if (requireNamespace("ape")) {
     testthat::expect_equal(max(ape::branching.times(tree1$phy)), 1)
   }
+  
+  # custom conditioning
+  tree3 <- secsse::secsse_sim(lambdas = lambdas,
+                              mus = mus,
+                              qs = qs,
+                              num_concealed_states = num_concealed_states,
+                              crown_age = max_time,
+                              max_spec = max_spec,
+                              conditioning = c(0, 1),
+                              seed = 444)
+  traits_present <- c(0, 1) %in% tree3$obs_traits
+  testthat::expect_equal(sum(traits_present), 2)
 })
+
+test_that("test secsse_sim 2", {
+  lambda_shift <- secsse::create_default_lambda_transition_matrix()
+  lambda_list <- secsse::create_lambda_list(transition_matrix = lambda_shift)
+  mus <- secsse::create_mu_vector(state_names = c(0, 1),
+                                  num_concealed_states = 2,
+                                  lambda_list = lambda_list)
+  q_mat <- secsse::create_default_shift_matrix(mu_vector = mus)
+  q_mat <- secsse::create_q_matrix(state_names = c(0, 1),
+                                   num_concealed_states = 2,
+                                   shift_matrix = q_mat)  
+  
+  pars <- c(0.5, 0.3, 0.7, 0.1, 0.1)
+  lambda_p <- secsse::fill_in(lambda_list, pars)
+  mu_p <- secsse::fill_in(mus, pars)
+  q_mat_p <- secsse::fill_in(q_mat, pars)
+  
+  focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = 10,
+                                   num_concealed_states = 2,
+                                   max_spec = 100,
+                                   seed = 21,
+                                   drop_extinct = FALSE)
+  if (requireNamespace("geiger")) {
+    vx <- geiger::is.extinct(focal_tree$phy)
+    testthat::expect_true(length(vx) > 0)
+  }
+})
+

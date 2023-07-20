@@ -33,13 +33,10 @@ namespace secsse {
                      const std::string& method,
                      double atol,
                      double rtol,
-                     bool see_states) {
-    auto num_threads = detect<ODE, const_rhs_callop>::value 
-      ? get_rcpp_num_threads() 
-      : size_t(1);              // prevent multithreading for mutable rhs
-    auto global_control = 
-      tbb::global_control(tbb::global_control::max_allowed_parallelism,
-                          num_threads);
+                     bool see_states)
+  {
+    auto num_threads = get_rcpp_num_threads();
+    auto global_control = tbb::global_control(tbb::global_control::max_allowed_parallelism, num_threads);
 
     auto T0 = std::chrono::high_resolution_clock::now();
     std::vector<std::vector<double>> tstates{};
@@ -48,9 +45,7 @@ namespace secsse {
     }
     const auto phy_edge = make_phy_edge_vector(rmatrix<const double>(forTime));
     auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates);
-    auto ll_res = calc_ll(Integrator<ODE>(std::move(od), method, atol, rtol),
-                                          inodes,
-                                          tstates);
+    auto ll_res = calc_ll(Integrator<ODE>(std::move(od), method, atol, rtol), inodes, tstates);
     auto T1 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> DT = (T1 - T0);
     Rcpp::NumericMatrix states_out;
@@ -103,19 +98,22 @@ Rcpp::List calc_ll_cpp(const std::string& rhs,
                        double atol,
                        double rtol,
                        bool is_complete_tree,
-                       bool see_states) {
-  using namespace secsse;
+                       bool see_states)
+{
+  using namespace secsse;  // remove 'secsse::' once deprecated code is removed
   if (rhs == "ode_standard") {
     auto ll = Rcpp::as<Rcpp::NumericVector>(lambdas);
     return is_complete_tree 
       ? calc_ll(std::make_unique<ode_standard<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
       : calc_ll(std::make_unique<ode_standard<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
-  } else if (rhs == "ode_cla") {
+  } 
+  else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
     return is_complete_tree 
       ? calc_ll(std::make_unique<ode_cla<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
       : calc_ll(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
-  } else {
+  }
+  else {
     throw std::runtime_error("calc_ll_cpp: unknown rhs");
   }
 }
@@ -130,8 +128,9 @@ Rcpp::NumericVector ct_condition_cpp(const std::string rhs,
                                      const Rcpp::NumericMatrix& Q,
                                      const std::string& method,
                                      double atol,
-                                     double rtol) {
-  using namespace secsse;  // remove '' once deprecated code is removed
+                                     double rtol) 
+{
+  using namespace secsse;  // remove '::secsse::' once deprecated code is removed
   if (rhs == "ode_standard") {
     auto ll = Rcpp::as<Rcpp::NumericVector>(lambdas);
     return ct_condition(std::make_unique<ode_standard<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol);
