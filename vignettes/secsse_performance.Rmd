@@ -1,11 +1,68 @@
-## ----setup, include=FALSE-----------------------------------------------------
+---
+title: "Secsse performance"
+author: "Thijs Janzen"
+date: "2023-07-10"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Secsse performance}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width = 7)
 knitr::opts_chunk$set(fig.height = 5)
 library(secsse)
 library(ggplot2)
+```
 
-## ----plot_results-------------------------------------------------------------
+secsse has gone over many versions since it's first appearance on CRAN in 2019, with various rates of computational performance. 
+Here, we would like to shortly go over the main versions of secsse, and compare
+their computational performance.
+
+## Secsse Versions
+
+### 1.0.0
+The first version of secsse appeared in January of 2019 on CRAN. It used the
+package deSolve to solve all integrations, and could switch between either using
+a fully R based evaluation, or use FORTRAN to speed up calculations.
+Furthermore, using the foreach package, within-R parallelization was
+implemented. However, parallelization only situationally improved computation
+times, and generally, computation was relatively slow.
+
+### 2.0.0
+Version 2.0.0 appeared in June of 2019 on CRAN and extended the package with the
+cla framework, e.g. including state shifts during speciation / asymmetric 
+inheritance during speciation. 
+
+### 2.5.0
+Version 2.5.0 appeared in 2021 on GitHub and was published in May 2023 on CRAN.
+Version 2.5.0 marks the first version using C++ to perform the integration,
+and it used tbb (from the RcppParallel package) to perform multithreading. This
+marks a ten fold increase in speed over previous versions.
+
+### 2.6.0
+Version 2.6.0 appeared on CRAN in July 2023, and introduced many functions 
+suited to prepare the parameter structure for secsse. It also introduced a new
+C++ code base for the standard likelihood, making smarter use of
+parallelization, this marks another 10-fold increase in speed.
+
+### 3.0.0
+Version 3.0.0 is expected to arrive to CRAN in the second half of 2023. It 
+extends the C++ code base used for the standard likelihood to the cla
+likelihood, harnessing the same computation improvement. 
+
+## Speed
+Using a standardized computation test of calculating the likelihood of a system
+with two observed and two concealed traits, on a tree of ~500 tips we calculated
+the computation time using either the cla or the standard likelihood. Loading 
+and reloading different versions of the same package inevitably requires
+restarting R in between to clear cache memory and avoid using parts of code not 
+completely unloaded. Hence, here we do not actually perform the benchmark, but 
+load the results directly from file:
+
+```{r plot_results}
 data(timing_data)
 
 ggplot(timing_data, aes(x = version, y = time, col = as.factor(num_threads))) +
@@ -17,8 +74,16 @@ ggplot(timing_data, aes(x = version, y = time, col = as.factor(num_threads))) +
   theme_classic() +
   scale_color_brewer(type = "qual", palette = 2) +
   facet_wrap(~type)
+```
 
-## ----standard likelihood------------------------------------------------------
+It is clear that we have come a long way since 2019, and that current versions
+of secsse are approximately a factor 100 faster. Note that for the cla
+likelihood, there are not timings available for version 1.0.0, because that 
+version did not contain the cla likelihood versions yet. 
+
+## Appendix
+### Testing code standard likelihood
+```{r standard likelihood}
 
 run_this_code <- FALSE
 if (run_this_code) {
@@ -95,8 +160,10 @@ if (run_this_code) {
   }
 }
 
+```
 
-## ----testing_cla--------------------------------------------------------------
+### Testing code Cla likelihood
+```{r testing_cla}
 run_code <- FALSE
 if (run_code) {
   set.seed(42)
@@ -174,4 +241,4 @@ if (run_code) {
   }
 }
 
-
+```
