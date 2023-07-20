@@ -86,7 +86,6 @@ struct ltable {
 
 struct lambda_dist {
   std::vector<size_t> indices;
-// std::vector<double> probs;
   std::discrete_distribution<size_t> d;
 
   size_t draw_from_dist(std::mt19937_64* rndgen) {
@@ -101,19 +100,19 @@ struct lambda_dist {
 };
 
 struct species_info {
-  species_info() {
-    max_la = max_mu = max_qs = 0.0;
-  }
-
   species_info(const std::vector<double>& m,
                const std::vector<double>& l,
                const std::vector<double>& s) :
-    trait_mu(m), trait_lambda(l), trait_qs(s) {
-    max_mu = *std::max_element(trait_mu.begin(), trait_mu.end());
-    max_la = *std::max_element(trait_lambda.begin(), trait_lambda.end());
-    max_qs = *std::max_element(trait_qs.begin(), trait_qs.end());
+    trait_mu(m), trait_lambda(l), trait_qs(s),
+    max_mu(calc_max(m)), 
+    max_la(calc_max(l)),
+    max_qs(calc_max(s)) {
   }
 
+  double calc_max(const std::vector<double>& v) {
+    return *std::max_element(v.begin(), v.end());
+  }
+  
   double mu(size_t trait) const {
     return trait_mu[trait];
   }
@@ -139,12 +138,12 @@ struct species_info {
   }
 
  private:
-  std::vector<double> trait_mu;
-  std::vector<double> trait_lambda;
-  std::vector<double> trait_qs;
-  double max_mu = 0.0;
-  double max_la = 0.0;
-  double max_qs = 0.0;
+  const std::vector<double> trait_mu;
+  const std::vector<double> trait_lambda;
+  const std::vector<double> trait_qs;
+  const double max_mu = 0.0;
+  const double max_la = 0.0;
+  const double max_qs = 0.0;
 };
 
 struct species {
@@ -247,20 +246,12 @@ struct secsse_sim {
   std::mt19937_64 rndgen_;
 
   ltable L;
-  double t;
-
-  finish_type run_info;
-
-  int init_state;
 
   population pop;
 
   std::vector< lambda_dist > lambda_distributions;
   vec_dist qs_dist;
   const species_info trait_info;
-
-  
-
 
   std::array<int, 2> track_crowns;
 
@@ -271,6 +262,10 @@ struct secsse_sim {
   const size_t max_spec;
   const std::vector<double> init_states;
   const bool non_extinction;
+  
+  finish_type run_info;
+  int init_state;
+  double t;
 
   secsse_sim(const std::vector<double>& m,
              const num_mat_mat& l,
@@ -360,8 +355,7 @@ struct secsse_sim {
     size_t dying = 0;
     if (pop.size() > 1) {
       // sample one at randomly following mus
-      auto get_val = [](const species& s) { return s.mu_;};
-      dying = sample_from_pop(get_val);
+      dying = sample_from_pop(event_type::extinction);
     }
     auto dying_id = pop.get_id(dying);
 
@@ -384,8 +378,7 @@ struct secsse_sim {
     size_t mother = 0;
     if (pop.size() > 1) {
       // sample one at randomly following lambdas
-      auto get_val = [](const species& s) { return s.lambda_;};
-      mother = sample_from_pop(get_val);
+      mother = sample_from_pop(event_type::speciation);
     }
     auto mother_trait = pop.get_trait(mother);
 
@@ -435,7 +428,7 @@ struct secsse_sim {
     if (pop.size() > 1) {
       // sample one at randomly following shiftprob
       auto get_val = [](const species& s) { return s.shiftprob_;};
-      index_chosen_species = sample_from_pop(get_val);
+      index_chosen_species = sample_from_pop(event_type::shift);
     }
 
     auto trait_chosen_species = pop.get_trait(index_chosen_species);
@@ -506,7 +499,13 @@ struct secsse_sim {
     return qs_row_sums;
   }
 
-  size_t sample_from_pop(double (*getvalfrom_species)(const species&)) {
+  size_t sample_from_pop(event_type event) {
+    
+    std::function<double(const species& s)> getvalfrom_species;
+    if (event == event_type::extinction) getvalfrom_species = [](const species& s) { return s.mu_;};
+    if (event == event_type::speciation) getvalfrom_species = [](const species& s) { return s.lambda_;};
+    if (event == event_type::shift)      getvalfrom_species = [](const species& s) { return s.shiftprob_;};
+    
     auto max = *std::max_element(pop.pop.begin(), pop.pop.end(),
                          [&](const species& a, const species& b) {
                            return getvalfrom_species(a) < getvalfrom_species(b);
