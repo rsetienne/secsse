@@ -65,7 +65,7 @@ NeedsCompilation: yes
 SystemRequirements: C++17
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/rsetienne/secsse, https://neves-p.github.io/secsse/
+URL: https://github.com/rsetienne/secsse, https://rsetienne.github.io/secsse/
 BugReports: https://github.com/rsetienne/secsse/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
