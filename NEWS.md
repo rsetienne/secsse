@@ -33,6 +33,9 @@ follows and allows for roxygen2 markdown.
 * Two new vignettes:
     * _Using secsse with complete phylogenies (with extinction)_ `vignette("complete_tree", package = "secsse")`
     * _Secsse versions_ `vignette("secsse_versions", package = "secsse")`
+* Revise, combine and simplify the _Using SecSSE ML search_ and _Setting up a 
+secsse analysis_ into the _Starting secsse_ vignette 
+`vignette("starting_secsse", package = "secsse")`.
 * `secsse_sim()` argument `conditioning` now defaults to `"obs_states"` from 
 `"none"`.
 * No longer Import package 'stringr' and Suggest package 'testit'.
