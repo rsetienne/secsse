@@ -282,7 +282,6 @@ struct secsse_sim {
              init_states(init),
              non_extinction(ne),
              run_info(not_run_yet),
-             init_state(0),
              t(0.0)
               {
     // randomize randomizer
