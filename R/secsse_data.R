@@ -20,7 +20,7 @@
 
 
 #' @name timing_data
-#' @title Computation time informatino
+#' @title Computation time information
 #' @description Results of benchmarking different versions of secsse
 #' @format A tibble
 "timing_data"

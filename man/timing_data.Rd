@@ -3,7 +3,7 @@
 \docType{data}
 \name{timing_data}
 \alias{timing_data}
-\title{Computation time informatino}
+\title{Computation time information}
 \format{
 A tibble
 }

@@ -7,3 +7,7 @@
 ^doc$
 ^Meta$
 ^\.vscode$
+^\.zenodo\.json$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
