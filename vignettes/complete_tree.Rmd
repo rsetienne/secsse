@@ -1,5 +1,6 @@
 ---
 title: "Using secsse with complete phylogenies (with extinction)"
+author: "Pedro Santos Neves"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

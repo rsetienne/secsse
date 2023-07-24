@@ -1,5 +1,5 @@
 ---
-title: "Secsse versions"
+title: "Secsse performance"
 author: "Thijs Janzen"
 date: "2023-07-10"
 output: rmarkdown::html_vignette
