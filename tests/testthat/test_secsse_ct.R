@@ -1,5 +1,3 @@
-context("test_secsse_ct")
-
 test_that("the loglik for the complete tree", {
   Sys.unsetenv("R_TESTS")
   set.seed(42)

@@ -1,5 +1,3 @@
-context("test_hisse")
-
 test_that("secsse gives the same result as hisse", {
   ## Test to check that our approach reaches the same likelihood than HiSSE.
   # to calculate likelihood of a trait with 2 states using Hisse

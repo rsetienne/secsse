@@ -1,5 +1,3 @@
-context("test_secsse_cla_ct")
-
 test_that("the loglik for the complete tree under cla_secsse", {
   Sys.unsetenv("R_TESTS")
   utils::data("example_phy_GeoSSE", package = "secsse")

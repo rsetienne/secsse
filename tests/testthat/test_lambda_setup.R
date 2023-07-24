@@ -1,5 +1,3 @@
-context("lambda_and_qmat_setup")
-
 test_that("lambda setup", {
   # Islandness, ETD model
   full_lambdas <- list()
