@@ -1,7 +1,6 @@
 # secsse 3.0.0
 
-Version 3.0.0 is expected to arrive to CRAN in the second half of 2023. It 
-extends the C++ code base used for the standard likelihood to the "cla_"
+Version 3.0.0 extends the C++ code base used for the standard likelihood to the "cla_"
 likelihood, harnessing the same computation improvement. 
 
 ## Breaking changes
