@@ -6,7 +6,7 @@
 [![](http://cranlogs.r-pkg.org/badges/secsse)](https://CRAN.R-project.org/package=secsse)
 <!-- badges: end -->
 
-Branch|[![GitHub Actions logo](pics/github_actions_logo.png)](https://github.com/features/actions)|[![Codecov logo](pics/Codecov.png)](https://www.codecov.io)
+Branch|[![GitHub Actions logo](man/figures/github_actions_logo.png)](https://github.com/features/actions)|[![Codecov logo](man/figures/Codecov.png)](https://www.codecov.io)
 --------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 `master`|[![R build status](https://github.com/rsetienne/secsse/workflows/R-CMD-check/badge.svg?branch=master)](https://github.com/rsetienne/secsse/actions)|[![codecov.io](https://codecov.io/gh/rsetienne/secsse/branch/master/graph/badge.svg)](https://codecov.io/github/rsetienne/secsse/branch/master)
 `develop`|[![R build status](https://github.com/rsetienne/secsse/workflows/R-CMD-check/badge.svg?branch=develop)](https://github.com/rsetienne/secsse/actions)|[![codecov.io](https://codecov.io/gh/rsetienne/secsse/branch/develop/graph/badge.svg)](https://codecov.io/github/rsetienne/secsse/branch/develop)

@@ -12,6 +12,7 @@ Simultaneously infers state-dependent diversification across two or more states 
 Useful links:
 \itemize{
   \item \url{https://github.com/rsetienne/secsse}
+  \item \url{https://rsetienne.github.io/secsse/}
   \item Report bugs at \url{https://github.com/rsetienne/secsse/issues}
 }
 
