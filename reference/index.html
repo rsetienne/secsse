@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,10 +24,15 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/Using_secsse.html">Using SecSSE ML search</a>
+    <a class="dropdown-item" href="../articles/starting_secsse.html">Starting secsse</a>
     <a class="dropdown-item" href="../articles/plotting_states.html">Plotting probabilities</a>
-    <a class="dropdown-item" href="../articles/setting_up_secsse.html">Setting up a secsse analysis</a>
+    <a class="dropdown-item" href="../articles/sim_with_secsse.html">Simulating with secsse</a>
+    <a class="dropdown-item" href="../articles/complete_tree.html">Using secsse with complete phylogenies (with extinction)</a>
+    <a class="dropdown-item" href="../articles/secsse_performance.html">Secsse performance</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -63,17 +68,16 @@
           
           <code><a href="cla_id_paramPos.html">cla_id_paramPos()</a></code> 
         </dt>
-        <dd>Parameter structure setting for cla_secsse</dd>
-      </dl><dl><dt>
-          
-          <code><a href="cla_secsse_eval.html">cla_secsse_eval()</a></code> 
-        </dt>
-        <dd>Likelihood for SecSSE model, using Rcpp</dd>
+        <dd>Parameter structure setting for cla_secsse
+It sets the parameters (speciation, extinction and transition)
+IDs. Needed for ML calculation with cladogenetic options (cla_secsse_ml)</dd>
       </dl><dl><dt>
           
           <code><a href="cla_secsse_loglik.html">cla_secsse_loglik()</a></code> 
         </dt>
-        <dd>Likelihood for SecSSE model, using Rcpp</dd>
+        <dd>Likelihood for SecSSE model, using Rcpp
+Loglikelihood calculation for the cla_SecSSE model given a set of parameters
+and data using Rcpp</dd>
       </dl><dl><dt>
           
           <code><a href="cla_secsse_ml.html">cla_secsse_ml()</a></code> 
@@ -87,29 +91,29 @@
 functions. Cladogenetic version</dd>
       </dl><dl><dt>
           
-          <code><a href="create_default_lambda_list.html">create_default_lambda_list()</a></code> 
+          <code><a href="create_default_lambda_transition_matrix.html">create_default_lambda_transition_matrix()</a></code> 
         </dt>
-        <dd>helper function to create a default lambda list</dd>
+        <dd>Helper function to create a default lambda list</dd>
       </dl><dl><dt>
           
-          <code><a href="create_default_q_list.html">create_default_q_list()</a></code> 
+          <code><a href="create_default_shift_matrix.html">create_default_shift_matrix()</a></code> 
         </dt>
-        <dd>helper function to create a default q_matrix list</dd>
+        <dd>Helper function to create a default <code>shift_matrix</code> list</dd>
       </dl><dl><dt>
           
-          <code><a href="create_lambda_matrices.html">create_lambda_matrices()</a></code> 
+          <code><a href="create_lambda_list.html">create_lambda_list()</a></code> 
         </dt>
-        <dd>helper function to automatically create lambda matrices, based on input</dd>
+        <dd>Helper function to automatically create lambda matrices, based on input</dd>
       </dl><dl><dt>
           
-          <code><a href="create_mus.html">create_mus()</a></code> 
+          <code><a href="create_mu_vector.html">create_mu_vector()</a></code> 
         </dt>
-        <dd>function to generate generic mus vector</dd>
+        <dd>Generate mus vector</dd>
       </dl><dl><dt>
           
-          <code><a href="create_transition_matrix.html">create_transition_matrix()</a></code> 
+          <code><a href="create_q_matrix.html">create_q_matrix()</a></code> 
         </dt>
-        <dd>helper function to neatly setup a Q matrix, without transitions to
+        <dd>Helper function to neatly setup a Q matrix, without transitions to
 concealed states (only observed transitions shown)</dd>
       </dl><dl><dt>
           
@@ -118,67 +122,68 @@ concealed states (only observed transitions shown)</dd>
         <dd>Event times of a (possibly non-ultrametric) phylogenetic tree</dd>
       </dl><dl><dt>
           
-          <code><a href="example_phy_GeoSSE.html">phy</a></code> 
+          <code><a href="example_phy_GeoSSE.html">example_phy_GeoSSE</a></code> 
         </dt>
         <dd>A phylogeny with traits at the tips</dd>
       </dl><dl><dt>
           
           <code><a href="expand_q_matrix.html">expand_q_matrix()</a></code> 
         </dt>
-        <dd>function to expand an existing q_matrix to a number of
-concealed states</dd>
+        <dd>Function to expand an existing q_matrix to a number of concealed states</dd>
       </dl><dl><dt>
           
           <code><a href="extract_par_vals.html">extract_par_vals()</a></code> 
         </dt>
-        <dd>function to extract parameter values out of the result of a maximum
-likelihood inference run.</dd>
+        <dd>Extract parameter values out of the result of a maximum likelihood inference
+run</dd>
       </dl><dl><dt>
           
           <code><a href="fill_in.html">fill_in()</a></code> 
         </dt>
-        <dd>helper function to enter parameter value on their right place</dd>
+        <dd>Helper function to enter parameter value on their right place</dd>
       </dl><dl><dt>
           
           <code><a href="id_paramPos.html">id_paramPos()</a></code> 
         </dt>
-        <dd>Parameter structure setting</dd>
+        <dd>Parameter structure setting
+Sets the parameters (speciation, extinction and transition) ids. Needed for
+ML calculation (<code><a href="../reference/secsse_ml.html">secsse_ml()</a></code>).</dd>
       </dl><dl><dt>
           
-          <code><a href="phylo_Vign.html">phylo_Vign</a></code> 
+          <code><a href="phylo_vignette.html">phylo_vignette</a></code> 
         </dt>
         <dd>A phylogenetic reconstuction to run the vignette</dd>
       </dl><dl><dt>
           
           <code><a href="plot_state_exact.html">plot_state_exact()</a></code> 
         </dt>
-        <dd>function to plot the local probability along the tree, including the branches</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot_state_exact_cla.html">plot_state_exact_cla()</a></code> 
-        </dt>
-        <dd>function to plot the local probability along the tree,
-including the branches, for the CLA model.</dd>
+        <dd>Plot the local probability along a tree</dd>
       </dl><dl><dt>
           
           <code><a href="prepare_full_lambdas.html">prepare_full_lambdas()</a></code> 
         </dt>
-        <dd>Prepares the entire set of lambda matrices for cla_secsse.</dd>
+        <dd>Prepares the entire set of lambda matrices for cla_secsse.
+It provides the set of matrices containing all the speciation rates</dd>
       </dl><dl><dt>
           
           <code><a href="q_doubletrans.html">q_doubletrans()</a></code> 
         </dt>
-        <dd>Basic Qmatrix</dd>
+        <dd>Basic Qmatrix
+Sets a Q matrix where double transitions are not allowed</dd>
       </dl><dl><dt>
           
           <code><a href="secsse_loglik.html">secsse_loglik()</a></code> 
         </dt>
-        <dd>Likelihood for SecSSE model</dd>
+        <dd>Likelihood for SecSSE model
+Loglikelihood calculation for the SecSSE model given a set of parameters and
+data</dd>
       </dl><dl><dt>
           
           <code><a href="secsse_loglik_eval.html">secsse_loglik_eval()</a></code> 
         </dt>
-        <dd>Likelihood for SecSSE model</dd>
+        <dd>Likelihood for SecSSE model
+Logikelihood calculation for the SecSSE model given a set of parameters and
+data, returning also the likelihoods along the branches</dd>
       </dl><dl><dt>
           
           <code><a href="secsse_ml.html">secsse_ml()</a></code> 
@@ -199,10 +204,12 @@ functions.</dd>
           
           <code><a href="sortingtraits.html">sortingtraits()</a></code> 
         </dt>
-        <dd>Data checking and trait sorting</dd>
+        <dd>Data checking and trait sorting
+In preparation for likelihood calculation, it orders trait data according
+the tree tips</dd>
       </dl><dl><dt>
           
-          <code><a href="traitinfo.html">traitinfo</a></code> 
+          <code><a href="traits.html">traits</a></code> 
         </dt>
         <dd>A table with trait info to run the vignette</dd>
       </dl></div>

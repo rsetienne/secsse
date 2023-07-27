@@ -16,7 +16,7 @@ are functions of other parameters and/or factors."><!-- mathjax --><script src="
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,10 +30,15 @@ are functions of other parameters and/or factors."><!-- mathjax --><script src="
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/Using_secsse.html">Using SecSSE ML search</a>
+    <a class="dropdown-item" href="../articles/starting_secsse.html">Starting secsse</a>
     <a class="dropdown-item" href="../articles/plotting_states.html">Plotting probabilities</a>
-    <a class="dropdown-item" href="../articles/setting_up_secsse.html">Setting up a secsse analysis</a>
+    <a class="dropdown-item" href="../articles/sim_with_secsse.html">Simulating with secsse</a>
+    <a class="dropdown-item" href="../articles/complete_tree.html">Using secsse with complete phylogenies (with extinction)</a>
+    <a class="dropdown-item" href="../articles/secsse_performance.html">Secsse performance</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -77,13 +82,13 @@ are functions of other parameters and/or factors.</p>
 <span>  <span class="va">idparsfix</span>,</span>
 <span>  <span class="va">parsfix</span>,</span>
 <span>  <span class="va">idparsfuncdefpar</span>,</span>
-<span>  <span class="va">functions_defining_params</span>,</span>
+<span>  functions_defining_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cond <span class="op">=</span> <span class="st">"proper_cond"</span>,</span>
 <span>  root_state_weight <span class="op">=</span> <span class="st">"proper_weights"</span>,</span>
 <span>  <span class="va">sampling_fraction</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e-04</span>, <span class="fl">1e-05</span>, <span class="fl">1e-07</span><span class="op">)</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">1000</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1.25</span><span class="op">)</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">idparsopt</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  optimmethod <span class="op">=</span> <span class="st">"simplex"</span>,</span>
+<span>  optimmethod <span class="op">=</span> <span class="st">"subplex"</span>,</span>
 <span>  num_cycles <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  loglik_penalty <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -97,12 +102,14 @@ are functions of other parameters and/or factors.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>phy</dt>
-<dd><p>phylogenetic tree of class phylo, ultrametric, rooted and with
+<dd><p>phylogenetic tree of class <code>phylo</code>, rooted and with
 branch lengths.</p></dd>
 
 
 <dt>traits</dt>
-<dd><p>a vector with trait states for each tip in the phylogeny.</p></dd>
+<dd><p>vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+<code><a href="../articles/starting_secsse.html">vignette("starting_secsse", package = "secsse")</a></code>.</p></dd>
 
 
 <dt>num_concealed_states</dt>
@@ -115,114 +122,118 @@ to the number of examined states in the dataset.</p></dd>
 
 
 <dt>idparsopt</dt>
-<dd><p>id of parameters to be estimated.</p></dd>
+<dd><p>a numeric vector with the ID of parameters to be estimated.</p></dd>
 
 
 <dt>initparsopt</dt>
-<dd><p>initial guess of the parameters to be estimated.</p></dd>
+<dd><p>a numeric vector with the initial guess of the parameters
+to be estimated.</p></dd>
 
 
 <dt>idfactorsopt</dt>
 <dd><p>id of the factors that will be optimized. There are not
-fixed factors, so use a constant within 'functions_defining_params'.</p></dd>
+fixed factors, so use a constant within <code>functions_defining_params</code>.</p></dd>
 
 
 <dt>initfactors</dt>
-<dd><p>the initial guess for a factor (it should be set to NULL
+<dd><p>the initial guess for a factor (it should be set to <code>NULL</code>
 when no factors).</p></dd>
 
 
 <dt>idparsfix</dt>
-<dd><p>id of the fixed parameters (it should be set to NULL when
-there are no factors).</p></dd>
+<dd><p>a numeric vector with the ID of the fixed parameters.</p></dd>
 
 
 <dt>parsfix</dt>
-<dd><p>value of the fixed parameters.</p></dd>
+<dd><p>a numeric vector with the value of the fixed parameters.</p></dd>
 
 
 <dt>idparsfuncdefpar</dt>
 <dd><p>id of the parameters which will be a function of
 optimized and/or fixed parameters. The order of id should match
-functions_defining_params</p></dd>
+<code>functions_defining_params</code>.</p></dd>
 
 
 <dt>functions_defining_params</dt>
 <dd><p>a list of functions. Each element will be a
-function which defines a parameter e.g. id_3 &lt;- (id_1+id_2)/2. See example
-and vigenette</p></dd>
+function which defines a parameter e.g. <code>id_3 &lt;- (id_1 + id_2) / 2</code>. See
+example.</p></dd>
 
 
 <dt>cond</dt>
-<dd><p>condition on the existence of a node root:
-"maddison_cond","proper_cond"(default). For details, see vignette.</p></dd>
+<dd><p>condition on the existence of a node root: <code>"maddison_cond"</code>,
+<code>"proper_cond"</code> (default). For details, see vignette.</p></dd>
 
 
 <dt>root_state_weight</dt>
 <dd><p>the method to weigh the states:
-"maddison_weights","proper_weights"(default) or "equal_weights". It can also
-be specified the root state:the vector c(1, 0, 0) indicates state
-1 was the root state.</p></dd>
+<code>"maddison_weights"</code>, <code>"proper_weights"</code> (default) or <code>"equal_weights"</code>.
+It can also be specified for the root state: the vector <code>c(1, 0, 0)</code>
+indicates state 1 was the root state.</p></dd>
 
 
 <dt>sampling_fraction</dt>
-<dd><p>vector that states the sampling proportion per trait
-state. It must have as many elements as there are trait states.</p></dd>
+<dd><p>vector that states the sampling proportion per
+trait state. It must have as many elements as there are trait states.</p></dd>
 
 
 <dt>tol</dt>
-<dd><p>maximum tolerance. Default is "c(1e-04, 1e-05, 1e-05)".</p></dd>
+<dd><p>A numeric vector with the maximum tolerance of the optimization
+algorithm. Default is <code>c(1e-04, 1e-05, 1e-05)</code>.</p></dd>
 
 
 <dt>maxiter</dt>
 <dd><p>max number of iterations. Default is
-"1000 *round((1.25)^length(idparsopt))".</p></dd>
+<code>1000 * round((1.25) ^ length(idparsopt))</code>.</p></dd>
 
 
 <dt>optimmethod</dt>
-<dd><p>method used for optimization. Default is "simplex".</p></dd>
+<dd><p>A string with method used for optimization. Default is
+<code>"subplex"</code>. Alternative is <code>"simplex"</code> and it shouldn't be used in normal
+conditions (only for debugging). Both are called from <code><a href="https://rdrr.io/pkg/DDD/man/optimizer.html" class="external-link">DDD::optimizer()</a></code>,
+simplex is implemented natively in <a href="https://rdrr.io/pkg/DDD/man/DDD-package.html" class="external-link">DDD</a>, while subplex is ultimately
+called from <code><a href="https://rdrr.io/pkg/subplex/man/subplex.html" class="external-link">subplex::subplex()</a></code>.</p></dd>
 
 
 <dt>num_cycles</dt>
-<dd><p>number of cycles of the optimization (default is 1).</p></dd>
+<dd><p>Number of cycles of the optimization. When set to <code>Inf</code>,
+the optimization will be repeated until the result is, within the
+tolerance, equal to the starting values, with a maximum of 10 cycles.</p></dd>
 
 
 <dt>loglik_penalty</dt>
-<dd><p>the size of the penalty for all parameters;
-default is 0 (no penalty)</p></dd>
+<dd><p>the size of the penalty for all parameters; default is
+0 (no penalty).</p></dd>
 
 
 <dt>is_complete_tree</dt>
-<dd><p>whether or not a tree with all its extinct species
-is provided</p></dd>
+<dd><p>logical specifying whether or not a tree with all its
+extinct species is provided. If set to <code>TRUE</code>, it also assumes that all
+<em>all</em> extinct lineages are present on the tree. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt>num_threads</dt>
-<dd><p>number of threads. Set to -1 to use all available threads.
-Default is one thread.</p></dd>
+<dd><p>number of threads to be used. Default is one thread.</p></dd>
 
 
 <dt>atol</dt>
-<dd><p>absolute tolerance of integration</p></dd>
+<dd><p>A numeric specifying the absolute tolerance of integration.</p></dd>
 
 
 <dt>rtol</dt>
-<dd><p>relative tolerance of integration</p></dd>
+<dd><p>A numeric specifying the relative tolerance of integration.</p></dd>
 
 
 <dt>method</dt>
 <dd><p>integration method used, available are:
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".</p></dd>
+<code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
+<code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
-
-<p>Parameter estimated and maximum likelihood</p>
-
 
 <p>Parameter estimated and maximum likelihood</p>
     </div>
@@ -231,7 +242,7 @@ Default is one thread.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example of how to set the arguments for a ML search.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span>all<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rsetienne/secsse" class="external-link">secsse</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rsetienne.github.io/secsse/">secsse</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DDD</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">16</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">phylotree</span> <span class="op">&lt;-</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/rlineage.html" class="external-link">rbdtree</a></span><span class="op">(</span><span class="fl">0.07</span>,<span class="fl">0.001</span>,Tmax<span class="op">=</span><span class="fl">50</span><span class="op">)</span></span></span>
@@ -311,97 +322,7 @@ Default is one thread.</p></dd>
 <span class="r-in"><span><span class="va">maxiter</span>,</span></span>
 <span class="r-in"><span><span class="va">optimmethod</span>,</span></span>
 <span class="r-in"><span>num_cycles <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>You set some transitions as impossible to happen</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.29892658976</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating the likelihood for the initial parameters.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The loglikelihood for the initial parameter values is -138.29892658976</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Optimizing the likelihood - this may take a while.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.29892658976</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -19.6874997974797 0.0565371031208431 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 -19.6874997974797 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 -2.25 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2.57370518668921 2.57370518668921 -0.166666666666667 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 1.23970037744085 0.428571428571429 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 0.0565371031208431 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 1.23970037744085 4 -408.954085121498</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 -4.33333333333333 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.630909092451593 0.630909092451593 0.428571428571429 -394.970765338453</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.183184094316379 1.55798479466909 0.875 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.0289580508740217 0.887427671713442 1.22222222222222 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.435774310919359 0.0565371031208431 4 -217.435326543504</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.435774310919359 4 -215.759921685576</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.282344532762055 0.282344532762055 1.22222222222222 -235.408077326566</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.056537103120843 -21 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.217302799841525 0.217302799841525 2.07692307692308 -202.86182250914</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.164220824193095 0.0565371031208431 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 -0.164220824193095 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 1.22222222222222 -140.359130113342</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.101652478250067 0.435774310919359 1.72727272727273 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.0667186885311693 0.217302799841525 2.07692307692308 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.0667186885311693 0.0565371031208431 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 -0.0667186885311693 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 2.07692307692308 -139.142155325368</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.0289580508740217 0.217302799841525 2.52941176470588 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.00890822400049493 0.13123669972533 2.80952380952381 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.00890822400049493 0.0565371031208431 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 -0.00890822400049493 4 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 2.80952380952381 -138.67921314246</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.13123669972533 0.0565371031208431 4 -147.961630608301</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.13123669972533 4 -148.307993814251</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 6.27272727272728 -138.007331731512</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.105190205544315 -0.00890822400049493 5.31578947368422 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0682943175325757 0.0926116256780313 4.27472527472528 -143.832954528161</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -0.00203968049049697 0.0803161467061682 5.60550458715597 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0946881343274375 0.0623831825484161 4.32347504621072 -143.090390803217</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0696168471619277 0.0264136556123879 5.22478386167147 -136.921872814753</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0702793406885307 -0.00376572610556988 5.84085510688836 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0290624149289556 0.0306992264027016 5.93233484889008 -138.621348872489</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0447199562294352 0.0384417109814988 5.44535621036927 -136.933297942811</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0571834882945641 0.0245878726542851 8.78482446206113 -136.628875452395</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0575069775640771 0.00932706313748703 17.7622149837132 -137.320525917318</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0576148513184024 0.00434065127435459 6.08390270565726 -137.660662938957</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0573452081868561 0.01690021567186 6.13018361873322 -136.854746501097</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0785180903673741 0.00726785049012128 7.80434782608691 -136.66692497088</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0589471061052005 0.00619256503065626 12.0371363903092 -137.452222887806</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0669293051341006 0.0212825683726463 6.16013858035703 -136.672632060038</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0777955629677048 0.0184151658513158 9.33996720003544 -136.875767566307</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0623846944917256 0.0172785305143808 6.73008650701768 -136.669341578847</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0649759220488105 0.0114221191842328 10.0578020753919 -136.754385324718</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0664402878763672 0.0187994754408668 6.85206414499345 -136.62941971293</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0722796266989215 0.0163897753025553 9.06121371968436 -136.664259288779</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0523333066096938 0.0328819777396786 8.45922624799519 -136.644991100937</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0571834882945641 0.0245878726542851 10.5508021390374 -136.61329407849</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0571834882945641 0.00844351337212945 8.78482446206113 -137.355370383151</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0749398740088071 0.0245878726542851 8.78482446206113 -137.000930185751</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.068955173283337 0.0412575580652741 9.89533417402267 -137.62465214392</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.060102036129208 0.0164515916081767 9.04067402672863 -136.731129320048</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0418853769445456 0.0191492893092306 10.1053984575835 -137.888330604895</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0664811703227776 0.0232227923625168 9.08462211847093 -136.661966791511</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0604273142411855 0.0319302561674392 9.82706766917288 -136.710722399657</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0603459760007705 0.0280165617887137 9.61914272545702 -136.632090775921</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0501164607402297 0.0282459571605786 10.1772315653298 -136.685285960957</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0623423617057083 0.0244739768629935 9.33724669109395 -136.618106435315</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0574530489386094 0.0211065491733346 9.39815464848055 -136.67481972123</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0596212613135387 0.0262803056984378 9.56301975217448 -136.609547399912</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0622516599521428 0.0256394398772377 11.0305172263747 -136.618678751559</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0609800668078614 0.0253763457627227 10.3776997414283 -136.606982053466</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0561940323902956 0.0263565014061938 11.0939591443943 -136.601916434086</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0531464784189513 0.0273003604917051 12.2170088677485 -136.620072375956</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0561940323902956 0.0263565014061938 11.6936320646434 -136.598657837232</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0561940323902956 0.0304879388893961 11.0939591443943 -136.601797973284</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0518543360127933 0.0263565014061938 11.0939591443943 -136.67522313991</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0605696861929951 0.0291071023570987 11.4872408653628 -136.638485430601</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0583773367400651 0.0284180708851324 11.3865418216029 -136.601123650355</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0576485663801091 0.0304879388893961 11.6936320646434 -136.611870687239</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565572906928047 0.0273862519522353 11.2385020583417 -136.593935947306</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0578913782940932 0.0243031806466864 11.7994074348409 -136.603654137303</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.056617858037715 0.0289347579451092 11.2629291226824 -136.594303984702</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0545423449410474 0.0266995221514903 11.4032120586783 -136.613573793234</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0574159761990854 0.0279878945637536 11.3907051784793 -136.593337698077</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0575339439395769 0.029854595782983 10.9244371603553 -136.609229071358</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565286918602074 0.0272287952443322 11.4921777044809 -136.592899600194</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.057049882100307 0.0261374692352738 11.4848913607935 -136.596049082943</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.05672583094284 0.0282340069577987 11.3176764761025 -136.592637544749</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Note: you set some transitions as impossible to happen.</span>
 <span class="r-in"><span><span class="co"># ML -136.5796</span></span></span>
 </code></pre></div>
     </div>

@@ -12,7 +12,7 @@ States-dependent Speciation and Extinction (SecSSE)"><!-- mathjax --><script src
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +26,15 @@ States-dependent Speciation and Extinction (SecSSE)"><!-- mathjax --><script src
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/Using_secsse.html">Using SecSSE ML search</a>
+    <a class="dropdown-item" href="../articles/starting_secsse.html">Starting secsse</a>
     <a class="dropdown-item" href="../articles/plotting_states.html">Plotting probabilities</a>
-    <a class="dropdown-item" href="../articles/setting_up_secsse.html">Setting up a secsse analysis</a>
+    <a class="dropdown-item" href="../articles/sim_with_secsse.html">Simulating with secsse</a>
+    <a class="dropdown-item" href="../articles/complete_tree.html">Using secsse with complete phylogenies (with extinction)</a>
+    <a class="dropdown-item" href="../articles/secsse_performance.html">Secsse performance</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -77,7 +82,7 @@ States-dependent Speciation and Extinction (SecSSE)</p>
 <span>  num_cycles <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  loglik_penalty <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="op">(</span><span class="va">optimmethod</span> <span class="op">==</span> <span class="st">"subplex"</span><span class="op">)</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="op">(</span><span class="va">optimmethod</span> <span class="op">==</span> <span class="st">"simplex"</span><span class="op">)</span>,</span>
 <span>  num_threads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  atol <span class="op">=</span> <span class="fl">1e-08</span>,</span>
 <span>  rtol <span class="op">=</span> <span class="fl">1e-07</span>,</span>
@@ -88,12 +93,14 @@ States-dependent Speciation and Extinction (SecSSE)</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>phy</dt>
-<dd><p>phylogenetic tree of class phylo, ultrametric, rooted and with
+<dd><p>phylogenetic tree of class <code>phylo</code>, rooted and with
 branch lengths.</p></dd>
 
 
 <dt>traits</dt>
-<dd><p>a vector with trait states for each tip in the phylogeny.</p></dd>
+<dd><p>vector with trait states for each tip in the phylogeny. The
+order of the states must be the same as the tree tips. For help, see
+<code><a href="../articles/starting_secsse.html">vignette("starting_secsse", package = "secsse")</a></code>.</p></dd>
 
 
 <dt>num_concealed_states</dt>
@@ -106,31 +113,32 @@ to the number of examined states in the dataset.</p></dd>
 
 
 <dt>idparsopt</dt>
-<dd><p>id of parameters to be estimated.</p></dd>
+<dd><p>a numeric vector with the ID of parameters to be estimated.</p></dd>
 
 
 <dt>initparsopt</dt>
-<dd><p>initial guess of the parameters to be estimated.</p></dd>
+<dd><p>a numeric vector with the initial guess of the parameters
+to be estimated.</p></dd>
 
 
 <dt>idparsfix</dt>
-<dd><p>id of the fixed parameters.</p></dd>
+<dd><p>a numeric vector with the ID of the fixed parameters.</p></dd>
 
 
 <dt>parsfix</dt>
-<dd><p>value of the fixed parameters.</p></dd>
+<dd><p>a numeric vector with the value of the fixed parameters.</p></dd>
 
 
 <dt>cond</dt>
-<dd><p>condition on the existence of a node root: 'maddison_cond',
-'proper_cond'(default). For details, see vignette.</p></dd>
+<dd><p>condition on the existence of a node root: <code>"maddison_cond"</code>,
+<code>"proper_cond"</code> (default). For details, see vignette.</p></dd>
 
 
 <dt>root_state_weight</dt>
 <dd><p>the method to weigh the states:
-'maddison_weights','proper_weights'(default) or 'equal_weights'.
-It can also be specified the
-root state:the vector c(1,0,0) indicates state 1 was the root state.</p></dd>
+<code>"maddison_weights"</code>, <code>"proper_weights"</code> (default) or <code>"equal_weights"</code>.
+It can also be specified for the root state: the vector <code>c(1, 0, 0)</code>
+indicates state 1 was the root state.</p></dd>
 
 
 <dt>sampling_fraction</dt>
@@ -139,56 +147,63 @@ trait state. It must have as many elements as there are trait states.</p></dd>
 
 
 <dt>tol</dt>
-<dd><p>maximum tolerance. Default is 'c(1e-04, 1e-05, 1e-05)'.</p></dd>
+<dd><p>A numeric vector with the maximum tolerance of the optimization
+algorithm. Default is <code>c(1e-04, 1e-05, 1e-05)</code>.</p></dd>
 
 
 <dt>maxiter</dt>
-<dd><p>max number of iterations.
-Default is '1000 *round((1.25)^length(idparsopt))'.</p></dd>
+<dd><p>max number of iterations. Default is
+<code>1000 * round((1.25) ^ length(idparsopt))</code>.</p></dd>
 
 
 <dt>optimmethod</dt>
-<dd><p>method used for optimization. Available are simplex and
-subplex, default is 'subplex'. Simplex should only be used for debugging.</p></dd>
+<dd><p>A string with method used for optimization. Default is
+<code>"subplex"</code>. Alternative is <code>"simplex"</code> and it shouldn't be used in normal
+conditions (only for debugging). Both are called from <code><a href="https://rdrr.io/pkg/DDD/man/optimizer.html" class="external-link">DDD::optimizer()</a></code>,
+simplex is implemented natively in <a href="https://rdrr.io/pkg/DDD/man/DDD-package.html" class="external-link">DDD</a>, while subplex is ultimately
+called from <code><a href="https://rdrr.io/pkg/subplex/man/subplex.html" class="external-link">subplex::subplex()</a></code>.</p></dd>
 
 
 <dt>num_cycles</dt>
-<dd><p>number of cycles of the optimization (default is 1).</p></dd>
+<dd><p>Number of cycles of the optimization. When set to <code>Inf</code>,
+the optimization will be repeated until the result is, within the
+tolerance, equal to the starting values, with a maximum of 10 cycles.</p></dd>
 
 
 <dt>loglik_penalty</dt>
-<dd><p>the size of the penalty for all parameters; default
-is 0 (no penalty)</p></dd>
+<dd><p>the size of the penalty for all parameters; default is
+0 (no penalty).</p></dd>
 
 
 <dt>is_complete_tree</dt>
-<dd><p>whether or not a tree with all its extinct species
-is provided</p></dd>
+<dd><p>logical specifying whether or not a tree with all its
+extinct species is provided. If set to <code>TRUE</code>, it also assumes that all
+<em>all</em> extinct lineages are present on the tree. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt>verbose</dt>
-<dd><p>sets verbose output; default is verbose when optimmethod is
-'simplex'</p></dd>
+<dd><p>sets verbose output; default is <code>TRUE</code> when <code>optimmethod</code> is
+<code>"simplex"</code>. If <code>optimmethod</code> is set to <code>"simplex"</code>, then even if set to
+<code>FALSE</code>, optimizer output will be shown.</p></dd>
 
 
 <dt>num_threads</dt>
-<dd><p>number of threads. Set to -1 to use all available threads.
-Default is one thread.</p></dd>
+<dd><p>number of threads to be used. Default is one thread.</p></dd>
 
 
 <dt>atol</dt>
-<dd><p>absolute tolerance of integration</p></dd>
+<dd><p>A numeric specifying the absolute tolerance of integration.</p></dd>
 
 
 <dt>rtol</dt>
-<dd><p>relative tolerance of integration</p></dd>
+<dd><p>A numeric specifying the relative tolerance of integration.</p></dd>
 
 
 <dt>method</dt>
 <dd><p>integration method used, available are:
-"odeint::runge_kutta_cash_karp54", "odeint::runge_kutta_fehlberg78",
-"odeint::runge_kutta_dopri5", "odeint::bulirsch_stoer" and
-"odeint::runge_kutta4". Default method is:"odeint::bulirsch_stoer".</p></dd>
+<code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
+<code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -201,10 +216,9 @@ Default is one thread.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example of how to set the arguments for a ML search.</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rsetienne/secsse" class="external-link">secsse</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rsetienne.github.io/secsse/">secsse</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DDD</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">13</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Check the vignette for a better working exercise.</span></span></span>
 <span class="r-in"><span><span class="co"># lambdas for 0A and 1A and 2A are the same but need to be estimated</span></span></span>
 <span class="r-in"><span><span class="co"># mus are fixed to</span></span></span>
 <span class="r-in"><span><span class="co"># the transition rates are constrained to be equal and fixed 0.01</span></span></span>
@@ -220,7 +234,7 @@ Default is one thread.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">masterBlock</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
 <span class="r-in"><span><span class="va">diff.conceal</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="va">idparslist</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="q_doubletrans.html">q_doubletrans</a></span><span class="op">(</span><span class="va">traits</span>,<span class="va">masterBlock</span>,<span class="va">diff.conceal</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">startingpoint</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DDD/man/bd_ML.html" class="external-link">bd_ML</a></span><span class="op">(</span>brts <span class="op">=</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/branching.times.html" class="external-link">branching.times</a></span><span class="op">(</span><span class="va">phylotree</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">startingpoint</span> <span class="op">&lt;-</span> <span class="fu">DDD</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DDD/man/bd_ML.html" class="external-link">bd_ML</a></span><span class="op">(</span>brts <span class="op">=</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/branching.times.html" class="external-link">branching.times</a></span><span class="op">(</span><span class="va">phylotree</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> You are optimizing lambda0 mu0 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> You are fixing lambda1 mu1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Optimizing the likelihood - this may take a while. </span>
@@ -257,7 +271,7 @@ Default is one thread.</p></dd>
 <span class="r-in"><span><span class="va">optimmethod</span>,</span></span>
 <span class="r-in"><span>num_cycles <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>You set some transitions as impossible to happen</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Note: you set some transitions as impossible to happen.</span>
 <span class="r-in"><span><span class="co"># model$ML</span></span></span>
 <span class="r-in"><span><span class="co"># [1] -16.04127</span></span></span>
 </code></pre></div>

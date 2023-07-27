@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,10 +41,15 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/Using_secsse.html">Using SecSSE ML search</a>
+    <a class="dropdown-item" href="../articles/starting_secsse.html">Starting secsse</a>
     <a class="dropdown-item" href="../articles/plotting_states.html">Plotting probabilities</a>
-    <a class="dropdown-item" href="../articles/setting_up_secsse.html">Setting up a secsse analysis</a>
+    <a class="dropdown-item" href="../articles/sim_with_secsse.html">Simulating with secsse</a>
+    <a class="dropdown-item" href="../articles/complete_tree.html">Using secsse with complete phylogenies (with extinction)</a>
+    <a class="dropdown-item" href="../articles/secsse_performance.html">Secsse performance</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -90,10 +95,10 @@ to plot your ancestral states alongside your tree. Let us assume we have
 a simple tree, with almost trivial traits:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
-<span><span class="va">focal_tree</span> <span class="op">&lt;-</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/rlineage.html" class="external-link">rphylo</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span>, birth <span class="op">=</span> <span class="fl">1</span>, death <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">phy</span> <span class="op">&lt;-</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/rlineage.html" class="external-link">rphylo</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span>, birth <span class="op">=</span> <span class="fl">1</span>, death <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">focal_tree</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">phy</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plotting_states_files/figure-html/starting_conditions-1.png" width="576"></p>
 <p>A typical likelihood calculation would look like (assuming 2 observed
 and 2 hidden traits):</p>
@@ -106,7 +111,7 @@ and 2 hidden traits):</p>
 <span></span>
 <span></span>
 <span><span class="va">ll</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/secsse_loglik.html">secsse_loglik</a></span><span class="op">(</span>parameter <span class="op">=</span> <span class="va">params</span>,</span>
-<span>                             phy <span class="op">=</span> <span class="va">focal_tree</span>,</span>
+<span>                             phy <span class="op">=</span> <span class="va">phy</span>,</span>
 <span>                             traits <span class="op">=</span> <span class="va">traits</span>,</span>
 <span>                             num_concealed_states <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                             see_ancestral_states <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -166,7 +171,7 @@ precies, but might be memory heavy. Usually, using 10-100 evaluations
 per branch provides a very accurate approximation:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
-<span>                 focal_tree <span class="op">=</span> <span class="va">focal_tree</span>,</span>
+<span>                 phy <span class="op">=</span> <span class="va">phy</span>,</span>
 <span>                 traits <span class="op">=</span> <span class="va">traits</span>,</span>
 <span>                 num_concealed_states <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                 sampling_fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -175,21 +180,21 @@ per branch provides a very accurate approximation:</p>
 <p><img src="plotting_states_files/figure-html/exact-1.png" width="576"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
-<span>                 focal_tree <span class="op">=</span> <span class="va">focal_tree</span>,</span>
+<span>                 phy <span class="op">=</span> <span class="va">phy</span>,</span>
 <span>                 traits <span class="op">=</span> <span class="va">traits</span>,</span>
 <span>                 num_concealed_states <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                 sampling_fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>                 steps <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>                 num_steps <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>                 prob_func <span class="op">=</span> <span class="va">helper_function</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 6 rows containing missing values (`geom_segment()`).</span></span></code></pre>
 <p><img src="plotting_states_files/figure-html/exact-2.png" width="576"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
-<span>                 focal_tree <span class="op">=</span> <span class="va">focal_tree</span>,</span>
+<span>                 phy <span class="op">=</span> <span class="va">phy</span>,</span>
 <span>                 traits <span class="op">=</span> <span class="va">traits</span>,</span>
 <span>                 num_concealed_states <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                 sampling_fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>                 steps <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>                 num_steps <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>                 prob_func <span class="op">=</span> <span class="va">helper_function</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 6 rows containing missing values (`geom_segment()`).</span></span></code></pre>
 <p><img src="plotting_states_files/figure-html/exact-3.png" width="576"></p>
@@ -241,16 +246,16 @@ that the first 9 states are the extinction rates:</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>And then we use these for plotting:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact_cla.html">plot_state_exact_cla</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameter</span>,</span>
-<span>                             focal_tree <span class="op">=</span> <span class="va">phy</span>,</span>
-<span>                             traits <span class="op">=</span> <span class="va">traits</span>,</span>
-<span>                             num_concealed_states <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                             sampling_fraction <span class="op">=</span> <span class="va">sampling_fraction</span>,</span>
-<span>                             cond <span class="op">=</span> <span class="st">"maddison_cond"</span>,</span>
-<span>                             root_state_weight <span class="op">=</span> <span class="st">"maddison_weights"</span>,</span>
-<span>                             is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                             prob_func <span class="op">=</span> <span class="va">helper_function</span>,</span>
-<span>                             steps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameter</span>,</span>
+<span>                         phy <span class="op">=</span> <span class="va">phy</span>,</span>
+<span>                         traits <span class="op">=</span> <span class="va">traits</span>,</span>
+<span>                         num_concealed_states <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                         sampling_fraction <span class="op">=</span> <span class="va">sampling_fraction</span>,</span>
+<span>                         cond <span class="op">=</span> <span class="st">"maddison_cond"</span>,</span>
+<span>                         root_state_weight <span class="op">=</span> <span class="st">"maddison_weights"</span>,</span>
+<span>                         is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                         prob_func <span class="op">=</span> <span class="va">helper_function</span>,</span>
+<span>                         num_steps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 22 rows containing missing values (`geom_segment()`).</span></span></code></pre>
 <p><img src="plotting_states_files/figure-html/plot%20cla-1.png" width="576"></p>
 </div>

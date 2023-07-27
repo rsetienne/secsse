@@ -6,7 +6,7 @@ is typically a list of matrices.
 Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying 'pool_init_states'.
+modifying pool_init_states.
 By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree
 has a crown age that matches the used crown age. You can modify
@@ -17,7 +17,7 @@ is typically a list of matrices.
 Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying 'pool_init_states'.
+modifying pool_init_states.
 By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree
 has a crown age that matches the used crown age. You can modify
@@ -32,7 +32,7 @@ has a crown age that matches the used crown age. You can modify
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,10 +46,15 @@ has a crown age that matches the used crown age. You can modify
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/Using_secsse.html">Using SecSSE ML search</a>
+    <a class="dropdown-item" href="../articles/starting_secsse.html">Starting secsse</a>
     <a class="dropdown-item" href="../articles/plotting_states.html">Plotting probabilities</a>
-    <a class="dropdown-item" href="../articles/setting_up_secsse.html">Setting up a secsse analysis</a>
+    <a class="dropdown-item" href="../articles/sim_with_secsse.html">Simulating with secsse</a>
+    <a class="dropdown-item" href="../articles/complete_tree.html">Using secsse with complete phylogenies (with extinction)</a>
+    <a class="dropdown-item" href="../articles/secsse_performance.html">Secsse performance</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -80,7 +85,7 @@ is typically a list of matrices.</p>
 <p>Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying 'pool_init_states'.</p>
+modifying <code>pool_init_states</code>.</p>
 <p>By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree
 has a crown age that matches the used crown age. You can modify
@@ -96,8 +101,9 @@ has a crown age that matches the used crown age. You can modify
 <span>  <span class="va">crown_age</span>,</span>
 <span>  <span class="va">num_concealed_states</span>,</span>
 <span>  pool_init_states <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  maxSpec <span class="op">=</span> <span class="fl">1e+05</span>,</span>
-<span>  conditioning <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  max_spec <span class="op">=</span> <span class="fl">1e+05</span>,</span>
+<span>  min_spec <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  conditioning <span class="op">=</span> <span class="st">"obs_states"</span>,</span>
 <span>  non_extinction <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  max_tries <span class="op">=</span> <span class="fl">1e+06</span>,</span>
@@ -109,11 +115,11 @@ has a crown age that matches the used crown age. You can modify
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>lambdas</dt>
-<dd><p>speciation rates, in the form of a list of matrices</p></dd>
+<dd><p>speciation rates, in the form of a list of matrices.</p></dd>
 
 
 <dt>mus</dt>
-<dd><p>extinction rates, in the form of a vector</p></dd>
+<dd><p>extinction rates, in the form of a vector.</p></dd>
 
 
 <dt>qs</dt>
@@ -127,7 +133,8 @@ on non-extinction and this crown age.</p></dd>
 
 
 <dt>num_concealed_states</dt>
-<dd><p>number of concealed states</p></dd>
+<dd><p>number of concealed states, generally equivalent
+to the number of examined states in the dataset.</p></dd>
 
 
 <dt>pool_init_states</dt>
@@ -135,26 +142,33 @@ on non-extinction and this crown age.</p></dd>
 different from all available states, otherwise leave at NULL</p></dd>
 
 
-<dt>maxSpec</dt>
+<dt>max_spec</dt>
 <dd><p>Maximum number of species in the tree (please note that the
-tree is not conditioned on this number, but that this is a safeguard against
-generating extremely large trees).</p></dd>
+tree is not conditioned on this number, but that this is a safeguard
+against generating extremely large trees).</p></dd>
+
+
+<dt>min_spec</dt>
+<dd><p>Minimum number of species in the tree.</p></dd>
 
 
 <dt>conditioning</dt>
-<dd><p>can be 'obs_states', 'true_states' or 'none', the tree is
-simulated until one is generated that contains all observed states
-('obs_states'), all true states (e.g. all combinations of obs and hidden
-states), or is always returned ('none').</p></dd>
+<dd><p>can be <code>"obs_states"</code>, <code>"true_states"</code> or <code>"none"</code>, the
+tree is simulated until one is generated that contains all observed states
+(<code>"obs_states"</code>), all true states (e.g. all combinations of obs and hidden
+states), or is always returned (<code>"none"</code>). Alternatively, a vector with
+the names of required observed states can be provided, e.g. c("S", "N").</p></dd>
 
 
 <dt>non_extinction</dt>
-<dd><p>should the tree be conditioned on non-extinction of the
-crown lineages? Default is TRUE.</p></dd>
+<dd><p>boolean stating if the tree should be conditioned on
+non-extinction of the crown lineages. Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt>verbose</dt>
-<dd><p>provide intermediate output.</p></dd>
+<dd><p>sets verbose output; default is <code>TRUE</code> when <code>optimmethod</code> is
+<code>"simplex"</code>. If <code>optimmethod</code> is set to <code>"simplex"</code>, then even if set to
+<code>FALSE</code>, optimizer output will be shown.</p></dd>
 
 
 <dt>max_tries</dt>
@@ -162,12 +176,12 @@ crown lineages? Default is TRUE.</p></dd>
 
 
 <dt>drop_extinct</dt>
-<dd><p>should extinct species be dropped from the tree? default
-is TRUE.</p></dd>
+<dd><p>boolean stating if extinct species should be dropped from
+the tree. Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt>seed</dt>
-<dd><p>pseudo-random number generator seed</p></dd>
+<dd><p>pseudo-random number generator seed.</p></dd>
 
 </dl></div>
     <div class="section level2">
