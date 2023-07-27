@@ -1,5 +1,3 @@
-context("test_secsse_ml_and_par")
-
 test_that("trying a short ML search: secsse_ml & parallel procedure", {
   skip_on_cran()
 
@@ -50,7 +48,7 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
       maxiter = maxiter,
       optimmethod = optimmethod,
       num_cycles = 1,
-      verbose = FALSE
+      verbose = 0
     )
   )
 

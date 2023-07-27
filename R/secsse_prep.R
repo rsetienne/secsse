@@ -44,27 +44,24 @@ get_state_names <- function(state_names, num_concealed_states) {
   return(all_state_names)
 }
 
-#' helper function to automatically create lambda matrices, based on input
-#' @param state_names vector of names of all observed states
-#' @param num_concealed_states number of hidden states
-#' @param transition_list a matrix containing a description of all speciation
-#' events, where the first column indicates the source state, the second and
-#' third column indicate the two daughter states, and the fourth column gives
-#' the rate indicator used. E.g.: ["SA", "S", "A", 1] for a trait state "SA"
-#' which upon speciation generates two daughter species with traits "S" and "A",
-#' where the number 1 is used as indicator for optimization of the likelihood.
-#' @param model used model, choice of "ETD" (Examined Traits Diversification) or
-#' "CTD" (Concealed Traits Diversification).
-#' @param concealed_spec_rates vector specifying the rate indicators for each
-#' concealed state, length should be identical to num_concealed_states. If left
-#' empty when using the CTD model, it is assumed that all available speciation
-#' rates are distributed uniformly over the concealed states.
+#' Helper function to automatically create lambda matrices, based on input
+#' 
+#' @inheritParams default_params_doc
+#' 
+#' @examples
+#' trans_matrix <- c(0, 0, 0, 1)
+#' trans_matrix <- rbind(trans_matrix, c(1, 1, 1, 2))
+#' lambda_list <- create_lambda_list(state_names = c(0, 1),
+#'                                   num_concealed_states = 2,
+#'                                   transition_matrix = trans_matrix,
+#'                                   model = "ETD")
+#'
 #' @export
-create_lambda_matrices <- function(state_names,
-                                   num_concealed_states,
-                                   transition_list,
-                                   model = "ETD",
-                                   concealed_spec_rates = NULL) {
+create_lambda_list <- function(state_names = c(0, 1),
+                               num_concealed_states = 2,
+                               transition_matrix,
+                               model = "ETD",
+                               concealed_spec_rates = NULL) {
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")
   }
@@ -77,12 +74,13 @@ create_lambda_matrices <- function(state_names,
   lambdas <- list()
   for (i in 1:total_num_states) {
     lambdas[[i]] <- matrix(0, nrow = total_num_states,
-                              ncol = total_num_states)
+                           ncol = total_num_states)
     rownames(lambdas[[i]]) <- all_state_names
     colnames(lambdas[[i]]) <- all_state_names
   }
+  names(lambdas) <- all_state_names
 
-  transition_list <- convert_transition_list(transition_list, state_names)
+  transition_list <- convert_transition_list(transition_matrix, state_names)
 
   if (model == "CTD") {
     if (is.null(concealed_spec_rates)) {
@@ -106,7 +104,6 @@ create_lambda_matrices <- function(state_names,
       incr <- (j - 1) * num_obs_states
       focal_rate <- target_rate
       if (model == "CTD") focal_rate <- concealed_spec_rates[j]
-      # if (model == "CR") focal_rate <- 1
 
       lambdas[[focal_state + incr]][daughter1 + incr,
                                     daughter2 + incr] <- focal_rate
@@ -117,31 +114,30 @@ create_lambda_matrices <- function(state_names,
   return(lambdas)
 }
 
-
-#' helper function to neatly setup a Q matrix, without transitions to
+#' Helper function to neatly setup a Q matrix, without transitions to
 #' concealed states (only observed transitions shown)
-#' @param state_names names of observed states
-#' @param num_concealed_states number of concealed states
-#' @param transition_list matrix of transitions, indicating in order: 1)
-#' starting state (typically the column in the transition matrix), 2) ending
-#' state (typically the row in the transition matrix) and 3) associated rate
-#' indicator
-#' @param diff.conceal should we use the same number of rates for the
-#' concealed state transitions, or should all concealed state transitions
-#' have separate rates? Typically, FALSE is fine and should be used in order
-#' to avoid having a huge number of parameters.
+#' 
+#' @inheritParams default_params_doc
+#' 
 #' @return transition matrix
+#' @examples
+#' shift_matrix <- c(0, 1, 5)
+#' shift_matrix <- rbind(shift_matrix, c(1, 0, 6))
+#' q_matrix <- secsse::create_q_matrix(state_names = c(0, 1),
+#'                                     num_concealed_states = 2,
+#'                                     shift_matrix = shift_matrix,
+#'                                     diff.conceal = TRUE)
 #' @export
-create_transition_matrix <- function(state_names,
-                                     num_concealed_states,
-                                     transition_list,
-                                     diff.conceal = FALSE) {
+create_q_matrix <- function(state_names,
+                            num_concealed_states,
+                            shift_matrix,
+                            diff.conceal = FALSE) {
 
   total_num_states <- length(state_names)
   trans_matrix <- matrix(0, ncol = total_num_states,
                          nrow = total_num_states)
-  
-  transition_list <- convert_transition_list_q(transition_list, state_names)
+
+  transition_list <- convert_transition_list_q(shift_matrix, state_names)
   for (i in seq_len(nrow(transition_list))) {
     parent_state <- transition_list[i, 1]
     daughter_state <- transition_list[i, 2]
@@ -150,10 +146,9 @@ create_transition_matrix <- function(state_names,
   }
 
   diag(trans_matrix) <- NA
-  
-  
+
   trans_matrix <- secsse::expand_q_matrix(q_matrix = trans_matrix,
-                                          num_concealed_states = 
+                                          num_concealed_states =
                                             num_concealed_states,
                                           diff.conceal = diff.conceal)
 
@@ -161,7 +156,7 @@ create_transition_matrix <- function(state_names,
   colnames(trans_matrix) <- all_state_names
   rownames(trans_matrix) <- all_state_names
   diag(trans_matrix) <- NA
-  
+
   return(trans_matrix)
 }
 
@@ -207,7 +202,7 @@ get_chosen_rates <- function(q_matrix, num_concealed_states) {
   existing_rates <- existing_rates[existing_rates > 0]
   existing_rates <- existing_rates[!is.na(existing_rates)]
   existing_rates <- sort(existing_rates)
-  
+
   num_transitions <- num_concealed_states * (num_concealed_states - 1)
   chosen_rates <- existing_rates
   while (num_transitions > length(chosen_rates)) {
@@ -221,8 +216,10 @@ get_chosen_rates <- function(q_matrix, num_concealed_states) {
 }
 
 #' @keywords internal
-fill_from_rates <- function(new_q_matrix, chosen_rates, 
-                            num_traits, num_concealed_states,
+fill_from_rates <- function(new_q_matrix,
+                            chosen_rates,
+                            num_traits,
+                            num_concealed_states,
                             rate_indic) {
   for (i in 1:num_concealed_states) {
     for (j in i:num_concealed_states) {
@@ -240,14 +237,12 @@ fill_from_rates <- function(new_q_matrix, chosen_rates,
   return(new_q_matrix)
 }
 
-#' function to expand an existing q_matrix to a number of
-#' concealed states
-#' @param q_matrix q_matrix with only transitions between observed states
-#' @param num_concealed_states number of concealed states
-#' @param diff.conceal should we use the same number of rates for the
-#' concealed state transitions, or should all concealed state transitions
-#' have separate rates? Typically, FALSE is fine and should be used in order
-#' to avoid having a huge number of parameters.
+#' Function to expand an existing q_matrix to a number of concealed states
+#' 
+#' @inheritParams default_params_doc
+#' 
+#' @note This is highly similar to [q_doubletrans()].
+#' 
 #' @return updated q matrix
 #' @export
 expand_q_matrix <- function(q_matrix,
@@ -268,25 +263,36 @@ expand_q_matrix <- function(q_matrix,
     # we now re-use the existing rates
     chosen_rates <- get_chosen_rates(q_matrix, num_concealed_states)
     rate_indic <- 1
-    new_q_matrix <- fill_from_rates(new_q_matrix, chosen_rates, 
-                                    num_traits, num_concealed_states,
+    new_q_matrix <- fill_from_rates(new_q_matrix,
+                                    chosen_rates,
+                                    num_traits,
+                                    num_concealed_states,
                                     rate_indic)
   }
+
   return(new_q_matrix)
 }
 
-
-#' helper function to create a default q_matrix list
-#' @param state_names names of the observed states
-#' @param num_concealed_states number of concealed states
-#' @param mus previously defined mus - used to choose indicator number
-#' @description
-#' This function generates a generic transition list
+#' Helper function to create a default `shift_matrix` list
+#' 
+#' This function generates a generic shift matrix to be used with the function
+#' [create_q_matrix()].
+#' 
+#' @inheritParams default_params_doc
+#' 
+#' @examples
+#' shift_matrix <- create_default_shift_matrix(state_names = c(0, 1),
+#'                                             num_concealed_states = 2,
+#'                                             mu_vector = c(1, 2, 1, 2))
+#' q_matrix <- create_q_matrix(state_names = c(0, 1),
+#'                             num_concealed_states = 2,
+#'                             shift_matrix = shift_matrix,
+#'                             diff.conceal = FALSE)
 #' @export
-create_default_q_list <- function(state_names = c("0", "1"),
-                                  num_concealed_states,
-                                  mus = NULL) {
-  lm <- unlist(mus)
+create_default_shift_matrix <- function(state_names = c("0", "1"),
+                                        num_concealed_states = 2,
+                                        mu_vector = NULL) {
+  lm <- unlist(mu_vector)
   focal_rate <- max(lm) + 1
   num_obs_states <- length(state_names)
   transition_list <- c()
@@ -298,7 +304,7 @@ create_default_q_list <- function(state_names = c("0", "1"),
         to_add <- c(start_state, end_state, focal_rate)
         transition_list <- rbind(transition_list, to_add)
         focal_rate <- focal_rate + 1
-      }  
+      }
     }
   }
 
@@ -306,18 +312,25 @@ create_default_q_list <- function(state_names = c("0", "1"),
   return(transition_list)
 }
 
-#' helper function to create a default lambda list
-#' @param state_names names of the observed states
-#' @param model chosen model of interest, either "CR" (Constant Rates), "ETD" 
-#' (Examined Trait Diversification) or "CTD" ("Concealed Trait Diversification).
-#' @description
+#' Helper function to create a default lambda list
+#' 
 #' This function generates a generic lambda list, assuming no transitions
 #' between states, e.g. a species of observed state 0 generates daughter
 #' species with state 0 as well.
+#'
+#' @inheritParams default_params_doc
+#' 
+#' @examples
+#' lambda_matrix <-
+#'      create_default_lambda_transition_matrix(state_names = c(0, 1),
+#'                                              model = "ETD")
+#' lambda_list <- create_lambda_list(state_names = c(0, 1),
+#'                                   num_concealed_states = 2,
+#'                                   transition_matrix = lambda_matrix,
+#'                                   model = "ETD")
 #' @export
-create_default_lambda_list <- function(state_names = c("0", "1"),
-                                       model = "ETD") {
-  
+create_default_lambda_transition_matrix <- function(state_names = c("0", "1"),
+                                                    model = "ETD") {
   transition_list <- c()
   for (i in seq_along(state_names)) {
     focal_rate <- i
@@ -325,27 +338,24 @@ create_default_lambda_list <- function(state_names = c("0", "1"),
     transition_list <- rbind(transition_list,
                              c(state_names[i],
                                state_names[i],
-                               state_names[i], 
+                               state_names[i],
                                focal_rate))
   }
   rownames(transition_list) <- rep("", nrow(transition_list))
   return(transition_list)
 }
 
-#' function to generate generic mus vector
-#' @param state_names full state names, including concealed states, for example
-#' c("0A", "1A", "0B", "1B")
-#' @param num_concealed_states number of concealed states
-#' @param model model replicated, available are "CR", "ETD" and "CTD"
-#' @param lambdas previously generated lambda matrices, used to infer the rate
-#' number to start with
+#' Generate mus vector
+#'
+#' @inheritParams default_params_doc
+#'
 #' @return mu vector
 #' @export
-create_mus <- function(state_names,
-                       num_concealed_states,
-                       model = "CR",
-                       lambdas) {
-  focal_rate <- 1 + max(unlist(lambdas), na.rm = TRUE)
+create_mu_vector <- function(state_names,
+                             num_concealed_states,
+                             model = "CR",
+                             lambda_list) {
+  focal_rate <- 1 + max(unlist(lambda_list), na.rm = TRUE)
 
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")
@@ -390,13 +400,11 @@ replace_matrix <- function(focal_matrix,
   return(focal_matrix)
 }
 
-#' helper function to enter parameter value on their right place
-#' @param object lambda matrices, q_matrix or mu vector
-#' @param params parameters in order, where each value reflects the value
-#' of the parameter at that position, e.g. c(0.3, 0.2, 0.1) will fill out
-#' the value 0.3 for the parameter with rate indentifier 1, 0.2 for the
-#' parameter with rate identifier 2 and 0.1 for the parameter with rate
-#' identifier 3
+#' Helper function to enter parameter value on their right place
+#' 
+#' @inheritParams default_params_doc
+#' @return lambda matrices, `q_matrix` or mu vector with the correct values in
+#'   their right place.
 #' @export
 fill_in <- function(object,
                     params) {
@@ -432,14 +440,12 @@ extract_answ <- function(indic_mat,
 }
 
 
-#' function to extract parameter values out of the result of a maximum
-#' likelihood inference run.
-#' @param param_posit initial parameter structure, consisting of a list with
-#' three entries: 1) lambda matrices, 2) mus and 3) Q matrix. In each entry,
-#' integers numbers (1-n) indicate the parameter to be optimized
-#' @param ml_pars resulting parameter estimates as returned by for instance
-#' cla_secsse_ml, having the same structure as param_post
-#' @return vector of parameter estimates
+#' Extract parameter values out of the result of a maximum likelihood inference 
+#' run
+#' 
+#' @inheritParams default_params_doc
+
+#' @return Vector of parameter estimates.
 #' @export
 extract_par_vals <- function(param_posit,
                              ml_pars) {
@@ -457,7 +463,6 @@ extract_par_vals <- function(param_posit,
   answ <- extract_answ(param_posit[[3]], # Q matrix
                        ml_pars[[3]],
                        answ)
-
   for (i in seq_along(param_posit[[2]])) {
     if (param_posit[[2]][i] > 0 && !is.na(param_posit[[2]][i])) {
       answ[param_posit[[2]][i]] <- ml_pars[[2]][i]

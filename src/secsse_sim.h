@@ -13,6 +13,7 @@
 #include <random>
 #include <tuple>
 #include <string>
+#include <map>
 
 using num_mat = std::vector< std::vector<double >>;
 using num_mat_mat = std::vector<num_mat>;
@@ -24,13 +25,15 @@ enum finish_type {done, extinct, overshoot, conditioning, not_run_yet,
                   max_types};
 
 struct ltab_species {
-  enum info_index {time, p_id, self_id, extinct_time};
+  enum info_index {time, p_id, self_id, extinct_time, trait_val};
 
-  ltab_species(double brts, int parent, int ID, double death) {
+  ltab_species(double brts, int parent, int ID, double death,
+               double trait) {
     data_[time] = brts;
     data_[p_id] = static_cast<double>(parent);
     data_[self_id] = static_cast<double>(ID);
     data_[extinct_time] = death;
+    data_[trait_val] = trait;
   }
 
   double get_id() const {
@@ -39,6 +42,10 @@ struct ltab_species {
 
   double get_parent() const  {
     return(data_[p_id]);
+  }
+  
+  double get_trait() const {
+    return(data_[trait_val]);
   }
 
   void set_death(double d) {
@@ -55,22 +62,21 @@ struct ltab_species {
     data_[p_id] = -1e6;
     data_[self_id] = -1e6;
     data_[extinct_time] = -1e6;
+    data_[trait_val] = -1;
   }
 
-  std::array<double, 4>& get_data() {
+  std::array<double, 5>& get_data() {
     return data_;
   }
 
  private:
-  std::array<double, 4> data_;
+  std::array<double, 5> data_;
 };
 
 struct ltable {
   std::vector< ltab_species > data_;
 
   ltable() {
-    data_.emplace_back(ltab_species(0.0,  0, -1, -1));
-    data_.emplace_back(ltab_species(0.0, -1,  2, -1));
   }
 
   void clear() {
@@ -80,34 +86,33 @@ struct ltable {
 
 struct lambda_dist {
   std::vector<size_t> indices;
-  std::vector<double> probs;
   std::discrete_distribution<size_t> d;
 
-  size_t draw_from_dist(std::mt19937* rndgen) {
+  size_t draw_from_dist(std::mt19937_64* rndgen) {
     auto index = d(*rndgen);
     return indices[index];
   }
 
   lambda_dist(const std::vector<size_t>& i,
-              const std::vector<double>& p) : indices(i), probs(p) {
-    d = std::discrete_distribution<size_t>(probs.begin(), probs.end());
+              const std::vector<double>& p) : indices(i) {
+    d = std::discrete_distribution<size_t>(p.begin(), p.end());
   }
 };
 
 struct species_info {
-  species_info() {
-    max_la = max_mu = max_qs = 0.0;
-  }
-
   species_info(const std::vector<double>& m,
                const std::vector<double>& l,
                const std::vector<double>& s) :
-    trait_mu(m), trait_lambda(l), trait_qs(s) {
-    max_mu = *std::max_element(trait_mu.begin(), trait_mu.end());
-    max_la = *std::max_element(trait_lambda.begin(), trait_lambda.end());
-    max_qs = *std::max_element(trait_qs.begin(), trait_qs.end());
+    trait_mu(m), trait_lambda(l), trait_qs(s),
+    max_mu(calc_max(m)), 
+    max_la(calc_max(l)),
+    max_qs(calc_max(s)) {
   }
 
+  double calc_max(const std::vector<double>& v) {
+    return *std::max_element(v.begin(), v.end());
+  }
+  
   double mu(size_t trait) const {
     return trait_mu[trait];
   }
@@ -133,12 +138,12 @@ struct species_info {
   }
 
  private:
-  std::vector<double> trait_mu;
-  std::vector<double> trait_lambda;
-  std::vector<double> trait_qs;
-  double max_mu = 0.0;
-  double max_la = 0.0;
-  double max_qs = 0.0;
+  const std::vector<double> trait_mu;
+  const std::vector<double> trait_lambda;
+  const std::vector<double> trait_qs;
+  const double max_mu = 0.0;
+  const double max_la = 0.0;
+  const double max_qs = 0.0;
 };
 
 struct species {
@@ -238,21 +243,15 @@ struct population {
 };
 
 struct secsse_sim {
-  std::mt19937 rndgen_;
+  std::mt19937_64 rndgen_;
 
   ltable L;
-  double t;
-
-  finish_type run_info;
-
-  int init_state;
 
   population pop;
 
-  species_info trait_info;
-
   std::vector< lambda_dist > lambda_distributions;
   vec_dist qs_dist;
+  const species_info trait_info;
 
   std::array<int, 2> track_crowns;
 
@@ -263,6 +262,10 @@ struct secsse_sim {
   const size_t max_spec;
   const std::vector<double> init_states;
   const bool non_extinction;
+  
+  finish_type run_info;
+  int init_state;
+  double t;
 
   secsse_sim(const std::vector<double>& m,
              const num_mat_mat& l,
@@ -271,25 +274,18 @@ struct secsse_sim {
              size_t max_s,
              const std::vector<double>& init,
              const bool& ne,
-             int seed) : 
+             int seed) :
+             trait_info(m, update_lambdas(l), update_qs_row_sums(q)), 
              mus(m),
              num_states(m.size()), max_t(mt),
              max_spec(max_s),
              init_states(init),
-             non_extinction(ne) {
-    auto l_sums = update_lambdas(l);
-    auto q_sums = update_qs_row_sums(q);
-    trait_info = species_info(mus, l_sums, q_sums);
-
+             non_extinction(ne),
+             run_info(not_run_yet),
+             t(0.0)
+              {
     // randomize randomizer
-    std::random_device rd;
-    if (seed < 0) seed = rd();
-    std::mt19937 rndgen_t(seed);
-    rndgen_ = rndgen_t;
-   
-    run_info = not_run_yet;
-    t = 0.0;
-    init_state = 0;
+    rndgen_.seed((seed < 0) ? std::random_device{}() : seed);
   }
 
   void run() {
@@ -303,8 +299,7 @@ struct secsse_sim {
     run_info = not_run_yet;
 
     pop.clear();
-    L.clear();
-
+   
     auto crown_states = root_speciation(init_state);
 
     pop.add(species(std::get<0>(crown_states), -1, trait_info));
@@ -312,8 +307,10 @@ struct secsse_sim {
 
     track_crowns = {1, 1};
 
-    L = ltable();
-
+    L.clear();
+    L.data_.emplace_back(0.0, 0, -1, -1, pop.get_trait(0));
+    L.data_.emplace_back(0.0, -1, 2, -1, pop.get_trait(1));
+ 
     while (true) {
       double dt = draw_dt();
       t += dt;
@@ -329,30 +326,8 @@ struct secsse_sim {
         run_info = extinct;
         break;
       }
-      if (pop.size() > max_spec) {
+      if (pop.size() >= max_spec) {
         run_info = overshoot; break;
-      }
-    }
-  }
-
-  void check_rates() {
-    // for debugging
-    std::vector<double> check_rates(3);
-    check_rates[shift] = std::accumulate(pop.pop.begin(), pop.pop.end(),
-                    0.0,
-                    [](double x, const species& s){return x + s.shiftprob_;});
-    check_rates[extinction] = std::accumulate(pop.pop.begin(), pop.pop.end(),
-                    0.0,
-                    [](double x, const species& s){return x + s.mu_;});
-    check_rates[speciation] = std::accumulate(pop.pop.begin(), pop.pop.end(),
-                    0.0,
-                    [](double x, const species& s){return x + s.lambda_;});
-
-    for (int i = shift; i != max_num; ++i) {
-      if (std::abs(check_rates[i] - pop.rates[i]) > 1e-3) {
-        std::cerr << t << " " << i << " " <<
-                     pop.rates[i] << " " << check_rates[i] << "\n";
-        exit(0);
       }
     }
   }
@@ -380,8 +355,7 @@ struct secsse_sim {
     size_t dying = 0;
     if (pop.size() > 1) {
       // sample one at randomly following mus
-      auto get_val = [](const species& s) { return s.mu_;};
-      dying = sample_from_pop(get_val);
+      dying = sample_from_pop(event_type::extinction);
     }
     auto dying_id = pop.get_id(dying);
 
@@ -404,8 +378,7 @@ struct secsse_sim {
     size_t mother = 0;
     if (pop.size() > 1) {
       // sample one at randomly following lambdas
-      auto get_val = [](const species& s) { return s.lambda_;};
-      mother = sample_from_pop(get_val);
+      mother = sample_from_pop(event_type::speciation);
     }
     auto mother_trait = pop.get_trait(mother);
 
@@ -424,7 +397,7 @@ struct secsse_sim {
     }
 
     pop.add(species(trait_to_daughter, new_id, trait_info));
-    L.data_.emplace_back(ltab_species(t, pop.get_id(mother), new_id, -1));
+    L.data_.emplace_back(t, pop.get_id(mother), new_id, -1, trait_to_daughter);
   }
 
   std::tuple<int, int> root_speciation(int root_state) {
@@ -454,8 +427,7 @@ struct secsse_sim {
     size_t index_chosen_species = 0;
     if (pop.size() > 1) {
       // sample one at randomly following shiftprob
-      auto get_val = [](const species& s) { return s.shiftprob_;};
-      index_chosen_species = sample_from_pop(get_val);
+      index_chosen_species = sample_from_pop(event_type::shift);
     }
 
     auto trait_chosen_species = pop.get_trait(index_chosen_species);
@@ -492,7 +464,6 @@ struct secsse_sim {
   std::vector<double> update_lambdas(const num_mat_mat& lambdas) {
     std::vector<double> lambda_sums(lambdas.size(), 0.0);
 
-    lambda_distributions.clear();
     std::vector<size_t> indices;
     std::vector<double> probs;
 
@@ -510,7 +481,7 @@ struct secsse_sim {
           index++;
         }
       }
-      lambda_distributions.emplace_back(lambda_dist(indices, probs));
+      lambda_distributions.emplace_back(indices, probs);
     }
 
     return lambda_sums;
@@ -521,12 +492,19 @@ struct secsse_sim {
     qs_dist.resize(qs.size());
     for (size_t i = 0; i < qs.size(); ++i) {
       qs_row_sums[i] = std::accumulate(qs[i].begin(), qs[i].end(), 0.0);
+      // qs_dist[i] is not accessed if qs_row_sums[i] == 0.0
       qs_dist[i] = std::discrete_distribution<>(qs[i].begin(), qs[i].end());
     }
     return qs_row_sums;
   }
 
-  size_t sample_from_pop(double (*getvalfrom_species)(const species&)) {
+  size_t sample_from_pop(event_type event) {
+    
+    std::function<double(const species& s)> getvalfrom_species;
+    if (event == event_type::extinction) getvalfrom_species = [](const species& s) { return s.mu_;};
+    if (event == event_type::speciation) getvalfrom_species = [](const species& s) { return s.lambda_;};
+    if (event == event_type::shift)      getvalfrom_species = [](const species& s) { return s.shiftprob_;};
+    
     auto max = *std::max_element(pop.pop.begin(), pop.pop.end(),
                          [&](const species& a, const species& b) {
                            return getvalfrom_species(a) < getvalfrom_species(b);
@@ -550,131 +528,51 @@ struct secsse_sim {
     }
     return index;
   }
+  
+  void check_states(size_t num_traits,
+                    size_t num_concealed_states) {
+    
+    auto total_num_traits = num_concealed_states > 0 ? num_traits / num_concealed_states : num_traits;
 
-  size_t get_num_traits() {
-    std::vector<int> hist(mus.size(), 0);
-    for (size_t i = 0; i < pop.size(); ++i) {
-      auto trait = pop.get_trait(i);
-      hist[trait]++;
+    std::vector<int> focal_traits;
+    for (size_t i = 0; i < total_num_traits; ++i) focal_traits.push_back(0);
+
+    for (const auto& i : L.data_) {
+      int trait = static_cast<int>(i.get_trait());
+      if (num_concealed_states > 0) trait %= num_concealed_states;
+      focal_traits[trait]++;
     }
-    size_t cnt = 0;
-    for (const auto& i : hist) {
-      if (i > 0) cnt++;
-    }
-    return cnt;
-  }
-
-  void check_true_states(size_t num_traits) {
-      std::vector<int> focal_traits(num_traits);
-      std::iota(focal_traits.begin(), focal_traits.end(), 0);
-      for (size_t i = 0; i < pop.size(); ++i) {
-        auto trait = static_cast<int>(pop.get_trait(i));
-        for (size_t j = 0; j < focal_traits.size(); ++j) {
-          if (focal_traits[j] == trait) {
-            focal_traits[j] = focal_traits.back();
-            focal_traits.pop_back();
-            break;
-          }
-        }
-        if (focal_traits.empty()) {
-          break;
-        }
-      }
-      if (focal_traits.empty()) {
-        run_info = done;
-        return;
-      }
-
-      // otherwise, conditioning is a reason to reject:
+    
+    auto min_val = *std::min_element(focal_traits.begin(), 
+                                     focal_traits.end());
+    if (min_val == 0) {
       run_info = conditioning;
-
-      return;
-  }
-
-  void check_obs_states(size_t num_concealed_states,
-                        size_t num_observed_states) {
-      std::vector<int> focal_traits;    //(num_observed_states);
-      for (size_t i = 0; i < num_observed_states; ++i)  {
-        focal_traits.push_back(i);
-      }
-
-      for (size_t i = 0; i < pop.size(); ++i) {
-        auto trait = static_cast<int>(pop.get_trait(i) % num_concealed_states);
-        for (size_t j = 0; j < focal_traits.size(); ++j) {
-          if (focal_traits[j] == trait) {
-            focal_traits[j] = focal_traits.back();
-            focal_traits.pop_back();
-            break;
-          }
-        }
-        if (focal_traits.empty()) {
-          break;
-        }
-      }
-      if (focal_traits.empty()) {
-        run_info = done;
-        return;
-      }
-
-      // otherwise, conditioning is a reason to reject:
-      run_info = conditioning;
-      return;
-  }
-
-  void check_conditioning(std::string conditioning_type,
-                          size_t num_concealed_states,
-                          size_t num_states) {
-    if (run_info == extinct) return;
-
-    if (conditioning_type == "none") {
+    } else {
       run_info = done;
     }
-
-    if (conditioning_type == "true_states") {
-        check_true_states(num_states);
-    }
-
-    if (conditioning_type == "obs_states") {
-      check_obs_states(num_concealed_states,
-                       num_states / num_concealed_states);
-    }
-
+    
     return;
   }
-
-  void check_num_traits(const std::vector<double>& input_traits) {
-    std::vector<double> focal_traits = input_traits;
-    if (run_info != done) return;
-
-    // check if all focal traits are there
-    if (focal_traits.empty()) return;  // no conditioning
-
-    // now check if each trait to be checked is present:
-    for (size_t i = 0; i < pop.size(); ++i) {
-      auto trait = pop.get_trait(i);
-      for (size_t j = 0; j < focal_traits.size(); ++j) {
-        if (focal_traits[j] == trait) {
-          focal_traits[j] = focal_traits.back();
-          focal_traits.pop_back();
-          break;
-        }
-      }
-      if (focal_traits.empty()) {
-        break;
+  
+  void check_custom_conditioning(const std::vector<double>& condition_vec, int num_concealed_traits) {
+    std::map<int, int> histogram;
+       
+    for (const auto& i : L.data_) {
+      int trait = static_cast<int>(i.get_trait()) % num_concealed_traits;
+        histogram[trait]++;
+    }
+    
+    for (const auto& c : condition_vec) {
+      if (histogram.find(c) == histogram.end()) {
+        run_info = conditioning;
+        return;
       }
     }
-    // if traits is empty, all traits were found:
-    if (focal_traits.empty()) {
-      run_info = done;
-      return;
-    }
-
-    // otherwise, conditioning is a reason to reject:
-    run_info = conditioning;
-
+    
+    run_info = done;
     return;
   }
-
+  
   std::vector<int> get_traits() {
     std::vector<int> traits(pop.size() * 2);
     for (size_t i = 0; i < pop.size(); ++i) {
@@ -684,13 +582,43 @@ struct secsse_sim {
     }
     return traits;
   }
+  
+  void check_conditioning(std::string conditioning_type,
+                          size_t num_concealed_states,
+                          size_t num_states,
+                          const std::vector<double>& condition_vec) {
+    if (run_info == extinct) return;
+
+    if (conditioning_type == "none") {
+      run_info = done;
+    }
+
+    if (conditioning_type == "true_states") {
+        check_states(num_states, 0); 
+    }
+
+    if (conditioning_type == "obs_states") {
+        check_states(num_states, num_concealed_states);
+    }
+    
+    if (conditioning_type == "custom") {
+      // do something
+      check_custom_conditioning(condition_vec, num_concealed_states);
+    }
+
+    return;
+  }
 
   size_t get_initial_state() {
     return init_state;
   }
 
+  size_t num_species() {
+    return pop.size();
+  }
+  
   num_mat extract_ltable() {
-    num_mat extracted_ltable(L.data_.size(), std::vector<double>(4));
+    num_mat extracted_ltable(L.data_.size(), std::vector<double>(5));
     for (size_t i = 0; i < L.data_.size(); ++i) {
       auto temp = L.data_[i].get_data();
       std::vector<double> row(temp.begin(), temp.end());

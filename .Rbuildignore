@@ -3,10 +3,11 @@
 ^README\.md
 ^\.github$
 ^LICENSE\.md$
-^pics$
 ^doc$
 ^Meta$
 ^\.vscode$
+^\.zenodo\.json$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^vignettes/secsse_performance\.Rmd$

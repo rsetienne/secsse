@@ -1,5 +1,3 @@
-context("test_cla_secsse_ml")
-
 test_that("trying a short ML search: cla_secsse", {
   Sys.unsetenv("R_TESTS")
   parenthesis <- "(((6:0.2547423371,(1:0.0496153503,4:0.0496153503):0.2051269868):0.1306304758,(9:0.2124135406,5:0.2124135406):0.1729592723):1.151205247,(((7:0.009347664296,3:0.009347664296):0.2101416075,10:0.2194892718):0.1035186448,(2:0.2575886319,8:0.2575886319):0.06541928469):1.213570144);" #nolint
@@ -29,22 +27,23 @@ test_that("trying a short ML search: cla_secsse", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-  testthat::expect_warning( # Expect warning because some transitions are set to 
-    model_R <- cla_secsse_ml( # be impossible
-      phylotree,
-      traits,
-      num_concealed_states,
-      idparslist,
-      idparsopt,
-      initparsopt,
-      idparsfix,
-      parsfix,
-      cond,
-      root_state_weight,
-      sampling_fraction,
-      tol,
-      maxiter,
-      optimmethod,
+  # Expect warning because some transitions are set to be impossible
+  testthat::expect_warning(
+    model_R <- cla_secsse_ml(
+      phy = phylotree,
+      traits = traits,
+      num_concealed_states = num_concealed_states,
+      idparslist = idparslist,
+      idparsopt = idparsopt,
+      initparsopt = initparsopt,
+      idparsfix = idparsfix,
+      parsfix = parsfix,
+      cond = cond,
+      root_state_weight = root_state_weight,
+      sampling_fraction = sampling_fraction,
+      tol = tol,
+      maxiter = maxiter,
+      optimmethod = optimmethod,
       num_cycles = 1,
       verbose = FALSE)
   )

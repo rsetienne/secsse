@@ -1,9 +1,6 @@
-context("visualisation")
-
 test_that("normal plotting", {
-
    set.seed(5)
-   focal_tree <- ape::rphylo(n = 4, birth = 1, death = 0)
+   phy <- ape::rphylo(n = 4, birth = 1, death = 0)
    traits <- c(0, 1, 1, 0)
    params <- secsse::id_paramPos(c(0, 1), 2)
    params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
@@ -19,11 +16,11 @@ test_that("normal plotting", {
    }
   testthat::expect_silent(
    px <- plot_state_exact(parameters = params,
-                    focal_tree = focal_tree,
+                    phy = phy,
                     traits = traits,
                     num_concealed_states = 2,
                     sampling_fraction = c(1, 1),
-                    steps = 10,
+                    num_steps = 10,
                     prob_func = helper_function)
   )
    testthat::expect_true(inherits(px, "ggplot"))
@@ -43,7 +40,7 @@ test_that("cla plotting", {
   diff.conceal <- FALSE
 
   idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
-  
+
   testthat::expect_output(
     startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
@@ -85,15 +82,15 @@ test_that("cla plotting", {
   }
 
   testthat::expect_silent(
-    px <- secsse::plot_state_exact_cla(parameters = model_R$MLpars,
-                                       focal_tree = phylotree,
-                                       traits = traits,
-                                       num_concealed_states =
-                                         num_concealed_states,
-                                       sampling_fraction = sampling_fraction,
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       prob_func = helper_function)
+    px <- secsse::plot_state_exact(parameters = model_R$MLpars,
+                                   phy = phylotree,
+                                   traits = traits,
+                                   num_concealed_states =
+                                   num_concealed_states,
+                                   sampling_fraction = sampling_fraction,
+                                   cond = cond,
+                                   root_state_weight = root_state_weight,
+                                   prob_func = helper_function)
   )
 
   testthat::expect_true(inherits(px, "ggplot"))
