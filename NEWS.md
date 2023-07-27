@@ -29,9 +29,12 @@ and faster run time for standard secsse and cla_secsse likelihood calculations.
 * Documentation reworked into `default_params_doc()`.
 * Several documentation formatting improvements and linking. Documentation now
 follows and allows for roxygen2 markdown.
-* Two new vignettes:
+* A new vignette:
     * _Using secsse with complete phylogenies (with extinction)_ `vignette("complete_tree", package = "secsse")`
-    * _Secsse versions_ `vignette("secsse_versions", package = "secsse")`
+* A new [pkgdown website](https://rsetienne.github.io/secsse/index.html)! 
+    * It contains all the documentation and vignettes of the package, along with
+    additional interesting information like the _Secsse versions_ article with
+    details on performance and the development history of secsse.
 * Revise, combine and simplify the _Using SecSSE ML search_ and _Setting up a 
 secsse analysis_ into the _Starting secsse_ vignette 
 `vignette("starting_secsse", package = "secsse")`.
