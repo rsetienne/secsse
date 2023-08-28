@@ -207,9 +207,9 @@ get_chosen_rates <- function(q_matrix, num_concealed_states) {
   chosen_rates <- existing_rates
   while (num_transitions > length(chosen_rates)) {
     remain <- num_transitions - length(existing_rates)
-    to_add <- sample(existing_rates,
-                     size = min(remain, length(existing_rates)),
-                     replace = FALSE)
+    to_add <- DDD::sample2(x = existing_rates,
+                           size = min(remain, length(existing_rates)),
+                           replace = FALSE)
     chosen_rates <- c(chosen_rates, to_add)
   }
   return(chosen_rates)
