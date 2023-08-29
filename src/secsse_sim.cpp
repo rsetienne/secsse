@@ -83,6 +83,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::NumericMatrix& q_R,
                           double max_time,
                           double max_species,
+                          bool max_species_extant,
                           double min_species,
                           const std::vector<double>& init_states,
                           std::string condition,
@@ -91,52 +92,59 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           bool verbose,
                           int max_tries,
                           int seed,
-                          const std::vector<double>& conditioning_vec) {
+                          const std::vector<double>& conditioning_vec,
+                          bool return_tree_size_hist) {
   num_mat q;
   util::numericmatrix_to_vector(q_R, &q);
   
   num_mat_mat lambdas = util::list_to_nummatmat(lambdas_R);
-
+  
   secsse_sim sim(m_R,
                  lambdas,
                  q,
                  max_time,
                  max_species,
+                 max_species_extant,
                  init_states,
                  non_extinction,
                  seed);
-  std::array<int, 5> tracker = {0, 0, 0, 0, 0};
+  std::array<double, 6> tracker = {0, 0, 0, 0, 0, 0};
+  std::vector<int> tree_size_hist;
+  if (return_tree_size_hist) tree_size_hist = std::vector<int>(max_tries, -1);
   int cnt = 0;
   while (true) {
     sim.run();
+    cnt++;
+    sim.update_tree_size_hist(&tree_size_hist[cnt]);
     
     if (sim.num_species() >= min_species) {
-
       sim.check_conditioning(condition,
                              num_concealed_states,
                              m_R.size(),
                              conditioning_vec);
       
-      if (sim.run_info != done) {
-        cnt++;
-        tracker[ sim.run_info ]++;
-        if (verbose) {
-          if (cnt % 1000 == 0) {
-            Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
-                        << "large: "   << tracker[overshoot] << " "
-                        << "cond: "    << tracker[conditioning] << "\n";
-          }
-        }
+      if (sim.run_info == done) {
+        break;
       } else {
-        break;
+        tracker[ sim.run_info ]++;
       }
-      
-      if (cnt > max_tries) {
-        break;
-      }
-      Rcpp::checkUserInterrupt();
-      if (!non_extinction && sim.run_info == extinct) break;
+    } else { // if not reached minimum size
+      tracker[ 5 ]++;
     }
+    
+    if (verbose) {
+      if (cnt % 1000 == 0) {
+        Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
+                    << "large: "   << tracker[overshoot] << " "
+                    << "cond: "    << tracker[conditioning] << " "
+                    << "small: "   << tracker[5] << "\n";
+      }
+    }
+    if (cnt > max_tries) {
+      break;
+    }
+    Rcpp::checkUserInterrupt();
+    if (!non_extinction && sim.run_info == extinct) break;
   }
   // extract and return
   Rcpp::NumericMatrix ltable_for_r;
@@ -148,6 +156,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   Rcpp::List output = Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
                                          Rcpp::Named("traits") = traits,
                                          Rcpp::Named("initial_state") = init,
-                                         Rcpp::Named("tracker") = tracker);
+                                         Rcpp::Named("tracker") = tracker,
+                                         Rcpp::Named("hist_tree_size") = tree_size_hist);
   return output;
 }

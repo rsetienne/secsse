@@ -76,6 +76,9 @@
 #'  tree is not conditioned on this number, but that this is a safeguard 
 #'  against generating extremely large trees).
 #' @param min_spec Minimum number of species in the tree.
+#' @param max_species_extant Should the maximum number of species be counted in
+#' the reconstructed tree (if TRUE) or in the complete tree (if FALSE).
+#' @param tree_size_hist if TRUE, returns a vector of all found tree sizes. 
 #' @param conditioning can be `"obs_states"`, `"true_states"` or `"none"`, the 
 #'  tree is simulated until one is generated that contains all observed states
 #'  (`"obs_states"`), all true states (e.g. all combinations of obs and hidden

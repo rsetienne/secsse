@@ -270,6 +270,11 @@ against generating extremely large trees).}
 
 \item{min_spec}{Minimum number of species in the tree.}
 
+\item{max_species_extant}{Should the maximum number of species be counted in
+the reconstructed tree (if TRUE) or in the complete tree (if FALSE).}
+
+\item{tree_size_hist}{if TRUE, returns a vector of all found tree sizes.}
+
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
 conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},

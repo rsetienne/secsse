@@ -29,6 +29,8 @@ secsse_sim <- function(lambdas,
                        pool_init_states = NULL,
                        max_spec = 1e5,
                        min_spec = 2,
+                       max_species_extant = TRUE,
+                       tree_size_hist = FALSE,
                        conditioning = "obs_states",
                        non_extinction = TRUE,
                        verbose = FALSE,
@@ -88,6 +90,7 @@ secsse_sim <- function(lambdas,
                         qs,
                         crown_age,
                         max_spec,
+                        max_species_extant,
                         min_spec,
                         pool_init_states,
                         conditioning,
@@ -96,9 +99,13 @@ secsse_sim <- function(lambdas,
                         verbose,
                         max_tries,
                         seed,
-                        condition_vec)
+                        condition_vec,
+                        tree_size_hist)
 
   Ltable        <- res$ltable
+  
+  out_hist <- 0
+  if (tree_size_hist == TRUE) out_hist <- res$hist_tree_size
   
   if (sum(Ltable[, 4] == -1) < 2) {
     warning("crown lineages died out")
@@ -106,17 +113,20 @@ secsse_sim <- function(lambdas,
                 traits = 0,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
-                conditioning = res$tracker[4]))
+                conditioning = res$tracker[4],
+                size_hist = out_hist))
   }
 
   if (sum(res$tracker) >= max_tries) {
     warning("Couldn't simulate a tree in enough tries,
             try increasing max_tries")
+
     return(list(phy = "ds",
                 traits = 0,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
-                conditioning = res$tracker[4]))
+                conditioning = res$tracker[4],
+                size_hist = out_hist))
   }
 
   
@@ -163,7 +173,8 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
                 event_counter = res$event_counter,
-                extinct_draw = res$extinct_draw))
+                extinct_draw = res$extinct_draw,
+                size_hist = out_hist))
   } else {
     warning("simulation did not meet minimal requirements")
     return(list(phy = "ds",
@@ -172,6 +183,7 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
                 event_counter = res$event_counter,
-                extinct_draw = res$extinct_draw))
+                extinct_draw = res$extinct_draw,
+                size_hist = out_hist))
   }
 }
