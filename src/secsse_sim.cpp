@@ -115,7 +115,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   while (true) {
     sim.run();
     cnt++;
-    sim.update_tree_size_hist(&tree_size_hist[cnt]);
+    if (return_tree_size_hist) sim.update_tree_size_hist(&tree_size_hist[cnt]);
     
     if (sim.num_species() >= min_species) {
       sim.check_conditioning(condition,
