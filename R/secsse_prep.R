@@ -147,11 +147,15 @@ create_q_matrix <- function(state_names,
 
   diag(trans_matrix) <- NA
 
-  trans_matrix <- secsse::expand_q_matrix(q_matrix = trans_matrix,
-                                          num_concealed_states =
-                                            num_concealed_states,
-                                          diff.conceal = diff.conceal)
+  #trans_matrix <- secsse::expand_q_matrix(q_matrix = trans_matrix,
+  #                                        num_concealed_states =
+  #                                          num_concealed_states,
+  #                                        diff.conceal = diff.conceal)
 
+  trans_matrix <- secsse::q_doubletrans(traits = state_names,
+                                        masterBlock = trans_matrix,
+                                        diff.conceal = diff.conceal)
+  
   all_state_names <- get_state_names(state_names, num_concealed_states)
   colnames(trans_matrix) <- all_state_names
   rownames(trans_matrix) <- all_state_names
@@ -248,6 +252,7 @@ fill_from_rates <- function(new_q_matrix,
 expand_q_matrix <- function(q_matrix,
                             num_concealed_states,
                             diff.conceal = FALSE) {
+  stop("this function is deprecated. Please use q_doubletrans")
   num_traits <- ncol(q_matrix)
 
   # we first fill in the existing q matrix
