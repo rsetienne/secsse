@@ -29,13 +29,13 @@ test_that("secsse gives the same result as cla_secsse", {
   
   num_modeled_traits <- ncol(q) / floor(num_concealed_states)
   
-  setting_calculation <- build_initStates_time(example_phy_GeoSSE,
-                                               traits,
-                                               num_concealed_states,
+  setting_calculation <- build_initStates_time(phy = example_phy_GeoSSE,
+                                               traits = traits,
+                                               num_concealed_states = num_concealed_states,
                                                sampling_fraction = c(1, 1, 1),
                                                is_complete_tree = FALSE,
-                                               mus,
-                                               num_modeled_traits,
+                                               mus = mus,
+                                               num_unique_traits = num_modeled_traits,
                                                first_time = TRUE)
   states <- setting_calculation$states
   d <- ncol(states) / 2
@@ -49,7 +49,7 @@ test_that("secsse gives the same result as cla_secsse", {
                                      num_concealed_states = 3,
                                      cond = "proper_cond",
                                      root_state_weight = "proper_weights",
-                                     sampling_fraction = c(1,1,1),
+                                     sampling_fraction = c(1, 1, 1),
                                      setting_calculation = setting_calculation,
                                      see_ancestral_states = FALSE,
                                      loglik_penalty = 0,

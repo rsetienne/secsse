@@ -65,6 +65,17 @@ secsse_sim <- function(lambdas,
     # now we have to match the indices
     all_states <- names(mus)
     indices <- which(all_states %in% pool_init_states)
+    if (length(indices) < 1) {
+      # most likely states without hidden labels have been provided
+      letters_conceal <- LETTERS[1:num_concealed_states]
+      all_states2 <- c()
+      for (i in 1:length(pool_init_states)) {
+        for (j in 1:length(letters_conceal)) {
+          all_states2 <- c(all_states2, paste0(pool_init_states[i], letters_conceal[j]))
+        }
+      }
+      indices <- which(all_states %in% all_states2)
+    }
     pool_init_states <- -1 + indices
   }
 
@@ -131,7 +142,7 @@ secsse_sim <- function(lambdas,
 
   
 
-  initialState  <- res$initial_state
+  initialState  <- names(mus)[1 + res$initial_state]
   Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
                                            # not at crown age
   notmin1 <- which(Ltable[, 4] != -1)
