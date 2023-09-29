@@ -128,3 +128,79 @@ test_that("test secsse_sim 2", {
   }
 })
 
+
+test_that("test secsse_sim pool_init_states and complete tree", {
+  lambda_shift <- secsse::create_default_lambda_transition_matrix()
+  lambda_list <- secsse::create_lambda_list(transition_matrix = lambda_shift)
+  mus <- secsse::create_mu_vector(state_names = c(0, 1),
+                                  num_concealed_states = 2,
+                                  lambda_list = lambda_list)
+  q_mat <- secsse::create_default_shift_matrix(mu_vector = mus)
+  q_mat <- secsse::create_q_matrix(state_names = c(0, 1),
+                                   num_concealed_states = 2,
+                                   shift_matrix = q_mat)  
+  
+  pars <- c(0.5, 0.3, 0.7, 0.1, 0.1)
+  lambda_p <- secsse::fill_in(lambda_list, pars)
+  mu_p <- secsse::fill_in(mus, pars)
+  q_mat_p <- secsse::fill_in(q_mat, pars)
+  
+  focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = 10,
+                                   num_concealed_states = 2,
+                                   pool_init_states = c("0A"),
+                                   max_spec = 100,
+                                   seed = 21,
+                                   drop_extinct = FALSE)
+  testthat::expect_true(focal_tree$initialState == "0A")
+  
+  focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = 10,
+                                   num_concealed_states = 2,
+                                   pool_init_states = c("0A", "1B"),
+                                   max_spec = 100,
+                                   seed = 21,
+                                   drop_extinct = FALSE)
+  testthat::expect_true(focal_tree$initialState %in% c("0A", "1B"))
+  
+  focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = 10,
+                                   num_concealed_states = 2,
+                                   pool_init_states = c("0"),
+                                   max_spec = 100,
+                                   seed = 21,
+                                   drop_extinct = FALSE)
+  testthat::expect_true(focal_tree$initialState %in% c("0A", "0B"))
+  
+  pars <- c(0.5, 0.3, 0.2, 0.1, 0.1)
+  
+  mu_p <- secsse::fill_in(mus, pars)
+  q_mat_p <- secsse::fill_in(q_mat, pars)
+
+  focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = 10,
+                                   num_concealed_states = 2,
+                                   max_spec = 100,
+                                   min_spec = 99,
+                                   max_species_extant = FALSE,
+                                   seed = 21,
+                                   drop_extinct = FALSE,
+                                   tree_size_hist = TRUE,
+                                   verbose = FALSE)
+  
+  testthat::expect_equal(length(focal_tree$phy$tip.label), 100)
+  if (requireNamespace("geiger")) {
+    vx <- geiger::is.extinct(focal_tree$phy)
+    testthat::expect_true(length(vx) > 0)
+  }
+  testthat::expect_gt(length(focal_tree$size_hist), 0)
+})
+                      

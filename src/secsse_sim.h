@@ -262,6 +262,7 @@ struct secsse_sim {
   const size_t max_spec;
   const std::vector<double> init_states;
   const bool non_extinction;
+  const bool max_spec_extant;
   
   finish_type run_info;
   int init_state;
@@ -272,6 +273,7 @@ struct secsse_sim {
              const num_mat& q,
              double mt,
              size_t max_s,
+             bool max_s_e,
              const std::vector<double>& init,
              const bool& ne,
              int seed) :
@@ -281,6 +283,7 @@ struct secsse_sim {
              max_spec(max_s),
              init_states(init),
              non_extinction(ne),
+             max_spec_extant(max_s_e),
              run_info(not_run_yet),
              t(0.0)
               {
@@ -326,8 +329,15 @@ struct secsse_sim {
         run_info = extinct;
         break;
       }
-      if (pop.size() >= max_spec) {
-        run_info = overshoot; break;
+      
+      if (max_spec_extant) {
+        if (pop.size() >= max_spec) {
+          run_info = overshoot; break;
+        }
+      } else {
+        if (L.data_.size() >= max_spec) {
+          run_info = overshoot; break;
+        }
       }
     }
   }
@@ -539,7 +549,7 @@ struct secsse_sim {
 
     for (const auto& i : L.data_) {
       int trait = static_cast<int>(i.get_trait());
-      if (num_concealed_states > 0) trait %= num_concealed_states;
+      if (num_concealed_states > 0) trait = trait % num_concealed_states;
       focal_traits[trait]++;
     }
     
@@ -614,7 +624,15 @@ struct secsse_sim {
   }
 
   size_t num_species() {
-    return pop.size();
+    if (max_spec_extant) {
+      return pop.size();
+    } else {
+      return L.data_.size();
+    }
+  }
+  
+  size_t ltable_size() {
+    return L.data_.size();
   }
   
   num_mat extract_ltable() {
@@ -625,5 +643,19 @@ struct secsse_sim {
       extracted_ltable[i] = row;
     }
     return extracted_ltable;
+  }
+
+  void update_tree_size_hist(int* val) {
+    if (run_info == extinct) {
+      *val = 0;
+      return;
+    }
+
+    if (max_spec_extant) {
+       *val = pop.size();
+    } else {
+       *val = L.data_.size();
+    }
+    return;
   }
 };

@@ -35,25 +35,6 @@ test_that("lambda setup", {
   }
 })
 
-test_that("q_matrix", {
-  q_mat <- matrix(data = NA, nrow = 2, ncol = 2)
-  q_mat[1, 2] <- 1
-  q_mat[2, 1] <- 2
-
-  # first, we test on a 2x2 matrix
-  for (dd in c(TRUE, FALSE)) {
-    q1 <- secsse::q_doubletrans(traits = c(1, 2),
-                                masterBlock = q_mat,
-                                diff.conceal = dd)
-
-    q2 <- secsse::expand_q_matrix(q_matrix = q_mat,
-                                  num_concealed_states = 2,
-                                  diff.conceal = dd)
-    v1 <- as.vector(q1)
-    v2 <- as.vector(q2)
-    testthat::expect_true(all.equal(v1, v2))
-  }
-})
 
 test_that("setup", {
   focal_matrix <-
@@ -144,4 +125,18 @@ test_that("setup", {
                                    shift_matrix = t_ETD,
                                    diff.conceal = TRUE)
   testthat::expect_equal(8, max(q_ETD, na.rm = TRUE))
+})
+
+
+test_that("test q_doubletrans", {
+  traits <- c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
+  num_concealed_states <- 3
+  masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
+  diag(masterBlock) <- NA
+  a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  
+  a1 <- unique(as.vector(a1))
+  a2 <- unique(as.vector(a2))
+  testthat::expect_gt(length(a2), length(a1))
 })

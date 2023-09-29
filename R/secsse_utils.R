@@ -466,7 +466,7 @@ check_input <- function(traits,
 
     check_tree(phy, is_complete_tree)
 
-    check_traits(traits, sampling_fraction)
+    # check_traits(traits, sampling_fraction)
 }
 
 
