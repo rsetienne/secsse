@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 # secsse 3.0.1
 
 Version 3.0.1 patches some inaccuracies in simulation functions, and
