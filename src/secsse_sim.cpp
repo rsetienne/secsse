@@ -45,21 +45,6 @@ void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
   return;
 }
 
-
-void list_to_vector(const Rcpp::ListOf<Rcpp::NumericMatrix>& l,
-                    std::vector< std::vector< std::vector<double >>>* v) {
-  size_t n = l.size();
-  (*v) = std::vector< std::vector< std::vector<double>>>(n);
-  for (size_t i = 0; i < n; ++i) {
-    std::vector< std::vector< double >> entry;
-    Rcpp::NumericMatrix temp = l[i];
-    util::numericmatrix_to_vector(temp, &entry);
-    (*v).push_back(entry);
-  }
-  return;
-}
-
-
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
   for (int m = 0; m < lambdas_R.size(); ++m) {
