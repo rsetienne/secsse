@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,73 +55,18 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="3.0.0" id="secsse-300">secsse 3.0.0<a class="anchor" aria-label="anchor" href="#secsse-300"></a></h2>
-<p>Version 3.0.0 extends the C++ code base used for the standard likelihood to the “cla_” likelihood, harnessing the same computation improvement.</p>
+<h2 class="pkg-version" data-toc-text="3.0.1" id="secsse-301">secsse 3.0.1<a class="anchor" aria-label="anchor" href="#secsse-301"></a></h2>
+<p>Version 3.0.1 patches some inaccuracies in simulation functions, and deprecates expand_q_matrix, as this was making some incorrect assumptions.</p>
 <div class="section level3">
-<h3 id="breaking-changes-3-0-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-3-0-0"></a></h3>
-<ul><li>Function name changes:
-<ul><li>
-<code>create_lambda_matrices()</code> is now called <code><a href="../reference/create_lambda_list.html">create_lambda_list()</a></code>
-</li>
-<li>
-<code>create_transition_matrix()</code> is now called <code><a href="../reference/create_q_matrix.html">create_q_matrix()</a></code>
-</li>
-<li>
-<code>create_mus()</code> is now called <code><a href="../reference/create_mu_vector.html">create_mu_vector()</a></code>
-</li>
-<li>
-<code>create_default_q_list()</code> is now called <code><a href="../reference/create_default_shift_matrix.html">create_default_shift_matrix()</a></code>
-</li>
-<li>
-<code>create_default_lambda_list ()</code> is now called <code><a href="../reference/create_default_lambda_transition_matrix.html">create_default_lambda_transition_matrix()</a></code>
-</li>
-<li>
-<code>create_default_q_list()</code> is now called <code><a href="../reference/create_default_shift_matrix.html">create_default_shift_matrix()</a></code>
-</li>
-</ul></li>
-<li>Package data files renamed:
-<ul><li>
-<code>phylo_Vign</code> is now called <code>phylo_vignette</code>
-</li>
-<li>
-<code>traitinfo</code> is now called <code>traits</code>
-</li>
-<li>
-<code>phy</code> is now called <code>example_phy_GeoSSE</code>
-</li>
-</ul></li>
-<li>
-<code><a href="../reference/plot_state_exact.html">plot_state_exact()</a></code> argument <code>steps</code> renamed to <code>num_steps</code> and argument <code>focal_tree</code> renamed to <code>phy</code> for consistency with other functions.</li>
+<h3 id="breaking-changes-3-0-1">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-3-0-1"></a></h3>
+<ul><li>The function expand_q_matrix is now deprecated, please use q_doubletrans</li>
 </ul></div>
 <div class="section level3">
-<h3 id="major-changes-3-0-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-3-0-0"></a></h3>
-<ul><li>Vastly improve the computational speed of “cla_” likelihood calculation.</li>
-<li>Optimization of parallelization resulting in better scaling with more threads and faster run time for standard secsse and cla_secsse likelihood calculations.</li>
-</ul></div>
-<div class="section level3">
-<h3 id="minor-changes-3-0-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-3-0-0"></a></h3>
-<ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
-<li>Documentation reworked into <code><a href="../reference/default_params_doc.html">default_params_doc()</a></code>.</li>
-<li>Several documentation formatting improvements and linking. Documentation now follows and allows for roxygen2 markdown.</li>
-<li>A new vignette:
-<ul><li>
-<em>Using secsse with complete phylogenies (with extinction)</em> <code><a href="../articles/complete_tree.html">vignette("complete_tree", package = "secsse")</a></code>
+<h3 id="minor-changes-3-0-1">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-3-0-1"></a></h3>
+<ul><li>Added conditioning of simulation of complete trees on complete tree size</li>
+<li>Fixed some issues with setting <code>pool_init_states</code>
 </li>
-</ul></li>
-<li>A new <a href="https://rsetienne.github.io/secsse/index.html">pkgdown website</a>!
-<ul><li>It contains all the documentation and vignettes of the package, along with additional interesting information like the <em>Secsse versions</em> article with details on performance and the development history of secsse.</li>
-</ul></li>
-<li>Revise, combine and simplify the <em>Using SecSSE ML search</em> and <em>Setting up a secsse analysis</em> into the <em>Starting secsse</em> vignette <code><a href="../articles/starting_secsse.html">vignette("starting_secsse", package = "secsse")</a></code>.</li>
-<li>
-<code><a href="../reference/secsse_sim.html">secsse_sim()</a></code> argument <code>conditioning</code> now defaults to <code>"obs_states"</code> from <code>"none"</code>.</li>
-<li>No longer Import package ‘stringr’ and Suggest package ‘testit’.</li>
-<li>New organisation of code in .R, .cpp and .h files. (Developer side).</li>
-<li>Start archiving in Zenodo, with new .zenodo.json metadata file.</li>
-</ul></div>
-<div class="section level3">
-<h3 id="bug-fixes-3-0-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-0-0"></a></h3>
-<ul><li>
-<code><a href="../reference/secsse_sim.html">secsse_sim()</a></code> fix bug causing error when simulating trees with extinct species.</li>
+<li>Added option to return a histogram of simulated tree sizes, across all successful and failed trees.</li>
 </ul></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

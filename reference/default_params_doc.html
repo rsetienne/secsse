@@ -12,7 +12,7 @@ inherited by the relevant functions."><!-- mathjax --><script src="https://cdnjs
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,7 +124,12 @@ inherited by the relevant functions.</p>
 <span>  <span class="va">params</span>,</span>
 <span>  <span class="va">param_posit</span>,</span>
 <span>  <span class="va">ml_pars</span>,</span>
-<span>  <span class="va">mu_vector</span></span>
+<span>  <span class="va">mu_vector</span>,</span>
+<span>  <span class="va">max_spec</span>,</span>
+<span>  <span class="va">min_spec</span>,</span>
+<span>  <span class="va">max_species_extant</span>,</span>
+<span>  <span class="va">tree_size_hist</span>,</span>
+<span>  <span class="va">optimmethod</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -444,6 +449,15 @@ against generating extremely large trees).</p></dd>
 
 <dt>min_spec</dt>
 <dd><p>Minimum number of species in the tree.</p></dd>
+
+
+<dt>max_species_extant</dt>
+<dd><p>Should the maximum number of species be counted in
+the reconstructed tree (if TRUE) or in the complete tree (if FALSE).</p></dd>
+
+
+<dt>tree_size_hist</dt>
+<dd><p>if TRUE, returns a vector of all found tree sizes.</p></dd>
 
 
 <dt>optimmethod</dt>

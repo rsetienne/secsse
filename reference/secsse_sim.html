@@ -32,7 +32,7 @@ has a crown age that matches the used crown age. You can modify
     
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,6 +103,8 @@ has a crown age that matches the used crown age. You can modify
 <span>  pool_init_states <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_spec <span class="op">=</span> <span class="fl">1e+05</span>,</span>
 <span>  min_spec <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  max_species_extant <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tree_size_hist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="st">"obs_states"</span>,</span>
 <span>  non_extinction <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -150,6 +152,15 @@ against generating extremely large trees).</p></dd>
 
 <dt>min_spec</dt>
 <dd><p>Minimum number of species in the tree.</p></dd>
+
+
+<dt>max_species_extant</dt>
+<dd><p>Should the maximum number of species be counted in
+the reconstructed tree (if TRUE) or in the complete tree (if FALSE).</p></dd>
+
+
+<dt>tree_size_hist</dt>
+<dd><p>if TRUE, returns a vector of all found tree sizes.</p></dd>
 
 
 <dt>conditioning</dt>
