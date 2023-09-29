@@ -188,3 +188,4 @@ test_that("test secsse_sim pool_init_states and complete tree", {
     testthat::expect_true(length(vx) > 0)
   }
 })
+                      

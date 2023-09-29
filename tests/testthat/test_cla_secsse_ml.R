@@ -49,4 +49,15 @@ test_that("trying a short ML search: cla_secsse", {
   )
 
   testthat::expect_equal(model_R$ML, -16.1342246206186)
+  
+  # we have to translate to lambda matrices to test the following:
+  param_posit <- idparslist
+  param_posit[[1]] <- secsse::prepare_full_lambdas(traits,
+                                                   num_concealed_states,
+                                                   idparslist[[1]])
+  
+  found_pars <- secsse::extract_par_vals(param_posit,
+                                         model_R$MLpars)
+  testthat::expect_equal(length(found_pars),
+                         max(param_posit[[3]], na.rm = TRUE))
 })

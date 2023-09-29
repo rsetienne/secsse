@@ -126,3 +126,17 @@ test_that("setup", {
                                    diff.conceal = TRUE)
   testthat::expect_equal(8, max(q_ETD, na.rm = TRUE))
 })
+
+
+test_that("test q_doubletrans", {
+  traits <- c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
+  num_concealed_states <- 3
+  masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
+  diag(masterBlock) <- NA
+  a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  
+  a1 <- unique(as.vector(a1))
+  a2 <- unique(as.vector(a2))
+  testthat::expect_gt(length(a2), length(a1))
+})
