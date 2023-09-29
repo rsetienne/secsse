@@ -64,7 +64,12 @@ default_params_doc(
   params,
   param_posit,
   ml_pars,
-  mu_vector
+  mu_vector,
+  max_spec,
+  min_spec,
+  max_species_extant,
+  tree_size_hist,
+  optimmethod
 )
 }
 \arguments{
