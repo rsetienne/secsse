@@ -77,6 +77,8 @@ num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
 
 }  // namespace util
 
+//' 
+
 // [[Rcpp::export]]
 Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const Rcpp::List& lambdas_R,
@@ -129,7 +131,10 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
         tracker[ sim.run_info ]++;
       }
     } else { // if not reached minimum size
-      tracker[ 5 ]++;
+      if (sim.run_info == extinct) tracker[extinct]++;
+      else {
+        tracker[ 5 ]++;
+      }
     }
     
     if (verbose) {

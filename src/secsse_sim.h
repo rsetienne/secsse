@@ -549,7 +549,7 @@ struct secsse_sim {
 
     for (const auto& i : L.data_) {
       int trait = static_cast<int>(i.get_trait());
-      if (num_concealed_states > 0) trait %= num_concealed_states;
+      if (num_concealed_states > 0) trait = trait % num_concealed_states;
       focal_traits[trait]++;
     }
     

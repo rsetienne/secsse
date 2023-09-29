@@ -147,11 +147,6 @@ create_q_matrix <- function(state_names,
 
   diag(trans_matrix) <- NA
 
-  #trans_matrix <- secsse::expand_q_matrix(q_matrix = trans_matrix,
-  #                                        num_concealed_states =
-  #                                          num_concealed_states,
-  #                                        diff.conceal = diff.conceal)
-
   trans_matrix <- secsse::q_doubletrans(traits = state_names,
                                         masterBlock = trans_matrix,
                                         diff.conceal = diff.conceal)
@@ -162,83 +157,6 @@ create_q_matrix <- function(state_names,
   diag(trans_matrix) <- NA
 
   return(trans_matrix)
-}
-
-#' @keywords internal
-initialize_new_q_matrix <- function(q_matrix,
-                                    num_concealed_states) {
-  num_traits <- ncol(q_matrix)
-  total_num_states <- ncol(q_matrix) * num_concealed_states
-  new_q_matrix <- matrix(0, nrow = total_num_states, ncol = total_num_states)
-  diag(new_q_matrix) <- NA
-  for (x in seq_len(ncol(q_matrix))) {
-    for (y in seq_len(nrow(q_matrix))) {
-      for (i in 1:num_concealed_states) {
-        incr <- (i - 1) * num_traits
-        new_q_matrix[x + incr, y + incr] <- q_matrix[x, y]
-      }
-    }
-  }
-  return(new_q_matrix)
-}
-
-#' @keywords internal
-fill_all_diff <- function(new_q_matrix, num_concealed_states,
-                          rate_indic, num_traits) {
-  for (i in 1:num_concealed_states) {
-    for (j in 1:num_concealed_states) {
-      if (i != j) {
-        for (k in 1:num_traits) {
-          start <- (i - 1) * num_traits + k
-          end <- (j - 1) * num_traits + k
-          new_q_matrix[start, end] <- rate_indic
-        }
-        rate_indic <- rate_indic + 1
-      }
-    }
-  }
-  return(new_q_matrix)
-}
-
-#' @keywords internal
-get_chosen_rates <- function(q_matrix, num_concealed_states) {
-  existing_rates <- unique(as.vector(q_matrix))
-  existing_rates <- existing_rates[existing_rates > 0]
-  existing_rates <- existing_rates[!is.na(existing_rates)]
-  existing_rates <- sort(existing_rates)
-
-  num_transitions <- num_concealed_states * (num_concealed_states - 1)
-  chosen_rates <- existing_rates
-  while (num_transitions > length(chosen_rates)) {
-    remain <- num_transitions - length(existing_rates)
-    to_add <- DDD::sample2(x = existing_rates,
-                           size = min(remain, length(existing_rates)),
-                           replace = FALSE)
-    chosen_rates <- c(chosen_rates, to_add)
-  }
-  return(chosen_rates)
-}
-
-#' @keywords internal
-fill_from_rates <- function(new_q_matrix,
-                            chosen_rates,
-                            num_traits,
-                            num_concealed_states,
-                            rate_indic) {
-  for (i in 1:num_concealed_states) {
-    for (j in i:num_concealed_states) {
-      if (i != j) {
-        for (k in 1:num_traits) {
-          start <- (i - 1) * num_traits + k
-          end <- (j - 1) * num_traits + k
-          new_q_matrix[start, end] <- chosen_rates[rate_indic]
-          new_q_matrix[end, start] <- chosen_rates[rate_indic + 1]
-        }
-        rate_indic <- rate_indic + 2
-      }
-    }
-  }
-  return(new_q_matrix)
 }
 
 #' Function to expand an existing q_matrix to a number of concealed states
@@ -252,30 +170,15 @@ fill_from_rates <- function(new_q_matrix,
 expand_q_matrix <- function(q_matrix,
                             num_concealed_states,
                             diff.conceal = FALSE) {
-  stop("this function is deprecated. Please use q_doubletrans")
-  num_traits <- ncol(q_matrix)
-
-  # we first fill in the existing q matrix
-  new_q_matrix <- initialize_new_q_matrix(q_matrix, num_concealed_states)
-
-  # and now we add all forward and reverse transitions
-  if (diff.conceal == TRUE) {
-    # we need all combinations!
-    rate_indic <- max(new_q_matrix, na.rm = TRUE) + 1
-    new_q_matrix <- fill_all_diff(new_q_matrix, num_concealed_states,
-                                  rate_indic, num_traits)
-  } else {
-    # we now re-use the existing rates
-    chosen_rates <- get_chosen_rates(q_matrix, num_concealed_states)
-    rate_indic <- 1
-    new_q_matrix <- fill_from_rates(new_q_matrix,
-                                    chosen_rates,
-                                    num_traits,
-                                    num_concealed_states,
-                                    rate_indic)
-  }
-
-  return(new_q_matrix)
+  
+  warning("This function is deprecated, please use q_doubletrans, piping result
+          to q_doubletrans, this may introduce inaccuracies.")
+  
+  traits <- get_state_names(names(q_matrix), num_concealed_states)
+  
+  return(secsse::q_doubletrans(traits = traits,
+                               masterBlock = q_matrix,
+                               diff.conceal = diff.conceal))
 }
 
 #' Helper function to create a default `shift_matrix` list
