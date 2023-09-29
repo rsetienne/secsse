@@ -182,7 +182,7 @@ test_that("test secsse_sim pool_init_states and complete tree", {
   
   mu_p <- secsse::fill_in(mus, pars)
   q_mat_p <- secsse::fill_in(q_mat, pars)
-  testthat::expect_output(
+
   focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
                                    mus = mu_p,
                                    qs = q_mat_p,
@@ -195,7 +195,7 @@ test_that("test secsse_sim pool_init_states and complete tree", {
                                    drop_extinct = FALSE,
                                    tree_size_hist = TRUE,
                                    verbose = FALSE)
-  )
+  
   testthat::expect_equal(length(focal_tree$phy$tip.label), 100)
   if (requireNamespace("geiger")) {
     vx <- geiger::is.extinct(focal_tree$phy)
