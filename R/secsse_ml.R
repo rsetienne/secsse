@@ -361,9 +361,8 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'diag(masterBlock) <- NA
 #'diff.conceal <- FALSE
 #'idparslist[[3]] <- q_doubletrans(traits,masterBlock,diff.conceal)
-#'startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
-#'intGuessLamba <- startingpoint$lambda0
-#'intGuessMu <- startingpoint$mu0
+#'intGuessLamba <- 11
+#'intGuessMu <- 12
 #'idparsopt <- c(1,2,3)
 #'initparsopt <- c(rep(intGuessLamba,3))
 #'idparsfix <- c(0,4,5)
@@ -390,6 +389,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'  maxiter,
 #'  optimmethod,
 #'  num_cycles = 1,
+#'  num_threads = 1,
 #'  verbose = FALSE)
 #' # [1] -90.97626
 #' @export
