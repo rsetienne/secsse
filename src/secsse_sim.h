@@ -289,6 +289,7 @@ struct secsse_sim {
               {
     // randomize randomizer
     rndgen_.seed((seed < 0) ? std::random_device{}() : seed);
+    init_state = 0;
   }
 
   void run() {

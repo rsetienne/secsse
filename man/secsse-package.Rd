@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Rampal S. Etienne \email{r.s.etienne@rug.nl} (\href{https://orcid.org/0000-0003-2142-7612}{ORCID})
+\strong{Maintainer}: Rampal S. Etienne \email{t.janzen@rug.nl} (\href{https://orcid.org/0000-0003-2142-7612}{ORCID})
 
 Authors:
 \itemize{

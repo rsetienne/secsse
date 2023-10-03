@@ -4,6 +4,7 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/secsse)](https://CRAN.R-project.org/package=secsse)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/secsse)]( https://CRAN.R-project.org/package=secsse)
 [![](http://cranlogs.r-pkg.org/badges/secsse)](https://CRAN.R-project.org/package=secsse)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8393098.svg)](https://doi.org/10.5281/zenodo.8393098)
 <!-- badges: end -->
 
 Branch|[![GitHub Actions logo](man/figures/github_actions_logo.png)](https://github.com/features/actions)|[![Codecov logo](man/figures/Codecov.png)](https://www.codecov.io)
