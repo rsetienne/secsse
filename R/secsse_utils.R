@@ -719,8 +719,8 @@ condition <- function(cond,
 
         if (cond == "proper_cond") {
             pre_cond <- rep(NA, lmb) # nolint
-            temp_debug <- 1 - nodeM[1:d]
-            cat(min(temp_debug), max(temp_debug), "\n")
+           # temp_debug <- 1 - nodeM[1:d]
+           # cat(min(temp_debug), max(temp_debug), "\n")
             prefactor <- ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d]))
             for (j in 1:lmb) {
                 pre_cond[j] <- sum(lambdas[[j]] * prefactor)
