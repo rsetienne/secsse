@@ -701,7 +701,7 @@ condition <- function(cond,
                       lambdas,
                       nodeM) {
   if (cond == "none") {
-    return(mergebranch2)
+    return(mergeBranch2)
   }
   
     lmb <- length(mergeBranch2)
