@@ -700,6 +700,10 @@ condition <- function(cond,
                       weight_states,
                       lambdas,
                       nodeM) {
+  if (cond == "none") {
+    return(mergebranch2)
+  }
+  
     lmb <- length(mergeBranch2)
     d <- length(lambdas)
     if (is.list(lambdas)) {
@@ -715,9 +719,11 @@ condition <- function(cond,
 
         if (cond == "proper_cond") {
             pre_cond <- rep(NA, lmb) # nolint
+            temp_debug <- 1 - nodeM[1:d]
+            cat(min(temp_debug), max(temp_debug), "\n")
+            prefactor <- ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d]))
             for (j in 1:lmb) {
-                pre_cond[j] <- sum(lambdas[[j]] *
-                                       ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d])))
+                pre_cond[j] <- sum(lambdas[[j]] * prefactor)
             }
             mergeBranch2 <- mergeBranch2 / pre_cond # nolint
         }
