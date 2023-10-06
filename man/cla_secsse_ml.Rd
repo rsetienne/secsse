@@ -157,6 +157,7 @@ model <- cla_secsse_ml(
  maxiter,
  optimmethod,
  num_cycles = 1,
+ num_threads = 1,
  verbose = FALSE)
 # [1] -90.97626
 }

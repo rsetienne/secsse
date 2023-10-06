@@ -390,6 +390,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'  maxiter,
 #'  optimmethod,
 #'  num_cycles = 1,
+#'  num_threads = 1,
 #'  verbose = FALSE)
 #' # [1] -90.97626
 #' @export

@@ -2,8 +2,8 @@ Package: secsse
 Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
-Version: 3.0.0
-Date: 2023-07-04
+Version: 3.0.2
+Date: 2023-10-03
 License: GPL (>= 3) | file LICENSE
 Authors@R: c(
  person(given = "Leonel",
@@ -65,7 +65,8 @@ NeedsCompilation: yes
 SystemRequirements: C++17
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/rsetienne/secsse
+URL: https://rsetienne.github.io/secsse/,
+    https://github.com/rsetienne/secsse
 BugReports: https://github.com/rsetienne/secsse/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3

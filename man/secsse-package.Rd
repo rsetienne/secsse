@@ -11,13 +11,14 @@ Simultaneously infers state-dependent diversification across two or more states 
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://rsetienne.github.io/secsse/}
   \item \url{https://github.com/rsetienne/secsse}
   \item Report bugs at \url{https://github.com/rsetienne/secsse/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Rampal S. Etienne \email{r.s.etienne@rug.nl} (\href{https://orcid.org/0000-0003-2142-7612}{ORCID})
+\strong{Maintainer}: Rampal S. Etienne \email{t.janzen@rug.nl} (\href{https://orcid.org/0000-0003-2142-7612}{ORCID})
 
 Authors:
 \itemize{

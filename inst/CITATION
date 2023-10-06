@@ -1,0 +1,20 @@
+citHeader("To cite secsse in publications use:")
+
+bibentry("Article",
+         title = "Detecting the Dependence of Diversification on Multiple Traits from Phylogenetic Trees and Trait Data",
+         author = c(person("Leonel", "Herrera Alsina",
+                           comment = c(ORCID = "0000-0003-0474-3592"),
+                           email = "leonelhalsina@gmail.com"),
+                    person("Paul", "van Els",
+                           email = "paulvanels@gmail.com",
+                           comment = c(ORCID = "0000-0002-9499-8873")),
+                    person("Rampal", "S. Etienne",
+                           email = "r.s.etienne@rug.nl",
+                           comment = c(ORCID = "0000-0003-2142-7612"))),
+         journal = "Systematic Biology",
+         year = "2019",
+         volume = "68",
+         number = "2",
+         pages = "317--328",
+         doi = "10.1093/sysbio/syy057")
+

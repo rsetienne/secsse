@@ -1,5 +1,3 @@
-context("test_GeoSSE")
-
 test_that("secsse gives the same result as GeoSSE", {
   Sys.unsetenv("R_TESTS")
 

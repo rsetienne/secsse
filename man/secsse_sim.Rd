@@ -13,6 +13,8 @@ secsse_sim(
   pool_init_states = NULL,
   max_spec = 1e+05,
   min_spec = 2,
+  max_species_extant = TRUE,
+  tree_size_hist = FALSE,
   conditioning = "obs_states",
   non_extinction = TRUE,
   verbose = FALSE,
@@ -43,6 +45,11 @@ tree is not conditioned on this number, but that this is a safeguard
 against generating extremely large trees).}
 
 \item{min_spec}{Minimum number of species in the tree.}
+
+\item{max_species_extant}{Should the maximum number of species be counted in
+the reconstructed tree (if TRUE) or in the complete tree (if FALSE).}
+
+\item{tree_size_hist}{if TRUE, returns a vector of all found tree sizes.}
 
 \item{conditioning}{can be \code{"obs_states"}, \code{"true_states"} or \code{"none"}, the
 tree is simulated until one is generated that contains all observed states

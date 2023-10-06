@@ -466,7 +466,7 @@ check_input <- function(traits,
 
     check_tree(phy, is_complete_tree)
 
-    check_traits(traits, sampling_fraction)
+    # check_traits(traits, sampling_fraction)
 }
 
 
@@ -700,10 +700,12 @@ condition <- function(cond,
                       weight_states,
                       lambdas,
                       nodeM) {
-  if (cond == "none") {
-    return(mergeBranch2)
-  }
-  
+
+
+    if(cond == "no_cond") {
+      return(mergeBranch2)
+    }
+
     lmb <- length(mergeBranch2)
     d <- length(lambdas)
     if (is.list(lambdas)) {

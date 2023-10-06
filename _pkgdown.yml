@@ -1,0 +1,17 @@
+url: https://rsetienne.github.io/secsse/
+template:
+  bootstrap: 5
+
+resource_files:
+  - man/figures/Codecov.png
+  - man/figures/github_actions_logo.png
+
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - starting_secsse
+  - plotting_states
+  - sim_with_secsse
+  - complete_tree
+  - secsse_performance
