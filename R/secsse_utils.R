@@ -700,6 +700,9 @@ condition <- function(cond,
                       weight_states,
                       lambdas,
                       nodeM) {
+    if(cond == "no_cond") {
+      return(mergeBranch2)
+    }
     lmb <- length(mergeBranch2)
     d <- length(lambdas)
     if (is.list(lambdas)) {

@@ -125,18 +125,20 @@ secsse_sim <- function(lambdas,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
+                small = res$tracker[6],
                 size_hist = out_hist))
   }
 
   if (sum(res$tracker) >= max_tries) {
     warning("Couldn't simulate a tree in enough tries,
             try increasing max_tries")
-
+    
     return(list(phy = "ds",
                 traits = 0,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
+                small = res$tracker[6],
                 size_hist = out_hist))
   }
 
@@ -183,8 +185,7 @@ secsse_sim <- function(lambdas,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
-                event_counter = res$event_counter,
-                extinct_draw = res$extinct_draw,
+                small = res$tracker[6],
                 size_hist = out_hist))
   } else {
     warning("simulation did not meet minimal requirements")
@@ -193,8 +194,7 @@ secsse_sim <- function(lambdas,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
-                event_counter = res$event_counter,
-                extinct_draw = res$extinct_draw,
+                small = res$tracker[6],
                 size_hist = out_hist))
   }
 }
