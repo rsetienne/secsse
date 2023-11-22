@@ -34,6 +34,7 @@ Imports:
     ape,
     geiger,
     Rcpp,
+    paleotree,
     RcppParallel
 Suggests: diversitree,
  phytools,

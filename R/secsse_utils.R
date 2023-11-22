@@ -356,13 +356,21 @@ calc_mus <- function(is_complete_tree,
                      idparsfix,
                      parsfix,
                      idparsopt,
-                     initparsopt) {
+                     initparsopt,
+                     critical_t = NULL) {
     mus <- NULL
     if (is_complete_tree) {
-        mus <- rep(NA, length(idparslist[[2]]))
-        for (i in seq_along(idparslist[[2]])) {
-            mus[i] <- c(parsfix[which(idparsfix == idparslist[[2]][i])], initparsopt[which(idparsopt == idparslist[[2]][i])])
+      mus <- list()
+        mus_early <- rep(NA, length(idparslist[[1]][[2]]))
+        for (i in seq_along(idparslist[[1]][[2]])) {
+          mus_early[i] <- c(parsfix[which(idparsfix == idparslist[[1]][[2]][i])], initparsopt[which(idparsopt == idparslist[[1]][[2]][i])])
         }
+        mus_late <- rep(NA, length(idparslist[[2]][[2]]))
+        for (i in seq_along(idparslist[[2]][[2]])) {
+          mus_late[i] <- c(parsfix[which(idparsfix == idparslist[[2]][[2]][i])], initparsopt[which(idparsopt == idparslist[[2]][[2]][i])])
+        }
+        mus[[1]] <- mus_early
+        mus[[2]] <- mus_late
     }
     return(mus)
 }

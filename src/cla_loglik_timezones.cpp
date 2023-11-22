@@ -348,7 +348,7 @@ double calc_ll_cla_timezones_break(const Rcpp::List& params,
   return loglik;
 }
 
-
+//' @export
 // [[Rcpp::export]]
 Rcpp::List cla_calThruNodes_timezones_cpp(const Rcpp::NumericVector& ances,
                                           const Rcpp::NumericMatrix& states_R,
@@ -372,9 +372,9 @@ Rcpp::List cla_calThruNodes_timezones_cpp(const Rcpp::NumericVector& ances,
     std::vector<double> node_heights = make_node_heights(node_heights_R);
   
     double loglik = 0.0;
-    if (is_complete_tree) {
-      Rcpp::stop("complete tree conditioning is not available with timezones");
-    } else {
+    //if (is_complete_tree) {
+   //   Rcpp::stop("complete tree conditioning is not available with timezones");
+  //  } else {
       loglik = calc_ll_cla_timezones_break(params,
                                            std::vector<double>(crit_t.begin(), crit_t.end()),
                                            std::vector<int>(ances.begin(), ances.end()),
@@ -384,7 +384,7 @@ Rcpp::List cla_calThruNodes_timezones_cpp(const Rcpp::NumericVector& ances,
                                            mergeBranch,
                                            nodeM,
                                            method, atol, rtol);
-    }
+   // }
     
     NumericMatrix states_out;
     vector_to_numericmatrix(states, states_out);

@@ -13,6 +13,7 @@ calc_cla_ll_threaded <- function(ances, states_R, forTime_R, lambdas_R, mus_R, Q
     .Call(`_secsse_calc_cla_ll_threaded`, ances, states_R, forTime_R, lambdas_R, mus_R, Q, num_threads, method, is_complete_tree)
 }
 
+#' @export
 cla_calThruNodes_timezones_cpp <- function(ances, states_R, forTime_R, params, crit_t, node_heights_R, method, atol, rtol, is_complete_tree) {
     .Call(`_secsse_cla_calThruNodes_timezones_cpp`, ances, states_R, forTime_R, params, crit_t, node_heights_R, method, atol, rtol, is_complete_tree)
 }

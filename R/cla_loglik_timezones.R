@@ -101,7 +101,8 @@ cla_secsse_loglik_timezones <- function(parameter,
                                                         "odeint::bulirsch_stoer",
                                                         "odeint::runge_kutta_fehlberg78"),
                                         atol = 1e-16,
-                                        rtol = 1e-16) {
+                                        rtol = 1e-16,
+                                        mus = NULL) {
   
   critical_t <- c(critical_t, 1e200)
   
@@ -112,8 +113,12 @@ cla_secsse_loglik_timezones <- function(parameter,
   for (i in 1:length(parameter)) {
     parameter[[i]][[3]][is.na(parameter[[i]][[3]])] <- 0
   }
-  
-  mus1 <- parameter[[1]][[2]]
+
+  if(is_complete_tree){
+    mus1 <- mus
+  } else{
+      mus1 <- parameter[[1]][[2]]
+  }
   
   if (is.null(setting_calculation)) {
     check_input(traits,
@@ -126,7 +131,8 @@ cla_secsse_loglik_timezones <- function(parameter,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus1)
+                                                 mus1,
+                                                 critical_t = critical_t[1])
   }
   
   states <- setting_calculation$states
@@ -137,7 +143,8 @@ cla_secsse_loglik_timezones <- function(parameter,
                            num_concealed_states = num_concealed_states,
                            sampling_fraction = sampling_fraction,
                            is_complete_tree = is_complete_tree,
-                           mus = mus1)
+                           mus = mus1,
+                           critical_t = critical_t[1])
   }
   
   forTime <- setting_calculation$forTime  # nolint
@@ -186,7 +193,7 @@ cla_secsse_loglik_timezones <- function(parameter,
   ## At the root
   mergeBranch2 <- mergeBranch # nolint
   lambdas1 <- parameter[[ length(parameter) ]][[1]]
-  
+  Q <- parameter[[ length(parameter) ]][[3]]
   lmb <- length(mergeBranch2)
   if (is.numeric(root_state_weight)) {
     weightStates <- rep(root_state_weight / num_concealed_states, # nolint
@@ -219,7 +226,18 @@ cla_secsse_loglik_timezones <- function(parameter,
   }
   
   if (is_complete_tree) {
-    warning("no conditioning available with timezones for complete trees")
+    timeInte <- max(abs(ape::branching.times(phy))) # nolint
+    y <- rep(0, lmb)
+    
+    nodeM <- ct_condition_cla(y, # nolint
+                              timeInte,
+                              lambdas1,
+                              mus[[length(parameter)]],
+                              Q,
+                              "odeint::bulirsch_stoer",
+                              1e-16,
+                              1e-12)
+    nodeM <- c(nodeM, y) # nolint
   }
   
   if (cond == "proper_cond") {

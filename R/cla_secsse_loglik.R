@@ -112,7 +112,8 @@ cla_secsse_loglik <- function(parameter,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus)
+                                                 mus,
+                                                 critical_t = NULL)
   }
 
   states <- setting_calculation$states
@@ -123,7 +124,8 @@ cla_secsse_loglik <- function(parameter,
                            num_concealed_states = num_concealed_states,
                            sampling_fraction = sampling_fraction,
                            is_complete_tree = is_complete_tree,
-                           mus = mus)
+                           mus = mus,
+                           critical_t = NULL)
   }
   
   forTime <- setting_calculation$forTime  # nolint

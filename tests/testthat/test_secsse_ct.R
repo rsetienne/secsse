@@ -83,7 +83,8 @@ test_that("the loglik for the complete tree", {
                                       root_state_weight = root_state_weight,
                                       sampling_fraction = sampling_fraction,
                                       is_complete_tree = TRUE))
-  testthat::expect_equal(loglik5, -312.7751, tolerance = 1E-4) # TJ: hardcoded modified LL
+  testthat::expect_equal(loglik5, -303.4003,, tolerance = 1E-4) # TJ: hardcoded modified LL
+  # the LL -303.4003 is taken from test_secsse_cla_ct.R from master branch on November 22nd 2023.
   
   lambdas <- list()
   for (i in 1:4) {

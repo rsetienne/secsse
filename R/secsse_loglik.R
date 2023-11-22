@@ -91,7 +91,8 @@ secsse_loglik <- function(parameter,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus)
+                                                 mus,
+                                                 critical_t = NULL)
   }
   
   states <- setting_calculation$states
@@ -135,7 +136,7 @@ secsse_loglik <- function(parameter,
                                method,
                                is_complete_tree)
   } else {
-     ancescpp <- ances - 1
+    ancescpp <- ances - 1
     forTimecpp <- forTime
     forTimecpp[, c(1, 2)] <- forTimecpp[, c(1, 2)] - 1
     
@@ -181,7 +182,7 @@ secsse_loglik <- function(parameter,
     if (root_state_weight == "proper_weights") {
       weightStates <- (mergeBranch2 / 
                          (lambdas * (1 - nodeM[1:d]) ^ 2)) / 
-                          sum((mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)))
+        sum((mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)))
     }
     
     if (root_state_weight == "equal_weights") {
@@ -211,7 +212,7 @@ secsse_loglik <- function(parameter,
   if (cond == "proper_cond") {
     mergeBranch2 <- mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)
   }
-
+  
   
   wholeLike <- sum((mergeBranch2) * (weightStates))
   LL <- log(wholeLike) + loglik - penalty(pars = parameter,
@@ -242,8 +243,8 @@ check_input <- function(traits,
     }
   } else {
     if (any(root_state_weight == "maddison_weights" |
-           root_state_weight == "equal_weights" |
-           root_state_weight == "proper_weights") == FALSE) {
+            root_state_weight == "equal_weights" |
+            root_state_weight == "proper_weights") == FALSE) {
       stop("The root_state_weight must be any of maddison_weights, equal_weights, or proper_weights.")
     }
   }
@@ -290,7 +291,10 @@ build_states <- function(phy,
                          num_concealed_states,
                          sampling_fraction,
                          is_complete_tree = FALSE,
-                         mus = NULL) {
+                         mus = NULL,
+                         critical_t = NULL) {
+
+        
   if (!is.matrix(traits)) {
     traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
   }
@@ -327,17 +331,55 @@ build_states <- function(phy,
       tipSampling <- 1 * sampling_fraction
       states[which(usetraits == traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
     }
-    if (is_complete_tree) {
-      extinct_species <- geiger::is.extinct(phy)
+    
+    
+    
+    if (is_complete_tree) { # LHA, using critical point
+      
+      
+      
+      if(!is.null(critical_t)){
+              extinct_species <- geiger::is.extinct(phy)
+      suppressMessages({age_all_tips <- paleotree::dateNodes(phy)}) 
+      # the suppressed message reads: "Root age not given; treating tree as if latest tip was at modern day (time = 0)"
+      # so it is safe to suppress. 
       if (!is.null(extinct_species)) {
         for (i in seq_along(extinct_species)) {
-          states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <- 
-            mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+          
+          this_node <- which(phy$tip.label == extinct_species[i])
+          age_this_extinct_tip <- age_all_tips[which(as.numeric(names(age_all_tips)) == this_node)]
+          
+          if(age_this_extinct_tip > critical_t){
+            states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <- 
+              mus[[1]] * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+          } else {
+            states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <- 
+              mus[[2]] * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+          }
+          
         }
       }
       for (iii in 1:nb_tip) {
         states[iii,1:d] <- 0
       }
+      
+      } else {
+        extinct_species <- geiger::is.extinct(phy)
+        if (!is.null(extinct_species)) {
+          for (i in seq_along(extinct_species)) {
+            states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <- 
+              mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+          }
+        }
+        for (iii in 1:nb_tip) {
+          states[iii,1:d] <- 0
+        }
+      }
+
+      
+      
+      
+      
     } else {
       for (iii in 1:nb_tip) {
         states[iii,1:d] <- rep(1 - sampling_fraction, num_concealed_states)
@@ -352,35 +394,44 @@ build_initStates_time <- function(phy,
                                   num_concealed_states,
                                   sampling_fraction,
                                   is_complete_tree = FALSE,
-                                  mus = NULL){ 
+                                  mus = NULL,
+                                  critical_t = NULL){ 
+
   states <- build_states(phy, 
                          traits,
                          num_concealed_states,
                          sampling_fraction,
-                         is_complete_tree,
-                         mus)
+                         is_complete_tree = is_complete_tree,
+                         mus = mus,
+                         critical_t = critical_t)
   phy$node.label <- NULL
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
-  forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
-  forTime[,1:2] <- phy$edge
   
-  for (ab in seq_along(ances)) {
-    focalTime <- ances[ab]
-    desRows <- which(phy$edge[, 1] == focalTime)
-    desNodes <- phy$edge[desRows, 2]
-    rootward_age <- split_times[which(names(split_times) == focalTime)]
-    for (desIndex in 1:2) {
-      ## to Find the time which the integration will be done in
-      if (any(desNodes[desIndex] == names(split_times))) {
-        tipward_age <- split_times[which(names(split_times) == desNodes[desIndex])]
-        timeInterv <- c(tipward_age, rootward_age)
-      } else {
-        timeInterv <- c(0, rootward_age)
-      }  
-      forTime[which(forTime[,2] == desNodes[desIndex]),3] <- timeInterv[2] - timeInterv[1]
+  
+  if(is_complete_tree){ # LHA
+    forTime <- cbind(phy$edge, phy$edge.length)
+  } else {
+    forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
+    forTime[,1:2] <- phy$edge
+    for (ab in seq_along(ances)) {
+      focalTime <- ances[ab]
+      desRows <- which(phy$edge[, 1] == focalTime)
+      desNodes <- phy$edge[desRows, 2]
+      rootward_age <- split_times[which(names(split_times) == focalTime)]
+      for (desIndex in 1:2) {
+        ## to Find the time which the integration will be done in
+        if (any(desNodes[desIndex] == names(split_times))) {
+          tipward_age <- split_times[which(names(split_times) == desNodes[desIndex])]
+          timeInterv <- c(tipward_age, rootward_age)
+        } else {
+          timeInterv <- c(0, rootward_age)
+        }  
+        forTime[which(forTime[,2] == desNodes[desIndex]),3] <- timeInterv[2] - timeInterv[1]
+      }
     }
   }
+  
   return(list(
     states = states,
     ances = ances,

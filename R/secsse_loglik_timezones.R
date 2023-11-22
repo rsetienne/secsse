@@ -95,12 +95,21 @@ secsse_loglik_timezones <- function(parameter,
                 root_state_weight,
                 is_complete_tree)
     mus1 <- parameter[[1]][[2]]
+    mus_when_complete_tree <- calc_mus(is_complete_tree,
+                    idparslist,
+                    idparsfix,
+                    parsfix,
+                    idparsopt,
+                    initparsopt,
+                    critical_t = critical_t)
+    
     setting_calculation <- build_initStates_time(phy,
                                                  traits,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
-                                                 mus1)
+                                                 mus_when_complete_tree,
+                                                 critical_t=critical_t[1])
   }
   
   states <- setting_calculation$states

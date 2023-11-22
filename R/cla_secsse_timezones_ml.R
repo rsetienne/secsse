@@ -175,14 +175,14 @@ cla_secsse_timezones_ml <- function(phy,
   trparsfix <- parsfix/(1 + parsfix)
   trparsfix[which(parsfix == Inf)] <- 1
   
-  mus <- calc_mus(is_complete_tree,
-                  idparslist[[1]],
+  mus <- calc_mus(is_complete_tree = is_complete_tree,
+                  idparslist,
                   idparsfix,
                   parsfix,
                   idparsopt,
-                  initparsopt)
-  
-  
+                  initparsopt,
+                  critical_t = critical_t)
+
   optimpars <- c(tol, maxiter)
   
   setting_calculation <- build_initStates_time(phy, 
@@ -190,7 +190,8 @@ cla_secsse_timezones_ml <- function(phy,
                                                num_concealed_states,
                                                sampling_fraction,
                                                is_complete_tree, 
-                                               mus)
+                                               mus = mus,
+                                               critical_t=critical_t)
   
   initloglik <- secsse_loglik_choosepar_timezones(trparsopt = trparsopt,
                                                   trparsfix = trparsfix,
@@ -213,7 +214,8 @@ cla_secsse_timezones_ml <- function(phy,
                                                   num_threads = num_threads,
                                                   atol = atol,
                                                   rtol = rtol,
-                                                  method = method)
+                                                  method = method,
+                                                  mus = mus)
   cat("The loglikelihood for the initial parameter values is", initloglik, "\n")
   if (initloglik == -Inf) {
     stop("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.")
@@ -245,7 +247,8 @@ cla_secsse_timezones_ml <- function(phy,
                           num_threads = num_threads,
                           atol = atol,
                           rtol = rtol,
-                          method = method)
+                          method = method,
+                          mus = mus)
     if (out$conv != 0) {
       stop("Optimization has not converged. Try again with different initial values.\n")
     } else {
@@ -284,7 +287,8 @@ secsse_loglik_choosepar_timezones <- function(trparsopt,
                                               num_threads = num_threads,
                                               atol = atol,
                                               rtol = rtol,
-                                              method = method) {
+                                              method = method,
+                                              mus = mus) {
   alltrpars <- c(trparsopt, trparsfix)
   if (max(alltrpars) > 1 | min(alltrpars) < 0) {
     loglik <- -Inf
@@ -298,7 +302,7 @@ secsse_loglik_choosepar_timezones <- function(trparsopt,
     
     if (is.list(pars1[[1]][[1]])) {
       # is the cla_ used?
-      loglik <- cla_secsse_loglik_timezones(parameter = pars1,
+        loglik <- cla_secsse_loglik_timezones(parameter = pars1,
                                             phy = phy,
                                             traits = traits,
                                             num_concealed_states = num_concealed_states,
@@ -313,7 +317,8 @@ secsse_loglik_choosepar_timezones <- function(trparsopt,
                                             num_threads = num_threads,
                                             atol = atol,
                                             rtol = rtol,
-                                            method = method)
+                                            method = method,
+                                            mus = mus)
     } else {
       loglik <- secsse_loglik_timezones(parameter = pars1,
                                         phy = phy,
