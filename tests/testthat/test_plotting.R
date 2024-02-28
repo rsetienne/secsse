@@ -14,7 +14,7 @@ test_that("normal plotting", {
    helper_function <- function(x) {
      return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
    }
-  testthat::expect_silent(
+  testthat::expect_message(
    px <- plot_state_exact(parameters = params,
                     phy = phy,
                     traits = traits,
@@ -57,6 +57,7 @@ test_that("cla plotting", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
+  testthat::expect_message(
   testthat::expect_warning(
     model_R <- cla_secsse_ml(
       phylotree,
@@ -75,13 +76,13 @@ test_that("cla plotting", {
       optimmethod,
       num_cycles = 1,
       verbose = FALSE)
-  )
+  ))
 
   helper_function <- function(x) {
     return(sum(x[c(10, 13, 16)]) / sum(x))
   }
 
-  testthat::expect_silent(
+  testthat::expect_message(
     px <- secsse::plot_state_exact(parameters = model_R$MLpars,
                                    phy = phylotree,
                                    traits = traits,

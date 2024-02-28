@@ -35,7 +35,10 @@ master_loglik <- function(parameter,
                                                  sampling_fraction,
                                                  is_complete_tree,
                                                  mus,
-                                                 num_modeled_traits)
+                                                 num_modeled_traits,
+                                                 traitStates = 
+                                                   get_trait_states(parameter,
+                                                                    num_concealed_states))
   } 
   
   states <- setting_calculation$states
@@ -53,7 +56,10 @@ master_loglik <- function(parameter,
                            sampling_fraction = sampling_fraction,
                            is_complete_tree = is_complete_tree,
                            mus = mus,
-                           num_unique_traits = num_modeled_traits)
+                           num_unique_traits = num_modeled_traits,
+                           traitStates = 
+                             get_trait_states(parameter,
+                                              num_concealed_states))
   }
 
   RcppParallel::setThreadOptions(numThreads = num_threads)

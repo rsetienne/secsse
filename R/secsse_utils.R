@@ -836,7 +836,8 @@ build_states <- function(phy,
                          is_complete_tree = FALSE,
                          mus = NULL,
                          num_unique_traits = NULL,
-                         first_time = FALSE) {
+                         first_time = FALSE,
+                         traitStates = NULL) {
     if (!is.matrix(traits)) {
         traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
     }
@@ -844,11 +845,12 @@ build_states <- function(phy,
     if (length(phy$tip.label) != nrow(traits)) {
      stop("Number of species in the tree must be the same as in the trait file")
     }
+  
     # if there are traits that are not in the observed tree,
     # the user passes these themselves.
     # yes, this is a weird use-case
 
-    traitStates <- sort(unique(traits[, 1]))
+    if (is.null(traitStates)) traitStates <- sort(unique(traits[, 1]))
 
     if (!is.null(num_unique_traits)) {
         if (num_unique_traits > length(traitStates)) {
@@ -857,6 +859,12 @@ build_states <- function(phy,
             traitStates <- 1:num_unique_traits
         }
     }
+    
+    obs_traits <- unique(traits[, 1])
+    if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
+      stop("Tip traits are not in idparslist")
+    }
+    
 
     nb_tip <- ape::Ntip(phy)
     nb_node <- phy$Nnode
@@ -894,7 +902,8 @@ build_initStates_time <- function(phy,
                                   is_complete_tree = FALSE,
                                   mus = NULL,
                                   num_unique_traits = NULL,
-                                  first_time = FALSE) {
+                                  first_time = FALSE,
+                                  traitStates = NULL) {
     states <- build_states(phy,
                            traits,
                            num_concealed_states,
@@ -902,7 +911,8 @@ build_initStates_time <- function(phy,
                            is_complete_tree,
                            mus,
                            num_unique_traits,
-                           first_time)
+                           first_time,
+                           traitStates)
     phy$node.label <- NULL
     split_times <- sort(event_times(phy), decreasing = FALSE)
     ances <- as.numeric(names(split_times))
@@ -1123,4 +1133,31 @@ check_ml_conditions <- function(traits,
   if (min(initparsopt) <= 0.0) {
     stop("All elements in init_parsopt need to be larger than 0")
   }
+}
+
+#' @keywords internal
+get_trait_states <- function(idparslist,
+                             num_concealed_states) {
+  if (is.null(names(idparslist[[2]]))) return(NULL)
+
+  # by convention, hidden states are appended A,B,C letters
+  num_traits <- length(idparslist[[2]]) / num_concealed_states
+  focal_names <- names(idparslist[[2]])[1:num_traits]
+  
+  output <- "Deduced names and order of used states to be: "
+  
+  for (i in seq_along(focal_names)) {
+    focal_names[i] <- substr(focal_names[i], 1, nchar(focal_names[i]) - 1)
+    if (i != length(focal_names)) {
+      output <- paste0(output, focal_names[i], ", ")
+    } else {
+      output <- paste0(output, focal_names[i])
+    }
+  }
+  
+  message(output)
+  message("if this is incorrect, consider passing states as matching numeric 
+ordering, e.g. 1 for the first state, 2 for the second etc.")
+  
+  return(focal_names)
 }
