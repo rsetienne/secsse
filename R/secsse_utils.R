@@ -861,6 +861,7 @@ build_states <- function(phy,
     }
     
     obs_traits <- unique(traits[, 1])
+    obs_traits <- obs_traits[!is.na(obs_traits)]
     if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
       stop("Tip traits are not in idparslist")
     }
