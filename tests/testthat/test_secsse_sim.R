@@ -203,4 +203,109 @@ test_that("test secsse_sim pool_init_states and complete tree", {
   }
   testthat::expect_gt(length(focal_tree$size_hist), 0)
 })
+
+
+test_that("test trait shift", {
+  states <- c("S", "G")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 2,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 2,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 5)
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 6))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 2,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = TRUE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  spec_S <- 0
+  spec_G <- 0
+  ext_S <- ext_G <- 0.0
+  q_SG <- 1.0
+  q_GS <- 0
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  
+  crown_age_used <- 5
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
+  
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 pool_init_states = c("S"))
+
+  testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 0)
+})
+
+test_that("test mutate away shift", {
+  states <- c("S", "G", "D")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  spec_matrix <- rbind(spec_matrix, c("D", "S", "G", 3))
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 3,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 3,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 7)
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 8))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 3,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = FALSE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  used_params <- rep(0, 8)
+  
+  used_params[3] <- 1 # spec_D
+  
+  crown_age_used <- 5
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
+  
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 pool_init_states = c("D"))
+  
+  testthat::expect_true(length(sim_tree$phy$tip.label) == 4)
+  
+  testthat::expect_true(length(which(sim_tree$obs_traits == "D")) == 0)
+  testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 2)
+  testthat::expect_true(length(which(sim_tree$obs_traits == "G")) == 2)
+})
                       

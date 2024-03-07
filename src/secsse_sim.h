@@ -48,6 +48,10 @@ struct ltab_species {
     return(data_[trait_val]);
   }
 
+  void set_trait(double new_val) {
+    data_[trait_val] = new_val;
+  }
+
   void set_death(double d) {
     data_[extinct_time] = d;
   }
@@ -304,10 +308,13 @@ struct secsse_sim {
 
     pop.clear();
    
-    auto crown_states = root_speciation(init_state);
+    //auto crown_states = root_speciation(init_state);
 
-    pop.add(species(std::get<0>(crown_states), -1, trait_info));
-    pop.add(species(std::get<1>(crown_states),  2, trait_info));
+    //pop.add(species(std::get<0>(crown_states), -1, trait_info));
+    //pop.add(species(std::get<1>(crown_states),  2, trait_info));
+
+    pop.add(species(init_state, -1, trait_info));
+    pop.add(species(init_state,  2, trait_info));
 
     track_crowns = {1, 1};
 
@@ -399,8 +406,17 @@ struct secsse_sim {
 
     pop.change_trait(mother, trait_to_parent, trait_info);
 
+    auto spec_id = pop.get_id(mother);
+    for (auto& i : L.data_) {
+      if (std::abs(i.get_id()) == std::abs(spec_id)) {
+        i.set_trait(trait_to_parent);
+        break;
+      }
+    }
+
+
     int new_id = static_cast<int>(L.data_.size()) + 1;
-    if (pop.get_id(mother) < 0) {
+    if (spec_id < 0) {
       track_crowns[0]++;
       new_id *= -1;
     } else {
@@ -445,6 +461,15 @@ struct secsse_sim {
 
     size_t shift_to = qs_dist[trait_chosen_species](rndgen_);
     pop.change_trait(index_chosen_species, shift_to, trait_info);
+
+    auto shift_id = pop.get_id(index_chosen_species);
+    for (auto& i : L.data_) {
+      if (std::abs(i.get_id()) == std::abs(shift_id)) {
+          i.set_trait(shift_to);
+          break;
+      }
+    }
+
     return;
   }
 
