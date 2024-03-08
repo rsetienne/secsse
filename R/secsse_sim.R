@@ -36,6 +36,7 @@ secsse_sim <- function(lambdas,
                        verbose = FALSE,
                        max_tries = 1e6,
                        drop_extinct = TRUE,
+                       start_at_crown = TRUE,
                        seed = NULL) {
 
   if (is.matrix(lambdas)) {
@@ -111,7 +112,8 @@ secsse_sim <- function(lambdas,
                         max_tries,
                         seed,
                         condition_vec,
-                        tree_size_hist)
+                        tree_size_hist,
+                        start_at_crown)
 
   Ltable        <- res$ltable
   

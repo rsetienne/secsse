@@ -7,7 +7,7 @@
 
 
 #include <Rcpp.h>
-#include "secsse_sim.h"   // NOLINT [build/include_subdir]
+#include "secsse_sim2.h"   // NOLINT [build/include_subdir]
 #include <string>
 #include <algorithm>
 #include <numeric>
@@ -80,7 +80,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           int max_tries,
                           int seed,
                           const std::vector<double>& conditioning_vec,
-                          bool return_tree_size_hist) {
+                          bool return_tree_size_hist,
+                          bool start_at_crown) {
   num_mat q;
   util::numericmatrix_to_vector(q_R, &q);
   
@@ -94,7 +95,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  max_species_extant,
                  init_states,
                  non_extinction,
-                 seed);
+                 seed,
+                 start_at_crown);
   std::array<double, 6> tracker = {0, 0, 0, 0, 0, 0};
   std::vector<int> tree_size_hist;
   if (return_tree_size_hist) tree_size_hist = std::vector<int>(max_tries, -1);

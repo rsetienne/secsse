@@ -285,6 +285,11 @@ the reconstructed tree (if TRUE) or in the complete tree (if FALSE).}
 conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
 simplex is implemented natively in \link{DDD}, while subplex is ultimately
 called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
+
+\item{start_at_crown}{if FALSE, the simulation starts with one species
+instead of two, and resulting crown age will be lower than the set
+crown age. However, this facilitates comparison with BiSSE and facilitates
+implementing speciation effects at the crown.}
 }
 \value{
 Nothing
