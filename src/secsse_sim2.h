@@ -372,7 +372,7 @@ struct secsse_sim {
       if (i.indices.empty()) num_empty++;
     }
     if (num_empty == lambda_distributions.size()) {
-      throw "all speciation rates are zero - this makes it impossible to create a crown from a root state, \nplease set one rate to a very low non-zero rate";
+      Rcpp::stop("all speciation rates are zero - this makes it impossible to create a crown from a root state, \nplease set one rate to a very low non-zero rate");
     }
 
     // calculate if the other crown lineage is the same trait:
