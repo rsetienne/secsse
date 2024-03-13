@@ -82,6 +82,9 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           const std::vector<double>& conditioning_vec,
                           bool return_tree_size_hist,
                           bool start_at_crown) {
+  
+  try {
+  
   num_mat q;
   util::numericmatrix_to_vector(q_R, &q);
   
@@ -150,5 +153,14 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                                          Rcpp::Named("initial_state") = init,
                                          Rcpp::Named("tracker") = tracker,
                                          Rcpp::Named("hist_tree_size") = tree_size_hist);
-  return output;
+  return output; 
+  
+  } catch(std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (const char* msg) {
+    Rcpp::Rcout << msg << std::endl;
+  } catch(...) {
+    ::Rf_error("c++ exception (unknown reason)");
+  }
+  return NA_REAL;
 }

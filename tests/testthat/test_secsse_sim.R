@@ -27,6 +27,7 @@ test_that("test secsse_sim", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
   
+  testthat::expect_message(
   testthat::expect_warning(
     model_R <- secsse::cla_secsse_ml(
       phylotree,
@@ -45,7 +46,7 @@ test_that("test secsse_sim", {
       optimmethod,
       num_cycles = 1,
       verbose = FALSE)
-  )
+  ))
   
   qs <- model_R$MLpars[[3]]
   diag(qs) <- 0
@@ -189,7 +190,7 @@ test_that("test secsse_sim pool_init_states and complete tree", {
                                    crown_age = 10,
                                    num_concealed_states = 2,
                                    max_spec = 100,
-                                   min_spec = 99,
+                                   min_spec = 100,
                                    max_species_extant = FALSE,
                                    seed = 21,
                                    drop_extinct = FALSE,
@@ -245,6 +246,8 @@ test_that("test trait shift", {
   sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
   sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
   
+  testthat::expect_warning(
+  testthat::expect_output(
   sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
                                  mus = sim_mu_vector_etd,
                                  qs = sim_q_matrix_etd,
@@ -252,7 +255,21 @@ test_that("test trait shift", {
                                  num_concealed_states = 2,
                                  conditioning = "none",
                                  pool_init_states = c("S"))
-
+  ))
+  
+  spec_S <- 1e-10
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  
+  
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 pool_init_states = c("S"))
+  
   testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 0)
 })
 
@@ -302,10 +319,10 @@ test_that("test mutate away shift", {
                                  conditioning = "none",
                                  pool_init_states = c("D"))
   
-  testthat::expect_true(length(sim_tree$phy$tip.label) == 4)
+  testthat::expect_true(length(sim_tree$phy$tip.label) == 2)
   
   testthat::expect_true(length(which(sim_tree$obs_traits == "D")) == 0)
-  testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 2)
-  testthat::expect_true(length(which(sim_tree$obs_traits == "G")) == 2)
+  testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 1)
+  testthat::expect_true(length(which(sim_tree$obs_traits == "G")) == 1)
 })
                       

@@ -366,6 +366,15 @@ struct secsse_sim {
   }
 
   std::tuple<int, int> root_speciation(int root_state) {
+    // check of rates:
+    size_t num_empty = 0;
+    for (const auto& i : lambda_distributions) {
+      if (i.indices.empty()) num_empty++;
+    }
+    if (num_empty == lambda_distributions.size()) {
+      throw "all speciation rates are zero - this makes it impossible to create a crown from a root state, \nplease set one rate to a very low non-zero rate";
+    }
+
     // calculate if the other crown lineage is the same trait:
     auto mother_trait = root_state;
 
