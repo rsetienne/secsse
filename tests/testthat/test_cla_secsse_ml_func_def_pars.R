@@ -37,12 +37,12 @@ test_that("multiplication works", {
   }
   
   tol = c(1e-02, 1e-03, 1e-04)
-  maxiter = 1000 * round((1.25)^length(idparsopt))
+  maxiter = 100 * round((1.25)^length(idparsopt))
   optimmethod = 'subplex'
   cond <- 'proper_cond'
   root_state_weight <- 'proper_weights'
-  sampling_fraction <- c(1,1,1)
-  model <- expect_warning(cla_secsse_ml_func_def_pars(
+  sampling_fraction <- c(1, 1, 1)
+  model <- expect_message(expect_warning(cla_secsse_ml_func_def_pars(
     phylotree,
     traits,
     num_concealed_states,
@@ -63,7 +63,7 @@ test_that("multiplication works", {
     optimmethod,
     num_cycles = 1,
     verbose = 0
-  ))
+  )))
   
   expect_equal(model$ML, -136.5926599)
   expect_length(model, 3)

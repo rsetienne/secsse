@@ -247,15 +247,17 @@ test_that("test trait shift", {
   sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
   
   testthat::expect_warning(
-  testthat::expect_output(
-  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
-                                 mus = sim_mu_vector_etd,
-                                 qs = sim_q_matrix_etd,
-                                 crown_age = crown_age_used,
-                                 num_concealed_states = 2,
-                                 conditioning = "none",
-                                 pool_init_states = c("S"))
-  ))
+    testthat::expect_output(
+      sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                      mus = sim_mu_vector_etd,
+                                      qs = sim_q_matrix_etd,
+                                      crown_age = crown_age_used,
+                                      num_concealed_states = 2,
+                                      conditioning = "none",
+                                      pool_init_states = c("S"))
+    )
+  )
+
   
   spec_S <- 1e-10
   used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
