@@ -115,6 +115,11 @@ secsse_sim <- function(lambdas,
                         tree_size_hist,
                         start_at_crown)
 
+  if (length(res) < 1) { # this happens upon a throw
+    return(list(phy = "ds",
+                traits = 0))
+  }
+  
   Ltable        <- res$ltable
   
   out_hist <- 0
