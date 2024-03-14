@@ -280,35 +280,40 @@ struct secsse_sim {
   }
 
   void evolve_until_crown() {
-      update_rates();
-      double dt = draw_dt();
-      t += dt;
-      event_type event = draw_event();
-      switch (event) {
-        case shift: {
-            event_traitshift();
-            break;
-        }
-        case extinction: {
-           event_extinction();
-           break; 
-        }
-        case speciation: {
-            size_t mother = 0;
-    
-            auto mother_trait = L[mother].get_trait();
+      while(L.size() < 2) {
+        
+        update_rates();
+        double dt = draw_dt();
+        t += dt;
+        event_type event = draw_event();
+        switch (event) {
+          case shift: {
+              event_traitshift();
+              break;
+          }
+          case extinction: {
+            event_extinction();
+            break; 
+          }
+          case speciation: {
+              size_t mother = 0;
+      
+              auto mother_trait = L[mother].get_trait();
 
-            auto pick_speciation_cell = pick_speciation_id(mother_trait);
-            auto trait_to_parent      = calc_y(pick_speciation_cell);
-            auto trait_to_daughter    = calc_x(pick_speciation_cell);
+              auto pick_speciation_cell = pick_speciation_id(mother_trait);
+              auto trait_to_parent      = calc_y(pick_speciation_cell);
+              auto trait_to_daughter    = calc_x(pick_speciation_cell);
 
-            L[mother].set_trait(trait_to_parent, trait_info);
+              L[mother].set_trait(trait_to_parent, trait_info);
 
-            L.emplace_back(t, L[mother].get_id(), 2, -1, trait_to_daughter, trait_info);
-            break;
+              L.emplace_back(t, L[mother].get_id(), 2, -1, trait_to_daughter, trait_info);
+              break;
+          }
+          default:
+              break;
         }
-        default:
-            break;
+
+        if (L.empty()) return;
       }
   }
 
@@ -404,6 +409,11 @@ struct secsse_sim {
     auto trait_chosen_species = L[index_chosen_species].get_trait();
 
     size_t shift_to = qs_dist[trait_chosen_species](rndgen_);
+
+    if (shift_to == 0) {
+      int a = 5;
+    }
+
     L[index_chosen_species].set_trait(shift_to, trait_info);
 
     return;
@@ -430,7 +440,7 @@ struct secsse_sim {
     // ordering of rates is:
     // {shift, speciation, extinction, max_num};
      if (r < rates[shift]) return shift;
-     if (r < rates[shift] + rates[speciation]) return speciation;
+     if (r < (rates[shift] + rates[speciation])) return speciation;
 
      return extinction;
   }
@@ -495,7 +505,7 @@ struct secsse_sim {
 
     std::uniform_int_distribution<> d(0, static_cast<int>(L.size()) - 1);
     std::uniform_real_distribution<double> r(0.0, 1.0);
-    int index;
+    size_t index = 0;
     double mult = 1.0 / getvalfrom_species(max);
     double ulim = 1.0 - 1e-9;
     while (true) {

@@ -339,7 +339,7 @@ fill_in <- function(object,
                     params) {
   if (is.list(object)) { # lambda matrix
     for (k in seq_along(object)) {
-      object[[k]] <- replace_matrix(object[[k]], params, is_lambda = TRUE)
+      object[[k]] <- replace_matrix(object[[k]], params, is_lambda = FALSE)
     }
   } else if (is.matrix(object)) {
     object <- replace_matrix(object, params)
