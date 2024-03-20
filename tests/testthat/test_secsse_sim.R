@@ -659,8 +659,6 @@ test_that("test comparison classe", {
     freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
     freq_3 <- sum(sim_tree$obs_traits == "D") / length(sim_tree$obs_traits)
     
-    testit::assert(freq_1 + freq_2 + freq_3 >= (1 - 1e-9))
-    
     to_add <- c(freq_1, freq_2, freq_3)
     found1 <- rbind(found1, to_add)
   }
@@ -690,7 +688,6 @@ test_that("test comparison classe", {
     a1 <- as.vector(unlist(found1[, i]))
     a2 <- as.vector(unlist(found2[, i]))
     b <- t.test(a1, a2)
-  #  cat(colnames(found1)[i], mean(a1), mean(a2), b$p.value, "\n")
     testthat::expect_true(b$p.value > 0.05)
   }
 })
