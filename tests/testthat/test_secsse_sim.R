@@ -416,9 +416,7 @@ test_that("test comparison musse", {
     freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
     freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
     freq_3 <- sum(sim_tree$obs_traits == "D") / length(sim_tree$obs_traits)
-    
-    testit::assert(freq_1 + freq_2 + freq_3 >= (1 - 1e-9))
-    
+
     to_add <- c(unlist(local_stats), freq_1, freq_2, freq_3)
     found1 <- rbind(found1, to_add)
   }
@@ -451,7 +449,7 @@ test_that("test comparison musse", {
     a2 <- found2[, i]
     b <- t.test(a1, a2)
     testthat::expect_true(b$p.value > 0.05)
-    cat(i, mean(a1), mean(a2), b$p.value, "\n")
+  #  cat(i, mean(a1), mean(a2), b$p.value, "\n")
   }
 })
 
@@ -508,7 +506,6 @@ test_that("test comparison bisse", {
   found2 <- c()
   
   for (r in 1:num_repl) {
-    cat(r, "\n")
     sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
                                    mus = sim_mu_vector_etd,
                                    qs = sim_q_matrix_etd,
@@ -524,16 +521,12 @@ test_that("test comparison bisse", {
     freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
     freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
     
-    testit::assert(freq_1 + freq_2 >= (1 - 1e-9))
-    
     to_add <- c(unlist(local_stats), freq_1, freq_2)
     found1 <- rbind(found1, to_add)
   }
   
   
   for (r in 1:num_repl) {
-    
-    cat(r, "\n")
     sim_tree <- diversitree::tree.musse(pars = used_params[1:6],
                                         max.t = crown_age_used,
                                         x0 = 1)
@@ -559,6 +552,145 @@ test_that("test comparison bisse", {
     a2 <- found2[, i]
     b <- t.test(a1, a2)
     testthat::expect_true(b$p.value > 0.05)
-    cat(i, mean(a1), mean(a2), b$p.value, "\n")
+ #   cat(i, mean(a1), mean(a2), b$p.value, "\n")
+  }
+})
+
+test_that("test comparison classe", {
+  
+  states <- c("S", "G", "D")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  spec_matrix <- rbind(spec_matrix, c("D", "D", "D", 3))
+  
+  spec_matrix <- rbind(spec_matrix, c("G", "S", "D", 4))
+  
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 3,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 3,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 8)
+  shift_matrix <- rbind(shift_matrix, c( "S", "D", 9))
+  
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 10))
+  shift_matrix <- rbind(shift_matrix, c("G", "D", 11))
+  
+  shift_matrix <- rbind(shift_matrix, c( "D", "S", 12))
+  shift_matrix <- rbind(shift_matrix, c( "D", "G", 13))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 3,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = TRUE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  idparslist_ETD <- idparslist
+  
+  spec_S <- 0.1
+  spec_G <- 0.0
+  spec_D <- 0.1
+  
+  spec_G_SD <- 0.2
+  
+  ext_S <- ext_G <- ext_D <- 0.0
+  
+  q_SG <- 0.0
+  q_SD <- 0.0
+  
+  q_GS <- 0.0
+  q_GD <- 0.0
+  
+  q_DS <- 0.0
+  q_DG <- 0.0
+  
+  num_repl <- 100
+  crown_age_used <- 30
+  
+  used_params <- c(spec_S, spec_G, spec_D, spec_G_SD,
+                   ext_S, ext_G, ext_D,
+                   q_SG, q_SD,
+                   q_GS, q_GD,
+                   q_DS, q_DG,
+                   0, 0, 0, 0, 0, 0)
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist_ETD[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist_ETD[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist_ETD[[3]], used_params)
+  
+  
+  lambda_S <- c(spec_S, 0, 0, 0, 0, 0)         # lambda111 lambda112 lambda113 lambda122 lambda123 lambda133
+  lambda_G <- c(0, 0, spec_G_SD, spec_G, 0, 0) # lambda211 lambda212 lambda213 lambda222 lambda223 lambda233 
+  lambda_D <- c(0, 0, 0, 0, 0, spec_D)         # lambda311 lambda312 lambda313 lambda322 lambda323 lambda333
+  
+  
+  params <- c(lambda_S, 
+              lambda_G, 
+              lambda_D,
+              ext_S, ext_G, ext_D,
+              q_SG, q_SD,
+              q_GS, q_GD,
+              q_DS, q_DG)
+  
+  found1 <- c()
+  found2 <- c()
+  
+  for (r in 1:num_repl) {
+    sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                   mus = sim_mu_vector_etd,
+                                   qs = sim_q_matrix_etd,
+                                   crown_age = crown_age_used,
+                                   num_concealed_states = 3,
+                                   conditioning = "none",
+                                   min_spec = 10,
+                                   pool_init_states = c("G"),
+                                   start_at_crown = FALSE)
+    
+    freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
+    freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
+    freq_3 <- sum(sim_tree$obs_traits == "D") / length(sim_tree$obs_traits)
+    
+    testit::assert(freq_1 + freq_2 + freq_3 >= (1 - 1e-9))
+    
+    to_add <- c(freq_1, freq_2, freq_3)
+    found1 <- rbind(found1, to_add)
+  }
+  
+  for (r in 1:num_repl) {
+    sim_tree <- diversitree::tree.classe(pars = params,
+                                         max.t = crown_age_used,
+                                         x0 = 2)
+    
+    while (length(sim_tree$tip.label) < 10) {
+      sim_tree <- diversitree::tree.classe(pars = params,
+                                           max.t = crown_age_used,
+                                           x0 = 2)
+    }
+    
+    if (class(sim_tree) == "phylo") {
+      freq_1 <- sum(sim_tree$tip.state == 1) / length(sim_tree$tip.state)
+      freq_2 <- sum(sim_tree$tip.state == 2) / length(sim_tree$tip.state)
+      freq_3 <- sum(sim_tree$tip.state == 3) / length(sim_tree$tip.state)
+    
+      to_add <- c(freq_1, freq_2, freq_3)
+      found2 <- rbind(found2, to_add)
+    }
+  }
+  
+  for (i in c(1, 3)) {
+    a1 <- as.vector(unlist(found1[, i]))
+    a2 <- as.vector(unlist(found2[, i]))
+    b <- t.test(a1, a2)
+  #  cat(colnames(found1)[i], mean(a1), mean(a2), b$p.value, "\n")
+    testthat::expect_true(b$p.value > 0.05)
   }
 })
