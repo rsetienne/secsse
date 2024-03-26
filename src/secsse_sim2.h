@@ -284,6 +284,7 @@ struct secsse_sim {
         
         update_rates();
         double dt = draw_dt();
+     //   std::cerr << dt << "\n";
         t += dt;
         event_type event = draw_event();
         switch (event) {
@@ -409,10 +410,6 @@ struct secsse_sim {
     auto trait_chosen_species = L[index_chosen_species].get_trait();
 
     size_t shift_to = qs_dist[trait_chosen_species](rndgen_);
-
-    if (shift_to == 0) {
-      int a = 5;
-    }
 
     L[index_chosen_species].set_trait(shift_to, trait_info);
 

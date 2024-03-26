@@ -1,4 +1,17 @@
-# secsse 3.0.1
+# 3.1.0
+
+Version 3.1.0 fixes a bug in the simulation code that caused trait changes
+during speciation to not be tracked appropriately. This could, for instance,
+interfere with conditioning and this bug especially impacted ClaSSE-type 
+simulations.
+
+## Minor changes
+
+-   Added explicit check of the order of states, states are no longer assumed
+to be numerically or alphabetically sorted.
+-   Added multiple additional simulation checks
+
+# 3.0.1
 
 Version 3.0.1 patches some inaccuracies in simulation functions, and
 deprecates expand_q_matrix, as this was making some incorrect

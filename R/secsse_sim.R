@@ -162,9 +162,9 @@ secsse_sim <- function(lambdas,
   speciesTraits <- 1 + Ltable[, 5]
   used_id <- abs(Ltable[, 3])
 
-  phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
-  
- 
+  #phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
+  phy <- treestats::l_to_phylo(Ltable, drop_extinct = drop_extinct)
+
   if (drop_extinct) {
     to_drop <- which(Ltable[, 4] != -1)
     if (length(to_drop) > 0) {
