@@ -50,7 +50,8 @@ Imports:
  RcppParallel,
  ggplot2,
  tibble,
- rlang
+ rlang,
+ treestats
 Suggests: 
  diversitree,
  phytools,
