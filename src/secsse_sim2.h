@@ -238,8 +238,8 @@ struct secsse_sim {
     if (crown_start) {
       //L.push_back(ltab_species(0.0, -1,  2, -1, init_state, trait_info));
       auto crown_states = root_speciation(init_state);
-      L.push_back(ltab_species(0.0, -1,  2, -1, std::get<0>(crown_states), trait_info));
-      L.push_back(ltab_species(0.0,  0, -1, -1, std::get<1>(crown_states), trait_info));
+      L.push_back(ltab_species(0.0,   0, -1, -1, std::get<0>(crown_states), trait_info));
+      L.push_back(ltab_species(0.0,  -1,  2, -1, std::get<1>(crown_states), trait_info));
       
     } else {
       L.push_back(ltab_species(0.0,  0, -1, -1, init_state, trait_info));
