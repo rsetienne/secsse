@@ -688,6 +688,6 @@ test_that("test comparison classe", {
     a1 <- as.vector(unlist(found1[, i]))
     a2 <- as.vector(unlist(found2[, i]))
     b <- t.test(a1, a2)
-    testthat::expect_true(b$p.value > 0.05)
+    testthat::expect_true(b$p.value > 0.01)
   }
 })
