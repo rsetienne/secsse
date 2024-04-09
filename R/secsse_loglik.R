@@ -285,19 +285,94 @@ check_input <- function(traits,
   }
 }
 
+#' @keywords internal
+create_states <- function(usetraits,
+                          traits,
+                          states,
+                          sampling_fraction,
+                          num_concealed_states,
+                          d,
+                          traitStates,
+                          is_complete_tree,
+                          phy,
+                          ly,
+                          mus,
+                          nb_tip) {
+  if (anyNA(usetraits)) {
+    nas <- which(is.na(traits))
+    for (iii in seq_along(nas)) {
+      states[nas[iii], ] <- c(1 - rep(sampling_fraction,
+                                      num_concealed_states),
+                              rep(sampling_fraction, num_concealed_states))
+    }
+  }
+  
+  for (iii in seq_along(traitStates)) {  # Initial state probabilities
+    StatesPresents <- d + iii
+    toPlaceOnes <- StatesPresents +
+      length(traitStates) * (0:(num_concealed_states - 1))
+    tipSampling <- 1 * sampling_fraction
+    states[which(usetraits ==
+                   traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
+  }
+  
+  if (is_complete_tree) {
+    extinct_species <- geiger::is.extinct(phy)
+    if (!is.null(extinct_species)) {
+      for (i in seq_along(extinct_species)) {
+        states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
+          mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+      }
+    }
+    for (iii in 1:nb_tip) {
+      states[iii, 1:d] <- 0
+    }
+  } else {
+    for (iii in 1:nb_tip) {
+      states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+    }
+  }
+  return(states)
+}
+
+#' @keywords internal
 build_states <- function(phy,
                          traits,
                          num_concealed_states,
                          sampling_fraction,
                          is_complete_tree = FALSE,
-                         mus = NULL) {
+                         mus = NULL,
+                         num_unique_traits = NULL,
+                         first_time = FALSE,
+                         traitStates = NULL) {
   if (!is.matrix(traits)) {
     traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
   }
+  
   if (length(phy$tip.label) != nrow(traits)) {
     stop("Number of species in the tree must be the same as in the trait file")
   }
-  traitStates <- sort(unique(traits[,1]))
+  
+  # if there are traits that are not in the observed tree,
+  # the user passes these themselves.
+  # yes, this is a weird use-case
+  
+  if (is.null(traitStates)) traitStates <- sort(unique(traits[, 1]))
+  
+  if (!is.null(num_unique_traits)) {
+    if (num_unique_traits > length(traitStates)) {
+      if (first_time)
+        message("found un-observed traits, expanding state space")
+      traitStates <- 1:num_unique_traits
+    }
+  }
+  
+  obs_traits <- unique(traits[, 1])
+  obs_traits <- obs_traits[!is.na(obs_traits)]
+  if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
+    stop("Tip traits are not in idparslist")
+  }
+  
   
   nb_tip <- ape::Ntip(phy)
   nb_node <- phy$Nnode
@@ -308,79 +383,50 @@ build_states <- function(phy,
   ##
   ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
   ##                   "D0A","D1A","D2A","D0B","D1B","D2B")
-  states[1:nb_tip,] <- 0
+  states[1:nb_tip, ] <- 0
   ## I repeat the process of state assignment as many times as columns I have
-  for (iv in 1:ncol(traits)) {
-    usetraits <- traits[,iv]
-    if (anyNA(usetraits)) {
-      nas <- which(is.na(traits))
-      for (iii in seq_along(nas)) {
-        states[nas[iii],] <- c(1 - rep(sampling_fraction, num_concealed_states),
-                               rep(sampling_fraction, num_concealed_states))
-      }
-    }
-    
-    for (iii in seq_along(traitStates)) { # Initial state probabilities
-      StatesPresents <- d + iii
-      toPlaceOnes <- StatesPresents + 
-        length(traitStates) * (0:(num_concealed_states - 1))
-      tipSampling <- 1 * sampling_fraction
-      states[which(usetraits == traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
-    }
-    if (is_complete_tree) {
-      extinct_species <- geiger::is.extinct(phy)
-      if (!is.null(extinct_species)) {
-        for (i in seq_along(extinct_species)) {
-          states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <- 
-            mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
-        }
-      }
-      for (iii in 1:nb_tip) {
-        states[iii,1:d] <- 0
-      }
-    } else {
-      for (iii in 1:nb_tip) {
-        states[iii,1:d] <- rep(1 - sampling_fraction, num_concealed_states)
-      }
-    }
+  for (iv in seq_len(ncol(traits))) {
+    states <- create_states(traits[, iv],
+                            traits,
+                            states,
+                            sampling_fraction,
+                            num_concealed_states,
+                            d,
+                            traitStates,
+                            is_complete_tree,
+                            phy,
+                            ly,
+                            mus,
+                            nb_tip)
   }
   return(states)
 }
 
+#' @keywords internal
 build_initStates_time <- function(phy,
                                   traits,
                                   num_concealed_states,
                                   sampling_fraction,
                                   is_complete_tree = FALSE,
-                                  mus = NULL){ 
-  states <- build_states(phy, 
+                                  mus = NULL,
+                                  num_unique_traits = NULL,
+                                  first_time = FALSE,
+                                  traitStates = NULL) {
+  states <- build_states(phy,
                          traits,
                          num_concealed_states,
                          sampling_fraction,
                          is_complete_tree,
-                         mus)
+                         mus,
+                         num_unique_traits,
+                         first_time,
+                         traitStates)
   phy$node.label <- NULL
   split_times <- sort(event_times(phy), decreasing = FALSE)
   ances <- as.numeric(names(split_times))
-  forTime <- matrix(NA,ncol = 3,nrow = nrow(phy$edge))
-  forTime[,1:2] <- phy$edge
   
-  for (ab in seq_along(ances)) {
-    focalTime <- ances[ab]
-    desRows <- which(phy$edge[, 1] == focalTime)
-    desNodes <- phy$edge[desRows, 2]
-    rootward_age <- split_times[which(names(split_times) == focalTime)]
-    for (desIndex in 1:2) {
-      ## to Find the time which the integration will be done in
-      if (any(desNodes[desIndex] == names(split_times))) {
-        tipward_age <- split_times[which(names(split_times) == desNodes[desIndex])]
-        timeInterv <- c(tipward_age, rootward_age)
-      } else {
-        timeInterv <- c(0, rootward_age)
-      }  
-      forTime[which(forTime[,2] == desNodes[desIndex]),3] <- timeInterv[2] - timeInterv[1]
-    }
-  }
+  forTime <- cbind(phy$edge, phy$edge.length)
+  
   return(list(
     states = states,
     ances = ances,
