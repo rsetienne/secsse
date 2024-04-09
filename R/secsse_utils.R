@@ -1139,11 +1139,16 @@ check_ml_conditions <- function(traits,
 #' @keywords internal
 get_trait_states <- function(idparslist,
                              num_concealed_states) {
-  if (is.null(names(idparslist[[2]]))) return(NULL)
+  trait_names <- names(idparslist[[1]])
+  if (is.null(trait_names)) trait_names <- names(idparslist[[2]])
+  if (is.null(trait_names)) trait_names <- names(idparslist[[3]])
+  
+  
+  if (is.null(trait_names)) return(NULL)
 
   # by convention, hidden states are appended A,B,C letters
   num_traits <- length(idparslist[[2]]) / num_concealed_states
-  focal_names <- names(idparslist[[2]])[1:num_traits]
+  focal_names <- trait_names[1:num_traits]
   
   output <- "Deduced names and order of used states to be: "
   
