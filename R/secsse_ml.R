@@ -382,6 +382,12 @@ secsse_transform_parameters <- function(trparsopt,
         for (j in 2:3) {
             pars1[[j]] <- trpars1[[j]]/(1 - trpars1[[j]])
         }
+        if (!is.null(names(trpars1[[1]]))) {
+            trait_names <- names(trpars1[[1]])
+            names(pars1[[1]]) <- trait_names
+            names(pars1[[2]]) <- trait_names
+            colnames(pars1[[3]]) <- trait_names
+        }
         
     } else {
         #### when non-cla option is called
@@ -422,6 +428,12 @@ secsse_transform_parameters <- function(trparsopt,
         pars1 <- list()
         for (j in 1:3) {
             pars1[[j]] <- trpars1[[j]]/(1 - trpars1[[j]])
+        }
+        if (!is.null(names(trpars1[[1]]))) {
+          trait_names <- names(trpars1[[1]])
+          names(pars1[[1]]) <- trait_names
+          names(pars1[[2]]) <- trait_names
+          colnames(pars1[[3]]) <- trait_names
         }
     }
     return(pars1)

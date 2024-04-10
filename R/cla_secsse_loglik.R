@@ -131,6 +131,15 @@ cla_secsse_loglik <- function(parameter,
                              get_trait_states(parameter,
                                               num_concealed_states))
   }
+
+  for (i in 1:nrow(states)) {
+    v <- sum(states[i, ])
+    if (!is.na(v)) {
+      if (v == 0) {
+        cat("states entry zero: ", i, states[i, ], "\n")
+      }
+    }
+  }
   
   forTime <- setting_calculation$forTime  # nolint
   ances <- setting_calculation$ances
