@@ -56,7 +56,10 @@ secsse_loglik_eval <- function(parameter,
                                                num_concealed_states,
                                                sampling_fraction,
                                                is_complete_tree,
-                                               mus)
+                                               mus,
+                                               traitStates = 
+                                                 get_trait_states(parameter,
+                                                                  num_concealed_states))
   eval_cpp(rhs = if (is.list(lambdas)) "ode_cla" else "ode_standard",
            ances = setting_calculation$ances,
            states = setting_calculation$states,

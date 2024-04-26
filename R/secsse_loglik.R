@@ -22,6 +22,9 @@ master_loglik <- function(parameter,
   using_cla <- is.list(lambdas)
 
   num_modeled_traits <- ncol(q_matrix) / floor(num_concealed_states)
+  
+  traitStates = get_trait_states(parameter,
+                                 num_concealed_states)
 
   if (is.null(setting_calculation)) {
     check_input(traits,
@@ -35,7 +38,8 @@ master_loglik <- function(parameter,
                                                  sampling_fraction,
                                                  is_complete_tree,
                                                  mus,
-                                                 num_modeled_traits)
+                                                 num_modeled_traits,
+                                                 traitStates = traitStates)
   } 
   
   states <- setting_calculation$states
@@ -53,7 +57,17 @@ master_loglik <- function(parameter,
                            sampling_fraction = sampling_fraction,
                            is_complete_tree = is_complete_tree,
                            mus = mus,
-                           num_unique_traits = num_modeled_traits)
+                           num_unique_traits = num_modeled_traits,
+                           traitStates = traitStates)
+  }
+  
+  for (i in 1:nrow(states)) {
+    v <- sum(states[i, ])
+    if (!is.na(v)) {
+      if (v == 0) {
+        cat("states entry zero: ", i, states[i, ], "\n")
+      }
+    }
   }
 
   RcppParallel::setThreadOptions(numThreads = num_threads)

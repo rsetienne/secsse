@@ -133,6 +133,10 @@
 #' @param lambda_list previously generated list of lambda matrices,
 #'  used to infer the rate number to start with.
 #' @param object lambda matrices, `q_matrix` or mu vector.
+#' @param start_at_crown if FALSE, the simulation starts with one species
+#' instead of two, and resulting crown age will be lower than the set 
+#' crown age. However, this facilitates comparison with BiSSE and facilitates
+#' implementing speciation effects at the crown.
 #' @param params parameters in order, where each value reflects the value
 #'  of the parameter at that position, e.g. `c(0.3, 0.2, 0.1)` will fill out
 #'  the value 0.3 for the parameter with rate identifier 1, 0.2 for the

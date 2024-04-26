@@ -17,3 +17,5 @@ test.R
 test2.R
 /doc/
 /Meta/
+compare_diversitree_estimate.R
+classe_comparison.R

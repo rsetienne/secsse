@@ -83,7 +83,10 @@ master_ml <- function(phy,
                                                sampling_fraction,
                                                is_complete_tree,
                                                mus,
-                                               num_modeled_traits)
+                                               num_modeled_traits,
+                                               traitStates = 
+                                                 get_trait_states(idparslist,
+                                                                  num_concealed_states))
 
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,
