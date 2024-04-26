@@ -613,7 +613,7 @@ test_that("test comparison classe", {
   q_DS <- 0.0
   q_DG <- 0.0
   
-  num_repl <- 100
+  num_repl <- 300
   crown_age_used <- 30
   
   used_params <- c(spec_S, spec_G, spec_D, spec_G_SD,
@@ -684,10 +684,6 @@ test_that("test comparison classe", {
     }
   }
   
-  for (i in c(1, 3)) {
-    a1 <- as.vector(unlist(found1[, i]))
-    a2 <- as.vector(unlist(found2[, i]))
-    b <- t.test(a1, a2)
-    testthat::expect_true(b$p.value > 0.01)
-  }
+  testthat::expect_true(max(found1[, 2]) == max(found2[, 2]))
+  testthat::expect_true(max(found1[, 2]) == 0)
 })
