@@ -117,7 +117,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
         tracker[ sim.run_info ]++;
       }
     } else {    // if not reached minimum size
-      if (sim.run_info == extinct) { 
+      if (sim.run_info == extinct) {
         tracker[extinct]++;
       } else {
         tracker[ 5 ]++;
@@ -138,20 +138,20 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
     Rcpp::checkUserInterrupt();
     if (!non_extinction && sim.run_info == extinct) break;
   }
-  
+
   Rcpp::NumericMatrix ltable_for_r;      // extract and return
   util::vector_to_numericmatrix(sim.extract_ltable(), &ltable_for_r);
 
   auto traits = sim.get_traits();
   auto init = sim.get_initial_state();
 
-  Rcpp::List output = 
+  Rcpp::List output =
     Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
                        Rcpp::Named("traits") = traits,
                        Rcpp::Named("initial_state") = init,
                        Rcpp::Named("tracker") = tracker,
                        Rcpp::Named("hist_tree_size") = tree_size_hist);
-  return output; 
+  return output;
   } catch(std::exception &ex) {
     forward_exception_to_r(ex);
   } catch (const char* msg) {

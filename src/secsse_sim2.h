@@ -31,7 +31,7 @@ struct species_info {
                const std::vector<double>& l,
                const std::vector<double>& s) :
     trait_mu(m), trait_lambda(l), trait_qs(s),
-    max_mu(calc_max(m)), 
+    max_mu(calc_max(m)),
     max_la(calc_max(l)),
     max_qs(calc_max(s)) {
   }
@@ -39,7 +39,7 @@ struct species_info {
   double calc_max(const std::vector<double>& v) {
     return *std::max_element(v.begin(), v.end());
   }
-  
+
   double mu(size_t trait) const {
     return trait_mu[trait];
   }
@@ -97,7 +97,7 @@ struct ltab_species {
   double get_parent() const  {
     return(data_[p_id]);
   }
-  
+
   double get_trait() const {
     return(data_[trait_val]);
   }
@@ -192,7 +192,7 @@ struct secsse_sim {
   const bool non_extinction;
   const bool max_spec_extant;
   const bool crown_start;
-  
+
   finish_type run_info;
   int init_state;
   double t;
@@ -207,7 +207,7 @@ struct secsse_sim {
              const bool& ne,
              int seed,
              bool start_at_crown) :
-             trait_info(m, update_lambdas(l), update_qs_row_sums(q)), 
+             trait_info(m, update_lambdas(l), update_qs_row_sums(q)),
              mus(m),
              num_states(m.size()), max_t(mt),
              max_spec(max_s),
@@ -218,7 +218,7 @@ struct secsse_sim {
              run_info(not_run_yet),
              t(0.0) {
     // randomize randomizer
-    rndgen_.seed((seed < 0) ? std::random_device{}() : seed);
+    rndgen_.seed((seed < 0) ? std::random_device {}() : seed);
     init_state = 0;
   }
 
@@ -236,9 +236,9 @@ struct secsse_sim {
 
     if (crown_start) {
       auto crown_states = root_speciation(init_state);
-      L.push_back(ltab_species(0.0,   0, -1, -1, 
+      L.push_back(ltab_species(0.0,   0, -1, -1,
                                std::get<0>(crown_states), trait_info));
-      L.push_back(ltab_species(0.0,  -1,  2, -1, 
+      L.push_back(ltab_species(0.0,  -1,  2, -1,
                                std::get<1>(crown_states), trait_info));
     } else {
       L.push_back(ltab_species(0.0,  0, -1, -1, init_state, trait_info));
@@ -248,7 +248,7 @@ struct secsse_sim {
         run_info = extinct;
         return;
       }
-    } 
+    }
 
     track_crowns = {1, 1};
 
@@ -283,7 +283,6 @@ struct secsse_sim {
 
   void evolve_until_crown() {
       while (L.size() < 2) {
-
         update_rates();
         double dt = draw_dt();
         t += dt;
@@ -295,7 +294,7 @@ struct secsse_sim {
           }
           case extinction: {
             event_extinction();
-            break; 
+            break;
           }
           case speciation: {
               size_t mother = 0;
@@ -341,7 +340,7 @@ struct secsse_sim {
 
   void event_extinction() {
     size_t dying = sample_from_pop(event_type::extinction);
-    
+
     if (L[dying].get_id() < 0) {
           track_crowns[0]--;
     } else {
@@ -353,7 +352,7 @@ struct secsse_sim {
 
   void event_speciation() {
     size_t mother = sample_from_pop(event_type::speciation);
-    
+
     auto mother_trait = L[mother].get_trait();
 
     auto pick_speciation_cell = pick_speciation_id(mother_trait);
@@ -361,7 +360,7 @@ struct secsse_sim {
     auto trait_to_daughter    = calc_x(pick_speciation_cell);
 
     L[mother].set_trait(trait_to_parent, trait_info);
-    
+
     int new_id = static_cast<int>(L.size()) + 1;
     if (L[mother].get_id() < 0) {
       track_crowns[0]++;
@@ -370,7 +369,7 @@ struct secsse_sim {
       track_crowns[1]++;
     }
 
-    L.emplace_back(t, L[mother].get_id(), new_id, -1, 
+    L.emplace_back(t, L[mother].get_id(), new_id, -1,
                    trait_to_daughter, trait_info);
   }
 
@@ -489,13 +488,13 @@ struct secsse_sim {
 
   size_t sample_from_pop(event_type event) {
     std::function<double(const ltab_species& s)> getvalfrom_species;
-    if (event == event_type::extinction) 
+    if (event == event_type::extinction)
       getvalfrom_species = [](const ltab_species& s) { return s.mu();};
     if (event == event_type::speciation)
       getvalfrom_species = [](const ltab_species& s) { return s.lambda();};
     if (event == event_type::shift)
       getvalfrom_species = [](const ltab_species& s) { return s.shift_rate();};
-    
+
     auto max = *std::max_element(L.begin(), L.end(),
                          [&](const ltab_species& a, const ltab_species& b) {
                            return getvalfrom_species(a) < getvalfrom_species(b);
@@ -523,8 +522,8 @@ struct secsse_sim {
   void check_states(size_t num_traits,
                     size_t num_concealed_states) {
 
-    auto total_num_traits = num_concealed_states > 0 ? 
-                              num_traits / num_concealed_states : 
+    auto total_num_traits = num_concealed_states > 0 ?
+                              num_traits / num_concealed_states :
                               num_traits;
 
     std::vector<int> focal_traits;
@@ -536,7 +535,7 @@ struct secsse_sim {
       focal_traits[trait]++;
     }
 
-    auto min_val = *std::min_element(focal_traits.begin(), 
+    auto min_val = *std::min_element(focal_traits.begin(),
                                      focal_traits.end());
     if (min_val == 0) {
       run_info = conditioning;
@@ -588,7 +587,7 @@ struct secsse_sim {
     }
 
     if (conditioning_type == "true_states") {
-        check_states(num_states, 0); 
+        check_states(num_states, 0);
     }
 
     if (conditioning_type == "obs_states") {
