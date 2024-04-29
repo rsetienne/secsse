@@ -236,7 +236,7 @@ test_that("test trait shift", {
   spec_S <- 0
   spec_G <- 0
   ext_S <- ext_G <- 0.0
-  q_SG <- 1.0
+  q_SG <- 10.0
   q_GS <- 0
   used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
   
@@ -265,7 +265,7 @@ test_that("test trait shift", {
   sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
                                  mus = sim_mu_vector_etd,
                                  qs = sim_q_matrix_etd,
-                                 crown_age = crown_age_used,
+                                 crown_age = 100,
                                  num_concealed_states = 2,
                                  conditioning = "none",
                                  pool_init_states = c("S"))

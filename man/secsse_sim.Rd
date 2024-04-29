@@ -71,9 +71,10 @@ non-extinction of the crown lineages. Defaults to \code{TRUE}.}
 the tree. Defaults to \code{TRUE}.}
 
 \item{start_at_crown}{if FALSE, the simulation starts with one species
-instead of two, and resulting crown age will be lower than the set
-crown age. However, this facilitates comparison with BiSSE and facilitates
-implementing speciation effects at the crown.}
+instead of the two assumed by default by secsse (also in ML), and
+the resulting crown age will be lower than the set crown age. This allows
+for direct comparison with BiSSE and facilitates implementing speciation
+effects at the crown.}
 
 \item{seed}{pseudo-random number generator seed.}
 }

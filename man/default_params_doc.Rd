@@ -69,6 +69,7 @@ default_params_doc(
   min_spec,
   max_species_extant,
   tree_size_hist,
+  start_at_crown,
   optimmethod
 )
 }
@@ -280,16 +281,17 @@ the reconstructed tree (if TRUE) or in the complete tree (if FALSE).}
 
 \item{tree_size_hist}{if TRUE, returns a vector of all found tree sizes.}
 
+\item{start_at_crown}{if FALSE, the simulation starts with one species
+instead of the two assumed by default by secsse (also in ML), and
+the resulting crown age will be lower than the set crown age. This allows
+for direct comparison with BiSSE and facilitates implementing speciation
+effects at the crown.}
+
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
 conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
 simplex is implemented natively in \link{DDD}, while subplex is ultimately
 called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
-
-\item{start_at_crown}{if FALSE, the simulation starts with one species
-instead of two, and resulting crown age will be lower than the set
-crown age. However, this facilitates comparison with BiSSE and facilitates
-implementing speciation effects at the crown.}
 }
 \value{
 Nothing

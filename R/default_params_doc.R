@@ -134,9 +134,10 @@
 #'  used to infer the rate number to start with.
 #' @param object lambda matrices, `q_matrix` or mu vector.
 #' @param start_at_crown if FALSE, the simulation starts with one species
-#' instead of two, and resulting crown age will be lower than the set 
-#' crown age. However, this facilitates comparison with BiSSE and facilitates
-#' implementing speciation effects at the crown.
+#' instead of the two assumed by default by secsse (also in ML), and 
+#' the resulting crown age will be lower than the set crown age. This allows
+#' for direct comparison with BiSSE and facilitates implementing speciation
+#' effects at the crown.
 #' @param params parameters in order, where each value reflects the value
 #'  of the parameter at that position, e.g. `c(0.3, 0.2, 0.1)` will fill out
 #'  the value 0.3 for the parameter with rate identifier 1, 0.2 for the
@@ -221,6 +222,7 @@ default_params_doc <- function(phy,
                                min_spec,
                                max_species_extant,
                                tree_size_hist,
+                               start_at_crown,
                                optimmethod) {
   # Nothing
 }
