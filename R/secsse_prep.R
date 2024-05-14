@@ -44,7 +44,10 @@ get_state_names <- function(state_names, num_concealed_states) {
   return(all_state_names)
 }
 
-#' Helper function to automatically create lambda matrices, based on input
+#' Helper function to automatically create lambda matrices, based on input.
+#' When choosing the CTD model, rates associated with observed states are now
+#' re-distributed to concealed states. This implicitly assumes that the number
+#' of observed and concealed states is identical.
 #' 
 #' @inheritParams default_params_doc
 #' 
@@ -60,8 +63,7 @@ get_state_names <- function(state_names, num_concealed_states) {
 create_lambda_list <- function(state_names = c(0, 1),
                                num_concealed_states = 2,
                                transition_matrix,
-                               model = "ETD",
-                               concealed_spec_rates = NULL) {
+                               model = "ETD") {
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")
   }
@@ -82,33 +84,42 @@ create_lambda_list <- function(state_names = c(0, 1),
 
   transition_list <- convert_transition_list(transition_matrix, state_names)
 
-  if (model == "CTD") {
-    if (is.null(concealed_spec_rates)) {
-      spec_rates <- unique(transition_list[, 4])
-      spec_rates <- sort(spec_rates)
-      num_times <- ceiling(num_concealed_states / length(spec_rates))
-      concealed_spec_rates <- rep(spec_rates, num_times)
-      concealed_spec_rates <- concealed_spec_rates[1:num_concealed_states]
-      concealed_spec_rates <- sort(concealed_spec_rates)
+  if (model == "ETD") {
+  
+    # ETD settings
+    for (i in seq_len(nrow(transition_list))) {
+      focal_state <- transition_list[i, 1]
+      daughter1   <- transition_list[i, 2]
+      daughter2   <- transition_list[i, 3]
+      target_rate <- transition_list[i, 4]
+  
+      for (j in seq_len(num_concealed_states)) {
+        incr <- (j - 1) * num_obs_states
+        focal_rate <- target_rate
+        #if (model == "CTD") focal_rate <- concealed_spec_rates[j]
+  
+        lambdas[[focal_state + incr]][daughter1 + incr,
+                                      daughter2 + incr] <- focal_rate
+        lambdas[[focal_state + incr]][daughter2 + incr,
+                                      daughter1 + incr] <- focal_rate
+      }
     }
   }
-
-  # ETD settings
-  for (i in seq_len(nrow(transition_list))) {
-    focal_state <- transition_list[i, 1]
-    daughter1   <- transition_list[i, 2]
-    daughter2   <- transition_list[i, 3]
-    target_rate <- transition_list[i, 4]
-
-    for (j in seq_len(num_concealed_states)) {
-      incr <- (j - 1) * num_obs_states
-      focal_rate <- target_rate
-      if (model == "CTD") focal_rate <- concealed_spec_rates[j]
-
-      lambdas[[focal_state + incr]][daughter1 + incr,
-                                    daughter2 + incr] <- focal_rate
-      lambdas[[focal_state + incr]][daughter2 + incr,
-                                    daughter1 + incr] <- focal_rate
+  
+  if (model == "CTD") {
+    for (i in seq_len(nrow(transition_list))) {
+      focal_state <- (transition_list[i, 1] - 1) * num_obs_states
+      daughter1   <- (transition_list[i, 2] - 1) * num_obs_states
+      daughter2   <- (transition_list[i, 3] - 1) * num_obs_states
+      target_rate <- transition_list[i, 4]
+      
+      for (incr in 1:num_concealed_states) {
+        
+        lambdas[[focal_state + incr]][daughter1 + incr,
+                                      daughter2 + incr] <- target_rate
+        lambdas[[focal_state + incr]][daughter2 + incr,
+                                      daughter1 + incr] <- target_rate
+      }
     }
   }
   return(lambdas)

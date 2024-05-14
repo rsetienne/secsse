@@ -121,10 +121,6 @@
 #'  of the likelihood.
 #' @param model used model, choice of `"ETD"` (Examined Traits Diversification),
 #'  `"CTD"` (Concealed Traits Diversification) or `"CR"` (Constant Rate).
-#' @param concealed_spec_rates vector specifying the rate indicators for each
-#'  concealed state, length should be identical to `num_concealed_states`. If 
-#'  left empty when using the CTD model, it is assumed that all available 
-#'  speciation rates are distributed uniformly over the concealed states.
 #' @param shift_matrix matrix of shifts, indicating in order:
 #'  1. starting state (typically the column in the transition matrix)
 #'  2. ending state (typically the row in the transition matrix)
@@ -209,7 +205,6 @@ default_params_doc <- function(phy,
                                state_names,
                                transition_matrix,
                                model,
-                               concealed_spec_rates,
                                shift_matrix,
                                q_matrix,
                                lambda_list,
