@@ -802,17 +802,21 @@ create_states <- function(usetraits,
 
     for (iii in seq_along(traitStates)) {  # Initial state probabilities
         StatesPresents <- d + iii
-        toPlaceOnes <- StatesPresents +
-            length(traitStates) * (0:(num_concealed_states - 1))
+        toPlaceOnes <- StatesPresents + 
+                       length(traitStates) * (0:(num_concealed_states - 1))
         tipSampling <- 1 * sampling_fraction
-        states[which(usetraits ==
-                         traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
+        states[which(usetraits == traitStates[iii]), 
+               toPlaceOnes] <- tipSampling[iii]
     }
 
   if (is_complete_tree) {
     extinct_species <- geiger::is.extinct(phy)
     if (!is.null(extinct_species)) {
       for (i in seq_along(extinct_species)) {
+        
+        entry <- mus * states[which(phy$tip.label == extinct_species[i]), 
+                              (d + 1):ly]
+        
         states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
           mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
       }
@@ -825,7 +829,7 @@ create_states <- function(usetraits,
       states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
     }
   }
-    return(states)
+  return(states)
 }
 
 #' @keywords internal
@@ -865,7 +869,6 @@ build_states <- function(phy,
     if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
       stop("Tip traits are not in idparslist")
     }
-    
 
     nb_tip <- ape::Ntip(phy)
     nb_node <- phy$Nnode
@@ -1141,7 +1144,7 @@ get_trait_states <- function(idparslist,
                              num_concealed_states) {
   trait_names <- names(idparslist[[1]])
   if (is.null(trait_names)) trait_names <- names(idparslist[[2]])
-  if (is.null(trait_names)) trait_names <- names(idparslist[[3]])
+  if (is.null(trait_names)) trait_names <- colnames(idparslist[[3]])
   
   
   if (is.null(trait_names)) return(NULL)
@@ -1161,9 +1164,8 @@ get_trait_states <- function(idparslist,
     }
   }
   
-  message(output)
-  message("if this is incorrect, consider passing states as matching numeric 
-ordering, e.g. 1 for the first state, 2 for the second etc.")
-  
+  rlang::warn(message = paste0(output, "\n", "if this is incorrect, consider passing states as matching numeric 
+ordering, e.g. 1 for the first state, 2 for the second etc."))
+
   return(focal_names)
 }

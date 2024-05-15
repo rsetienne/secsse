@@ -84,7 +84,7 @@ create_lambda_list <- function(state_names = c(0, 1),
 
   transition_list <- convert_transition_list(transition_matrix, state_names)
 
-  if (model == "ETD") {
+  if (model == "ETD" || model == "CR") {
   
     # ETD settings
     for (i in seq_len(nrow(transition_list))) {
