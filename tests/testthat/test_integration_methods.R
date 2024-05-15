@@ -16,7 +16,7 @@ test_that("loglik for different integrators", {
   root_state_weight <- "maddison_weights"
   cond <- "noCondit"
   
-  loglik1 <- as.numeric(secsse_loglik(parameter = toCheck,
+  loglik1 <- testthat::expect_warning(as.numeric(secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
                                       num_concealed_states =
@@ -24,14 +24,14 @@ test_that("loglik for different integrators", {
                                       cond = cond,
                                       root_state_weight = root_state_weight,
                                       sampling_fraction = sampling_fraction)
-  )
+  ))
   
   for (integ_method in c("odeint::runge_kutta_cash_karp54", 
                          "odeint::runge_kutta_fehlberg78", 
                          "odeint::runge_kutta_dopri5", 
                          "odeint::bulirsch_stoer",
                          "odeint::runge_kutta4")) {
-    loglik2 <- as.numeric(secsse_loglik(parameter = toCheck,
+    loglik2 <- testthat::expect_warning(as.numeric(secsse_loglik(parameter = toCheck,
                                         phy = phy,
                                         traits = traits,
                                         num_concealed_states =
@@ -39,7 +39,7 @@ test_that("loglik for different integrators", {
                                         cond = cond,
                                         root_state_weight = root_state_weight,
                                         sampling_fraction = sampling_fraction,
-                                        method = integ_method))
+                                        method = integ_method)))
     testthat::expect_equal(loglik1, loglik2)
   }
 })  

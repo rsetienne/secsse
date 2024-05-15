@@ -42,7 +42,7 @@ test_that("multiplication works", {
   cond <- 'proper_cond'
   root_state_weight <- 'proper_weights'
   sampling_fraction <- c(1, 1, 1)
-  model <- expect_message(expect_warning(cla_secsse_ml_func_def_pars(
+  model <- expect_warning(cla_secsse_ml_func_def_pars(
     phylotree,
     traits,
     num_concealed_states,
@@ -63,7 +63,7 @@ test_that("multiplication works", {
     optimmethod,
     num_cycles = 1,
     verbose = 0
-  )))
+  ))
   
   expect_equal(model$ML, -136.5926599)
   expect_length(model, 3)
