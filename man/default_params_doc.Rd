@@ -56,7 +56,6 @@ default_params_doc(
   state_names,
   transition_matrix,
   model,
-  concealed_spec_rates,
   shift_matrix,
   q_matrix,
   lambda_list,
@@ -228,11 +227,6 @@ of the likelihood.}
 
 \item{model}{used model, choice of \code{"ETD"} (Examined Traits Diversification),
 \code{"CTD"} (Concealed Traits Diversification) or \code{"CR"} (Constant Rate).}
-
-\item{concealed_spec_rates}{vector specifying the rate indicators for each
-concealed state, length should be identical to \code{num_concealed_states}. If
-left empty when using the CTD model, it is assumed that all available
-speciation rates are distributed uniformly over the concealed states.}
 
 \item{shift_matrix}{matrix of shifts, indicating in order:
 \enumerate{

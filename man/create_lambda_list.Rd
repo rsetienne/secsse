@@ -2,14 +2,16 @@
 % Please edit documentation in R/secsse_prep.R
 \name{create_lambda_list}
 \alias{create_lambda_list}
-\title{Helper function to automatically create lambda matrices, based on input}
+\title{Helper function to automatically create lambda matrices, based on input.
+When choosing the CTD model, rates associated with observed states are now
+re-distributed to concealed states. This implicitly assumes that the number
+of observed and concealed states is identical.}
 \usage{
 create_lambda_list(
   state_names = c(0, 1),
   num_concealed_states = 2,
   transition_matrix,
-  model = "ETD",
-  concealed_spec_rates = NULL
+  model = "ETD"
 )
 }
 \arguments{
@@ -28,14 +30,12 @@ of the likelihood.}
 
 \item{model}{used model, choice of \code{"ETD"} (Examined Traits Diversification),
 \code{"CTD"} (Concealed Traits Diversification) or \code{"CR"} (Constant Rate).}
-
-\item{concealed_spec_rates}{vector specifying the rate indicators for each
-concealed state, length should be identical to \code{num_concealed_states}. If
-left empty when using the CTD model, it is assumed that all available
-speciation rates are distributed uniformly over the concealed states.}
 }
 \description{
-Helper function to automatically create lambda matrices, based on input
+Helper function to automatically create lambda matrices, based on input.
+When choosing the CTD model, rates associated with observed states are now
+re-distributed to concealed states. This implicitly assumes that the number
+of observed and concealed states is identical.
 }
 \examples{
 trans_matrix <- c(0, 0, 0, 1)
