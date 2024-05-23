@@ -145,6 +145,9 @@ create_q_matrix <- function(state_names,
                             diff.conceal = FALSE) {
 
   total_num_states <- length(state_names)
+  if (total_num_states != num_concealed_states) {
+    stop("number of concealed states has to be equal to the number of observed states")
+  }
   trans_matrix <- matrix(0, ncol = total_num_states,
                          nrow = total_num_states)
 

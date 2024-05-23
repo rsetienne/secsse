@@ -60,15 +60,6 @@ master_loglik <- function(parameter,
                            num_unique_traits = num_modeled_traits,
                            traitStates = traitStates)
   }
-  
-  for (i in 1:nrow(states)) {
-    v <- sum(states[i, ])
-    if (!is.na(v)) {
-      if (v == 0) {
-        cat("states entry zero: ", i, states[i, ], "\n")
-      }
-    }
-  }
 
   RcppParallel::setThreadOptions(numThreads = num_threads)
   calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
