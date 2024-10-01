@@ -13,7 +13,8 @@ master_loglik <- function(parameter,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,
-                          method = "odeint::bulirsch_stoer") {
+                          method = "odeint::bulirsch_stoer",
+                          display_warning = TRUE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -24,7 +25,7 @@ master_loglik <- function(parameter,
   num_modeled_traits <- ncol(q_matrix) / floor(num_concealed_states)
   
   traitStates = get_trait_states(parameter,
-                                 num_concealed_states)
+                                 num_concealed_states, display_warning)
 
   if (is.null(setting_calculation)) {
     check_input(traits,

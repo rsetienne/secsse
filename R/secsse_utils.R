@@ -1141,7 +1141,8 @@ check_ml_conditions <- function(traits,
 
 #' @keywords internal
 get_trait_states <- function(idparslist,
-                             num_concealed_states) {
+                             num_concealed_states,
+                             display_warning = TRUE) {
   trait_names <- names(idparslist[[1]])
   if (is.null(trait_names)) trait_names <- names(idparslist[[2]])
   if (is.null(trait_names)) trait_names <- colnames(idparslist[[3]])
@@ -1153,19 +1154,21 @@ get_trait_states <- function(idparslist,
   num_traits <- length(idparslist[[2]]) / num_concealed_states
   focal_names <- trait_names[1:num_traits]
   
-  output <- "Deduced names and order of used states to be: "
-  
-  for (i in seq_along(focal_names)) {
-    focal_names[i] <- substr(focal_names[i], 1, nchar(focal_names[i]) - 1)
-    if (i != length(focal_names)) {
-      output <- paste0(output, focal_names[i], ", ")
-    } else {
-      output <- paste0(output, focal_names[i])
+  if (display_warning) {
+    output <- "Deduced names and order of used states to be: "
+    
+    for (i in seq_along(focal_names)) {
+      focal_names[i] <- substr(focal_names[i], 1, nchar(focal_names[i]) - 1)
+      if (i != length(focal_names)) {
+        output <- paste0(output, focal_names[i], ", ")
+      } else {
+        output <- paste0(output, focal_names[i])
+      }
     }
+    
+    rlang::warn(message = paste0(output, "\n", "if this is incorrect, consider passing states as matching numeric 
+  ordering, e.g. 1 for the first state, 2 for the second etc."))
   }
-  
-  rlang::warn(message = paste0(output, "\n", "if this is incorrect, consider passing states as matching numeric 
-ordering, e.g. 1 for the first state, 2 for the second etc."))
 
   return(focal_names)
 }
