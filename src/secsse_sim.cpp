@@ -16,14 +16,14 @@
 
 namespace util {  // collection of left-overs
 
+using vec = std::vector< double >;
+using nummat = Rcpp::NumericMatrix;
 // Transpose Rcpp::NumericMatrix into
 // std::vector<std::vector<double>>
-void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
-                             std::vector< std::vector< double >>* v) {
-  (*v) = std::vector< std::vector< double> >(m.nrow(),
-                                            std::vector<double>(m.ncol(), 0.0));
+void numericmatrix_to_vector(const nummat& m, std::vector<vec>* v) {
+  (*v) = std::vector< vec >(m.nrow(), vec(m.ncol(), 0.0));
   for (int i = 0; i < m.nrow(); ++i) {
-    std::vector<double> row(m.ncol(), 0.0);
+    vec row(m.ncol(), 0.0);
     for (int j = 0; j < m.ncol(); ++j) {
       row[j] = m(i, j);
     }
@@ -32,11 +32,10 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   return;
 }
 
-void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
-                             Rcpp::NumericMatrix* m) {
+void vector_to_numericmatrix(const std::vector< vec>& v, nummat* m) {
   size_t n_rows = v.size();
   size_t n_cols = v[0].size();
-  (*m) = Rcpp::NumericMatrix(n_rows, n_cols);
+  (*m) = nummat(n_rows, n_cols);
   for (size_t i = 0; i < n_rows; ++i) {
     for (size_t j = 0; j < n_cols; ++j) {
       (*m)(i, j) = v[i][j];
@@ -48,8 +47,8 @@ void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
   for (int m = 0; m < lambdas_R.size(); ++m) {
-    Rcpp::NumericMatrix entry_R = lambdas_R[m];
-    num_mat entry_cpp(entry_R.nrow(), std::vector<double>(entry_R.ncol(), 0.0));
+    nummat entry_R = lambdas_R[m];
+    num_mat entry_cpp(entry_R.nrow(), vec(entry_R.ncol(), 0.0));
     for (int i = 0; i < entry_R.nrow(); ++i) {
       for (int j = 0; j < entry_R.ncol(); ++j) {
         entry_cpp[i][j] = entry_R(i, j);
