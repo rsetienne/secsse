@@ -1,3 +1,8 @@
+# 3.1.2
+
+Added the function 'plot_idparslist', which provides code to visualize the
+rates in the idparslist setup, using ggplot.
+
 # 3.1.0
 
 Version 3.1.0 fixes a bug in the simulation code that caused trait changes

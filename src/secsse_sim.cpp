@@ -11,6 +11,7 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
+#include <vector>
 
 
 namespace util {  // collection of left-overs
@@ -20,7 +21,7 @@ namespace util {  // collection of left-overs
 void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
                              std::vector< std::vector< double >>* v) {
   (*v) = std::vector< std::vector< double> >(m.nrow(),
-   std::vector<double>(m.ncol(), 0.0));
+                                            std::vector<double>(m.ncol(), 0.0));
   for (int i = 0; i < m.nrow(); ++i) {
     std::vector<double> row(m.ncol(), 0.0);
     for (int j = 0; j < m.ncol(); ++j) {
@@ -30,7 +31,6 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   }
   return;
 }
-
 
 void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
                              Rcpp::NumericMatrix* m) {
