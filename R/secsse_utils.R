@@ -1172,3 +1172,105 @@ get_trait_states <- function(idparslist,
 
   return(focal_names)
 }
+
+#' @keywords internal
+extract_data <- function(mat) {
+  to_plot <- c()
+  for (i in 1:nrow(mat)) {
+    for (j in 1:ncol(mat)) {
+      entry <- mat[i, j]
+      if (!is.na(entry)) {
+        if (entry > 0) {
+          x <- colnames(mat)[i]
+          y <- rownames(mat)[j]
+          to_plot <- rbind(to_plot, c(x, y, entry))
+        }
+      }
+    }
+  }
+  return(to_plot)
+}
+
+#' @keywords internal
+get_rates <- function(lambda_list, all_states, lambda_order) {
+  to_plot <- c()
+  for (i in seq_along(all_states)) {
+    local_v <- extract_data(lambda_list[[i]])
+    colnames(local_v) <- c("x", "y", "rate")
+    local_v <- as.data.frame(local_v)
+    
+    local_v$focal_rate <- lambda_order[i]
+    to_plot <- rbind(to_plot, local_v)
+  }
+  
+  to_plot$x <- factor(to_plot$x, levels = all_states)
+  to_plot$y <- factor(to_plot$y, levels = rev(all_states))
+  to_plot$focal_rate <- factor(to_plot$focal_rate, levels = all_states)
+  return(to_plot)
+}
+
+
+#' function to visualize the structure of the idparslist
+#' @param idparslist idparslist setup list
+#' @param state_names names of all states (including concealed states)
+#' @return list with two ggplot objects: plot_qmat which visualizes the 
+#' q_matrix, and plot_lambda which visualizes the lambda matrices. 
+#' @export
+#' @examples
+#' idparslist <- list()
+#' focal_matrix <-
+#' secsse::create_default_lambda_transition_matrix(state_names = c("1", "2"),
+#'                                                 model = "CR")
+#' idparslist[[1]] <- 
+#'   secsse::create_lambda_list(state_names = c("1", "2"),
+#'                              num_concealed_states = 2,
+#'                              transition_matrix = focal_matrix,
+#'                              model = "CR")
+#' idparslist[[2]] <- secsse::create_mu_vector(state_names = c("1", "2"),
+#'                                             num_concealed_states = 2,
+#'                                             model = "CR",
+#'                                             lambda_list = idparslist[[1]])
+#' shift_mat <- secsse::create_default_shift_matrix(state_names = c("1", "2"),
+#'                                                  num_concealed_states = 2,
+#'                                                  mu_vector = idparslist[[2]])
+#' idparslist[[3]] <- secsse::create_q_matrix(state_names = c("1", "2"),
+#'                                            num_concealed_states = 2,
+#'                                            shift_matrix = shift_mat,
+#'                                            diff.conceal = FALSE)
+#' p <- plot_idparslist(idparslist, state_names = names(idparslist[[1]]))
+#' p$plot_lambda
+#' p$plot_qmat
+plot_idparslist <- function(idparslist, 
+                            state_names) {
+  
+  v <- extract_data(idparslist[[3]])
+  colnames(v) <- c("x", "y", "rate")
+  v <- as.data.frame(v)
+  
+  v$x <- factor(v$x, levels = state_names)
+  v$y <- factor(v$y, levels = rev(state_names))
+  
+  plot_qmat <- 
+    ggplot2::ggplot(v, 
+                    ggplot2::aes(x = .data[["x"]], 
+                                 y = .data[["y"]], 
+                                 fill = .data[["rate"]])) +
+    ggplot2::geom_tile()
+  
+  to_plot <- get_rates(idparslist[[1]], state_names, state_names)
+  
+  to_plot$x <- factor(to_plot$x, levels = state_names)
+  to_plot$y <- factor(to_plot$y, levels = rev(state_names))
+  to_plot$focal_rate <- factor(to_plot$focal_rate, levels = state_names)
+  
+  plot_lambda <- 
+    ggplot2::ggplot(to_plot, 
+                    ggplot2::aes(x = .data[["x"]], 
+                                 y = .data[["y"]], 
+                                 fill = .data[["rate"]])) +
+    ggplot2::geom_tile() +
+    ggplot2::facet_wrap(~.data[["focal_rate"]])
+  
+  return(list("plot_qmat" = plot_qmat,
+              "plot_lambda" = plot_lambda))
+}
