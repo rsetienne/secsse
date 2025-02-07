@@ -1,0 +1,69 @@
+#include <cstdlib>    // std::getenv, std::atoi
+#include <vector> 
+#include <chrono>
+#include "config.h"    // NOLINT [build/include_subdir]
+#include <Rcpp.h>
+#include <RcppParallel.h>
+#include "secsse_loglik.h"    // NOLINT [build/include_subdir]
+
+
+template <typename ODE>
+Rcpp::List calc_ll_single_branch(std::unique_ptr<ODE> od,
+                                 const Rcpp::NumericVector& states,
+                                 const Rcpp::NumericVector& forTime,
+                                 const std::string& method,
+                                 double atol,
+                                 double rtol,
+                                 bool see_states) {
+  auto T0 = std::chrono::high_resolution_clock::now();
+  
+  auto states_out = states;
+  
+  auto workhorse = secsse::Integrator<ODE>(std::move(od), method, atol, rtol);
+  
+  auto t0 = std::min(forTime[0], forTime[1]);
+  auto t1 = std::max(forTime[0], forTime[1]);
+  
+  auto answ = workhorse(states_out, t0, t1);
+  
+  auto T1 = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> DT = (T1 - T0);
+  
+  return Rcpp::List::create(Rcpp::Named("loglik") = answ,
+                            Rcpp::Named("merge_branch") = states_out,
+                            Rcpp::Named("states") = states_out,
+                            Rcpp::Named("duration") = DT.count());
+}
+
+
+
+// [[Rcpp::export]]
+Rcpp::List calc_ll_single_branch_cpp(const std::string& rhs,
+                                     const Rcpp::NumericVector& states,
+                                     const Rcpp::NumericVector& forTime,
+                                     const Rcpp::RObject& lambdas,
+                                     const Rcpp::NumericVector& mus,
+                                     const Rcpp::NumericMatrix& Q,
+                                     const std::string& method,
+                                     double atol,
+                                     double rtol,
+                                     bool is_complete_tree,
+                                     bool see_states)
+{
+  using namespace secsse;
+  
+  if (rhs == "ode_standard") {
+    auto ll = Rcpp::as<Rcpp::NumericVector>(lambdas);
+    return is_complete_tree 
+    ? calc_ll_single_branch(std::make_unique<ode_standard<OdeVariant::complete_tree>>(ll, mus, Q), states, forTime, method, atol, rtol, see_states)
+      : calc_ll_single_branch(std::make_unique<ode_standard<OdeVariant::normal_tree>>(ll, mus, Q), states, forTime, method, atol, rtol, see_states);
+  } else if (rhs == "ode_cla") {
+    auto ll = Rcpp::as<Rcpp::List>(lambdas);
+    
+    return is_complete_tree 
+    ? calc_ll_single_branch(std::make_unique<ode_cla<OdeVariant::complete_tree>>(ll, mus, Q),states, forTime, method, atol, rtol, see_states)
+      : calc_ll_single_branch(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), states, forTime, method, atol, rtol, see_states);
+  } else {
+    throw std::runtime_error("calc_ll_cpp: unknown rhs");
+  }
+}
