@@ -56,7 +56,6 @@ default_params_doc(
   state_names,
   transition_matrix,
   model,
-  concealed_spec_rates,
   shift_matrix,
   q_matrix,
   lambda_list,
@@ -69,6 +68,7 @@ default_params_doc(
   min_spec,
   max_species_extant,
   tree_size_hist,
+  start_at_crown,
   optimmethod
 )
 }
@@ -228,11 +228,6 @@ of the likelihood.}
 \item{model}{used model, choice of \code{"ETD"} (Examined Traits Diversification),
 \code{"CTD"} (Concealed Traits Diversification) or \code{"CR"} (Constant Rate).}
 
-\item{concealed_spec_rates}{vector specifying the rate indicators for each
-concealed state, length should be identical to \code{num_concealed_states}. If
-left empty when using the CTD model, it is assumed that all available
-speciation rates are distributed uniformly over the concealed states.}
-
 \item{shift_matrix}{matrix of shifts, indicating in order:
 \enumerate{
 \item starting state (typically the column in the transition matrix)
@@ -279,6 +274,12 @@ against generating extremely large trees).}
 the reconstructed tree (if TRUE) or in the complete tree (if FALSE).}
 
 \item{tree_size_hist}{if TRUE, returns a vector of all found tree sizes.}
+
+\item{start_at_crown}{if FALSE, the simulation starts with one species
+instead of the two assumed by default by secsse (also in ML), and
+the resulting crown age will be lower than the set crown age. This allows
+for direct comparison with BiSSE and facilitates implementing speciation
+effects at the crown.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal

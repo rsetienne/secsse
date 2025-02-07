@@ -44,7 +44,10 @@ get_state_names <- function(state_names, num_concealed_states) {
   return(all_state_names)
 }
 
-#' Helper function to automatically create lambda matrices, based on input
+#' Helper function to automatically create lambda matrices, based on input.
+#' When choosing the CTD model, rates associated with observed states are now
+#' re-distributed to concealed states. This implicitly assumes that the number
+#' of observed and concealed states is identical.
 #' 
 #' @inheritParams default_params_doc
 #' 
@@ -60,8 +63,7 @@ get_state_names <- function(state_names, num_concealed_states) {
 create_lambda_list <- function(state_names = c(0, 1),
                                num_concealed_states = 2,
                                transition_matrix,
-                               model = "ETD",
-                               concealed_spec_rates = NULL) {
+                               model = "ETD") {
   if (!(model %in% c("CR", "ETD", "CTD"))) {
     stop("only CR, ETD or CTD are specified")
   }
@@ -82,33 +84,42 @@ create_lambda_list <- function(state_names = c(0, 1),
 
   transition_list <- convert_transition_list(transition_matrix, state_names)
 
-  if (model == "CTD") {
-    if (is.null(concealed_spec_rates)) {
-      spec_rates <- unique(transition_list[, 4])
-      spec_rates <- sort(spec_rates)
-      num_times <- ceiling(num_concealed_states / length(spec_rates))
-      concealed_spec_rates <- rep(spec_rates, num_times)
-      concealed_spec_rates <- concealed_spec_rates[1:num_concealed_states]
-      concealed_spec_rates <- sort(concealed_spec_rates)
+  if (model == "ETD" || model == "CR") {
+  
+    # ETD settings
+    for (i in seq_len(nrow(transition_list))) {
+      focal_state <- transition_list[i, 1]
+      daughter1   <- transition_list[i, 2]
+      daughter2   <- transition_list[i, 3]
+      target_rate <- transition_list[i, 4]
+  
+      for (j in seq_len(num_concealed_states)) {
+        incr <- (j - 1) * num_obs_states
+        focal_rate <- target_rate
+        #if (model == "CTD") focal_rate <- concealed_spec_rates[j]
+  
+        lambdas[[focal_state + incr]][daughter1 + incr,
+                                      daughter2 + incr] <- focal_rate
+        lambdas[[focal_state + incr]][daughter2 + incr,
+                                      daughter1 + incr] <- focal_rate
+      }
     }
   }
-
-  # ETD settings
-  for (i in seq_len(nrow(transition_list))) {
-    focal_state <- transition_list[i, 1]
-    daughter1   <- transition_list[i, 2]
-    daughter2   <- transition_list[i, 3]
-    target_rate <- transition_list[i, 4]
-
-    for (j in seq_len(num_concealed_states)) {
-      incr <- (j - 1) * num_obs_states
-      focal_rate <- target_rate
-      if (model == "CTD") focal_rate <- concealed_spec_rates[j]
-
-      lambdas[[focal_state + incr]][daughter1 + incr,
-                                    daughter2 + incr] <- focal_rate
-      lambdas[[focal_state + incr]][daughter2 + incr,
-                                    daughter1 + incr] <- focal_rate
+  
+  if (model == "CTD") {
+    for (i in seq_len(nrow(transition_list))) {
+      focal_state <- (transition_list[i, 1] - 1) * num_obs_states
+      daughter1   <- (transition_list[i, 2] - 1) * num_obs_states
+      daughter2   <- (transition_list[i, 3] - 1) * num_obs_states
+      target_rate <- transition_list[i, 4]
+      
+      for (incr in 1:num_concealed_states) {
+        
+        lambdas[[focal_state + incr]][daughter1 + incr,
+                                      daughter2 + incr] <- target_rate
+        lambdas[[focal_state + incr]][daughter2 + incr,
+                                      daughter1 + incr] <- target_rate
+      }
     }
   }
   return(lambdas)
@@ -134,6 +145,9 @@ create_q_matrix <- function(state_names,
                             diff.conceal = FALSE) {
 
   total_num_states <- length(state_names)
+  if (total_num_states != num_concealed_states) {
+    stop("number of concealed states has to be equal to the number of observed states")
+  }
   trans_matrix <- matrix(0, ncol = total_num_states,
                          nrow = total_num_states)
 
@@ -296,12 +310,33 @@ create_mu_vector <- function(state_names,
 
 #' @keywords internal
 replace_matrix <- function(focal_matrix,
-                           params) {
-  for (i in seq_len(nrow(focal_matrix))) {
-    for (j in seq_len(ncol(focal_matrix))) {
-      if (focal_matrix[i, j] != 0 && !is.na(focal_matrix[i, j]))  {
-        index <- focal_matrix[i, j]
-        focal_matrix[i, j] <- params[index]
+                           params,
+                           is_lambda = FALSE) {
+  if (is_lambda) {
+    entries <- table(focal_matrix)
+    entries <- entries[names(entries) != 0]
+    for (i in seq_len(nrow(focal_matrix))) {
+      for (j in seq_len(ncol(focal_matrix))) {
+        if (focal_matrix[i, j] != 0 && !is.na(focal_matrix[i, j]))  {
+          index <- focal_matrix[i, j]
+          
+          new_val <- params[index]
+          if (index %in% names(entries)) {
+            mult <- 1 / entries[names(entries) == index]
+            new_val <- new_val * mult
+          }
+          
+          focal_matrix[i, j] <- new_val
+        }
+      }
+    }
+  } else {
+    for (i in seq_len(nrow(focal_matrix))) {
+      for (j in seq_len(ncol(focal_matrix))) {
+        if (focal_matrix[i, j] != 0 && !is.na(focal_matrix[i, j]))  {
+          index <- focal_matrix[i, j]
+          focal_matrix[i, j] <- params[index]
+        }
       }
     }
   }
@@ -318,7 +353,7 @@ fill_in <- function(object,
                     params) {
   if (is.list(object)) { # lambda matrix
     for (k in seq_along(object)) {
-      object[[k]] <- replace_matrix(object[[k]], params)
+      object[[k]] <- replace_matrix(object[[k]], params, is_lambda = FALSE)
     }
   } else if (is.matrix(object)) {
     object <- replace_matrix(object, params)

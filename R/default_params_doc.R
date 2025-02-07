@@ -121,10 +121,6 @@
 #'  of the likelihood.
 #' @param model used model, choice of `"ETD"` (Examined Traits Diversification),
 #'  `"CTD"` (Concealed Traits Diversification) or `"CR"` (Constant Rate).
-#' @param concealed_spec_rates vector specifying the rate indicators for each
-#'  concealed state, length should be identical to `num_concealed_states`. If 
-#'  left empty when using the CTD model, it is assumed that all available 
-#'  speciation rates are distributed uniformly over the concealed states.
 #' @param shift_matrix matrix of shifts, indicating in order:
 #'  1. starting state (typically the column in the transition matrix)
 #'  2. ending state (typically the row in the transition matrix)
@@ -133,6 +129,11 @@
 #' @param lambda_list previously generated list of lambda matrices,
 #'  used to infer the rate number to start with.
 #' @param object lambda matrices, `q_matrix` or mu vector.
+#' @param start_at_crown if FALSE, the simulation starts with one species
+#' instead of the two assumed by default by secsse (also in ML), and 
+#' the resulting crown age will be lower than the set crown age. This allows
+#' for direct comparison with BiSSE and facilitates implementing speciation
+#' effects at the crown.
 #' @param params parameters in order, where each value reflects the value
 #'  of the parameter at that position, e.g. `c(0.3, 0.2, 0.1)` will fill out
 #'  the value 0.3 for the parameter with rate identifier 1, 0.2 for the
@@ -204,7 +205,6 @@ default_params_doc <- function(phy,
                                state_names,
                                transition_matrix,
                                model,
-                               concealed_spec_rates,
                                shift_matrix,
                                q_matrix,
                                lambda_list,
@@ -217,6 +217,7 @@ default_params_doc <- function(phy,
                                min_spec,
                                max_species_extant,
                                tree_size_hist,
+                               start_at_crown,
                                optimmethod) {
   # Nothing
 }

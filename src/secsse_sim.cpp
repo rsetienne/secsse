@@ -7,22 +7,23 @@
 
 
 #include <Rcpp.h>
-#include "secsse_sim.h"   // NOLINT [build/include_subdir]
+#include "secsse_sim2.h"   // NOLINT [build/include_subdir]
 #include <string>
 #include <algorithm>
 #include <numeric>
+#include <vector>
 
 
 namespace util {  // collection of left-overs
 
+using vec = std::vector< double >;
+using nummat = Rcpp::NumericMatrix;
 // Transpose Rcpp::NumericMatrix into
 // std::vector<std::vector<double>>
-void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
-                             std::vector< std::vector< double >>* v) {
-  (*v) = std::vector< std::vector< double> >(m.nrow(),
-   std::vector<double>(m.ncol(), 0.0));
+void numericmatrix_to_vector(const nummat& m, std::vector<vec>* v) {
+  (*v) = std::vector< vec >(m.nrow(), vec(m.ncol(), 0.0));
   for (int i = 0; i < m.nrow(); ++i) {
-    std::vector<double> row(m.ncol(), 0.0);
+    vec row(m.ncol(), 0.0);
     for (int j = 0; j < m.ncol(); ++j) {
       row[j] = m(i, j);
     }
@@ -31,12 +32,10 @@ void numericmatrix_to_vector(const Rcpp::NumericMatrix& m,
   return;
 }
 
-
-void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
-                             Rcpp::NumericMatrix* m) {
+void vector_to_numericmatrix(const std::vector< vec>& v, nummat* m) {
   size_t n_rows = v.size();
   size_t n_cols = v[0].size();
-  (*m) = Rcpp::NumericMatrix(n_rows, n_cols);
+  (*m) = nummat(n_rows, n_cols);
   for (size_t i = 0; i < n_rows; ++i) {
     for (size_t j = 0; j < n_cols; ++j) {
       (*m)(i, j) = v[i][j];
@@ -48,8 +47,8 @@ void vector_to_numericmatrix(const std::vector< std::vector< double >>& v,
 num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
   num_mat_mat out(lambdas_R.size());
   for (int m = 0; m < lambdas_R.size(); ++m) {
-    Rcpp::NumericMatrix entry_R = lambdas_R[m];
-    num_mat entry_cpp(entry_R.nrow(), std::vector<double>(entry_R.ncol(), 0.0));
+    nummat entry_R = lambdas_R[m];
+    num_mat entry_cpp(entry_R.nrow(), vec(entry_R.ncol(), 0.0));
     for (int i = 0; i < entry_R.nrow(); ++i) {
       for (int j = 0; j < entry_R.ncol(); ++j) {
         entry_cpp[i][j] = entry_R(i, j);
@@ -61,8 +60,6 @@ num_mat_mat list_to_nummatmat(const Rcpp::List& lambdas_R) {
 }
 
 }  // namespace util
-
-//' 
 
 // [[Rcpp::export]]
 Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
@@ -80,12 +77,14 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           int max_tries,
                           int seed,
                           const std::vector<double>& conditioning_vec,
-                          bool return_tree_size_hist) {
+                          bool return_tree_size_hist,
+                          bool start_at_crown) {
+  try {
   num_mat q;
   util::numericmatrix_to_vector(q_R, &q);
-  
+
   num_mat_mat lambdas = util::list_to_nummatmat(lambdas_R);
-  
+
   secsse_sim sim(m_R,
                  lambdas,
                  q,
@@ -94,7 +93,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  max_species_extant,
                  init_states,
                  non_extinction,
-                 seed);
+                 seed,
+                 start_at_crown);
   std::array<double, 6> tracker = {0, 0, 0, 0, 0, 0};
   std::vector<int> tree_size_hist;
   if (return_tree_size_hist) tree_size_hist = std::vector<int>(max_tries, -1);
@@ -103,25 +103,26 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
     sim.run();
     cnt++;
     if (return_tree_size_hist) sim.update_tree_size_hist(&tree_size_hist[cnt]);
-    
+
     if (sim.num_species() >= min_species) {
       sim.check_conditioning(condition,
                              num_concealed_states,
                              m_R.size(),
                              conditioning_vec);
-      
+
       if (sim.run_info == done) {
         break;
       } else {
         tracker[ sim.run_info ]++;
       }
-    } else { // if not reached minimum size
-      if (sim.run_info == extinct) tracker[extinct]++;
-      else {
+    } else {    // if not reached minimum size
+      if (sim.run_info == extinct) {
+        tracker[extinct]++;
+      } else {
         tracker[ 5 ]++;
       }
     }
-    
+
     if (verbose) {
       if (cnt % 1000 == 0) {
         Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
@@ -136,17 +137,26 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
     Rcpp::checkUserInterrupt();
     if (!non_extinction && sim.run_info == extinct) break;
   }
-  // extract and return
-  Rcpp::NumericMatrix ltable_for_r;
+
+  Rcpp::NumericMatrix ltable_for_r;      // extract and return
   util::vector_to_numericmatrix(sim.extract_ltable(), &ltable_for_r);
-  
+
   auto traits = sim.get_traits();
   auto init = sim.get_initial_state();
-  
-  Rcpp::List output = Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
-                                         Rcpp::Named("traits") = traits,
-                                         Rcpp::Named("initial_state") = init,
-                                         Rcpp::Named("tracker") = tracker,
-                                         Rcpp::Named("hist_tree_size") = tree_size_hist);
+
+  Rcpp::List output =
+    Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
+                       Rcpp::Named("traits") = traits,
+                       Rcpp::Named("initial_state") = init,
+                       Rcpp::Named("tracker") = tracker,
+                       Rcpp::Named("hist_tree_size") = tree_size_hist);
   return output;
+  } catch(std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (const char* msg) {
+    Rcpp::Rcout << msg << std::endl;
+  } catch(...) {
+    ::Rf_error("c++ exception (unknown reason)");
+  }
+  return NA_REAL;
 }

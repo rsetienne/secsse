@@ -189,7 +189,7 @@ test_that("test secsse_sim pool_init_states and complete tree", {
                                    crown_age = 10,
                                    num_concealed_states = 2,
                                    max_spec = 100,
-                                   min_spec = 99,
+                                   min_spec = 100,
                                    max_species_extant = FALSE,
                                    seed = 21,
                                    drop_extinct = FALSE,
@@ -203,4 +203,486 @@ test_that("test secsse_sim pool_init_states and complete tree", {
   }
   testthat::expect_gt(length(focal_tree$size_hist), 0)
 })
-                      
+
+
+test_that("test trait shift", {
+  states <- c("S", "G")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 2,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 2,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 5)
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 6))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 2,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = TRUE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  spec_S <- 0
+  spec_G <- 0
+  ext_S <- ext_G <- 0.0
+  q_SG <- 10.0
+  q_GS <- 0
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  
+  crown_age_used <- 5
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
+  
+  
+  testthat::expect_error(
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                  mus = sim_mu_vector_etd,
+                                  qs = sim_q_matrix_etd,
+                                  crown_age = crown_age_used,
+                                  num_concealed_states = 2,
+                                  conditioning = "none",
+                                  pool_init_states = c("S"))
+  )
+
+  spec_S <- 1e-10
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  
+  
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = 100,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 pool_init_states = c("S"))
+  
+  testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 0)
+})
+
+test_that("test mutate away shift", {
+  states <- c("S", "G", "D")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  spec_matrix <- rbind(spec_matrix, c("D", "S", "G", 3))
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 3,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 3,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 7)
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 8))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 3,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = FALSE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  used_params <- rep(0, 8)
+  
+  used_params[3] <- 1 # spec_D
+  
+  crown_age_used <- 5
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
+  
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 pool_init_states = c("D"))
+  
+  testthat::expect_true(length(sim_tree$phy$tip.label) == 2)
+  
+  testthat::expect_true(length(which(sim_tree$obs_traits == "D")) == 0)
+  testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 1)
+  testthat::expect_true(length(which(sim_tree$obs_traits == "G")) == 1)
+})
+
+test_that("test comparison musse", {
+  testthat::skip_on_ci()
+  testthat::skip_on_cran()
+  
+  if (!requireNamespace("diversitree")) testthat::skip()
+  
+  states <- c("S", "G", "D")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  spec_matrix <- rbind(spec_matrix, c("D", "D", "D", 3))
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 3,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 3,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 7)
+  shift_matrix <- rbind(shift_matrix, c( "S", "D", 8))
+  
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 9))
+  shift_matrix <- rbind(shift_matrix, c("G", "D", 10))
+  
+  shift_matrix <- rbind(shift_matrix, c( "D", "S", 11))
+  shift_matrix <- rbind(shift_matrix, c( "D", "G", 12))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 3,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = TRUE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  idparslist_ETD <- idparslist
+  
+  spec_S <- 0.1
+  spec_G <- 0.15
+  spec_D <- 0.2
+  
+  
+  ext_S <- ext_G <- ext_D <- 0.0
+  
+  q_SG <- 0.05
+  q_SD <- 0.0
+  
+  q_GS <- 0.05
+  q_GD <- 0.05
+  
+  q_DS <- 0.0
+  q_DG <- 0.05
+  
+  used_params <- c(spec_S, spec_G, spec_D,
+                   ext_S, ext_G, ext_D,
+                   q_SG, q_SD,
+                   q_GS, q_GD,
+                   q_DS, q_DG,
+                   0, 0, 0, 0, 0, 0)
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist_ETD[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist_ETD[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist_ETD[[3]], used_params)
+  
+  crown_age_used = 20
+  
+  num_repl <- 500 # increase if you want higher precision.
+  
+  found1 <- c()
+  found2 <- c()
+  
+  for (r in 1:num_repl) {
+    sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                   mus = sim_mu_vector_etd,
+                                   qs = sim_q_matrix_etd,
+                                   crown_age = crown_age_used,
+                                   num_concealed_states = 3,
+                                   conditioning = "none",
+                                   min_spec = 10,
+                                   pool_init_states = c("S"),
+                                   start_at_crown = FALSE)
+    
+    local_stats <- c(length(sim_tree$phy$tip.label))
+    freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
+    freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
+    freq_3 <- sum(sim_tree$obs_traits == "D") / length(sim_tree$obs_traits)
+
+    to_add <- c(unlist(local_stats), freq_1, freq_2, freq_3)
+    found1 <- rbind(found1, to_add)
+  }
+  
+  
+  for (r in 1:num_repl) {
+    sim_tree <- diversitree::tree.musse(pars = used_params[c(1:12)],
+                                        max.t = crown_age_used,
+                                        x0 = 1)
+    
+    while(length(sim_tree$tip.label) < 10) {
+      sim_tree <- diversitree::tree.musse(pars = used_params[c(1:12)],
+                                          max.t = crown_age_used,
+                                          x0 = 1)
+    }
+    
+    if (class(sim_tree) == "phylo") {
+      local_stats <- c(length(sim_tree$tip.label))
+      freq_1 <- sum(sim_tree$tip.state == 1) / length(sim_tree$tip.state)
+      freq_2 <- sum(sim_tree$tip.state == 2) / length(sim_tree$tip.state)
+      freq_3 <- sum(sim_tree$tip.state == 3) / length(sim_tree$tip.state)
+      
+      to_add <- c(unlist(local_stats), freq_1, freq_2, freq_3)
+      found2 <- rbind(found2, to_add)
+    }
+  }
+  
+  for (i in 1:4) {
+    a1 <- found1[, i]
+    a2 <- found2[, i]
+    b <- t.test(a1, a2)
+    testthat::expect_true(b$p.value > 0.05)
+  #  cat(i, mean(a1), mean(a2), b$p.value, "\n")
+  }
+})
+
+test_that("test comparison bisse", {
+  testthat::skip_on_ci()
+  testthat::skip_on_cran()
+  
+  if (!requireNamespace("diversitree")) testthat::skip()
+  
+  states <- c("S", "G")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 2,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 2,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 5)
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 6))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 2,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = TRUE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  idparslist_ETD <- idparslist
+  
+  spec_S <- 0.5
+  spec_G <- 1.0
+  ext_S <- ext_G <- 0.0
+  q_SG <- 0.05
+  q_GS <- 0.05
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist_ETD[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist_ETD[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist_ETD[[3]], used_params)
+  
+  crown_age_used = 5
+  
+  num_repl <- 100 # increase if you want higher precision.
+  
+  found1 <- c()
+  found2 <- c()
+  
+  for (r in 1:num_repl) {
+    sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                   mus = sim_mu_vector_etd,
+                                   qs = sim_q_matrix_etd,
+                                   crown_age = crown_age_used,
+                                   num_concealed_states = 2,
+                                   conditioning = "none",
+                                   min_spec = 10,
+                                   pool_init_states = c("S"),
+                                   start_at_crown = FALSE,
+                                   verbose = TRUE)
+    
+    local_stats <- c(length(sim_tree$phy$tip.label))
+    freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
+    freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
+    
+    to_add <- c(unlist(local_stats), freq_1, freq_2)
+    found1 <- rbind(found1, to_add)
+  }
+  
+  
+  for (r in 1:num_repl) {
+    sim_tree <- diversitree::tree.musse(pars = used_params[1:6],
+                                        max.t = crown_age_used,
+                                        x0 = 1)
+    
+    while (length(sim_tree$tip.label) < 10) {
+      sim_tree <- diversitree::tree.musse(pars = used_params[1:6],
+                                          max.t = crown_age_used,
+                                          x0 = 1)
+    }
+    
+    if (class(sim_tree) == "phylo") {
+      local_stats <- c(length(sim_tree$tip.label))
+      freq_1 <- sum(sim_tree$tip.state == 1) / length(sim_tree$tip.state)
+      freq_2 <- sum(sim_tree$tip.state == 2) / length(sim_tree$tip.state)
+      
+      to_add <- c(unlist(local_stats), freq_1, freq_2)
+      found2 <- rbind(found2, to_add)
+    }
+  }
+  
+  for (i in 1:3) {
+    a1 <- found1[, i]
+    a2 <- found2[, i]
+    b <- t.test(a1, a2)
+    testthat::expect_true(b$p.value > 0.05)
+ #   cat(i, mean(a1), mean(a2), b$p.value, "\n")
+  }
+})
+
+test_that("test comparison classe", {
+  
+  states <- c("S", "G", "D")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  spec_matrix <- rbind(spec_matrix, c("D", "D", "D", 3))
+  
+  spec_matrix <- rbind(spec_matrix, c("G", "S", "D", 4))
+  
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 3,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 3,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 8)
+  shift_matrix <- rbind(shift_matrix, c( "S", "D", 9))
+  
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 10))
+  shift_matrix <- rbind(shift_matrix, c("G", "D", 11))
+  
+  shift_matrix <- rbind(shift_matrix, c( "D", "S", 12))
+  shift_matrix <- rbind(shift_matrix, c( "D", "G", 13))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 3,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = TRUE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  idparslist_ETD <- idparslist
+  
+  spec_S <- 0.1
+  spec_G <- 0.0
+  spec_D <- 0.1
+  
+  spec_G_SD <- 0.2
+  
+  ext_S <- ext_G <- ext_D <- 0.0
+  
+  q_SG <- 0.0
+  q_SD <- 0.0
+  
+  q_GS <- 0.0
+  q_GD <- 0.0
+  
+  q_DS <- 0.0
+  q_DG <- 0.0
+  
+  num_repl <- 300
+  crown_age_used <- 30
+  
+  used_params <- c(spec_S, spec_G, spec_D, spec_G_SD,
+                   ext_S, ext_G, ext_D,
+                   q_SG, q_SD,
+                   q_GS, q_GD,
+                   q_DS, q_DG,
+                   0, 0, 0, 0, 0, 0)
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist_ETD[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist_ETD[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist_ETD[[3]], used_params)
+  
+  
+  lambda_S <- c(spec_S, 0, 0, 0, 0, 0)         # lambda111 lambda112 lambda113 lambda122 lambda123 lambda133
+  lambda_G <- c(0, 0, spec_G_SD, spec_G, 0, 0) # lambda211 lambda212 lambda213 lambda222 lambda223 lambda233 
+  lambda_D <- c(0, 0, 0, 0, 0, spec_D)         # lambda311 lambda312 lambda313 lambda322 lambda323 lambda333
+  
+  
+  params <- c(lambda_S, 
+              lambda_G, 
+              lambda_D,
+              ext_S, ext_G, ext_D,
+              q_SG, q_SD,
+              q_GS, q_GD,
+              q_DS, q_DG)
+  
+  found1 <- c()
+  found2 <- c()
+  
+  for (r in 1:num_repl) {
+    sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                   mus = sim_mu_vector_etd,
+                                   qs = sim_q_matrix_etd,
+                                   crown_age = crown_age_used,
+                                   num_concealed_states = 3,
+                                   conditioning = "none",
+                                   min_spec = 10,
+                                   pool_init_states = c("G"),
+                                   start_at_crown = FALSE)
+    
+    freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
+    freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
+    freq_3 <- sum(sim_tree$obs_traits == "D") / length(sim_tree$obs_traits)
+    
+    to_add <- c(freq_1, freq_2, freq_3)
+    found1 <- rbind(found1, to_add)
+  }
+  
+  for (r in 1:num_repl) {
+    sim_tree <- diversitree::tree.classe(pars = params,
+                                         max.t = crown_age_used,
+                                         x0 = 2)
+    
+    while (length(sim_tree$tip.label) < 10) {
+      sim_tree <- diversitree::tree.classe(pars = params,
+                                           max.t = crown_age_used,
+                                           x0 = 2)
+    }
+    
+    if (class(sim_tree) == "phylo") {
+      freq_1 <- sum(sim_tree$tip.state == 1) / length(sim_tree$tip.state)
+      freq_2 <- sum(sim_tree$tip.state == 2) / length(sim_tree$tip.state)
+      freq_3 <- sum(sim_tree$tip.state == 3) / length(sim_tree$tip.state)
+    
+      to_add <- c(freq_1, freq_2, freq_3)
+      found2 <- rbind(found2, to_add)
+    }
+  }
+  
+  testthat::expect_true(max(found1[, 2]) == max(found2[, 2]))
+  testthat::expect_true(max(found1[, 2]) == 0)
+})

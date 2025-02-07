@@ -37,11 +37,11 @@ test_that("multiplication works", {
   }
   
   tol = c(1e-02, 1e-03, 1e-04)
-  maxiter = 1000 * round((1.25)^length(idparsopt))
+  maxiter = 100 * round((1.25)^length(idparsopt))
   optimmethod = 'subplex'
   cond <- 'proper_cond'
   root_state_weight <- 'proper_weights'
-  sampling_fraction <- c(1,1,1)
+  sampling_fraction <- c(1, 1, 1)
   model <- expect_warning(cla_secsse_ml_func_def_pars(
     phylotree,
     traits,

@@ -83,7 +83,10 @@ master_ml <- function(phy,
                                                sampling_fraction,
                                                is_complete_tree,
                                                mus,
-                                               num_modeled_traits)
+                                               num_modeled_traits,
+                                               traitStates = 
+                                                 get_trait_states(idparslist,
+                                                                  num_concealed_states, TRUE))
 
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,
@@ -108,7 +111,8 @@ master_ml <- function(phy,
                                         num_threads = num_threads,
                                         atol = atol,
                                         rtol = rtol,
-                                        method = method)
+                                        method = method,
+                                        display_warning = FALSE)
   # Function here
   print_init_ll(initloglik = initloglik, verbose = verbose)
   if (initloglik == -Inf) {
@@ -288,7 +292,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     num_threads = num_threads,
                                     atol = atol,
                                     rtol = rtol,
-                                    method = method) {
+                                    method = method,
+                                    display_warning = FALSE) {
   alltrpars <- c(trparsopt, trparsfix)
   if (max(alltrpars) > 1 || min(alltrpars) < 0) {
     loglik <- -Inf
@@ -317,7 +322,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                             num_threads = num_threads,
                             method = method,
                             atol = atol,
-                            rtol = rtol)
+                            rtol = rtol,
+                            display_warning = display_warning)
 
     if (is.nan(loglik) || is.na(loglik)) {
       warning("There are parameter values used which cause

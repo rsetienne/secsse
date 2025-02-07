@@ -20,6 +20,7 @@ secsse_sim(
   verbose = FALSE,
   max_tries = 1e+06,
   drop_extinct = TRUE,
+  start_at_crown = TRUE,
   seed = NULL
 )
 }
@@ -68,6 +69,12 @@ non-extinction of the crown lineages. Defaults to \code{TRUE}.}
 
 \item{drop_extinct}{boolean stating if extinct species should be dropped from
 the tree. Defaults to \code{TRUE}.}
+
+\item{start_at_crown}{if FALSE, the simulation starts with one species
+instead of the two assumed by default by secsse (also in ML), and
+the resulting crown age will be lower than the set crown age. This allows
+for direct comparison with BiSSE and facilitates implementing speciation
+effects at the crown.}
 
 \item{seed}{pseudo-random number generator seed.}
 }

@@ -14,7 +14,7 @@ test_that("normal plotting", {
    helper_function <- function(x) {
      return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
    }
-  testthat::expect_silent(
+  testthat::expect_warning(
    px <- plot_state_exact(parameters = params,
                     phy = phy,
                     traits = traits,
@@ -81,7 +81,7 @@ test_that("cla plotting", {
     return(sum(x[c(10, 13, 16)]) / sum(x))
   }
 
-  testthat::expect_silent(
+  testthat::expect_warning(
     px <- secsse::plot_state_exact(parameters = model_R$MLpars,
                                    phy = phylotree,
                                    traits = traits,

@@ -74,8 +74,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // secsse_sim_cpp
-Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, bool max_species_extant, double min_species, const std::vector<double>& init_states, std::string condition, int num_concealed_states, bool non_extinction, bool verbose, int max_tries, int seed, const std::vector<double>& conditioning_vec, bool return_tree_size_hist);
-RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP max_species_extantSEXP, SEXP min_speciesSEXP, SEXP init_statesSEXP, SEXP conditionSEXP, SEXP num_concealed_statesSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP, SEXP seedSEXP, SEXP conditioning_vecSEXP, SEXP return_tree_size_histSEXP) {
+Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R, const Rcpp::List& lambdas_R, const Rcpp::NumericMatrix& q_R, double max_time, double max_species, bool max_species_extant, double min_species, const std::vector<double>& init_states, std::string condition, int num_concealed_states, bool non_extinction, bool verbose, int max_tries, int seed, const std::vector<double>& conditioning_vec, bool return_tree_size_hist, bool start_at_crown);
+RcppExport SEXP _secsse_secsse_sim_cpp(SEXP m_RSEXP, SEXP lambdas_RSEXP, SEXP q_RSEXP, SEXP max_timeSEXP, SEXP max_speciesSEXP, SEXP max_species_extantSEXP, SEXP min_speciesSEXP, SEXP init_statesSEXP, SEXP conditionSEXP, SEXP num_concealed_statesSEXP, SEXP non_extinctionSEXP, SEXP verboseSEXP, SEXP max_triesSEXP, SEXP seedSEXP, SEXP conditioning_vecSEXP, SEXP return_tree_size_histSEXP, SEXP start_at_crownSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -95,7 +95,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type conditioning_vec(conditioning_vecSEXP);
     Rcpp::traits::input_parameter< bool >::type return_tree_size_hist(return_tree_size_histSEXP);
-    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, max_species_extant, min_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed, conditioning_vec, return_tree_size_hist));
+    Rcpp::traits::input_parameter< bool >::type start_at_crown(start_at_crownSEXP);
+    rcpp_result_gen = Rcpp::wrap(secsse_sim_cpp(m_R, lambdas_R, q_R, max_time, max_species, max_species_extant, min_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed, conditioning_vec, return_tree_size_hist, start_at_crown));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -104,7 +105,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_secsse_eval_cpp", (DL_FUNC) &_secsse_eval_cpp, 12},
     {"_secsse_calc_ll_cpp", (DL_FUNC) &_secsse_calc_ll_cpp, 12},
     {"_secsse_ct_condition_cpp", (DL_FUNC) &_secsse_ct_condition_cpp, 9},
-    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 16},
+    {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 17},
     {NULL, NULL, 0}
 };
 

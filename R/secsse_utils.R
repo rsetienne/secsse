@@ -807,17 +807,21 @@ create_states <- function(usetraits,
 
     for (iii in seq_along(traitStates)) {  # Initial state probabilities
         StatesPresents <- d + iii
-        toPlaceOnes <- StatesPresents +
-            length(traitStates) * (0:(num_concealed_states - 1))
+        toPlaceOnes <- StatesPresents + 
+                       length(traitStates) * (0:(num_concealed_states - 1))
         tipSampling <- 1 * sampling_fraction
-        states[which(usetraits ==
-                         traitStates[iii]), toPlaceOnes] <- tipSampling[iii]
+        states[which(usetraits == traitStates[iii]), 
+               toPlaceOnes] <- tipSampling[iii]
     }
 
   if (is_complete_tree) {
     extinct_species <- geiger::is.extinct(phy)
     if (!is.null(extinct_species)) {
       for (i in seq_along(extinct_species)) {
+        
+        entry <- mus * states[which(phy$tip.label == extinct_species[i]), 
+                              (d + 1):ly]
+        
         states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
           mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
       }
@@ -830,7 +834,7 @@ create_states <- function(usetraits,
       states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
     }
   }
-    return(states)
+  return(states)
 }
 
 #' @keywords internal
@@ -841,7 +845,8 @@ build_states <- function(phy,
                          is_complete_tree = FALSE,
                          mus = NULL,
                          num_unique_traits = NULL,
-                         first_time = FALSE) {
+                         first_time = FALSE,
+                         traitStates = NULL) {
     if (!is.matrix(traits)) {
         traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
     }
@@ -849,11 +854,12 @@ build_states <- function(phy,
     if (length(phy$tip.label) != nrow(traits)) {
      stop("Number of species in the tree must be the same as in the trait file")
     }
+  
     # if there are traits that are not in the observed tree,
     # the user passes these themselves.
     # yes, this is a weird use-case
 
-    traitStates <- sort(unique(traits[, 1]))
+    if (is.null(traitStates)) traitStates <- sort(unique(traits[, 1]))
 
     if (!is.null(num_unique_traits)) {
         if (num_unique_traits > length(traitStates)) {
@@ -861,6 +867,12 @@ build_states <- function(phy,
                 message("found un-observed traits, expanding state space")
             traitStates <- 1:num_unique_traits
         }
+    }
+    
+    obs_traits <- unique(traits[, 1])
+    obs_traits <- obs_traits[!is.na(obs_traits)]
+    if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
+      stop("Tip traits are not in idparslist")
     }
 
     nb_tip <- ape::Ntip(phy)
@@ -899,7 +911,8 @@ build_initStates_time <- function(phy,
                                   is_complete_tree = FALSE,
                                   mus = NULL,
                                   num_unique_traits = NULL,
-                                  first_time = FALSE) {
+                                  first_time = FALSE,
+                                  traitStates = NULL) {
     states <- build_states(phy,
                            traits,
                            num_concealed_states,
@@ -907,7 +920,8 @@ build_initStates_time <- function(phy,
                            is_complete_tree,
                            mus,
                            num_unique_traits,
-                           first_time)
+                           first_time,
+                           traitStates)
     phy$node.label <- NULL
     split_times <- sort(event_times(phy), decreasing = FALSE)
     ances <- as.numeric(names(split_times))
@@ -1128,4 +1142,140 @@ check_ml_conditions <- function(traits,
   if (min(initparsopt) <= 0.0) {
     stop("All elements in init_parsopt need to be larger than 0")
   }
+}
+
+#' @keywords internal
+get_trait_states <- function(idparslist,
+                             num_concealed_states,
+                             display_warning = TRUE) {
+  trait_names <- names(idparslist[[1]])
+  if (is.null(trait_names)) trait_names <- names(idparslist[[2]])
+  if (is.null(trait_names)) trait_names <- colnames(idparslist[[3]])
+  
+  
+  if (is.null(trait_names)) return(NULL)
+
+  # by convention, hidden states are appended A,B,C letters
+  num_traits <- length(idparslist[[2]]) / num_concealed_states
+  focal_names <- trait_names[1:num_traits]
+  
+  if (display_warning) {
+    output <- "Deduced names and order of used states to be: "
+    
+    for (i in seq_along(focal_names)) {
+      focal_names[i] <- substr(focal_names[i], 1, nchar(focal_names[i]) - 1)
+      if (i != length(focal_names)) {
+        output <- paste0(output, focal_names[i], ", ")
+      } else {
+        output <- paste0(output, focal_names[i])
+      }
+    }
+    
+    rlang::warn(message = paste0(output, "\n", "if this is incorrect, consider passing states as matching numeric 
+  ordering, e.g. 1 for the first state, 2 for the second etc."))
+  }
+
+  return(focal_names)
+}
+
+#' @keywords internal
+extract_data <- function(mat) {
+  to_plot <- c()
+  for (i in 1:nrow(mat)) {
+    for (j in 1:ncol(mat)) {
+      entry <- mat[i, j]
+      if (!is.na(entry)) {
+        if (entry > 0) {
+          x <- colnames(mat)[i]
+          y <- rownames(mat)[j]
+          to_plot <- rbind(to_plot, c(x, y, entry))
+        }
+      }
+    }
+  }
+  return(to_plot)
+}
+
+#' @keywords internal
+get_rates <- function(lambda_list, all_states, lambda_order) {
+  to_plot <- c()
+  for (i in seq_along(all_states)) {
+    local_v <- extract_data(lambda_list[[i]])
+    colnames(local_v) <- c("x", "y", "rate")
+    local_v <- as.data.frame(local_v)
+    
+    local_v$focal_rate <- lambda_order[i]
+    to_plot <- rbind(to_plot, local_v)
+  }
+  
+  to_plot$x <- factor(to_plot$x, levels = all_states)
+  to_plot$y <- factor(to_plot$y, levels = rev(all_states))
+  to_plot$focal_rate <- factor(to_plot$focal_rate, levels = all_states)
+  return(to_plot)
+}
+
+
+#' function to visualize the structure of the idparslist
+#' @param idparslist idparslist setup list
+#' @param state_names names of all states (including concealed states)
+#' @return list with two ggplot objects: plot_qmat which visualizes the 
+#' q_matrix, and plot_lambda which visualizes the lambda matrices. 
+#' @export
+#' @examples
+#' idparslist <- list()
+#' focal_matrix <-
+#' secsse::create_default_lambda_transition_matrix(state_names = c("1", "2"),
+#'                                                 model = "CR")
+#' idparslist[[1]] <- 
+#'   secsse::create_lambda_list(state_names = c("1", "2"),
+#'                              num_concealed_states = 2,
+#'                              transition_matrix = focal_matrix,
+#'                              model = "CR")
+#' idparslist[[2]] <- secsse::create_mu_vector(state_names = c("1", "2"),
+#'                                             num_concealed_states = 2,
+#'                                             model = "CR",
+#'                                             lambda_list = idparslist[[1]])
+#' shift_mat <- secsse::create_default_shift_matrix(state_names = c("1", "2"),
+#'                                                  num_concealed_states = 2,
+#'                                                  mu_vector = idparslist[[2]])
+#' idparslist[[3]] <- secsse::create_q_matrix(state_names = c("1", "2"),
+#'                                            num_concealed_states = 2,
+#'                                            shift_matrix = shift_mat,
+#'                                            diff.conceal = FALSE)
+#' p <- plot_idparslist(idparslist, state_names = names(idparslist[[1]]))
+#' p$plot_lambda
+#' p$plot_qmat
+plot_idparslist <- function(idparslist, 
+                            state_names) {
+  
+  v <- extract_data(idparslist[[3]])
+  colnames(v) <- c("x", "y", "rate")
+  v <- as.data.frame(v)
+  
+  v$x <- factor(v$x, levels = state_names)
+  v$y <- factor(v$y, levels = rev(state_names))
+  
+  plot_qmat <- 
+    ggplot2::ggplot(v, 
+                    ggplot2::aes(x = .data[["x"]], 
+                                 y = .data[["y"]], 
+                                 fill = .data[["rate"]])) +
+    ggplot2::geom_tile()
+  
+  to_plot <- get_rates(idparslist[[1]], state_names, state_names)
+  
+  to_plot$x <- factor(to_plot$x, levels = state_names)
+  to_plot$y <- factor(to_plot$y, levels = rev(state_names))
+  to_plot$focal_rate <- factor(to_plot$focal_rate, levels = state_names)
+  
+  plot_lambda <- 
+    ggplot2::ggplot(to_plot, 
+                    ggplot2::aes(x = .data[["x"]], 
+                                 y = .data[["y"]], 
+                                 fill = .data[["rate"]])) +
+    ggplot2::geom_tile() +
+    ggplot2::facet_wrap(~.data[["focal_rate"]])
+  
+  return(list("plot_qmat" = plot_qmat,
+              "plot_lambda" = plot_lambda))
 }

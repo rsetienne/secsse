@@ -36,6 +36,7 @@ secsse_sim <- function(lambdas,
                        verbose = FALSE,
                        max_tries = 1e6,
                        drop_extinct = TRUE,
+                       start_at_crown = TRUE,
                        seed = NULL) {
 
   if (is.matrix(lambdas)) {
@@ -111,8 +112,14 @@ secsse_sim <- function(lambdas,
                         max_tries,
                         seed,
                         condition_vec,
-                        tree_size_hist)
+                        tree_size_hist,
+                        start_at_crown)
 
+  if (length(res) < 1) { # this happens upon a throw
+    return(list(phy = "ds",
+                traits = 0))
+  }
+  
   Ltable        <- res$ltable
   
   out_hist <- 0
@@ -155,9 +162,9 @@ secsse_sim <- function(lambdas,
   speciesTraits <- 1 + Ltable[, 5]
   used_id <- abs(Ltable[, 3])
 
-  phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
-  
- 
+  #phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
+  phy <- treestats::l_to_phylo(Ltable, drop_extinct = drop_extinct)
+
   if (drop_extinct) {
     to_drop <- which(Ltable[, 4] != -1)
     if (length(to_drop) > 0) {

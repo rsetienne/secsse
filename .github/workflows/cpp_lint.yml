@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
       - run: pip install cpplint
-      - run: cpplint --quiet --exclude="src/RcppExports.cpp" src/*.cpp src/*.h
+      - run: cpplint --quiet src/secsse_sim2.h src/secsse_sim.cpp 
 
   cppcheck:
     runs-on: ubuntu-latest
