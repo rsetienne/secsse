@@ -72,7 +72,7 @@ secsse_single_branch_loglik <- function(parameter,
                         see_states = see_ancestral_states)
 
   loglik <- calcul$loglik
-  nodeM <- calcul$node_M
+  nodeM <- calcul$merge_branch
   mergeBranch <- calcul$merge_branch
   
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
