@@ -17,7 +17,7 @@ secsse_sim_cpp <- function(m_R, lambdas_R, q_R, max_time, max_species, max_speci
     .Call(`_secsse_secsse_sim_cpp`, m_R, lambdas_R, q_R, max_time, max_species, max_species_extant, min_species, init_states, condition, num_concealed_states, non_extinction, verbose, max_tries, seed, conditioning_vec, return_tree_size_hist, start_at_crown)
 }
 
-calc_ll_single_branch_cpp <- function(rhs, states, forTime, lambdas, mus, Q, method, atol, rtol, is_complete_tree, see_states) {
-    .Call(`_secsse_calc_ll_single_branch_cpp`, rhs, states, forTime, lambdas, mus, Q, method, atol, rtol, is_complete_tree, see_states)
+calc_ll_single_branch_cpp <- function(rhs, states, forTime, lambdas, mus, Q, method, atol, rtol, see_states) {
+    .Call(`_secsse_calc_ll_single_branch_cpp`, rhs, states, forTime, lambdas, mus, Q, method, atol, rtol, see_states)
 }
 

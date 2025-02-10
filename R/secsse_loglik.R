@@ -62,6 +62,12 @@ master_loglik <- function(parameter,
                            traitStates = traitStates)
   }
 
+  cat("states: \n");
+  for (i in 1:length(states[, 1])) {
+    cat(states[i, ], "\n")
+  }
+  
+  
   RcppParallel::setThreadOptions(numThreads = num_threads)
   calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
                         ances = ances,
@@ -78,9 +84,13 @@ master_loglik <- function(parameter,
   loglik <- calcul$loglik
   nodeM <- calcul$node_M
   mergeBranch <- calcul$merge_branch
-
+  
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
+  cat("ll: ", loglik, "\n")
+  cat("nodeM: ", nodeM, "\n")
+  cat("mergeBranch: ", mergeBranch, "\n")
+  
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
                                      num_concealed_states,
