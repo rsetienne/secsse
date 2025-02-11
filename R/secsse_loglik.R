@@ -15,6 +15,29 @@ master_loglik <- function(parameter,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer",
                           display_warning = TRUE) {
+  
+  if (inherits(phy, "multiPhylo")) {
+    if (!is.list(traits)) {
+      stop("traits needs to be supplied as a list now that there are multiple phylogenies")
+    }
+    return(multi_loglik(parameter,
+                        phy,
+                        traits,
+                        num_concealed_states,
+                        cond = cond,
+                        root_state_weight = root_state_weight,
+                        sampling_fraction = sampling_fraction,
+                        setting_calculation = setting_calculation,
+                        see_ancestral_states = see_ancestral_states,
+                        loglik_penalty = 0,
+                        is_complete_tree = is_complete_tree,
+                        num_threads = num_threads,
+                        atol = atol,
+                        rtol = rtol,
+                        method = method,
+                        display_warning = display_warning))
+  }
+
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -61,12 +84,6 @@ master_loglik <- function(parameter,
                            num_unique_traits = num_modeled_traits,
                            traitStates = traitStates)
   }
-
- # cat("states: \n");
-#  for (i in 1:length(states[, 1])) {
-#    cat(states[i, ], "\n")
-#  }
-  
   
   RcppParallel::setThreadOptions(numThreads = num_threads)
   calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
@@ -85,11 +102,30 @@ master_loglik <- function(parameter,
   nodeM <- calcul$node_M
   mergeBranch <- calcul$merge_branch
   
+  # cat(nodeM, "\n")
+  # cat(mergeBranch, "\n")
+  
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
- # cat("ll: ", loglik, "\n")
- # cat("nodeM: ", nodeM, "\n")
- #  cat("mergeBranch: ", mergeBranch, "\n")
+  if (!is.null(phy$root.edge) ) {
+    if (phy$root.edge > 0) {
+      calcul <- calc_ll_single_branch_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
+                                          states = c(nodeM[1:d], mergeBranch),
+                                          forTime = c(0, phy$root.edge),
+                                          lambdas = lambdas,
+                                          mus = mus,
+                                          Q = q_matrix,
+                                          method = method,
+                                          atol = atol,
+                                          rtol = rtol,
+                                          see_states = see_ancestral_states)
+      loglik <- loglik + calcul$loglik
+      nodeM <- calcul$states
+      mergeBranch <- calcul$merge_branch
+    }
+  }
+  
+  
   
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
@@ -196,6 +232,84 @@ secsse_loglik <- function(parameter,
                 atol = atol,
                 rtol = rtol,
                 method = method)
+}
+
+#' @keywords internal
+multi_loglik <- function(parameter,
+                         phy,
+                         traits,
+                         num_concealed_states,
+                         cond = "proper_cond",
+                         root_state_weight = "proper_weights",
+                         sampling_fraction,
+                         setting_calculation = NULL,
+                         see_ancestral_states = FALSE,
+                         loglik_penalty = 0,
+                         is_complete_tree = FALSE,
+                         num_threads = 1,
+                         atol = 1e-8,
+                         rtol = 1e-7,
+                         method = "odeint::bulirsch_stoer",
+                         display_warning = TRUE) {
+  
+   get_ll <- function(focal_data) {
+    focal_tree <- focal_data$tree
+    focal_traits <- focal_data$traits
+    
+    if (length(focal_tree$tip.label) == 1) {
+       return(secsse::secsse_single_branch_loglik(parameter,
+                                                  focal_tree,
+                                                  focal_traits,
+                                                  num_concealed_states =
+                                                    num_concealed_states,
+                                                  cond = cond,
+                                                  root_state_weight = 
+                                                    root_state_weight,
+                                                  sampling_fraction = 
+                                                    sampling_fraction,
+                                                  setting_calculation = NULL,
+                                                  see_ancestral_states = FALSE,
+                                                  loglik_penalty = 0,
+                                                  is_complete_tree = 
+                                                    is_complete_tree,
+                                                  num_threads = num_threads,
+                                                  atol = atol,
+                                                  rtol = rtol,
+                                                  method = method,
+                                                  display_warning = FALSE))
+    } else {
+       return(secsse_loglik(parameter,
+                            focal_tree,
+                            focal_traits,
+                            num_concealed_states,
+                            cond = cond,
+                            root_state_weight = root_state_weight,
+                            sampling_fraction = sampling_fraction,
+                            setting_calculation = NULL,
+                            see_ancestral_states = FALSE,
+                            loglik_penalty = 0,
+                            is_complete_tree = is_complete_tree,
+                            num_threads = num_threads,
+                            atol = atol,
+                            rtol = rtol,
+                            method = method)) 
+    }
+  }
+  
+  focal_data <- list()
+  for (i in 1:length(phy)) {
+    focal_data[[i]] <- list("tree", "traits")
+    
+    focal_data[[i]]$tree <- phy[[i]]
+    focal_data[[i]]$traits <- traits[[i]]
+  }
+  
+  
+  res <- lapply(focal_data, get_ll)
+  
+  ll <- do.call(sum, res)
+  
+  return(ll) 
 }
 
 #' @title Likelihood for SecSSE model, using Rcpp

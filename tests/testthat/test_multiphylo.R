@@ -1,9 +1,9 @@
-test_that("single branch check", {
+test_that("multi phylo", {
   set.seed(42)
-  focal_tree <- TreeSim::sim.bd.taxa(n = 2, numbsim = 1, 
+  focal_tree <- TreeSim::sim.bd.taxa(n = 3, numbsim = 1, 
                                      lambda = 1, mu = 0)[[1]]
   focal_tree$root.edge <- NULL
-  traits <- c(1, 1)
+  traits <- c(1, 1, 1)
   
   num_concealed_states <- 2
   idparslist <- cla_id_paramPos(c(1, 2), num_concealed_states)
@@ -17,10 +17,10 @@ test_that("single branch check", {
                                                   num_concealed_states,
                                                   idparslist[[1]])
   
- # Expect warning because some transitions are set to be impossible
-
+  # Expect warning because some transitions are set to be impossible
+  
   params <- c(0.3, 0.0, 0.0) # extinction and shifts to zero, to allow direct
-                             # comparison
+  # comparison
   
   lambdas <- secsse::fill_in(idparslist[[1]], params)
   mus <- secsse::fill_in(idparslist[[2]], params)
@@ -33,34 +33,31 @@ test_that("single branch check", {
   
   sf <- c(1, 1)
   
+  focal_tree$root.edge <- NULL
   testthat::expect_warning(
-    res1 <- secsse::cla_secsse_loglik(parameter = parslist,
+  res1 <- secsse::cla_secsse_loglik(parameter = parslist,
                                     phy = focal_tree,
                                     traits = traits,
                                     num_concealed_states = num_concealed_states,
                                     sampling_fraction = sf,
                                     cond = "no_cond")
   )
-  # create phylogeny with single branch:
+  trees <- list()
+  trees[[1]]<- focal_tree
+  trees[[2]]<- focal_tree
   
-  phy <- focal_tree
-  phy$edge <- phy$edge[-2, ]
-  phy$edge.length <- phy$edge.length[-2]
-  phy$tip.label <- phy$tip.label[-2]
-  traits <- traits[-2]
+  class(trees) <- "multiPhylo"
   
+  trait_list <- list()
+  trait_list[[1]] <- traits
+  trait_list[[2]] <- traits
   testthat::expect_warning(
-  res2 <- secsse::secsse_single_branch_loglik(parameter = parslist,
-                                              phy = phy,
-                                              traits = traits,
-                                              num_concealed_states = 
-                                                num_concealed_states,
-                                              sampling_fraction = sf,
-                                              cond = "no_cond")
+  res2 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                    phy = trees,
+                                    traits = trait_list,
+                                    num_concealed_states = num_concealed_states,
+                                    sampling_fraction = sf,
+                                    cond = "no_cond")
   )
-  sz <- res2$nodeM * params[1]
-  prefact <- log(sum(abs(sz)))
-  answ_normal <- (res1 - prefact) / 2
-  answ_single_branch <- res2$loglik
-  testthat::expect_equal(answ_normal, answ_single_branch)
+  testthat::expect_equal(2*res1, res2)
 })
