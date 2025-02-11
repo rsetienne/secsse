@@ -72,8 +72,12 @@ secsse_single_branch_loglik <- function(parameter,
                         see_states = see_ancestral_states)
 
   loglik <- calcul$loglik
-  nodeM <- calcul$merge_branch
+  nodeM <- calcul$states
   mergeBranch <- calcul$merge_branch
+  
+#  cat("ll: ", loglik, "\n")
+#  cat("nodeM: ", nodeM, "\n")
+#  cat("mergeBranch: ", mergeBranch, "\n")
   
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
   
@@ -97,7 +101,8 @@ secsse_single_branch_loglik <- function(parameter,
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
-  
+ 
+  if (1 == 2) { 
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
     num_tips <- ape::Ntip(phy)
@@ -109,4 +114,9 @@ secsse_single_branch_loglik <- function(parameter,
   } else {
     return(LL)
   }
+  }
+  
+  return(list("loglik" = LL,
+              "nodeM" = nodeM,
+              "merge_branch" = mergeBranch))
 }

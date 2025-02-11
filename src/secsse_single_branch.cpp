@@ -34,8 +34,11 @@ Rcpp::List calc_ll_single_branch(std::unique_ptr<ODE> od,
   auto loglik = secsse::normalize_loglik(std::begin(states_out) + d, 
                                          std::end(states_out));
   
+  const auto merge_branch = std::vector<double>(std::begin(states_out) + d, 
+                                                std::end(states_out));
+  
   return Rcpp::List::create(Rcpp::Named("loglik") = loglik,
-                            Rcpp::Named("merge_branch") = states_out,
+                            Rcpp::Named("merge_branch") = merge_branch,
                             Rcpp::Named("states") = states_out,
                             Rcpp::Named("duration") = DT.count());
 }
