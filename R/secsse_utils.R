@@ -370,8 +370,9 @@ prepare_full_lambdas <- function(traits,
 
 #' @keywords internal
 penalty <- function(pars, loglik_penalty = 0) {
-    pars <- unlist(unlist(pars))
-    return(loglik_penalty * sum(pars^2) / (2 * length(pars)))
+  if (loglik_penalty == 0) return(0)
+  pars <- unlist(unlist(pars))
+  return(loglik_penalty * sum(pars^2) / (2 * length(pars)))
 }
 
 #' @keywords internal

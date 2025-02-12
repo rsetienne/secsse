@@ -216,7 +216,8 @@ secsse_loglik <- function(parameter,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,
-                          method = "odeint::bulirsch_stoer") {
+                          method = "odeint::bulirsch_stoer",
+                          display_warning = TRUE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -231,7 +232,8 @@ secsse_loglik <- function(parameter,
                 num_threads = num_threads,
                 atol = atol,
                 rtol = rtol,
-                method = method)
+                method = method,
+                display_warning = display_warning)
 }
 
 #' @keywords internal
@@ -250,7 +252,7 @@ multi_loglik <- function(parameter,
                          atol = 1e-8,
                          rtol = 1e-7,
                          method = "odeint::bulirsch_stoer",
-                         display_warning = TRUE) {
+                         display_warning = FALSE) {
   
    get_ll <- function(focal_data) {
     focal_tree <- focal_data$tree
@@ -278,7 +280,7 @@ multi_loglik <- function(parameter,
                                                   atol = atol,
                                                   rtol = rtol,
                                                   method = method,
-                                                  display_warning = FALSE))
+                                                  display_warning = display_warning))
     } else {
        return(secsse_loglik(parameter,
                             focal_tree,
@@ -294,7 +296,8 @@ multi_loglik <- function(parameter,
                             num_threads = num_threads,
                             atol = atol,
                             rtol = rtol,
-                            method = method)) 
+                            method = method,
+                            display_warning = display_warning)) 
     }
   }
   
