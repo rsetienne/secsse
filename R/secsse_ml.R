@@ -77,16 +77,33 @@ master_ml <- function(phy,
 
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
 
-  setting_calculation <- build_initStates_time(phy,
-                                               traits,
-                                               num_concealed_states,
-                                               sampling_fraction,
-                                               is_complete_tree,
-                                               mus,
-                                               num_modeled_traits,
-                                               traitStates = 
-                                                 get_trait_states(idparslist,
-                                                                  num_concealed_states, TRUE))
+  if (!is.list(traits)) {
+  
+    setting_calculation <- build_initStates_time(phy,
+                                                 traits,
+                                                 num_concealed_states,
+                                                 sampling_fraction,
+                                                 is_complete_tree,
+                                                 mus,
+                                                 num_modeled_traits,
+                                                 traitStates = 
+                                                   get_trait_states(idparslist,
+                                                                    num_concealed_states, TRUE))
+  } else {
+    setting_calculation <- list()
+    for (i in 1:length(phy)) {
+      setting_calculation[[i]] <- build_initStates_time(phy[[i]],
+                                                   traits[[i]],
+                                                   num_concealed_states,
+                                                   sampling_fraction,
+                                                   is_complete_tree,
+                                                   mus,
+                                                   num_modeled_traits,
+                                                   traitStates = 
+                                                     get_trait_states(idparslist,
+                                                                      num_concealed_states, TRUE))
+    }
+  }
 
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,

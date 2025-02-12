@@ -323,14 +323,14 @@ prepare_full_lambdas <- function(traits,
                                  lambd_and_modeSpe) {
     if (is.list(lambd_and_modeSpe)) return(lambd_and_modeSpe)
 
-    num_exami <- length(sort(unique(traits)))
+    num_exami <- length(sort(unique(unlist(traits))))
     mat_size <- num_exami * num_concealed_states
     posib_trans <- matrix(1,
                           ncol = num_exami,
                           nrow = num_exami,
                           byrow = TRUE)
     diag(posib_trans) <- NA
-    posib_trans <- q_doubletrans(traits,
+    posib_trans <- q_doubletrans(unique(unlist(traits)),
                                  masterBlock = posib_trans,
                                  diff.conceal = FALSE)
 

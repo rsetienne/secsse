@@ -255,6 +255,7 @@ multi_loglik <- function(parameter,
    get_ll <- function(focal_data) {
     focal_tree <- focal_data$tree
     focal_traits <- focal_data$traits
+    focal_setting_calculation <- focal_data$setting_calculation
     
     if (length(focal_tree$tip.label) == 1) {
        return(secsse::secsse_single_branch_loglik(parameter,
@@ -267,7 +268,8 @@ multi_loglik <- function(parameter,
                                                     root_state_weight,
                                                   sampling_fraction = 
                                                     sampling_fraction,
-                                                  setting_calculation = NULL,
+                                                  setting_calculation = 
+                                                    focal_setting_calculation,
                                                   see_ancestral_states = FALSE,
                                                   loglik_penalty = 0,
                                                   is_complete_tree = 
@@ -285,7 +287,7 @@ multi_loglik <- function(parameter,
                             cond = cond,
                             root_state_weight = root_state_weight,
                             sampling_fraction = sampling_fraction,
-                            setting_calculation = NULL,
+                            setting_calculation = focal_setting_calculation,
                             see_ancestral_states = FALSE,
                             loglik_penalty = 0,
                             is_complete_tree = is_complete_tree,
@@ -298,14 +300,22 @@ multi_loglik <- function(parameter,
   
   focal_data <- list()
   for (i in 1:length(phy)) {
-    focal_data[[i]] <- list("tree", "traits")
+    focal_data[[i]] <- list()
     
     focal_data[[i]]$tree <- phy[[i]]
     focal_data[[i]]$traits <- traits[[i]]
+    focal_data[[i]]$setting_calculation <- NULL
+    if (is.list(setting_calculation)) {
+      focal_data[[i]]$setting_calculation <- setting_calculation[[i]]
+    }
   }
   
   
   res <- lapply(focal_data, get_ll)
+  #for (i in 1:length(focal_data)) {
+  #  res[[i]] <- get_ll(focal_data[[i]])
+  #}
+  
   
   ll <- do.call(sum, res)
   
