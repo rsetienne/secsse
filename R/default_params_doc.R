@@ -150,7 +150,7 @@
 #' @param ml_pars resulting parameter estimates as returned by for instance
 #'  [cla_secsse_ml()], having the same structure as `param_post`.
 #' @param mu_vector previously defined mus - used to choose indicator number.
-#'
+#' @param display_warning display a warning if necessary
 #' @return Nothing
 #' @keywords internal
 #' @export

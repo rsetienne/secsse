@@ -286,6 +286,8 @@ effects at the crown.}
 conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
 simplex is implemented natively in \link{DDD}, while subplex is ultimately
 called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
+
+\item{display_warning}{display a warning if necessary}
 }
 \value{
 Nothing

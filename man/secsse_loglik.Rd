@@ -21,7 +21,8 @@ secsse_loglik(
   num_threads = 1,
   atol = 1e-08,
   rtol = 1e-07,
-  method = "odeint::bulirsch_stoer"
+  method = "odeint::bulirsch_stoer",
+  display_warning = TRUE
 )
 }
 \arguments{
@@ -72,6 +73,8 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+
+\item{display_warning}{display a warning if necessary}
 }
 \value{
 The loglikelihood of the data given the parameter.
