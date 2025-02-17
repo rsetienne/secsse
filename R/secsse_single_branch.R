@@ -94,7 +94,8 @@ secsse_single_branch_loglik <- function(parameter,
                             mergeBranch,
                             weight_states,
                             lambdas,
-                            nodeM)
+                            nodeM,
+                            is_root_edge = TRUE)
   
   wholeLike <- sum((mergeBranch2) * (weight_states))
   

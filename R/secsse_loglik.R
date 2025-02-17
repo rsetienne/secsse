@@ -151,7 +151,8 @@ master_loglik <- function(parameter,
                             mergeBranch,
                             weight_states,
                             lambdas,
-                            nodeM)
+                            nodeM,
+                            is_root_edge = take_into_account_root_edge)
 
   wholeLike <- sum((mergeBranch2) * (weight_states))
 
@@ -232,6 +233,7 @@ secsse_loglik <- function(parameter,
                 see_ancestral_states = see_ancestral_states,
                 loglik_penalty = loglik_penalty,
                 is_complete_tree = is_complete_tree,
+                take_into_account_root_edge = take_into_account_root_edge,
                 num_threads = num_threads,
                 atol = atol,
                 rtol = rtol,
@@ -280,8 +282,6 @@ multi_loglik <- function(parameter,
                                                   loglik_penalty = 0,
                                                   is_complete_tree = 
                                                     is_complete_tree,
-                                                  take_into_account_root_edge = 
-                                                    take_into_account_root_edge,
                                                   num_threads = num_threads,
                                                   atol = atol,
                                                   rtol = rtol,
@@ -408,6 +408,7 @@ cla_secsse_loglik <- function(parameter,
                 see_ancestral_states,
                 loglik_penalty,
                 is_complete_tree,
+                take_into_account_root_edge = take_into_account_root_edge,
                 num_threads,
                 atol,
                 rtol,
