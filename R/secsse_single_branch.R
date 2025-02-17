@@ -101,20 +101,6 @@ secsse_single_branch_loglik <- function(parameter,
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
- 
-  if (1 == 2) { 
-  if (see_ancestral_states == TRUE) {
-    states <- calcul$states
-    num_tips <- ape::Ntip(phy)
-    ancestral_states <- states[(num_tips + 1):(nrow(states)), ]
-    ancestral_states <-
-      ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
-    rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states, LL = LL, states = states))
-  } else {
-    return(LL)
-  }
-  }
   
   return(list("loglik" = LL,
               "nodeM" = nodeM,

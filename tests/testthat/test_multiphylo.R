@@ -1,7 +1,6 @@
 test_that("multi phylo", {
   set.seed(42)
-  focal_tree <- TreeSim::sim.bd.taxa(n = 3, numbsim = 1, 
-                                     lambda = 1, mu = 0)[[1]]
+  focal_tree <- ape::rphylo(n = 3, birth = 0.3 ,death = 0)
   focal_tree$root.edge <- NULL
   traits <- c(1, 1, 1)
   

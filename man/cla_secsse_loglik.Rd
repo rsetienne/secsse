@@ -18,6 +18,7 @@ cla_secsse_loglik(
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
+  take_into_account_root_edge = FALSE,
   num_threads = 1,
   method = "odeint::bulirsch_stoer",
   atol = 1e-08,

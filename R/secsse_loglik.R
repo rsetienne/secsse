@@ -14,6 +14,7 @@ master_loglik <- function(parameter,
                           atol = 1e-8,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer",
+                          take_into_account_root_edge = FALSE,
                           display_warning = TRUE) {
   
   if (inherits(phy, "multiPhylo")) {
@@ -107,9 +108,10 @@ master_loglik <- function(parameter,
   
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
-  if (!is.null(phy$root.edge) ) {
+  if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
     if (phy$root.edge > 0) {
-      calcul <- calc_ll_single_branch_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
+      calcul <- calc_ll_single_branch_cpp(rhs = 
+                                  if (using_cla) "ode_cla" else "ode_standard",
                                           states = c(nodeM[1:d], mergeBranch),
                                           forTime = c(0, phy$root.edge),
                                           lambdas = lambdas,
@@ -213,6 +215,7 @@ secsse_loglik <- function(parameter,
                           see_ancestral_states = FALSE,
                           loglik_penalty = 0,
                           is_complete_tree = FALSE,
+                          take_into_account_root_edge = FALSE,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,
@@ -248,6 +251,7 @@ multi_loglik <- function(parameter,
                          see_ancestral_states = FALSE,
                          loglik_penalty = 0,
                          is_complete_tree = FALSE,
+                         take_into_account_root_edge = FALSE,
                          num_threads = 1,
                          atol = 1e-8,
                          rtol = 1e-7,
@@ -276,6 +280,8 @@ multi_loglik <- function(parameter,
                                                   loglik_penalty = 0,
                                                   is_complete_tree = 
                                                     is_complete_tree,
+                                                  take_into_account_root_edge = 
+                                                    take_into_account_root_edge,
                                                   num_threads = num_threads,
                                                   atol = atol,
                                                   rtol = rtol,
@@ -293,6 +299,8 @@ multi_loglik <- function(parameter,
                             see_ancestral_states = FALSE,
                             loglik_penalty = 0,
                             is_complete_tree = is_complete_tree,
+                            take_into_account_root_edge = 
+                              take_into_account_root_edge,
                             num_threads = num_threads,
                             atol = atol,
                             rtol = rtol,
@@ -384,6 +392,7 @@ cla_secsse_loglik <- function(parameter,
                               see_ancestral_states = FALSE,
                               loglik_penalty = 0,
                               is_complete_tree = FALSE,
+                              take_into_account_root_edge = FALSE,
                               num_threads = 1,
                               method = "odeint::bulirsch_stoer",
                               atol = 1e-8,
