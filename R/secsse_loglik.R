@@ -102,9 +102,6 @@ master_loglik <- function(parameter,
   nodeM <- calcul$node_M
   mergeBranch <- calcul$merge_branch
   
-  # cat(nodeM, "\n")
-  # cat(mergeBranch, "\n")
-  
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
   if (!is.null(phy$root.edge) ) {
@@ -120,13 +117,12 @@ master_loglik <- function(parameter,
                                           rtol = rtol,
                                           see_states = see_ancestral_states)
       loglik <- loglik + calcul$loglik
+      
       nodeM <- calcul$states
       mergeBranch <- calcul$merge_branch
     }
   }
-  
-  
-  
+
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
                                      num_concealed_states,
@@ -260,7 +256,7 @@ multi_loglik <- function(parameter,
     focal_setting_calculation <- focal_data$setting_calculation
     
     if (length(focal_tree$tip.label) == 1) {
-       return(secsse::secsse_single_branch_loglik(parameter,
+       local_answ <- secsse::secsse_single_branch_loglik(parameter,
                                                   focal_tree,
                                                   focal_traits,
                                                   num_concealed_states =
@@ -280,7 +276,8 @@ multi_loglik <- function(parameter,
                                                   atol = atol,
                                                   rtol = rtol,
                                                   method = method,
-                                                  display_warning = display_warning))
+                                                  display_warning = display_warning)
+       return(local_answ$loglik)
     } else {
        return(secsse_loglik(parameter,
                             focal_tree,
@@ -313,11 +310,14 @@ multi_loglik <- function(parameter,
     }
   }
   
-  
-  res <- lapply(focal_data, get_ll)
-  #for (i in 1:length(focal_data)) {
-  #  res[[i]] <- get_ll(focal_data[[i]])
-  #}
+  a <- 5
+  # res <- lapply(focal_data, get_ll)
+  for (i in 1:length(focal_data)) {
+    cat(i, length(focal_data[[i]]$tree$tip.label))
+    answ <- get_ll(focal_data[[i]])
+    cat(answ, "\n")
+    res[[i]] <- answ
+  }
   
   
   ll <- do.call(sum, res)

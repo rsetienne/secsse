@@ -402,7 +402,10 @@ check_tree <- function(phy, is_complete_tree) {
     if (ape::is.binary(phy) == FALSE) {
         stop("The tree needs to be fully resolved.")
     }
-    if (ape::is.ultrametric(phy) == FALSE && is_complete_tree == FALSE) {
+    # using option = 2, which uses the variance, the default method until ape
+    # 3.5. This seems to be less sensitive.
+    if (ape::is.ultrametric(phy, option = 2) == FALSE && 
+        is_complete_tree == FALSE) {
         stop("The tree needs to be ultrametric.")
     }
     if (any(phy$edge.length == 0)) {
@@ -701,7 +704,6 @@ condition <- function(cond,
                       weight_states,
                       lambdas,
                       nodeM) {
-
 
     if(cond == "no_cond") {
       return(mergeBranch2)
