@@ -16,20 +16,29 @@ master_loglik <- function(parameter,
                           method = "odeint::bulirsch_stoer",
                           display_warning = TRUE) {
   
+  if (is.list(phy)) {
+    if (!inherits(phy, "phylo")) {
+      if (!inherits(phy, "multiPhylo")) {
+        stop("when providing multiple phylogenies, make sure to use the multiPhylo class")
+      }
+    }
+  }
+  
+  
   if (inherits(phy, "multiPhylo")) {
     if (!is.list(traits)) {
       stop("traits needs to be supplied as a list now that there are multiple phylogenies")
     }
-    return(multi_loglik(parameter,
-                        phy,
-                        traits,
-                        num_concealed_states,
+    return(multi_loglik(parameter = parameter,
+                        phy = phy,
+                        traits = traits,
+                        num_concealed_states = num_concealed_states,
                         cond = cond,
                         root_state_weight = root_state_weight,
                         sampling_fraction = sampling_fraction,
                         setting_calculation = setting_calculation,
                         see_ancestral_states = see_ancestral_states,
-                        loglik_penalty = 0,
+                        loglik_penalty = loglik_penalty,
                         is_complete_tree = is_complete_tree,
                         num_threads = num_threads,
                         atol = atol,
@@ -256,9 +265,9 @@ multi_loglik <- function(parameter,
     focal_setting_calculation <- focal_data$setting_calculation
     
     if (length(focal_tree$tip.label) == 1) {
-       local_answ <- secsse::secsse_single_branch_loglik(parameter,
-                                                  focal_tree,
-                                                  focal_traits,
+       local_answ <- secsse::secsse_single_branch_loglik(parameter = parameter,
+                                                  phy = focal_tree,
+                                                  traits = focal_traits,
                                                   num_concealed_states =
                                                     num_concealed_states,
                                                   cond = cond,
@@ -269,7 +278,7 @@ multi_loglik <- function(parameter,
                                                   setting_calculation = 
                                                     focal_setting_calculation,
                                                   see_ancestral_states = FALSE,
-                                                  loglik_penalty = 0,
+                                                  loglik_penalty = loglik_penalty,
                                                   is_complete_tree = 
                                                     is_complete_tree,
                                                   num_threads = num_threads,
@@ -279,16 +288,16 @@ multi_loglik <- function(parameter,
                                                   display_warning = display_warning)
        return(local_answ$loglik)
     } else {
-       return(secsse_loglik(parameter,
-                            focal_tree,
-                            focal_traits,
-                            num_concealed_states,
+       return(secsse_loglik(parameter = parameter,
+                            phy = focal_tree,
+                            traits = focal_traits,
+                            num_concealed_states = num_concealed_states,
                             cond = cond,
                             root_state_weight = root_state_weight,
                             sampling_fraction = sampling_fraction,
                             setting_calculation = focal_setting_calculation,
                             see_ancestral_states = FALSE,
-                            loglik_penalty = 0,
+                            loglik_penalty = loglik_penalty,
                             is_complete_tree = is_complete_tree,
                             num_threads = num_threads,
                             atol = atol,
@@ -310,12 +319,10 @@ multi_loglik <- function(parameter,
     }
   }
   
-  a <- 5
   # res <- lapply(focal_data, get_ll)
+  res <- list()
   for (i in 1:length(focal_data)) {
-    cat(i, length(focal_data[[i]]$tree$tip.label))
     answ <- get_ll(focal_data[[i]])
-    cat(answ, "\n")
     res[[i]] <- answ
   }
   
@@ -387,20 +394,22 @@ cla_secsse_loglik <- function(parameter,
                               num_threads = 1,
                               method = "odeint::bulirsch_stoer",
                               atol = 1e-8,
-                              rtol = 1e-7) {
-  master_loglik(parameter,
-                phy,
-                traits,
-                num_concealed_states,
-                cond,
-                root_state_weight,
-                sampling_fraction,
-                setting_calculation,
-                see_ancestral_states,
-                loglik_penalty,
-                is_complete_tree,
-                num_threads,
-                atol,
-                rtol,
-                method)
+                              rtol = 1e-7,
+                              display_warning = TRUE) {
+  master_loglik(parameter = parameter,
+                phy = phy,
+                traits = traits,
+                num_concealed_states = num_concealed_states,
+                cond = cond,
+                root_state_weight = root_state_weight,
+                sampling_fraction = sampling_fraction,
+                setting_calculation = setting_calculation,
+                see_ancestral_states = see_ancestral_states,
+                loglik_penalty = loglik_penalty,
+                is_complete_tree = is_complete_tree,
+                num_threads = num_threads,
+                atol = atol,
+                rtol = rtol,
+                method = method,
+                display_warning = display_warning)
 }

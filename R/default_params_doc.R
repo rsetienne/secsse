@@ -218,6 +218,7 @@ default_params_doc <- function(phy,
                                max_species_extant,
                                tree_size_hist,
                                start_at_crown,
-                               optimmethod) {
+                               optimmethod,
+                               display_warning) {
   # Nothing
 }

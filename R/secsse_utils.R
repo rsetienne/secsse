@@ -1162,11 +1162,14 @@ get_trait_states <- function(idparslist,
   num_traits <- length(idparslist[[2]]) / num_concealed_states
   focal_names <- trait_names[1:num_traits]
   
+  for (i in seq_along(focal_names)) {
+    focal_names[i] <- substr(focal_names[i], 1, nchar(focal_names[i]) - 1)
+  }
+  
   if (display_warning) {
     output <- "Deduced names and order of used states to be: "
     
     for (i in seq_along(focal_names)) {
-      focal_names[i] <- substr(focal_names[i], 1, nchar(focal_names[i]) - 1)
       if (i != length(focal_names)) {
         output <- paste0(output, focal_names[i], ", ")
       } else {

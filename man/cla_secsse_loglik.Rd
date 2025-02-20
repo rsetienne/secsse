@@ -21,7 +21,8 @@ cla_secsse_loglik(
   num_threads = 1,
   method = "odeint::bulirsch_stoer",
   atol = 1e-08,
-  rtol = 1e-07
+  rtol = 1e-07,
+  display_warning = TRUE
 )
 }
 \arguments{
@@ -72,6 +73,8 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
+
+\item{display_warning}{display a warning if necessary}
 }
 \value{
 The loglikelihood of the data given the parameters

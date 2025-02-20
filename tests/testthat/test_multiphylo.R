@@ -50,6 +50,7 @@ test_that("multi phylo", {
   trait_list <- list()
   trait_list[[1]] <- traits
   trait_list[[2]] <- traits
+  
   testthat::expect_warning(
   res2 <- secsse::cla_secsse_loglik(parameter = parslist,
                                     phy = trees,

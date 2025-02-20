@@ -69,7 +69,8 @@ default_params_doc(
   max_species_extant,
   tree_size_hist,
   start_at_crown,
-  optimmethod
+  optimmethod,
+  display_warning
 )
 }
 \arguments{
