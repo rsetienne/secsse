@@ -698,19 +698,32 @@ secsse_transform_parameters <- function(trparsopt,
     return(pars1)
 }
 
+condition_root_edge <- function(mergeBranch2,
+                                nodeM) {
+  # note that we don't do maddison conditioning here.
+  
+}
 
+
+#' @keywords internal
 condition <- function(cond,
                       mergeBranch2,
                       weight_states,
                       lambdas,
-                      nodeM) {
+                      nodeM,
+                      is_root_edge = FALSE) {
 
-    if(cond == "no_cond") {
+    if (cond == "no_cond") {
       return(mergeBranch2)
     }
-
+  
     lmb <- length(mergeBranch2)
     d <- length(lambdas)
+    
+    if (is_root_edge) {
+      return(mergeBranch2 / (1 - nodeM[1:d]))
+    }
+    
     if (is.list(lambdas)) {
         if (cond == "maddison_cond") {
             pre_cond <- rep(NA, lmb) # nolint

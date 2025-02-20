@@ -1,6 +1,8 @@
 test_that("multi phylo", {
   set.seed(42)
-  focal_tree <- ape::rphylo(n = 3, birth = 1, death = 0)
+
+  focal_tree <- ape::rphylo(n = 3, birth = 0.3 ,death = 0)
+
   focal_tree$root.edge <- NULL
   traits <- c(1, 1, 1)
   
