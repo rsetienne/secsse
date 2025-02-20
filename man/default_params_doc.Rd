@@ -70,7 +70,8 @@ default_params_doc(
   tree_size_hist,
   start_at_crown,
   optimmethod,
-  display_warning
+  display_warning,
+  take_into_account_root_edge
 )
 }
 \arguments{
@@ -289,6 +290,10 @@ simplex is implemented natively in \link{DDD}, while subplex is ultimately
 called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
 \item{display_warning}{display a warning if necessary}
+
+\item{take_into_account_root_edge}{if TRUE, the LL integration is continued
+along the root edge. This also affects conditioning (as now, conditioning
+no longer needs to assume a speciation event at the start of the tree)}
 }
 \value{
 Nothing

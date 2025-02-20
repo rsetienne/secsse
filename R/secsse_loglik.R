@@ -328,14 +328,12 @@ multi_loglik <- function(parameter,
     }
   }
   
-  # res <- lapply(focal_data, get_ll)
-  res <- list()
+  #res <- lapply(focal_data, get_ll)
+  res <- list() # interestingly, the for loop is faster than lapply here
   for (i in 1:length(focal_data)) {
-    answ <- get_ll(focal_data[[i]])
-    res[[i]] <- answ
+    res[[i]] <- get_ll(focal_data[[i]])
   }
-  
-  
+
   ll <- do.call(sum, res)
   
   return(ll) 

@@ -64,6 +64,10 @@ be shown? Defaults to \code{FALSE}.}
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
+\item{take_into_account_root_edge}{if TRUE, the LL integration is continued
+along the root edge. This also affects conditioning (as now, conditioning
+no longer needs to assume a speciation event at the start of the tree)}
+
 \item{num_threads}{number of threads to be used. Default is one thread.}
 
 \item{method}{integration method used, available are:

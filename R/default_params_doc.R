@@ -151,6 +151,9 @@
 #'  [cla_secsse_ml()], having the same structure as `param_post`.
 #' @param mu_vector previously defined mus - used to choose indicator number.
 #' @param display_warning display a warning if necessary
+#' @param take_into_account_root_edge if TRUE, the LL integration is continued
+#' along the root edge. This also affects conditioning (as now, conditioning
+#' no longer needs to assume a speciation event at the start of the tree)
 #' @return Nothing
 #' @keywords internal
 #' @export
@@ -219,6 +222,7 @@ default_params_doc <- function(phy,
                                tree_size_hist,
                                start_at_crown,
                                optimmethod,
-                               display_warning) {
+                               display_warning,
+                               take_into_account_root_edge) {
   # Nothing
 }
