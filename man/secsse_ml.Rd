@@ -22,7 +22,7 @@ secsse_ml(
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  take_into_account_root_edge = TRUE,
+  take_into_account_root_edge = FALSE,
   verbose = (optimmethod == "simplex"),
   num_threads = 1,
   atol = 1e-08,
