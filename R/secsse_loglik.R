@@ -288,8 +288,6 @@ multi_loglik <- function(parameter,
                                                   loglik_penalty = loglik_penalty,
                                                   is_complete_tree = 
                                                     is_complete_tree,
-                                                  take_into_account_root_edge = 
-                                                    take_into_account_root_edge
                                                   num_threads = num_threads,
                                                   atol = atol,
                                                   rtol = rtol,
