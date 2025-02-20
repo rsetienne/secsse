@@ -1,3 +1,16 @@
+# 3.2.0
+
+- Added support for integration along the root edge
+- Added support for single-branch trees
+- Added function to calculate the loglikelihood as calculated along a single 
+branch
+- Added support for calculating the likelihood across multiple phylogenies, 
+assuming that all phylogenies are subject to the same diversification regime.
+- Added support for performing Maximum Likelihood across multiple phylogenies
+- Reduced the number of warnings displayed during LL and ML calculation. 
+- Changed ape::ultrametric checking to use the variance (option = 2), to reduce
+this falsely triggering.
+
 # 3.1.2
 
 Added the function 'plot_idparslist', which provides code to visualize the
