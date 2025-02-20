@@ -20,6 +20,7 @@ master_ml <- function(phy,
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
+                      take_into_account_root_edge = take_into_account_root_edge,
                       verbose = (optimmethod == "simplex"),
                       num_threads = 1,
                       atol = 1e-8,
@@ -88,12 +89,23 @@ master_ml <- function(phy,
                                                  num_modeled_traits,
                                                  traitStates = 
                                                    get_trait_states(idparslist,
-                                                                    num_concealed_states, TRUE))
+                                                                    num_concealed_states, FALSE))
   } else {
     setting_calculation <- list()
     for (i in 1:length(phy)) {
-      setting_calculation[[i]] <- build_initStates_time(phy[[i]],
-                                                   traits[[i]],
+      
+      input_phy <- phy[[i]]
+      input_traits <- traits[[i]]
+      
+      if (length(input_phy$tip.label) == 1) {
+        fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
+        fake_phy$edge.length[1:2] <- input_phy$edge.length[1]
+        input_phy <- fake_phy
+        input_traits <- c(input_traits, input_traits)
+      }
+      
+      setting_calculation[[i]] <- build_initStates_time(phy = input_phy,
+                                                   traits = input_traits,
                                                    num_concealed_states,
                                                    sampling_fraction,
                                                    is_complete_tree,
@@ -101,7 +113,7 @@ master_ml <- function(phy,
                                                    num_modeled_traits,
                                                    traitStates = 
                                                      get_trait_states(idparslist,
-                                                                      num_concealed_states, TRUE))
+                                                                      num_concealed_states, FALSE))
     }
   }
 
@@ -124,6 +136,8 @@ master_ml <- function(phy,
                                           see_ancestral_states,
                                         loglik_penalty = loglik_penalty,
                                         is_complete_tree = is_complete_tree,
+                                        take_into_account_root_edge =
+                                          take_into_account_root_edge,
                                         verbose = verbose,
                                         num_threads = num_threads,
                                         atol = atol,
@@ -157,11 +171,14 @@ master_ml <- function(phy,
                           num_cycles = num_cycles,
                           loglik_penalty = loglik_penalty,
                           is_complete_tree = is_complete_tree,
+                          take_into_account_root_edge = 
+                            take_into_account_root_edge,
                           verbose = verbose,
                           num_threads = num_threads,
                           atol = atol,
                           rtol = rtol,
-                          method = method)
+                          method = method,
+                          display_warning = FALSE)
     if (out$conv != 0) {
       stop("Optimization has not converged. 
                  Try again with different initial values.")
@@ -257,6 +274,7 @@ secsse_ml <- function(phy,
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
+                      take_into_account_root_edge = TRUE,
                       verbose = (optimmethod == "simplex"),
                       num_threads = 1,
                       atol = 1e-8,
@@ -281,6 +299,7 @@ secsse_ml <- function(phy,
                    num_cycles = num_cycles,
                    loglik_penalty = loglik_penalty,
                    is_complete_tree = is_complete_tree,
+                   take_into_account_root_edge = take_into_account_root_edge,
                    verbose = verbose,
                    num_threads = num_threads,
                    atol = atol,
@@ -305,6 +324,7 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     see_ancestral_states = see_ancestral_states,
                                     loglik_penalty = loglik_penalty,
                                     is_complete_tree = is_complete_tree,
+                                    take_into_account_root_edge = take_into_account_root_edge,
                                     verbose = verbose,
                                     num_threads = num_threads,
                                     atol = atol,
@@ -336,6 +356,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                             loglik_penalty = loglik_penalty,
                             is_complete_tree =
                               is_complete_tree,
+                            take_into_account_root_edge =
+                              take_into_account_root_edge,
                             num_threads = num_threads,
                             method = method,
                             atol = atol,
@@ -434,6 +456,7 @@ cla_secsse_ml <- function(phy,
                           num_cycles = 1,
                           loglik_penalty = 0,
                           is_complete_tree = FALSE,
+                          take_into_account_root_edge = TRUE,
                           verbose = (optimmethod == "simplex"),
                           num_threads = 1,
                           atol = 1e-8,
@@ -456,6 +479,7 @@ cla_secsse_ml <- function(phy,
             num_cycles = num_cycles,
             loglik_penalty = loglik_penalty,
             is_complete_tree = is_complete_tree,
+            take_into_account_root_edge = take_into_account_root_edge,
             verbose = verbose,
             num_threads = num_threads,
             atol = atol,

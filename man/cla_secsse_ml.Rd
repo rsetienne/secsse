@@ -22,6 +22,7 @@ cla_secsse_ml(
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
+  take_into_account_root_edge = TRUE,
   verbose = (optimmethod == "simplex"),
   num_threads = 1,
   atol = 1e-08,
@@ -84,6 +85,10 @@ tolerance, equal to the starting values, with a maximum of 10 cycles.}
 \item{is_complete_tree}{logical specifying whether or not a tree with all its
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
+
+\item{take_into_account_root_edge}{if TRUE, the LL integration is continued
+along the root edge. This also affects conditioning (as now, conditioning
+no longer needs to assume a speciation event at the start of the tree)}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
 \code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to

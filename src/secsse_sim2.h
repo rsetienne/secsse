@@ -220,6 +220,8 @@ struct secsse_sim {
     // randomize randomizer
     rndgen_.seed((seed < 0) ? std::random_device {}() : seed);
     init_state = 0;
+    track_crowns = {0, 0};
+    rates = {0.0, 0.0, 0.0};
   }
 
   void run() {
