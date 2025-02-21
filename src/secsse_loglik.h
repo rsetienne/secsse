@@ -67,8 +67,8 @@ namespace secsse {
     struct dnode_t {
       dnode_t() noexcept = default;
       dnode_t(const terse::dnode_t& rhs) noexcept : state(rhs.state), time(rhs.time) {}
-      state_ptr state;
-      double time;   // branch length to ancestor
+      state_ptr state = nullptr;
+      double time = 0.0;   // branch length to ancestor
       std::vector<storage_t> storage;
     };
 
