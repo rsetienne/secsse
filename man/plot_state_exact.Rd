@@ -26,17 +26,23 @@ plot_state_exact(
 and the third transition rates.}
 
 \item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
-branch lengths.}
+branch lengths. Alternatively, multiple phylogenetic trees can be provided
+as the \code{multiPhylo} class.}
 
 \item{traits}{vector with trait states for each tip in the phylogeny. The
 order of the states must be the same as the tree tips. For help, see
-\code{vignette("starting_secsse", package = "secsse")}.}
+\code{vignette("starting_secsse", package = "secsse")}. When providing a
+\code{multiPhylo} set of multiple phylognies, traits should be a list where
+each entry in the list corresponds to the matching phylogeny on that
+position.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
-trait state. It must have as many elements as there are trait states.}
+trait state. It must have as many elements as there are trait states. When
+using a \code{multiPhylo} object, sampling fraction should be list where each
+entry in the list corresponds to the sampling proportion for each tree.}
 
 \item{cond}{condition on the existence of a node root: \code{"maddison_cond"},
 \code{"proper_cond"} (default). For details, see vignette.}

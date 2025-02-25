@@ -62,6 +62,20 @@ test_that("multi phylo", {
                                     cond = "no_cond")
   )
   testthat::expect_equal(2*res1, res2)
+  
+  sf_list <- list()
+  sf_list[[1]] <- sf
+  sf_list[[2]] <- sf
+  
+  testthat::expect_warning(
+    res3 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                      phy = trees,
+                                      traits = trait_list,
+                                      num_concealed_states = num_concealed_states,
+                                      sampling_fraction = sf_list,
+                                      cond = "no_cond")
+  )
+  testthat::expect_equal(2*res1, res3)
 })
 
 test_that("multi phylo ML", {
@@ -119,10 +133,12 @@ test_that("multi phylo ML", {
   
   phylo_list <- list()
   trait_list <- list()
+  sf_list    <- list()
   
   for (r in 1:3) {
     phylo_list[[r]] <- phylotree
     trait_list[[r]] <- traits
+    sf_list[[r]] <- sampling_fraction
   }
   
   class(phylo_list) <- "multiPhylo"
@@ -144,6 +160,30 @@ test_that("multi phylo ML", {
     optimmethod = optimmethod,
     num_cycles = 1,
     verbose = FALSE)
+  )
+  
+  testthat::expect_equal(3 * model_R$ML, multi_R$ML)
+  testthat::expect_true(all.equal(model_R$MLpars, multi_R$MLpars))
+  
+  # repeat with list:
+  testthat::expect_warning(
+    multi_R <- cla_secsse_ml(
+      phy = phylo_list,
+      traits = trait_list,
+      num_concealed_states = num_concealed_states,
+      idparslist = idparslist,
+      idparsopt = idparsopt,
+      initparsopt = initparsopt,
+      idparsfix = idparsfix,
+      parsfix = parsfix,
+      cond = cond,
+      root_state_weight = root_state_weight,
+      sampling_fraction = sf_list,
+      tol = tol,
+      maxiter = maxiter,
+      optimmethod = optimmethod,
+      num_cycles = 1,
+      verbose = FALSE)
   )
   
   testthat::expect_equal(3 * model_R$ML, multi_R$ML)

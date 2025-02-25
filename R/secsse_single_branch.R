@@ -16,6 +16,7 @@ secsse_single_branch_loglik <- function(parameter,
                                         see_ancestral_states = FALSE,
                                         loglik_penalty = 0,
                                         is_complete_tree = FALSE,
+                                        take_into_account_root_edge = FALSE,
                                         num_threads = 1,
                                         atol = 1e-8,
                                         rtol = 1e-7,
@@ -81,6 +82,26 @@ secsse_single_branch_loglik <- function(parameter,
   
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
   
+  if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE) {
+    if (phy$root.edge > 0) {
+      calcul <- calc_ll_single_branch_cpp(rhs = 
+                                            if (using_cla) "ode_cla" else "ode_standard",
+                                          states = c(nodeM[1:d], mergeBranch),
+                                          forTime = c(0, phy$root.edge),
+                                          lambdas = lambdas,
+                                          mus = mus,
+                                          Q = q_matrix,
+                                          method = method,
+                                          atol = atol,
+                                          rtol = rtol,
+                                          see_states = see_ancestral_states)
+      loglik <- loglik + calcul$loglik
+      
+      nodeM <- calcul$states
+      mergeBranch <- calcul$merge_branch
+    }
+  }
+
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
                                      num_concealed_states,

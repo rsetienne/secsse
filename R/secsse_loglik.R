@@ -270,6 +270,7 @@ multi_loglik <- function(parameter,
     focal_tree <- focal_data$tree
     focal_traits <- focal_data$traits
     focal_setting_calculation <- focal_data$setting_calculation
+    focal_sampling_fraction <- focal_data$sampling_fraction
     
     if (length(focal_tree$tip.label) == 1) {
        local_answ <- secsse::secsse_single_branch_loglik(parameter = parameter,
@@ -281,13 +282,15 @@ multi_loglik <- function(parameter,
                                                   root_state_weight = 
                                                     root_state_weight,
                                                   sampling_fraction = 
-                                                    sampling_fraction,
+                                                    focal_sampling_fraction,
                                                   setting_calculation = 
                                                     focal_setting_calculation,
                                                   see_ancestral_states = FALSE,
                                                   loglik_penalty = loglik_penalty,
                                                   is_complete_tree = 
                                                     is_complete_tree,
+                                                  take_into_account_root_edge = 
+                                                    take_into_account_root_edge,
                                                   num_threads = num_threads,
                                                   atol = atol,
                                                   rtol = rtol,
@@ -301,7 +304,7 @@ multi_loglik <- function(parameter,
                             num_concealed_states = num_concealed_states,
                             cond = cond,
                             root_state_weight = root_state_weight,
-                            sampling_fraction = sampling_fraction,
+                            sampling_fraction = focal_sampling_fraction,
                             setting_calculation = focal_setting_calculation,
                             see_ancestral_states = FALSE,
                             loglik_penalty = loglik_penalty,
@@ -322,6 +325,13 @@ multi_loglik <- function(parameter,
     
     focal_data[[i]]$tree <- phy[[i]]
     focal_data[[i]]$traits <- traits[[i]]
+    
+    if (is.list(sampling_fraction)) { # weirdly, ifelse(is.list) doesn't work
+      focal_data[[i]]$sampling_fraction <- sampling_fraction[[i]]
+    } else {
+      focal_data[[i]]$sampling_fraction <- sampling_fraction
+    }
+
     focal_data[[i]]$setting_calculation <- NULL
     if (is.list(setting_calculation)) {
       focal_data[[i]]$setting_calculation <- setting_calculation[[i]]

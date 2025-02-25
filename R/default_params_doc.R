@@ -4,10 +4,14 @@
 #' inherited by the relevant functions.
 #'
 #' @param phy phylogenetic tree of class `phylo`, rooted and with
-#'  branch lengths.
+#'  branch lengths. Alternatively, multiple phylogenetic trees can be provided
+#'  as the `multiPhylo` class.
 #' @param traits vector with trait states for each tip in the phylogeny. The 
 #'  order of the states must be the same as the tree tips. For help, see 
-#'  `vignette("starting_secsse", package = "secsse")`.
+#'  `vignette("starting_secsse", package = "secsse")`. When providing a
+#'  `multiPhylo` set of multiple phylognies, traits should be a list where 
+#'  each entry in the list corresponds to the matching phylogeny on that
+#'  position.
 #' @param num_concealed_states number of concealed states, generally equivalent
 #'  to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
@@ -33,7 +37,9 @@
 #'  It can also be specified for the root state: the vector `c(1, 0, 0)` 
 #'  indicates state 1 was the root state.
 #' @param sampling_fraction vector that states the sampling proportion per
-#'  trait state. It must have as many elements as there are trait states.
+#'  trait state. It must have as many elements as there are trait states. When
+#'  using a `multiPhylo` object, sampling fraction should be list where each
+#'  entry in the list corresponds to the sampling proportion for each tree.
 #' @param tol A numeric vector with the maximum tolerance of the optimization 
 #'  algorithm. Default is `c(1e-04, 1e-05, 1e-05)`.
 #' @param maxiter max number of iterations. Default is

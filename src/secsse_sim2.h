@@ -246,6 +246,10 @@ struct secsse_sim {
       L.push_back(ltab_species(0.0,  0, -1, -1, init_state, trait_info));
       track_crowns = {1, 0};
       evolve_until_crown();
+      if (t > max_t) {
+        run_info = done;
+        return;
+      }
       if (track_crowns[0] + track_crowns[1] < 1) {
         run_info = extinct;
         return;
@@ -288,6 +292,10 @@ struct secsse_sim {
         update_rates();
         double dt = draw_dt();
         t += dt;
+        if (t > max_t) {
+          run_info = done;
+          return;
+        }
         event_type event = draw_event();
         switch (event) {
           case shift: {

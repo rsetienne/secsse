@@ -13,7 +13,8 @@ sortingtraits(trait_info, phy)
 one is the trait associated information.}
 
 \item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
-branch lengths.}
+branch lengths. Alternatively, multiple phylogenetic trees can be provided
+as the \code{multiPhylo} class.}
 }
 \value{
 Vector of traits

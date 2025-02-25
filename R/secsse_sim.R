@@ -38,7 +38,6 @@ secsse_sim <- function(lambdas,
                        drop_extinct = TRUE,
                        start_at_crown = TRUE,
                        seed = NULL) {
-
   if (is.matrix(lambdas)) {
     # need to be converted
     lambdas <- prepare_full_lambdas(names(mus),
@@ -125,7 +124,24 @@ secsse_sim <- function(lambdas,
   out_hist <- 0
   if (tree_size_hist == TRUE) out_hist <- res$hist_tree_size
   
-  if (sum(Ltable[, 4] == -1) < 2) {
+  if (start_at_crown == FALSE && sum(Ltable[, 4] == -1) == 1) {
+    # fake phy
+    phy <- ape::rphylo(n = 2, birth = 0.2, death = 0)
+    phy$edge.length[-2]
+    phy$tip.label <- phy$tip.label[-2]
+    phy$edge <- phy$edge[-2, ]
+    phy$edge <- matrix(data = phy$edge, nrow = 1) # important!
+    phy$edge.length <- crown_age # this is now root age
+    return(list(phy = phy,
+                traits = res$traits[[1]],
+                extinct = res$tracker[2],
+                overshoot = res$tracker[3],
+                conditioning = res$tracker[4],
+                small = res$tracker[6],
+                size_hist = out_hist))
+    
+    
+  } else if (sum(Ltable[, 4] == -1) < 2) {
     warning("crown lineages died out")
     return(list(phy = "ds",
                 traits = 0,

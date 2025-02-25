@@ -10,7 +10,10 @@ q_doubletrans(traits, masterBlock, diff.conceal)
 \arguments{
 \item{traits}{vector with trait states for each tip in the phylogeny. The
 order of the states must be the same as the tree tips. For help, see
-\code{vignette("starting_secsse", package = "secsse")}.}
+\code{vignette("starting_secsse", package = "secsse")}. When providing a
+\code{multiPhylo} set of multiple phylognies, traits should be a list where
+each entry in the list corresponds to the matching phylogeny on that
+position.}
 
 \item{masterBlock}{matrix of transitions among only examined states, \code{NA} in
 the main diagonal, used to build the full transition rates matrix.}

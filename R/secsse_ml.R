@@ -97,6 +97,12 @@ master_ml <- function(phy,
       input_phy <- phy[[i]]
       input_traits <- traits[[i]]
       
+      if (is.list(sampling_fraction)) { # weirdly, ifelse(is.list) doesn't work
+        input_sampling_fraction <- sampling_fraction[[i]]
+      } else {
+        input_sampling_fraction <- sampling_fraction
+      }
+      
       if (length(input_phy$tip.label) == 1) {
         fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
         fake_phy$edge.length[1:2] <- input_phy$edge.length[1]
@@ -106,11 +112,16 @@ master_ml <- function(phy,
       
       setting_calculation[[i]] <- build_initStates_time(phy = input_phy,
                                                    traits = input_traits,
-                                                   num_concealed_states,
-                                                   sampling_fraction,
-                                                   is_complete_tree,
-                                                   mus,
-                                                   num_modeled_traits,
+                                                   num_concealed_states =
+                                                     num_concealed_states,
+                                                   sampling_fraction =
+                                                     input_sampling_fraction,
+                                                   is_complete_tree =
+                                                     is_complete_tree,
+                                                   mu = mus,
+                                                   num_unique_traits = 
+                                                     num_modeled_traits,
+                                                   first_time = FALSE,
                                                    traitStates = 
                                                      get_trait_states(idparslist,
                                                                       num_concealed_states, FALSE))
