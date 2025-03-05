@@ -163,6 +163,7 @@ master_ml <- function(phy,
   } else {
     out <- DDD::optimizer(optimmethod = optimmethod,
                           optimpars = optimpars,
+                          verbose = verbose,
                           fun = secsse_loglik_choosepar,
                           trparsopt = trparsopt,
                           num_cycles = num_cycles,
