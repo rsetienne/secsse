@@ -149,14 +149,13 @@ master_ml <- function(phy,
                                         is_complete_tree = is_complete_tree,
                                         take_into_account_root_edge =
                                           take_into_account_root_edge,
-                                        verbose = verbose,
                                         num_threads = num_threads,
                                         atol = atol,
                                         rtol = rtol,
                                         method = method,
                                         display_warning = FALSE)
   # Function here
-  print_init_ll(initloglik = initloglik, verbose = verbose)
+  if (verbose) print_init_ll(initloglik = initloglik)
   if (initloglik == -Inf) {
     stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 
@@ -166,6 +165,7 @@ master_ml <- function(phy,
                           optimpars = optimpars,
                           fun = secsse_loglik_choosepar,
                           trparsopt = trparsopt,
+                          num_cycles = num_cycles,
                           idparsopt = idparsopt,
                           trparsfix = trparsfix,
                           idparsfix = idparsfix,
@@ -179,12 +179,10 @@ master_ml <- function(phy,
                           sampling_fraction = sampling_fraction,
                           setting_calculation = setting_calculation,
                           see_ancestral_states = see_ancestral_states,
-                          num_cycles = num_cycles,
                           loglik_penalty = loglik_penalty,
                           is_complete_tree = is_complete_tree,
                           take_into_account_root_edge = 
                             take_into_account_root_edge,
-                          verbose = verbose,
                           num_threads = num_threads,
                           atol = atol,
                           rtol = rtol,
@@ -328,7 +326,7 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     phy,
                                     traits,
                                     num_concealed_states,
-                                    cond,
+                                    cond = cond,
                                     root_state_weight,
                                     sampling_fraction,
                                     setting_calculation,
@@ -336,12 +334,27 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     loglik_penalty,
                                     is_complete_tree,
                                     take_into_account_root_edge,
-                                    verbose,
                                     num_threads,
                                     atol,
                                     rtol,
                                     method,
-                                    display_warning = FALSE) {
+                                    #structure_func = structure_func,
+                                    #phy = phy,
+                                    #traits = traits,
+                                    #num_concealed_states = num_concealed_states,
+                                    #cond = cond,
+                                    #root_state_weight = root_state_weight,
+                                    #sampling_fraction = sampling_fraction,
+                                    #setting_calculation = setting_calculation,
+                                    #see_ancestral_states = see_ancestral_states,
+                                    #loglik_penalty = loglik_penalty,
+                                    #is_complete_tree = is_complete_tree,
+                                    #take_into_account_root_edge = take_into_account_root_edge,
+                                    #num_threads = num_threads,
+                                    #atol = atol,
+                                    #rtol = rtol,
+                                    #method = method,
+                                    display_warning) {
   alltrpars <- c(trparsopt, trparsfix)
   if (max(alltrpars) > 1 || min(alltrpars) < 0) {
     loglik <- -Inf
@@ -381,10 +394,10 @@ secsse_loglik_choosepar <- function(trparsopt,
       loglik <- -Inf
     }
   }
-  if (verbose) {
-    out_print <- c(trparsopt / (1 - trparsopt), loglik)
-    message(paste(out_print, collapse = " "))
-  }
+  #if (verbose) {
+  #  out_print <- c(trparsopt / (1 - trparsopt), loglik)
+  #  message(paste(out_print, collapse = " "))
+  #}
   return(loglik)
 }
 
