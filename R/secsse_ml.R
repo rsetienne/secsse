@@ -111,7 +111,6 @@ master_ml <- function(phy,
       }
       
       setting_calculation[[i]] <- build_initStates_time(phy = input_phy,
-<<<<<<< Updated upstream
                                                    traits = input_traits,
                                                    num_concealed_states =
                                                      num_concealed_states,
@@ -126,22 +125,6 @@ master_ml <- function(phy,
                                                    traitStates = 
                                                      get_trait_states(idparslist,
                                                                       num_concealed_states, FALSE))
-=======
-                                                        traits = input_traits,
-                                                        num_concealed_states =
-                                                          num_concealed_states,
-                                                        sampling_fraction =
-                                                          input_sampling_fraction,
-                                                        is_complete_tree =
-                                                          is_complete_tree,
-                                                        mus = mus,
-                                                        num_unique_traits = 
-                                                          num_modeled_traits,
-                                                        first_time = FALSE,
-                                                        traitStates = 
-                                                          get_trait_states(idparslist,
-                                                                           num_concealed_states, FALSE))
->>>>>>> Stashed changes
     }
   }
   
