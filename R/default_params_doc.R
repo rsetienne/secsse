@@ -109,11 +109,10 @@
 #'  parameters.
 #' @param trait_info data frame where first column has species ids and the second
 #'  one is the trait associated information.
-#' @param optimmethod A string with method used for optimization. Default is 
-#'  `"subplex"`. Alternative is `"simplex"` and it shouldn't be used in normal 
-#'  conditions (only for debugging). Both are called from [DDD::optimizer()], 
-#'  simplex is implemented natively in [DDD], while subplex is ultimately
-#'  called from [subplex::subplex()].
+#' @param optimmethod A string with method used for optimization. Default is
+#' `"simplex"`. Alternative is `"subplex"`. Both are called from 
+#' [DDD::optimizer()], simplex is implemented natively in [DDD], while subplex 
+#' is ultimately called from [subplex::subplex()].
 #' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
 #' @param initloglik A numeric with the value of loglikehood obtained prior to
 #'  optimisation. Only used internally.

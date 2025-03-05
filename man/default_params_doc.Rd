@@ -290,10 +290,9 @@ for direct comparison with BiSSE and facilitates implementing speciation
 effects at the crown.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
-\code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
-conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
-simplex is implemented natively in \link{DDD}, while subplex is ultimately
-called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
+\code{"simplex"}. Alternative is \code{"subplex"}. Both are called from
+\code{\link[DDD:optimizer]{DDD::optimizer()}}, simplex is implemented natively in \link{DDD}, while subplex
+is ultimately called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
 \item{display_warning}{display a warning if necessary}
 

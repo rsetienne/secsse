@@ -18,12 +18,12 @@ cla_secsse_ml(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  optimmethod = "subplex",
+  optimmethod = "simplex",
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
   take_into_account_root_edge = FALSE,
-  verbose = (optimmethod == "simplex"),
+  verbose = FALSE,
   num_threads = 1,
   atol = 1e-08,
   rtol = 1e-07,
@@ -76,10 +76,9 @@ algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 \code{1000 * round((1.25) ^ length(idparsopt))}.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
-\code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
-conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
-simplex is implemented natively in \link{DDD}, while subplex is ultimately
-called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
+\code{"simplex"}. Alternative is \code{"subplex"}. Both are called from
+\code{\link[DDD:optimizer]{DDD::optimizer()}}, simplex is implemented natively in \link{DDD}, while subplex
+is ultimately called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
 the optimization will be repeated until the result is, within the
@@ -148,7 +147,7 @@ idparsfix <- c(0,4,5)
 parsfix <- c(0,0,0.01)
 tol <- c(1e-04, 1e-05, 1e-07)
 maxiter <- 1000 * round((1.25) ^ length(idparsopt))
-optimmethod <- 'subplex'
+optimmethod <- 'simplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)

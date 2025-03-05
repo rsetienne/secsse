@@ -16,17 +16,17 @@ master_ml <- function(phy,
                       sampling_fraction,
                       tol = c(1e-04, 1e-05, 1e-07),
                       maxiter = 1000 * round((1.25)^length(idparsopt)),
-                      optimmethod = "subplex",
+                      optimmethod = "simplex",
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
                       take_into_account_root_edge = take_into_account_root_edge,
-                      verbose = (optimmethod == "simplex"),
+                      verbose = FALSE,
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::bulirsch_stoer") {
-
+  
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
     structure_func <- set_and_check_structure_func(idparsfuncdefpar,
@@ -43,31 +43,31 @@ master_ml <- function(phy,
              idparsopt or idparsfix ")
     }
   }
-
+  
   check_ml_conditions(traits,
                       idparslist,
                       initparsopt,
                       idparsopt,
                       idparsfix,
                       parsfix)
-
+  
   if (is.matrix(idparslist[[1]])) {
     ## it is a tailor case otherwise
     idparslist[[1]] <- prepare_full_lambdas(traits,
                                             num_concealed_states,
                                             idparslist[[1]])
   }
-
+  
   see_ancestral_states <- FALSE
   if (!is.null(structure_func)) {
     initparsopt <- c(initparsopt, initfactors)
   }
-
+  
   trparsopt <- initparsopt / (1 + initparsopt)
   trparsopt[which(initparsopt == Inf)] <- 1
   trparsfix <- parsfix / (1 + parsfix)
   trparsfix[which(parsfix == Inf)] <- 1
-
+  
   mus <- calc_mus(is_complete_tree,
                   idparslist,
                   idparsfix,
@@ -75,11 +75,11 @@ master_ml <- function(phy,
                   idparsopt,
                   initparsopt)
   optimpars <- c(tol, maxiter)
-
-  num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
-
-  if (!is.list(traits)) {
   
+  num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
+  
+  if (!is.list(traits)) {
+    
     setting_calculation <- build_initStates_time(phy,
                                                  traits,
                                                  num_concealed_states,
@@ -111,6 +111,7 @@ master_ml <- function(phy,
       }
       
       setting_calculation[[i]] <- build_initStates_time(phy = input_phy,
+<<<<<<< Updated upstream
                                                    traits = input_traits,
                                                    num_concealed_states =
                                                      num_concealed_states,
@@ -125,9 +126,25 @@ master_ml <- function(phy,
                                                    traitStates = 
                                                      get_trait_states(idparslist,
                                                                       num_concealed_states, FALSE))
+=======
+                                                        traits = input_traits,
+                                                        num_concealed_states =
+                                                          num_concealed_states,
+                                                        sampling_fraction =
+                                                          input_sampling_fraction,
+                                                        is_complete_tree =
+                                                          is_complete_tree,
+                                                        mus = mus,
+                                                        num_unique_traits = 
+                                                          num_modeled_traits,
+                                                        first_time = FALSE,
+                                                        traitStates = 
+                                                          get_trait_states(idparslist,
+                                                                           num_concealed_states, FALSE))
+>>>>>>> Stashed changes
     }
   }
-
+  
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,
                                         idparsopt = idparsopt,
@@ -244,7 +261,7 @@ master_ml <- function(phy,
 #'parsfix <- c(0,0)
 #'tol <- c(1e-02, 1e-03, 1e-04)
 #'maxiter <- 1000 * round((1.25)^length(idparsopt))
-#'optimmethod <- 'subplex'
+#'optimmethod <- 'simplex'
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
@@ -281,41 +298,41 @@ secsse_ml <- function(phy,
                       sampling_fraction,
                       tol = c(1e-04, 1e-05, 1e-07),
                       maxiter = 1000 * round((1.25)^length(idparsopt)),
-                      optimmethod = "subplex",
+                      optimmethod = "simplex",
                       num_cycles = 1,
                       loglik_penalty = 0,
                       is_complete_tree = FALSE,
                       take_into_account_root_edge = FALSE,
-                      verbose = (optimmethod == "simplex"),
+                      verbose = FALSE,
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::bulirsch_stoer") {
   master_ml(phy = phy,
-                   traits = traits,
-                   num_concealed_states = num_concealed_states,
-                   idparslist = idparslist,
-                   idparsopt = idparsopt,
-                   initparsopt = initparsopt,
-                   idparsfix = idparsfix,
-                   parsfix = parsfix,
-                   initfactors = NULL,
-                   idparsfuncdefpar = NULL,
-                   cond = cond,
-                   root_state_weight = root_state_weight,
-                   sampling_fraction = sampling_fraction,
-                   tol = tol,
-                   maxiter = maxiter,
-                   optimmethod = optimmethod,
-                   num_cycles = num_cycles,
-                   loglik_penalty = loglik_penalty,
-                   is_complete_tree = is_complete_tree,
-                   take_into_account_root_edge = take_into_account_root_edge,
-                   verbose = verbose,
-                   num_threads = num_threads,
-                   atol = atol,
-                   rtol = rtol,
-                   method = method)
+            traits = traits,
+            num_concealed_states = num_concealed_states,
+            idparslist = idparslist,
+            idparsopt = idparsopt,
+            initparsopt = initparsopt,
+            idparsfix = idparsfix,
+            parsfix = parsfix,
+            initfactors = NULL,
+            idparsfuncdefpar = NULL,
+            cond = cond,
+            root_state_weight = root_state_weight,
+            sampling_fraction = sampling_fraction,
+            tol = tol,
+            maxiter = maxiter,
+            optimmethod = optimmethod,
+            num_cycles = num_cycles,
+            loglik_penalty = loglik_penalty,
+            is_complete_tree = is_complete_tree,
+            take_into_account_root_edge = take_into_account_root_edge,
+            verbose = verbose,
+            num_threads = num_threads,
+            atol = atol,
+            rtol = rtol,
+            method = method)
 }
 
 #' @keywords internal
@@ -324,23 +341,23 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     idparsopt,
                                     idparsfix,
                                     idparslist,
-                                    structure_func = structure_func,
-                                    phy = phy,
-                                    traits = traits,
-                                    num_concealed_states = num_concealed_states,
-                                    cond = cond,
-                                    root_state_weight = root_state_weight,
-                                    sampling_fraction = sampling_fraction,
-                                    setting_calculation = setting_calculation,
-                                    see_ancestral_states = see_ancestral_states,
-                                    loglik_penalty = loglik_penalty,
-                                    is_complete_tree = is_complete_tree,
-                                    take_into_account_root_edge = take_into_account_root_edge,
-                                    verbose = verbose,
-                                    num_threads = num_threads,
-                                    atol = atol,
-                                    rtol = rtol,
-                                    method = method,
+                                    structure_func,
+                                    phy,
+                                    traits,
+                                    num_concealed_states,
+                                    cond,
+                                    root_state_weight,
+                                    sampling_fraction,
+                                    setting_calculation,
+                                    see_ancestral_states,
+                                    loglik_penalty,
+                                    is_complete_tree,
+                                    take_into_account_root_edge,
+                                    verbose,
+                                    num_threads,
+                                    atol,
+                                    rtol,
+                                    method,
                                     display_warning = FALSE) {
   alltrpars <- c(trparsopt, trparsfix)
   if (max(alltrpars) > 1 || min(alltrpars) < 0) {
@@ -349,7 +366,7 @@ secsse_loglik_choosepar <- function(trparsopt,
     pars1 <- secsse_transform_parameters(trparsopt, trparsfix,
                                          idparsopt, idparsfix,
                                          idparslist, structure_func)
-
+    
     loglik <- master_loglik(parameter = pars1,
                             phy = phy,
                             traits = traits,
@@ -374,7 +391,7 @@ secsse_loglik_choosepar <- function(trparsopt,
                             atol = atol,
                             rtol = rtol,
                             display_warning = display_warning)
-
+    
     if (is.nan(loglik) || is.na(loglik)) {
       warning("There are parameter values used which cause
                 numerical problems.")
@@ -426,7 +443,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'parsfix <- c(0,0,0.01)
 #'tol <- c(1e-04, 1e-05, 1e-07)
 #'maxiter <- 1000 * round((1.25) ^ length(idparsopt))
-#'optimmethod <- 'subplex'
+#'optimmethod <- 'simplex'
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
@@ -463,12 +480,12 @@ cla_secsse_ml <- function(phy,
                           sampling_fraction,
                           tol = c(1e-04, 1e-05, 1e-07),
                           maxiter = 1000 * round((1.25)^length(idparsopt)),
-                          optimmethod = "subplex",
+                          optimmethod = "simplex",
                           num_cycles = 1,
                           loglik_penalty = 0,
                           is_complete_tree = FALSE,
                           take_into_account_root_edge = FALSE,
-                          verbose = (optimmethod == "simplex"),
+                          verbose = FALSE,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,

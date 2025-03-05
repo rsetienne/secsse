@@ -61,7 +61,7 @@
 #'
 #'tol = c(1e-02, 1e-03, 1e-04)
 #'maxiter = 1000 * round((1.25)^length(idparsopt))
-#'optimmethod = "subplex"
+#'optimmethod = "simplex"
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction <- c(1,1,1)
@@ -104,7 +104,7 @@ secsse_ml_func_def_pars <- function(phy,
                                     tol = c(1E-4, 1E-5, 1E-7),
                                     maxiter = 1000 *
                                       round((1.25) ^ length(idparsopt)),
-                                    optimmethod = "subplex",
+                                    optimmethod = "simplex",
                                     num_cycles = 1,
                                     loglik_penalty = 0,
                                     is_complete_tree = FALSE,
