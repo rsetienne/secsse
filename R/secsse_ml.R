@@ -15,7 +15,7 @@ master_ml <- function(phy,
                       root_state_weight = "proper_weights",
                       sampling_fraction,
                       tol = c(1e-04, 1e-05, 1e-07),
-                      maxiter = 1000 * round((1.25)^length(idparsopt)),
+                      maxiter = 1000 * round((1.25) ^ length(idparsopt)),
                       optimmethod = "simplex",
                       num_cycles = 1,
                       loglik_penalty = 0,
@@ -74,7 +74,8 @@ master_ml <- function(phy,
                   parsfix,
                   idparsopt,
                   initparsopt)
-  optimpars <- c(tol, maxiter)
+  
+  optimpars <- c(tol, maxiter, verbose)
   
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
   
@@ -156,6 +157,7 @@ master_ml <- function(phy,
                                         display_warning = FALSE)
   # Function here
   if (verbose) print_init_ll(initloglik = initloglik)
+
   if (initloglik == -Inf) {
     stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 
@@ -163,7 +165,6 @@ master_ml <- function(phy,
   } else {
     out <- DDD::optimizer(optimmethod = optimmethod,
                           optimpars = optimpars,
-                          verbose = verbose,
                           fun = secsse_loglik_choosepar,
                           trparsopt = trparsopt,
                           num_cycles = num_cycles,
