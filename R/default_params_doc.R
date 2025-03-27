@@ -35,7 +35,9 @@
 #' @param root_state_weight the method to weigh the states:
 #'  `"maddison_weights"`, `"proper_weights"` (default) or `"equal_weights"`.
 #'  It can also be specified for the root state: the vector `c(1, 0, 0)` 
-#'  indicates state 1 was the root state.
+#'  indicates state 1 was the root state. When
+#'  using a `multiPhylo` object, root_state_weight should be list where each
+#'  entry in the list corresponds to the root_state_weight for each tree.
 #' @param sampling_fraction vector that states the sampling proportion per
 #'  trait state. It must have as many elements as there are trait states. When
 #'  using a `multiPhylo` object, sampling fraction should be list where each

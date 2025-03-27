@@ -23,12 +23,12 @@ cla_secsse_ml_func_def_pars(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  optimmethod = "subplex",
+  optimmethod = "simplex",
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
   take_into_account_root_edge = FALSE,
-  verbose = (optimmethod == "simplex"),
+  verbose = TRUE,
   num_threads = 1,
   atol = 1e-12,
   rtol = 1e-12,
@@ -81,7 +81,9 @@ example.}
 \item{root_state_weight}{the method to weigh the states:
 \code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
 It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state.}
+indicates state 1 was the root state. When
+using a \code{multiPhylo} object, root_state_weight should be list where each
+entry in the list corresponds to the root_state_weight for each tree.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states. When

@@ -48,7 +48,9 @@ to the number of examined states in the dataset.}
 \item{root_state_weight}{the method to weigh the states:
 \code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
 It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state.}
+indicates state 1 was the root state. When
+using a \code{multiPhylo} object, root_state_weight should be list where each
+entry in the list corresponds to the root_state_weight for each tree.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states. When

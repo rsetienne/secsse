@@ -271,6 +271,7 @@ multi_loglik <- function(parameter,
     focal_traits <- focal_data$traits
     focal_setting_calculation <- focal_data$setting_calculation
     focal_sampling_fraction <- focal_data$sampling_fraction
+    focal_root_state_weight <- focal_data$root_state_weight
     
     if (length(focal_tree$tip.label) == 1) {
        local_answ <- secsse::secsse_single_branch_loglik(parameter = parameter,
@@ -280,7 +281,7 @@ multi_loglik <- function(parameter,
                                                     num_concealed_states,
                                                   cond = cond,
                                                   root_state_weight = 
-                                                    root_state_weight,
+                                                    focal_root_state_weight,
                                                   sampling_fraction = 
                                                     focal_sampling_fraction,
                                                   setting_calculation = 
@@ -303,7 +304,7 @@ multi_loglik <- function(parameter,
                             traits = focal_traits,
                             num_concealed_states = num_concealed_states,
                             cond = cond,
-                            root_state_weight = root_state_weight,
+                            root_state_weight = focal_root_state_weight,
                             sampling_fraction = focal_sampling_fraction,
                             setting_calculation = focal_setting_calculation,
                             see_ancestral_states = FALSE,
@@ -330,6 +331,12 @@ multi_loglik <- function(parameter,
       focal_data[[i]]$sampling_fraction <- sampling_fraction[[i]]
     } else {
       focal_data[[i]]$sampling_fraction <- sampling_fraction
+    }
+    
+    if (is.list(root_state_weight)) {
+      focal_data[[i]]$root_state_weight <- root_state_weight[[i]]
+    } else {
+      focal_data[[i]]$root_state_weight <- root_state_weight
     }
 
     focal_data[[i]]$setting_calculation <- NULL
