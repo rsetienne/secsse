@@ -117,7 +117,11 @@ master_loglik <- function(parameter,
 
   if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
     if (phy$root.edge > 0) {
-      calcul <- calc_ll_single_branch_cpp(rhs = 
+      
+      # TODO, something is going wrong here!!!!!!!
+      # 
+      
+      calcul2 <- calc_ll_single_branch_cpp(rhs = 
                                   if (using_cla) "ode_cla" else "ode_standard",
                                           states = c(nodeM[1:d], mergeBranch),
                                           forTime = c(0, phy$root.edge),
@@ -128,10 +132,10 @@ master_loglik <- function(parameter,
                                           atol = atol,
                                           rtol = rtol,
                                           see_states = see_ancestral_states)
-      loglik <- loglik + calcul$loglik
+      loglik <- loglik + calcul2$loglik
       
-      nodeM <- calcul$states
-      mergeBranch <- calcul$merge_branch
+      nodeM <- calcul2$states
+      mergeBranch <- calcul2$merge_branch
     }
   }
 
@@ -162,6 +166,11 @@ master_loglik <- function(parameter,
 
   wholeLike <- sum((mergeBranch2) * (weight_states))
 
+  if (is.na(log(wholeLike))) {
+    a <- 5
+    cat("hello\n")
+  }
+  
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
