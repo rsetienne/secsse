@@ -118,7 +118,7 @@ master_ml <- function(phy,
                                                      input_sampling_fraction,
                                                    is_complete_tree =
                                                      is_complete_tree,
-                                                   mu = mus,
+                                                   mus = mus,
                                                    num_unique_traits = 
                                                      num_modeled_traits,
                                                    first_time = FALSE,
