@@ -48,19 +48,19 @@ master_loglik <- function(parameter,
                         method = method,
                         display_warning = display_warning))
   }
-
+  
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
   q_matrix <- parameter[[3]]
-
+  
   using_cla <- is.list(lambdas)
-
+  
   num_modeled_traits <- ncol(q_matrix) / floor(num_concealed_states)
   
   traitStates = get_trait_states(parameter,
                                  num_concealed_states, display_warning)
-
+  
   if (is.null(setting_calculation)) {
     check_input(traits,
                 phy,
@@ -114,7 +114,7 @@ master_loglik <- function(parameter,
   mergeBranch <- calcul$merge_branch
   
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
-
+  
   if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
     if (phy$root.edge > 0) {
       
@@ -122,24 +122,24 @@ master_loglik <- function(parameter,
       # 
       
       calcul2 <- calc_ll_single_branch_cpp(rhs = 
-                                  if (using_cla) "ode_cla" else "ode_standard",
-                                          states = c(nodeM[1:d], mergeBranch),
-                                          forTime = c(0, phy$root.edge),
-                                          lambdas = lambdas,
-                                          mus = mus,
-                                          Q = q_matrix,
-                                          method = method,
-                                          atol = atol,
-                                          rtol = rtol,
-                                          see_states = see_ancestral_states)
+                                             if (using_cla) "ode_cla" else "ode_standard",
+                                           states = c(nodeM[1:d], mergeBranch),
+                                           forTime = c(0, phy$root.edge),
+                                           lambdas = lambdas,
+                                           mus = mus,
+                                           Q = q_matrix,
+                                           method = method,
+                                           atol = atol,
+                                           rtol = rtol,
+                                           see_states = see_ancestral_states)
       loglik <- loglik + calcul2$loglik
       nodeM <- calcul2$states
       
       mergeBranch <- calcul2$merge_branch
-     
+      
     }
   }
-
+  
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
                                      num_concealed_states,
@@ -148,7 +148,7 @@ master_loglik <- function(parameter,
                                      nodeM,
                                      d,
                                      is_cla = using_cla)
-
+  
   if (is_complete_tree) nodeM <- update_complete_tree(phy,
                                                       lambdas,
                                                       mus,
@@ -157,20 +157,20 @@ master_loglik <- function(parameter,
                                                       atol,
                                                       rtol,
                                                       length(mergeBranch))
-
+  
   mergeBranch2 <- condition(cond,
                             mergeBranch,
                             weight_states,
                             lambdas,
                             nodeM,
                             is_root_edge = take_into_account_root_edge)
-
+  
   wholeLike <- sum((mergeBranch2) * (weight_states))
-
+  
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
-
+  
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
     num_tips <- ape::Ntip(phy)
@@ -252,6 +252,7 @@ secsse_loglik <- function(parameter,
                 display_warning = display_warning)
 }
 
+
 #' @keywords internal
 multi_loglik <- function(parameter,
                          phy,
@@ -271,91 +272,76 @@ multi_loglik <- function(parameter,
                          method = "odeint::bulirsch_stoer",
                          display_warning = FALSE) {
   
-   get_ll <- function(focal_data) {
-    focal_tree <- focal_data$tree
-    focal_traits <- focal_data$traits
-    focal_setting_calculation <- focal_data$setting_calculation
-    focal_sampling_fraction <- focal_data$sampling_fraction
-    focal_root_state_weight <- focal_data$root_state_weight
-    
-    if (length(focal_tree$tip.label) == 1) {
-       local_answ <- secsse::secsse_single_branch_loglik(parameter = parameter,
-                                                  phy = focal_tree,
-                                                  traits = focal_traits,
-                                                  num_concealed_states =
-                                                    num_concealed_states,
-                                                  cond = cond,
-                                                  root_state_weight = 
-                                                    focal_root_state_weight,
-                                                  sampling_fraction = 
-                                                    focal_sampling_fraction,
-                                                  setting_calculation = 
-                                                    focal_setting_calculation,
-                                                  see_ancestral_states = FALSE,
-                                                  loglik_penalty = loglik_penalty,
-                                                  is_complete_tree = 
-                                                    is_complete_tree,
-                                                  take_into_account_root_edge = 
-                                                    take_into_account_root_edge,
-                                                  num_threads = num_threads,
-                                                  atol = atol,
-                                                  rtol = rtol,
-                                                  method = method,
-                                                  display_warning = display_warning)
-       return(local_answ$loglik)
-    } else {
-       return(secsse_loglik(parameter = parameter,
-                            phy = focal_tree,
-                            traits = focal_traits,
-                            num_concealed_states = num_concealed_states,
-                            cond = cond,
-                            root_state_weight = focal_root_state_weight,
-                            sampling_fraction = focal_sampling_fraction,
-                            setting_calculation = focal_setting_calculation,
-                            see_ancestral_states = FALSE,
-                            loglik_penalty = loglik_penalty,
-                            is_complete_tree = is_complete_tree,
-                            take_into_account_root_edge = 
-                              take_into_account_root_edge,
-                            num_threads = num_threads,
-                            atol = atol,
-                            rtol = rtol,
-                            method = method,
-                            display_warning = display_warning)) 
-    }
-  }
-  
-  focal_data <- list()
+  res <- list()
   for (i in 1:length(phy)) {
-    focal_data[[i]] <- list()
-    
-    focal_data[[i]]$tree <- phy[[i]]
-    focal_data[[i]]$traits <- traits[[i]]
-    
-    if (is.list(sampling_fraction)) { # weirdly, ifelse(is.list) doesn't work
-      focal_data[[i]]$sampling_fraction <- sampling_fraction[[i]]
+    if (is.list(sampling_fraction)) {
+      focal_sampling_fraction <- sampling_fraction[[i]]
     } else {
-      focal_data[[i]]$sampling_fraction <- sampling_fraction
+      focal_sampling_fraction <- sampling_fraction
     }
     
     if (is.list(root_state_weight)) {
-      focal_data[[i]]$root_state_weight <- root_state_weight[[i]]
+      if (sum(is.na(root_state_weight[[i]])) || 
+          length(root_state_weight[[i]]) < 1) {
+        focal_root_state_weight <- "proper_weights"
+      } else {
+        focal_root_state_weight <- root_state_weight[[i]]
+      }
     } else {
-      focal_data[[i]]$root_state_weight <- root_state_weight
+      focal_root_state_weight <- root_state_weight
     }
-
-    focal_data[[i]]$setting_calculation <- NULL
+    
+    focal_setting_calculation <- NULL
     if (is.list(setting_calculation)) {
-      focal_data[[i]]$setting_calculation <- setting_calculation[[i]]
+      focal_setting_calculation <- setting_calculation[[i]]
+    }
+    
+    if (length(phy[[i]]$tip.label) == 1) {
+      res[[i]] <- secsse::secsse_single_branch_loglik(parameter = parameter,
+                                                      phy = phy[[i]],
+                                                      traits = traits[[i]],
+                                                      num_concealed_states =
+                                                        num_concealed_states,
+                                                      cond = cond,
+                                                      root_state_weight = 
+                                                        focal_root_state_weight,
+                                                      sampling_fraction = 
+                                                        focal_sampling_fraction,
+                                                      setting_calculation = 
+                                                        focal_setting_calculation,
+                                                      see_ancestral_states = FALSE,
+                                                      loglik_penalty = loglik_penalty,
+                                                      is_complete_tree = 
+                                                        is_complete_tree,
+                                                      take_into_account_root_edge = 
+                                                        take_into_account_root_edge,
+                                                      num_threads = num_threads,
+                                                      atol = atol,
+                                                      rtol = rtol,
+                                                      method = method,
+                                                      display_warning = display_warning)$loglik
+    } else {
+      res[[i]] <- secsse_loglik(parameter = parameter,
+                                phy = phy[[i]],
+                                traits = traits[[i]],
+                                num_concealed_states = num_concealed_states,
+                                cond = cond,
+                                root_state_weight = focal_root_state_weight,
+                                sampling_fraction = focal_sampling_fraction,
+                                setting_calculation = focal_setting_calculation,
+                                see_ancestral_states = FALSE,
+                                loglik_penalty = loglik_penalty,
+                                is_complete_tree = is_complete_tree,
+                                take_into_account_root_edge = 
+                                  take_into_account_root_edge,
+                                num_threads = num_threads,
+                                atol = atol,
+                                rtol = rtol,
+                                method = method,
+                                display_warning = display_warning) 
     }
   }
   
-  #res <- lapply(focal_data, get_ll)
-  res <- list() # interestingly, the for loop is faster than lapply here
-  for (i in 1:length(focal_data)) {
-    res[[i]] <- get_ll(focal_data[[i]])
-  }
-
   ll <- do.call(sum, res)
   
   return(ll) 

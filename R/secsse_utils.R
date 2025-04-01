@@ -443,13 +443,16 @@ check_traits <- function(traits, sampling_fraction) {
 #' @keywords internal
 check_root_state_weight <- function(root_state_weight, traits) {
     if (is.numeric(root_state_weight)) {
-        if (length(root_state_weight) != length(sort(unique(traits)))) {
-            stop("There need to be as many elements in root_state_weight 
-           as there are traits.")
-        }
+        #if (length(root_state_weight) != length(sort(unique(traits)))) {
+        #    stop("There need to be as many elements in root_state_weight 
+        #   as there are traits.")
+        #}
         if (length(which(root_state_weight == 1)) != 1) {
             stop("The root_state_weight needs only one 1.")
         }
+      if (sum(root_state_weight) > 1) {
+        stop("Root state weights need to sum to 1")
+      }
     } else {
         if (any(root_state_weight == "maddison_weights" |
                 root_state_weight == "equal_weights" |
