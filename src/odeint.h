@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <type_traits>
+#include <algorithm>
 
 
 #ifdef USE_BULRISCH_STOER_PATCH
@@ -35,6 +36,15 @@ using bstime_t = double;
 
 namespace odeintcpp {
 
+  template< typename STATE >
+  struct clamping_observer {
+    void operator()(STATE& x, double t) {
+      for (auto& i : x) {
+        i = std::clamp(i, 0.0, 1.0);
+      }
+    }
+  };
+
   namespace bno = boost::numeric::odeint;
 
   template <
@@ -46,7 +56,8 @@ namespace odeintcpp {
                  double t0, double t1, double dt) {
     using time_type = typename STEPPER::time_type;
     bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-                            time_type{t0}, time_type{t1}, time_type{dt});
+                            time_type{t0}, time_type{t1}, time_type{dt},
+                            clamping_observer<STATE>());
   }
 
   namespace {
@@ -86,7 +97,7 @@ namespace odeintcpp {
                                                                      rtol),
                                                           *ode, y, t0, t1, dt);
     } else if ("odeint::bulirsch_stoer" == stepper_name) {
-      // no controlled stepper for bulrisch stoer
+      // no controlled stepper for bulirsch stoer
       integrate(bno::bulirsch_stoer<STATE, double, STATE, bstime_t>(atol,
                                                                     rtol), 
                                                            *ode, y, t0, t1, dt);
