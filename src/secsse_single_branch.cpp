@@ -18,7 +18,7 @@ Rcpp::List calc_ll_single_branch(std::unique_ptr<ODE> od,
   auto T0 = std::chrono::high_resolution_clock::now();
   
   auto states_out = std::vector<double>(states.begin(), states.end());
-  
+
   auto workhorse = secsse::Integrator<ODE>(std::move(od), method, atol, rtol);
   
   auto t0 = std::min(forTime[0], forTime[1]);
@@ -30,20 +30,18 @@ Rcpp::List calc_ll_single_branch(std::unique_ptr<ODE> od,
   std::chrono::duration<double> DT = (T1 - T0);
   
   auto d = workhorse.size();
-  
+
   auto loglik = secsse::normalize_loglik(std::begin(states_out) + d, 
                                          std::end(states_out));
   
   const auto merge_branch = std::vector<double>(std::begin(states_out) + d, 
                                                 std::end(states_out));
-  
+
   return Rcpp::List::create(Rcpp::Named("loglik") = loglik,
                             Rcpp::Named("merge_branch") = merge_branch,
                             Rcpp::Named("states") = states_out,
                             Rcpp::Named("duration") = DT.count());
 }
-
-
 
 // [[Rcpp::export]]
 Rcpp::List calc_ll_single_branch_cpp(const std::string& rhs,

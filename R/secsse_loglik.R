@@ -133,9 +133,10 @@ master_loglik <- function(parameter,
                                           rtol = rtol,
                                           see_states = see_ancestral_states)
       loglik <- loglik + calcul2$loglik
-      
       nodeM <- calcul2$states
+      
       mergeBranch <- calcul2$merge_branch
+     
     }
   }
 
@@ -166,11 +167,6 @@ master_loglik <- function(parameter,
 
   wholeLike <- sum((mergeBranch2) * (weight_states))
 
-  if (is.na(log(wholeLike))) {
-    a <- 5
-    cat("hello\n")
-  }
-  
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)

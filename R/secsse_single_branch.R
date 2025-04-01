@@ -59,6 +59,10 @@ secsse_single_branch_loglik <- function(parameter,
   
   d <- ncol(states) / 2
   
+  if (!is.null(phy$root.edge)) {
+      forTime[3] <- forTime[3] + phy$root.edge
+  }
+  
   RcppParallel::setThreadOptions(numThreads = num_threads)
   
   calcul <- calc_ll_single_branch_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
@@ -76,31 +80,7 @@ secsse_single_branch_loglik <- function(parameter,
   nodeM <- calcul$states
   mergeBranch <- calcul$merge_branch
   
-#  cat("ll: ", loglik, "\n")
-#  cat("nodeM: ", nodeM, "\n")
-#  cat("mergeBranch: ", mergeBranch, "\n")
-  
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
-  
-  if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE) {
-    if (phy$root.edge > 0) {
-      calcul <- calc_ll_single_branch_cpp(rhs = 
-                                            if (using_cla) "ode_cla" else "ode_standard",
-                                          states = c(nodeM[1:d], mergeBranch),
-                                          forTime = c(0, phy$root.edge),
-                                          lambdas = lambdas,
-                                          mus = mus,
-                                          Q = q_matrix,
-                                          method = method,
-                                          atol = atol,
-                                          rtol = rtol,
-                                          see_states = see_ancestral_states)
-      loglik <- loglik + calcul$loglik
-      
-      nodeM <- calcul$states
-      mergeBranch <- calcul$merge_branch
-    }
-  }
 
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
@@ -119,7 +99,7 @@ secsse_single_branch_loglik <- function(parameter,
                             is_root_edge = TRUE)
   
   wholeLike <- sum((mergeBranch2) * (weight_states))
-  
+
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
