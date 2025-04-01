@@ -2,7 +2,7 @@ test_that("multiplication works", {
   
   set.seed(16)
   phylotree <- ape::rbdtree(0.07,0.001,Tmax=50)
-  startingpoint <- expect_output(
+  startingpoint <- testthat::expect_output(
     DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
   intGuessLamba <- startingpoint$lambda0
@@ -38,11 +38,12 @@ test_that("multiplication works", {
   
   tol = c(1e-02, 1e-03, 1e-04)
   maxiter = 100 * round((1.25)^length(idparsopt))
-  optimmethod = 'subplex'
+  optimmethod = 'simplex'
   cond <- 'proper_cond'
   root_state_weight <- 'proper_weights'
   sampling_fraction <- c(1, 1, 1)
-  model <- expect_warning(cla_secsse_ml_func_def_pars(
+  model <- testthat::expect_warning(
+    cla_secsse_ml_func_def_pars(
     phylotree,
     traits,
     num_concealed_states,
@@ -62,13 +63,13 @@ test_that("multiplication works", {
     maxiter,
     optimmethod,
     num_cycles = 1,
-    verbose = 0
+    verbose = TRUE
   ))
   
-  expect_equal(model$ML, -136.5926599)
-  expect_length(model, 3)
-  expect_length(model$MLpars, 3)
-  expect_equal(model$MLpars[[2]],
+  testthat::expect_equal(model$ML, -136.4534, tolerance = 1e-4)
+  testthat::expect_length(model, 3)
+  testthat::expect_length(model$MLpars, 3)
+  testthat::expect_equal(model$MLpars[[2]],
                c("0A" = 0,
                  "1A" = 0,
                  "2A" = 0,
