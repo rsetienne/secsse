@@ -129,6 +129,9 @@ master_ml <- function(phy,
     }
   }
   
+  ll_verbose <- ifelse(optimmethod == "subplex",
+                       verbose,
+                       FALSE)
   initloglik <- secsse_loglik_choosepar(trparsopt = trparsopt,
                                         trparsfix = trparsfix,
                                         idparsopt = idparsopt,
@@ -154,7 +157,8 @@ master_ml <- function(phy,
                                         atol = atol,
                                         rtol = rtol,
                                         method = method,
-                                        display_warning = FALSE)
+                                        display_warning = FALSE,
+                                        verbose = ll_verbose)
   # Function here
   if (verbose) print_init_ll(initloglik = initloglik)
 
@@ -189,7 +193,8 @@ master_ml <- function(phy,
                           atol = atol,
                           rtol = rtol,
                           method = method,
-                          display_warning = FALSE)
+                          display_warning = FALSE,
+                          verbose = ll_verbose)
     if (out$conv != 0) {
       stop("Optimization has not converged. 
                  Try again with different initial values.")
@@ -356,7 +361,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     #atol = atol,
                                     #rtol = rtol,
                                     #method = method,
-                                    display_warning) {
+                                    display_warning,
+                                    verbose) {
   alltrpars <- c(trparsopt, trparsfix)
   if (max(alltrpars) > 1 || min(alltrpars) < 0) {
     loglik <- -Inf
@@ -396,10 +402,10 @@ secsse_loglik_choosepar <- function(trparsopt,
       loglik <- -Inf
     }
   }
-  #if (verbose) {
-  #  out_print <- c(trparsopt / (1 - trparsopt), loglik)
-  #  message(paste(out_print, collapse = " "))
-  #}
+  if (verbose) {
+    out_print <- c(trparsopt / (1 - trparsopt), loglik)
+    message(paste(out_print, collapse = " "))
+  }
   return(loglik)
 }
 
