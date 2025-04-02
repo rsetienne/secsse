@@ -36,14 +36,28 @@ using bstime_t = double;
 
 namespace odeintcpp {
 
+  
   template< typename STATE >
   struct clamping_observer {
     void operator()(STATE& x, double t) {
       for (auto& i : x) {
+        
+      /*  if (i < 0.0) {
+          i = 0.0;
+          std::cerr << "observer clamped < 0\n";
+        } else {
+          if (i > 1.0) {
+            i = 1.0;
+            std::cerr << "observer clamped > 1\n";
+          }
+        }*/
+        
         i = std::clamp(i, 0.0, 1.0);
       }
+     
     }
   };
+
 
   namespace bno = boost::numeric::odeint;
 
@@ -56,7 +70,7 @@ namespace odeintcpp {
                  double t0, double t1, double dt) {
     using time_type = typename STEPPER::time_type;
     bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-                            time_type{t0}, time_type{t1}, time_type{dt},
+                            time_type{t0}, time_type{t1}, time_type{dt}, 
                             clamping_observer<STATE>());
   }
 
