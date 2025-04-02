@@ -161,6 +161,8 @@ namespace secsse {
     const rvector<const double> m_;
     const std::vector<double> q_;   // flat, transposed q matrix
     const ode_cla_precomp_t prec_;
+    
+    typedef bool use_observer_clamping;
 
   public:
     ode_cla(const Rcpp::List ll,
@@ -189,25 +191,10 @@ namespace secsse {
       }
     }
 
-    void operator()(const std::vector<double>& y,
+    void operator()(const std::vector<double>& x,
                     std::vector<double>& dxdt,
                     const double /* t */) const
     {
-      std::vector<double> x(y);
-      for (auto& i : x) {
-       if (i < 0.0) i = 0.0;
-       // i = std::clamp(i, 0.0, 1.0);
-      /*  if (i < 0.0) {
-          i = 0.0;
-          std::cerr << "rhs clamped < 0\n";
-        } else {
-          if (i > 1.0) {
-            i = 1.0;
-            std::cerr << "rhs clamped > 1\n";
-          }
-        }*/
-      }
-      
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
         auto llv = vector_view_t<const double>(prec_.ll.data(), d);

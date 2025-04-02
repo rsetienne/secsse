@@ -16,7 +16,6 @@
 
 namespace secsse {
 
-
   // retreives value set by RcppParallel::setThreadOptions(numThreads)
   // or tbb::task_arena::automatic if missing.
   size_t get_rcpp_num_threads();

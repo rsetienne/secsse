@@ -36,27 +36,29 @@ using bstime_t = double;
 
 namespace odeintcpp {
 
+  //SFINAE
+  template <typename, typename = void>
+  struct has_observer_clamping : std::false_type {};
+  
+  //SFINAE
+  template <typename T>
+  struct has_observer_clamping<T, std::void_t<decltype(T::use_observer_clamping)>> : std::true_type {};
+  
   
   template< typename STATE >
   struct clamping_observer {
     void operator()(STATE& x, double t) {
+      bool adjusted = false;
       for (auto& i : x) {
-        
-        if (i < 0.0) i = 0.0;
-        
-        /*if (i < 0.0) {
+        if (i < 0.0) {
+          adjusted = true;
           i = 0.0;
-          std::cerr << "observer clamped < 0\n";
-        } else {
-          if (i > 1.0) {
-            i = 1.0;
-            std::cerr << "observer clamped > 1\n";
-          }
-        }*/
-        
-        // i = std::clamp(i, 0.0, 1.0);
+        }
+        if (adjusted) {
+          auto s = std::accumulate(x.begin(), x.end(), 0.0);
+          for (auto& i : x) i *= 1.0 / s;
+        }
       }
-     
     }
   };
 
@@ -71,9 +73,15 @@ namespace odeintcpp {
   void integrate(STEPPER&& stepper, ODE& ode, STATE* y,
                  double t0, double t1, double dt) {
     using time_type = typename STEPPER::time_type;
-    bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-                            time_type{t0}, time_type{t1}, time_type{dt}, 
-                            clamping_observer<STATE>());
+    
+    if constexpr (has_observer_clamping<ODE>::value) {
+      bno::integrate_adaptive(stepper, std::ref(ode), (*y),
+                              time_type{t0}, time_type{t1}, time_type{dt}, 
+                              clamping_observer<STATE>());
+    } else {
+      bno::integrate_adaptive(stepper, std::ref(ode), (*y),
+                              time_type{t0}, time_type{t1}, time_type{dt});
+    }
   }
 
   namespace {

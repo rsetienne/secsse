@@ -38,7 +38,7 @@ test_that("multiplication works", {
   
   tol = c(1e-02, 1e-03, 1e-04)
   maxiter = 100 * round((1.25)^length(idparsopt))
-  optimmethod = 'simplex'
+  optimmethod = 'subplex'
   cond <- 'proper_cond'
   root_state_weight <- 'proper_weights'
   sampling_fraction <- c(1, 1, 1)
@@ -63,10 +63,10 @@ test_that("multiplication works", {
     maxiter,
     optimmethod,
     num_cycles = 1,
-    verbose = TRUE
+    verbose = 0
   ))
   
-  testthat::expect_equal(model$ML, -136.4534, tolerance = 1e-4)
+  testthat::expect_equal(model$ML, -136.4534, tol = 1e-4)
   testthat::expect_length(model, 3)
   testthat::expect_length(model$MLpars, 3)
   testthat::expect_equal(model$MLpars[[2]],
