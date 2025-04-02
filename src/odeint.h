@@ -42,7 +42,9 @@ namespace odeintcpp {
     void operator()(STATE& x, double t) {
       for (auto& i : x) {
         
-      /*  if (i < 0.0) {
+        if (i < 0.0) i = 0.0;
+        
+        /*if (i < 0.0) {
           i = 0.0;
           std::cerr << "observer clamped < 0\n";
         } else {
@@ -52,7 +54,7 @@ namespace odeintcpp {
           }
         }*/
         
-       i = std::clamp(i, 0.0, 1.0);
+        // i = std::clamp(i, 0.0, 1.0);
       }
      
     }
