@@ -195,8 +195,8 @@ namespace secsse {
     {
       std::vector<double> x(y);
       for (auto& i : x) {
-        i = std::clamp(i, 0.0, 1.0);
-       /* if (i < 0.0) {
+       // i = std::clamp(i, 0.0, 1.0);
+        if (i < 0.0) {
           i = 0.0;
           std::cerr << "rhs clamped < 0\n";
         } else {
@@ -204,7 +204,7 @@ namespace secsse {
             i = 1.0;
             std::cerr << "rhs clamped > 1\n";
           }
-        }*/
+        }
       }
       
       const auto d = size();
