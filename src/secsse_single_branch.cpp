@@ -31,6 +31,11 @@ Rcpp::List calc_ll_single_branch(std::unique_ptr<ODE> od,
   
   auto d = workhorse.size();
 
+  std::cerr << "\n";
+  for (const auto& i : states_out) {
+    std::cerr << i << " ";
+  } std::cerr << "\n";
+  
   auto loglik = secsse::normalize_loglik(std::begin(states_out) + d, 
                                          std::end(states_out));
   
