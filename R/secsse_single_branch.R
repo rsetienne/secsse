@@ -92,14 +92,12 @@ secsse_single_branch_loglik <- function(parameter,
                                      nodeM,
                                      d,
                                      is_cla = using_cla)
-  cat(mergeBranch, "\n")
   mergeBranch2 <- condition(cond,
                             mergeBranch,
                             weight_states,
                             lambdas,
                             nodeM,
                             is_root_edge = TRUE)
-  cat(mergeBranch2, "\n")
   wholeLike <- sum((mergeBranch2) * (weight_states))
 
   LL <- log(wholeLike) +
