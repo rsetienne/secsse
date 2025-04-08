@@ -71,7 +71,8 @@ default_params_doc(
   start_at_crown,
   optimmethod,
   display_warning,
-  take_into_account_root_edge
+  take_into_account_root_edge,
+  use_log_transform
 )
 }
 \arguments{
@@ -301,6 +302,12 @@ is ultimately called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 \item{take_into_account_root_edge}{if TRUE, the LL integration is continued
 along the root edge. This also affects conditioning (as now, conditioning
 no longer needs to assume a speciation event at the start of the tree)}
+
+\item{use_log_transform}{should the states along the branches be calculated
+in log transformed space (if TRUE), or normally? Calculating in log
+transformed space can reduce errors arising from numerical instabilities,
+which sometimes cause local state densities to become negative - this does
+not occur when using lo transformed states.}
 }
 \value{
 Nothing

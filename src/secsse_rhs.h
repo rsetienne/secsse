@@ -193,19 +193,10 @@ namespace secsse {
       }
     }
 
-    void operator()(const std::vector<double>& y,
+    void operator()(const std::vector<double>& x,
                     std::vector<double>& dxdt,
                     const double t ) const
     {
-      std::vector<double> x(y);
-     // std::cerr << t << " ";
-      for (auto& i : x) {
-       // i = i < 0.0 ? 0.0 : i;
-     //   std::cerr << i << " ";
-      } //std::cerr << "\n";
-      
-      
-      
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
         auto llv = vector_view_t<const double>(prec_.ll.data(), d);
@@ -250,6 +241,68 @@ namespace secsse {
             }
           }
           dxdt[i] = dx0;
+        }
+      }
+    }
+  };
+  
+  
+  template <OdeVariant variant>
+  class ode_cla_log {
+    const rvector<const double> m_;
+    const std::vector<double> q_;   // flat, transposed q matrix
+    const ode_cla_precomp_t prec_;
+
+  public:
+    
+    ode_cla_log(const Rcpp::List ll,
+            const Rcpp::NumericVector& m,
+            const Rcpp::NumericMatrix& q)
+      : m_(m), q_(flat_q_matrix(q)), prec_(ll) {
+    }
+    
+    size_t size() const noexcept { return m_.size(); }
+    
+    void mergebranch(const std::vector<double>& N,
+                     const std::vector<double>& M,
+                     std::vector<double>& out) const {
+      const auto d = size();
+      assert(2 * d == out.size());
+      auto llv = vector_view_t<const double>(prec_.ll.data(), d);
+      for (size_t i = 0; i < d; ++i) {
+        out[i] = M[i];
+        out[i + d] = 0.0;
+        for (size_t j = 0; j < d; ++j, llv.advance(d)) {
+          for (size_t k = 0; k < d; ++k) {
+            out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
+          }
+        }
+        out[i + d] *= 0.5;
+      }
+    }
+    
+    void operator()(const std::vector<double>& x,
+                  std::vector<double>& dxdt,
+                  const double /* t */ ) const
+    {
+      const auto d = size();
+      if constexpr (variant == OdeVariant::normal_tree) {
+        auto llv = vector_view_t<const double>(prec_.ll.data(), d);
+        auto nzv = prec_.nz.begin();
+        auto qv = vector_view_t<const double>{q_.data(), d};
+        for (size_t i = 0; i < d; ++i, qv.advance(d)) {
+          double dx0 = 0.0;
+          double dxd = 0.0;
+          for (size_t j = 0; j < d; ++j, llv.advance(d), ++nzv) {
+            for (auto k : *nzv) {
+              dx0 += llv[k] * (x[j] * x[k]);
+              dxd += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+            }
+            dx0 += (x[j] - x[i]) * qv[j];
+            dxd += (x[j + d] - x[i + d]) * qv[j];
+          }
+          dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i];
+          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]) * x[i + d];
         }
       }
     }

@@ -58,7 +58,8 @@ Rcpp::List calc_ll_single_branch_cpp(const std::string& rhs,
                                      const std::string& method,
                                      double atol,
                                      double rtol,
-                                     bool see_states)
+                                     bool see_states,
+                                     bool use_log_transform)
 {
   using namespace secsse;
   
@@ -68,7 +69,9 @@ Rcpp::List calc_ll_single_branch_cpp(const std::string& rhs,
   } else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
     
-    return calc_ll_single_branch(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), states, forTime, method, atol, rtol, see_states);
+    return use_log_transform ? 
+      calc_ll_single_branch(std::make_unique<ode_cla_log<OdeVariant::normal_tree>>(ll, mus, Q), states, forTime, method, atol, rtol, see_states) : 
+      calc_ll_single_branch(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), states, forTime, method, atol, rtol, see_states);
   } else {
     throw std::runtime_error("calc_ll_cpp: unknown rhs");
   }

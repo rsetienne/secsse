@@ -98,7 +98,8 @@ Rcpp::List calc_ll_cpp(const std::string& rhs,
                        double atol,
                        double rtol,
                        bool is_complete_tree,
-                       bool see_states)
+                       bool see_states,
+                       bool use_log_transform)
 {
   using namespace secsse;  // remove 'secsse::' once deprecated code is removed
   if (rhs == "ode_standard") {
@@ -109,9 +110,15 @@ Rcpp::List calc_ll_cpp(const std::string& rhs,
   } 
   else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
-    return is_complete_tree 
-      ? calc_ll(std::make_unique<ode_cla<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
-      : calc_ll(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
+    
+    if (use_log_transform == false) {
+    
+      return is_complete_tree 
+        ? calc_ll(std::make_unique<ode_cla<OdeVariant::complete_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states)
+        : calc_ll(std::make_unique<ode_cla<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
+    } else {
+      return calc_ll(std::make_unique<ode_cla_log<OdeVariant::normal_tree>>(ll, mus, Q), ances, states, forTime, method, atol, rtol, see_states);
+    }
   }
   else {
     throw std::runtime_error("calc_ll_cpp: unknown rhs");
