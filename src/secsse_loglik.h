@@ -138,7 +138,6 @@ namespace secsse {
     return std::log(sabs);
   }
 
-
   template <typename ODE>
   class Integrator {
   public:

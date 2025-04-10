@@ -138,7 +138,7 @@ namespace secsse {
       ll.resize(n * d * d, 0.0);
       nz.resize(n * d, {});
       auto llv = vector_view_t<double>{ll.data(), d};
-      auto nzv =nz.begin();
+      auto nzv = nz.begin();
       for (int i = 0; i < Rll.size(); ++i) {
         // we all love deeply nested loops...
         rmatrix<const double> mr(Rcpp::as<Rcpp::NumericMatrix>(Rll[i]));
@@ -195,8 +195,16 @@ namespace secsse {
 
     void operator()(const std::vector<double>& x,
                     std::vector<double>& dxdt,
-                    const double t ) const
+                    const double /* t */ ) const
     {
+      
+      /*for (const auto& i : x) {
+        if (i < 0.0) {
+          std::cerr << "negative encountered\n";
+        }
+      }*/
+      
+      
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
         auto llv = vector_view_t<const double>(prec_.ll.data(), d);
@@ -274,10 +282,11 @@ namespace secsse {
         out[i + d] = 0.0;
         for (size_t j = 0; j < d; ++j, llv.advance(d)) {
           for (size_t k = 0; k < d; ++k) {
-            out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
+           // out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
+           out[i + d] += llv[k] * std::exp(N[j + d] * M[k + d] + M[j + d] * N[k + d]); //(N[j + d] * M[k + d] + M[j + d] * N[k + d]);
           }
         }
-        out[i + d] *= 0.5;
+        out[i + d] = std::log(0.5 * out[i + d]);
       }
     }
     
@@ -285,6 +294,10 @@ namespace secsse {
                   std::vector<double>& dxdt,
                   const double /* t */ ) const
     {
+      // we are now working with log(x), but only for D, e.g. 
+      // for those indices +d
+      // 
+      
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
         auto llv = vector_view_t<const double>(prec_.ll.data(), d);
@@ -296,13 +309,15 @@ namespace secsse {
           for (size_t j = 0; j < d; ++j, llv.advance(d), ++nzv) {
             for (auto k : *nzv) {
               dx0 += llv[k] * (x[j] * x[k]);
-              dxd += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+             // dxd += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]); // ? sum_{j,k} lambda_{i,j,k} E_j exp(logD_k - logD_i)
+              dxd += llv[k] * x[j] * std::exp(x[k + d] - x[i + d]);
             }
+  
             dx0 += (x[j] - x[i]) * qv[j];
-            dxd += (x[j + d] - x[i + d]) * qv[j];
+            if (i != j) dxd += std::exp(x[j + d] - x[i + d]) * qv[j]; // sum_{j!=i} q_{ji} exp(logD_j - logD_i) + 
           }
           dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i];
-          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]) * x[i + d];
+          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]); // * x[i + d]; // ? -(mu_i + sum_{j!=i} q_{ij} + sum_{j,k} lambda_{i,j,k}) * 1
         }
       }
     }

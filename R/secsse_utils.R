@@ -917,6 +917,7 @@ build_states <- function(phy,
                                 mus,
                                 nb_tip)
     }
+
     return(states)
 }
 

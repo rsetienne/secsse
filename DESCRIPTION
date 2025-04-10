@@ -2,7 +2,7 @@ Package: secsse
 Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
-Version: 3.2.0
+Version: 3.3.0
 Date: 2024-05-14
 License: GPL (>= 3) | file LICENSE
 Authors@R: c(

@@ -78,10 +78,16 @@ secsse_single_branch_loglik <- function(parameter,
                         see_states = see_ancestral_states,
                         use_log_transform = use_log_transform)
 
+  
+  
   loglik <- calcul$loglik
   nodeM <- calcul$states
   mergeBranch <- calcul$merge_branch
   
+ # cat("loglik: ", loglik, "\n")
+#  cat("nodeM: ", nodeM, "\n")
+#  cat("mergeBranch: ", mergeBranch, "\n")
+
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
   ## At the root

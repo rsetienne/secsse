@@ -120,7 +120,6 @@ master_loglik <- function(parameter,
   
   if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
     if (phy$root.edge > 0) {
-      
       calcul2 <- calc_ll_single_branch_cpp(rhs = 
                                              if (using_cla) "ode_cla" else "ode_standard",
                                            states = c(nodeM[1:d], mergeBranch),
@@ -137,7 +136,6 @@ master_loglik <- function(parameter,
       nodeM <- calcul2$states
       
       mergeBranch <- calcul2$merge_branch
-      
     }
   }
   
@@ -349,6 +347,39 @@ multi_loglik <- function(parameter,
   }
   
   ll <- do.call(sum, res)
+  v <- unlist(res)
+ 
+  if (1 == 1) {
+    av <- which(is.na(v))
+    if (length(av)) {
+      cat(av, "\n")
+    }
+  }
+  
+  if (1 == 2) {
+    # output NA trees
+          av <- which(is.na(v))
+          if (length(av)) {
+            sum_bl <- rep(0, 1000)
+            cc <- rep(0, 1000)
+            for (i in av) {
+              num_tip <- treestats::number_of_lineages(phy_set[[i]])
+              bl <- max(phy_set[[i]]$edge.length, phy_set[[i]]$root.edge)
+              if (num_tip == 1) bl <- phy_set[[i]]$edge.length + phy_set[[i]]$root.edge
+              sum_bl[num_tip] <- sum_bl[num_tip] + bl
+              cc[num_tip] <- cc[num_tip] + 1
+            }
+            sum_bl <- sum_bl / cc
+            tips <- which(sum_bl > 0)
+            sum_bl <- sum_bl[!is.na(sum_bl)]
+            cc <- cc[cc > 0]
+            output <- cbind(tips, sum_bl, cc)
+            for (i in 1:nrow(output)) {
+              cat(output[i, ], "\n")
+            }
+          }
+  }
+  
   
   return(ll) 
 }

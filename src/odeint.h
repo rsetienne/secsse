@@ -47,12 +47,15 @@ namespace odeintcpp {
   template< typename STATE >
   struct clamping_observer {
     void operator()(STATE& x, double t) {
-      std::cerr << "Hello\n";
-      std::cerr << t << " ";
+     // std::cerr << "Hello\n";
+    //  std::cerr << t << " ";
       for (auto& i : x) {
-        std::cerr << i << " ";
+     //   std::cerr << i << " ";
     //    i = i < 0 ? 0.0 : i;
-      } std::cerr << "\n";
+         if (i < 0)  {
+           std::cerr << "accidental < 0 detected\n";
+         }
+      } //std::cerr << "\n";
     }
   };
 
@@ -69,12 +72,12 @@ namespace odeintcpp {
     using time_type = typename STEPPER::time_type;
     
    // if constexpr (std::is_same_v<has_observer_clamping<ODE>, std::true_type>) {
-    //  bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-    //                          time_type{t0}, time_type{t1}, time_type{dt}, 
-  ///                           clamping_observer<STATE>());
-  //  } else {
       bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-                              time_type{t0}, time_type{t1}, time_type{dt});
+                              time_type{t0}, time_type{t1}, time_type{dt}, 
+                             clamping_observer<STATE>());
+  //  } else {
+    //  bno::integrate_adaptive(stepper, std::ref(ode), (*y),
+  //                            time_type{t0}, time_type{t1}, time_type{dt});
    // }
   }
 
