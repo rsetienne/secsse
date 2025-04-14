@@ -23,8 +23,7 @@ secsse_loglik(
   atol = 1e-08,
   rtol = 1e-07,
   method = "odeint::bulirsch_stoer",
-  display_warning = TRUE,
-  use_log_transform = FALSE
+  display_warning = TRUE
 )
 }
 \arguments{
@@ -89,12 +88,6 @@ no longer needs to assume a speciation event at the start of the tree)}
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
 
 \item{display_warning}{display a warning if necessary}
-
-\item{use_log_transform}{should the states along the branches be calculated
-in log transformed space (if TRUE), or normally? Calculating in log
-transformed space can reduce errors arising from numerical instabilities,
-which sometimes cause local state densities to become negative - this does
-not occur when using lo transformed states.}
 }
 \value{
 The loglikelihood of the data given the parameter.

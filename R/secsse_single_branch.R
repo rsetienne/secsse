@@ -21,8 +21,7 @@ secsse_single_branch_loglik <- function(parameter,
                                         atol = 1e-8,
                                         rtol = 1e-7,
                                         method = "odeint::bulirsch_stoer",
-                                        display_warning = TRUE,
-                                        use_log_transform = FALSE) {
+                                        display_warning = TRUE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -75,8 +74,7 @@ secsse_single_branch_loglik <- function(parameter,
                         method = method,
                         atol = atol,
                         rtol = rtol,
-                        see_states = see_ancestral_states,
-                        use_log_transform = use_log_transform)
+                        see_states = see_ancestral_states)
 
   
   

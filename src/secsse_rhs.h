@@ -161,12 +161,9 @@ namespace secsse {
     const rvector<const double> m_;
     const std::vector<double> q_;   // flat, transposed q matrix
     const ode_cla_precomp_t prec_;
-    
-  
 
   public:
-    typedef bool use_observer_clamping;
-    
+
     ode_cla(const Rcpp::List ll,
             const Rcpp::NumericVector& m,
             const Rcpp::NumericMatrix& q)
@@ -197,13 +194,6 @@ namespace secsse {
                     std::vector<double>& dxdt,
                     const double /* t */ ) const
     {
-      
-      /*for (const auto& i : x) {
-        if (i < 0.0) {
-          std::cerr << "negative encountered\n";
-        }
-      }*/
-      
       
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
@@ -253,74 +243,4 @@ namespace secsse {
       }
     }
   };
-  
-  
-  template <OdeVariant variant>
-  class ode_cla_log {
-    const rvector<const double> m_;
-    const std::vector<double> q_;   // flat, transposed q matrix
-    const ode_cla_precomp_t prec_;
-
-  public:
-    
-    ode_cla_log(const Rcpp::List ll,
-            const Rcpp::NumericVector& m,
-            const Rcpp::NumericMatrix& q)
-      : m_(m), q_(flat_q_matrix(q)), prec_(ll) {
-    }
-    
-    size_t size() const noexcept { return m_.size(); }
-    
-    void mergebranch(const std::vector<double>& N,
-                     const std::vector<double>& M,
-                     std::vector<double>& out) const {
-      const auto d = size();
-      assert(2 * d == out.size());
-      auto llv = vector_view_t<const double>(prec_.ll.data(), d);
-      for (size_t i = 0; i < d; ++i) {
-        out[i] = M[i];
-        out[i + d] = 0.0;
-        for (size_t j = 0; j < d; ++j, llv.advance(d)) {
-          for (size_t k = 0; k < d; ++k) {
-           // out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
-           out[i + d] += llv[k] * std::exp(N[j + d] * M[k + d] + M[j + d] * N[k + d]); //(N[j + d] * M[k + d] + M[j + d] * N[k + d]);
-          }
-        }
-        out[i + d] = std::log(0.5 * out[i + d]);
-      }
-    }
-    
-    void operator()(const std::vector<double>& x,
-                  std::vector<double>& dxdt,
-                  const double /* t */ ) const
-    {
-      // we are now working with log(x), but only for D, e.g. 
-      // for those indices +d
-      // 
-      
-      const auto d = size();
-      if constexpr (variant == OdeVariant::normal_tree) {
-        auto llv = vector_view_t<const double>(prec_.ll.data(), d);
-        auto nzv = prec_.nz.begin();
-        auto qv = vector_view_t<const double>{q_.data(), d};
-        for (size_t i = 0; i < d; ++i, qv.advance(d)) {
-          double dx0 = 0.0;
-          double dxd = 0.0;
-          for (size_t j = 0; j < d; ++j, llv.advance(d), ++nzv) {
-            for (auto k : *nzv) {
-              dx0 += llv[k] * (x[j] * x[k]);
-             // dxd += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]); // ? sum_{j,k} lambda_{i,j,k} E_j exp(logD_k - logD_i)
-              dxd += llv[k] * x[j] * std::exp(x[k + d] - x[i + d]);
-            }
-  
-            dx0 += (x[j] - x[i]) * qv[j];
-            if (i != j) dxd += std::exp(x[j + d] - x[i + d]) * qv[j]; // sum_{j!=i} q_{ji} exp(logD_j - logD_i) + 
-          }
-          dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i];
-          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]); // * x[i + d]; // ? -(mu_i + sum_{j!=i} q_{ij} + sum_{j,k} lambda_{i,j,k}) * 1
-        }
-      }
-    }
-  };
-
 } // namespace secsse

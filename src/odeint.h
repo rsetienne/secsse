@@ -72,12 +72,12 @@ namespace odeintcpp {
     using time_type = typename STEPPER::time_type;
     
    // if constexpr (std::is_same_v<has_observer_clamping<ODE>, std::true_type>) {
-      bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-                              time_type{t0}, time_type{t1}, time_type{dt}, 
-                             clamping_observer<STATE>());
-  //  } else {
     //  bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-  //                            time_type{t0}, time_type{t1}, time_type{dt});
+    //                          time_type{t0}, time_type{t1}, time_type{dt}, 
+    //                         clamping_observer<STATE>());
+  //  } else {
+      bno::integrate_adaptive(stepper, std::ref(ode), (*y),
+                             time_type{t0}, time_type{t1}, time_type{dt});
    // }
   }
 
