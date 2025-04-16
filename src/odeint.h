@@ -93,7 +93,6 @@ namespace odeintcpp {
 
    template <
     typename STATE,
-    typename ODE
     typename ODE,
     typename NORMALIZER
   >
