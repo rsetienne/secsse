@@ -56,8 +56,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // ct_condition_cpp
-Rcpp::NumericVector ct_condition_cpp(const std::string rhs, const Rcpp::NumericVector& state, const double t, const Rcpp::RObject& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string& method, double atol, double rtol);
-RcppExport SEXP _secsse_ct_condition_cpp(SEXP rhsSEXP, SEXP stateSEXP, SEXP tSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP) {
+Rcpp::NumericVector ct_condition_cpp(const std::string rhs, const Rcpp::NumericVector& state, const double t, const Rcpp::RObject& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string& method, double atol, double rtol, bool use_normalization);
+RcppExport SEXP _secsse_ct_condition_cpp(SEXP rhsSEXP, SEXP stateSEXP, SEXP tSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP use_normalizationSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -70,7 +70,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type atol(atolSEXP);
     Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
-    rcpp_result_gen = Rcpp::wrap(ct_condition_cpp(rhs, state, t, lambdas, mus, Q, method, atol, rtol));
+    Rcpp::traits::input_parameter< bool >::type use_normalization(use_normalizationSEXP);
+    rcpp_result_gen = Rcpp::wrap(ct_condition_cpp(rhs, state, t, lambdas, mus, Q, method, atol, rtol, use_normalization));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -126,7 +127,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_secsse_eval_cpp", (DL_FUNC) &_secsse_eval_cpp, 12},
     {"_secsse_calc_ll_cpp", (DL_FUNC) &_secsse_calc_ll_cpp, 13},
-    {"_secsse_ct_condition_cpp", (DL_FUNC) &_secsse_ct_condition_cpp, 9},
+    {"_secsse_ct_condition_cpp", (DL_FUNC) &_secsse_ct_condition_cpp, 10},
     {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 17},
     {"_secsse_calc_ll_single_branch_cpp", (DL_FUNC) &_secsse_calc_ll_single_branch_cpp, 11},
     {NULL, NULL, 0}
