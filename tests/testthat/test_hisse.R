@@ -28,7 +28,7 @@ test_that("secsse gives the same result as hisse", {
 
   testthat::expect_warning(
 
-  y <- secsse_loglik(parameter = toCheck,
+  y <- secsse::secsse_loglik(parameter = toCheck,
                      phy = phy,
                      traits = traits,
                      num_concealed_states = num_concealed_states,

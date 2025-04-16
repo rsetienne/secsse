@@ -166,6 +166,7 @@ namespace secsse {
         std::copy_n(std::begin(*dnode.state), 2 * d, std::begin(y[i]));
         
         if (use_normalization) {
+          dnode.loglik = 0.0;
           do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF, dnode.loglik);
         } else {
           do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF);
@@ -231,7 +232,7 @@ namespace secsse {
     const std::string method_;
     const double atol_;
     const double rtol_;
-    bool use_normalization = false;
+    bool use_normalization;
   };
     
 

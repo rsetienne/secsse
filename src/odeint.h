@@ -41,56 +41,6 @@ namespace secsse {
 }
 
 namespace odeintcpp {
-
-  //SFINAE
-  template <typename, typename = void>
-  struct has_observer_clamping : std::false_type {};
-  
-  //SFINAE
-  template <typename T>
-  struct has_observer_clamping<T, std::void_t<decltype(T::use_observer_clamping)>> : std::true_type {};
-  
-  template< typename STATE >
-  struct clamping_observer {
-    void operator()(STATE& x, double t) {
-     for (auto& i : x) {
-        if (i < 0)  {
-           std::cerr << "accidental < 0 detected\n";
-         }
-      } 
-    }
-  };
-  
-  template< typename STATE >
-  class normalizing_observer {
-  public:
-    void operator()(STATE& x, double t) {
-      auto d = x.size() / 2;
-      loglik += secsse::normalize_loglik(x.begin() + d, x.end());
-      cnt++;
-    }
-    
-    normalizing_observer() {
-      loglik = 0.0;
-      cnt = 0;
-    }
-
-    normalizing_observer(int x) : cnt(x), loglik(0.0) {   }
-    
-    double get_loglik() {
-      return loglik;
-    }
-
-    size_t get_cnt() {
-      return cnt;
-    }
-
-   private: 
-    double loglik;
-    size_t cnt;
-  };
-
-
   namespace bno = boost::numeric::odeint;
 
   template <
