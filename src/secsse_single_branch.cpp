@@ -115,15 +115,6 @@ Rcpp::List calc_ll_single_branch(std::unique_ptr<ODE> od,
   auto t0 = std::min(forTime[0], forTime[1]);
   auto t1 = std::max(forTime[0], forTime[1]);
   
-/*  if (t1 > 0 && break_up == 1) {
-    return call_ll_single_branch_broken(std::move(od), states, forTime, method, atol, rtol, see_states);
-  } 
-  
-  if (t1 > 0 && break_up == 2) {
-    return call_ll_single_branch_obs(std::move(od), states, forTime, method, atol, rtol, see_states);
-  } */
-  
-  
   auto T0 = std::chrono::high_resolution_clock::now();
   
   auto states_out = std::vector<double>(states.begin(), states.end());

@@ -43,39 +43,38 @@ namespace secsse {
 namespace odeintcpp {
   namespace bno = boost::numeric::odeint;
 
+  struct normalize{
+    double loglik = 0.0;
+  };
+
+  struct no_normalization{};
+
   template <
     typename STEPPER,
     typename ODE,
-    typename STATE
-  >
-  void integrate(STEPPER&& stepper, ODE& ode, STATE* y,
-                 double t0, double t1, double dt) {
-    using time_type = typename STEPPER::time_type;
-    bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-                            time_type{t0}, time_type{t1}, time_type{dt});
-  }
-  
-  
-  template <
-    typename STEPPER,
-    typename ODE,
-    typename STATE
+    typename STATE,
+    typename NORMALIZER
   >
   void integrate(STEPPER&& stepper, ODE& ode, STATE* y,
                  double t0, double t1, double dt,
-                 double& loglik_obs) {
-    // TODO make loglik_obs it a class and check if it has loglik_obs using constexpr.
+                 NORMALIZER& norm) {
     
     using time_type = typename STEPPER::time_type;
     
-    auto observer = [&loglik_obs](STATE &x, double t) {
-      auto d = x.size() / 2;
-      loglik_obs += secsse::normalize_loglik(x.begin() + d, x.end());
-    };
+    if constexpr (std::is_same<NORMALIZER, normalize>::value) {
     
-    bno::integrate_adaptive(stepper, std::ref(ode), (*y),
-                            time_type{t0}, time_type{t1}, time_type{dt},
-                            observer);
+      auto observer = [&norm](STATE &x, double t) {
+        auto d = x.size() / 2;
+        norm.loglik += secsse::normalize_loglik(x.begin() + d, x.end());
+      };
+      
+      bno::integrate_adaptive(stepper, std::ref(ode), (*y),
+                              time_type{t0}, time_type{t1}, time_type{dt},
+                              observer);
+    } else {
+      bno::integrate_adaptive(stepper, std::ref(ode), (*y),
+                              time_type{t0}, time_type{t1}, time_type{dt});
+    }
   }
   
 
@@ -91,48 +90,8 @@ namespace odeintcpp {
 
   template <
     typename STATE,
-    typename ODE
-  >
-  void integrate(const std::string& stepper_name,
-                 ODE ode,
-                 STATE* y,
-                 double t0,
-                 double t1,
-                 double dt,
-                 double atol,
-                 double rtol) {
-    static_assert(is_unique_ptr<ODE>::value ||
-                  std::is_pointer_v<ODE>, 
-                  "ODE shall be pointer or unique_ptr type");
-    if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
-      integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, 
-                                                                          rtol), 
-                *ode, y, t0, t1, dt);
-    } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
-      integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol,
-                                                                         rtol),
-                                                          *ode, y, t0, t1, dt);
-    } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
-      integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol,
-                                                                     rtol),
-                                                          *ode, y, t0, t1, dt);
-    } else if ("odeint::bulirsch_stoer" == stepper_name) {
-      // no controlled stepper for bulirsch stoer
-      integrate(bno::bulirsch_stoer<STATE, double, STATE, bstime_t>(atol,
-                                                                    rtol), 
-                                                           *ode, y, t0, t1, dt);
-    } else if ("odeint::runge_kutta4" == stepper_name) {
-      integrate(bno::runge_kutta4<STATE>(), *ode, y, t0, t1, dt);
-    } else {
-      throw std::runtime_error("odeintcpp::integrate: unknown stepper");
-    }
-  }
-  
-  
-  // in case you want to use a normalizing observer, bit of code dupl
-  template <
-    typename STATE,
-    typename ODE
+    typename ODE,
+    typename NORMALIZER
   >
   void integrate(const std::string& stepper_name,
                  ODE ode,
@@ -142,29 +101,29 @@ namespace odeintcpp {
                  double dt,
                  double atol,
                  double rtol,
-                 double& loglik_obs) {
+                 NORMALIZER&  norm) {
     static_assert(is_unique_ptr<ODE>::value ||
                   std::is_pointer_v<ODE>, 
                   "ODE shall be pointer or unique_ptr type");
     if ("odeint::runge_kutta_cash_karp54" == stepper_name) {
       integrate(bno::make_controlled<bno::runge_kutta_cash_karp54<STATE>>(atol, 
                                                                           rtol), 
-                                                                          *ode, y, t0, t1, dt, loglik_obs);
+                *ode, y, t0, t1, dt, norm);
     } else if ("odeint::runge_kutta_fehlberg78" == stepper_name) {
       integrate(bno::make_controlled<bno::runge_kutta_fehlberg78<STATE>>(atol,
                                                                          rtol),
-                                                                         *ode, y, t0, t1, dt, loglik_obs);
+                                                          *ode, y, t0, t1, dt, norm);
     } else if ("odeint::runge_kutta_dopri5" == stepper_name) {
       integrate(bno::make_controlled<bno::runge_kutta_dopri5<STATE>>(atol,
                                                                      rtol),
-                                                                     *ode, y, t0, t1, dt, loglik_obs);
+                                                          *ode, y, t0, t1, dt, norm);
     } else if ("odeint::bulirsch_stoer" == stepper_name) {
       // no controlled stepper for bulirsch stoer
       integrate(bno::bulirsch_stoer<STATE, double, STATE, bstime_t>(atol,
                                                                     rtol), 
-                                                                    *ode, y, t0, t1, dt, loglik_obs);
+                                                           *ode, y, t0, t1, dt, norm);
     } else if ("odeint::runge_kutta4" == stepper_name) {
-      integrate(bno::runge_kutta4<STATE>(), *ode, y, t0, t1, dt, loglik_obs);
+      integrate(bno::runge_kutta4<STATE>(), *ode, y, t0, t1, dt, norm);
     } else {
       throw std::runtime_error("odeintcpp::integrate: unknown stepper");
     }

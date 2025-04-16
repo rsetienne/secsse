@@ -80,6 +80,8 @@
         "numbers": "cpp",
         "queue": "cpp",
         "semaphore": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "__verbose_abort": "cpp",
+        "charconv": "cpp"
     }
 }
