@@ -769,7 +769,8 @@ update_complete_tree <- function(phy,
                                  method,
                                  atol,
                                  rtol,
-                                 lmb) {
+                                 lmb,
+                                 use_normalization) {
     time_inte <- max(abs(ape::branching.times(phy))) # nolint
 
     if (is.list(lambdas)) {
@@ -782,7 +783,8 @@ update_complete_tree <- function(phy,
                                   q_matrix,
                                   method,
                                   atol,
-                                  rtol)
+                                  rtol,
+                                  use_normalization)
         nodeM <- c(nodeM, y) # nolint
     } else {
         y <- rep(0, 2 * lmb)
@@ -794,7 +796,8 @@ update_complete_tree <- function(phy,
                                   q_matrix,
                                   method,
                                   atol,
-                                  rtol)
+                                  rtol,
+                                  use_normalization)
     }
     return(nodeM)
 }

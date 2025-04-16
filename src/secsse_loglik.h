@@ -138,18 +138,17 @@ namespace secsse {
     return std::log(sabs);
   }
 
-  template <typename ODE>
+  template <typename ODE,
+            typename NORMALIZER>
   class Integrator {
   public:
     using ode_type = ODE;
 
-    Integrator(std::unique_ptr<ode_type>&& od, const std::string& method, double atol, double rtol,
-               bool normalize) : 
+    Integrator(std::unique_ptr<ode_type>&& od, const std::string& method, double atol, double rtol) : 
       od_(std::move(od)),
       method_(method),
       atol_(atol),
-      rtol_(rtol),
-      use_normalization(normalize)
+      rtol_(rtol)
     {}
 
     size_t size() const noexcept { return od_->size(); }
@@ -165,14 +164,10 @@ namespace secsse {
         auto& dnode = inode.desc[i];
         std::copy_n(std::begin(*dnode.state), 2 * d, std::begin(y[i]));
         
-        if (use_normalization) {
-          norm.loglik = 0.0;
-          do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF, norm);
-          dnode.loglik = norm.loglik;
-        } else {
-          do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF, no_norm);
-          dnode.loglik = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
-        }
+       
+        NORMALIZER norm;
+        do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF, norm);
+        dnode.loglik = norm.loglik + normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
       }
 #ifdef SECSSE_NESTED_PARALLELISM
       );
@@ -184,16 +179,21 @@ namespace secsse {
                    + normalize_loglik(std::begin(*inode.state) + d, std::end(*inode.state));
     }
 
-    template <typename NORMALIZER>
     void operator()(std::vector<double>& state, double t0, double t1,
                     NORMALIZER& norm) const {
       do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF, norm);
     }
+      
+      void operator()(std::vector<double>& state, double t0, double t1) const {
+        odeintcpp::no_normalization no_norm;
+        do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF, no_norm);
+      }
 
     void operator()(storing::dnode_t& dnode, size_t num_steps) const {
       auto t0 = 0.0;
       const auto dt = dnode.time / num_steps;
       auto y = *dnode.state;
+      
       odeintcpp::no_normalization no_norm;
       for (size_t i = 0; i < num_steps; ++i, t0 += dt) {
         dnode.storage.emplace_back(t0, y);
@@ -203,9 +203,9 @@ namespace secsse {
     }
 
   private:
-    template <typename NORMALIZER>
+    template <typename N>
     void do_integrate(std::vector<double>& state, double t0, double t1, double dtf,
-                      NORMALIZER& norm) const {
+                      N& norm) const {
       odeintcpp::integrate(method_,
                            od_.get(),
                            &state,
@@ -221,10 +221,6 @@ namespace secsse {
     const std::string method_;
     const double atol_;
     const double rtol_;
-    
-    bool use_normalization;
-    odeintcpp::normalize norm;
-    odeintcpp::no_normalization no_norm;
   };
     
 
@@ -257,8 +253,8 @@ namespace secsse {
     const auto merge_branch = std::vector<double>(std::begin(*root_node.state) + d, std::end(*root_node.state));
     std::vector<double> node_M{ *root_node.desc[1].state };
     
-    odeintcpp::no_normalization av;
-    integrator(node_M, 0.0, root_node.desc[1].time, av);
+    
+    integrator(node_M, 0.0, root_node.desc[1].time);
     
     normalize_loglik(std::begin(node_M) + d, std::end(node_M));
     const auto tot_loglik = std::accumulate(std::begin(inodes), std::end(inodes), 0.0, [](auto& sum, const auto& node) { return sum + node.loglik; });

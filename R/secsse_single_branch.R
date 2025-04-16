@@ -23,7 +23,7 @@ secsse_single_branch_loglik <- function(parameter,
                                         rtol = 1e-7,
                                         method = "odeint::bulirsch_stoer",
                                         display_warning = TRUE,
-                                        use_normalization = FALSE) {
+                                        use_normalization = TRUE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0

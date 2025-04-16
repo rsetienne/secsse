@@ -47,7 +47,9 @@ namespace odeintcpp {
     double loglik = 0.0;
   };
 
-  struct no_normalization{};
+  struct no_normalization{
+    double loglik = 0.0; // placeholder
+  };
 
   template <
     typename STEPPER,
