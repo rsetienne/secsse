@@ -72,9 +72,22 @@ namespace secsse {
                                    const double t,
                                    const std::string& method,
                                    double atol,
-                                   double rtol)  {
+                                   double rtol,
+                                   bool use_normalization)  {
     auto init_state = std::vector<double>(y.begin(), y.end());
-    odeintcpp::integrate(method,
+    if (use_normalization) {
+      double ll = 0.0;
+      odeintcpp::integrate(method,
+                           std::move(od),
+                           &init_state,         // state vector
+                           0.0,                 // t0
+                           t,                   // t1
+                           t * 0.01,
+                           atol,
+                           rtol,
+                           ll);
+    } else {
+       odeintcpp::integrate(method,
                          std::move(od),
                          &init_state,         // state vector
                          0.0,                 // t0
@@ -82,6 +95,7 @@ namespace secsse {
                          t * 0.01,
                          atol,
                          rtol);
+    }
     return Rcpp::NumericVector(init_state.begin(), init_state.end());
   }
 }  // namespace  secsse

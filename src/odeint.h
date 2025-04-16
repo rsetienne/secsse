@@ -64,7 +64,6 @@ namespace odeintcpp {
   void integrate(STEPPER&& stepper, ODE& ode, STATE* y,
                  double t0, double t1, double dt,
                  double& loglik_obs) {
-    // TODO make loglik_obs it a class and check if it has loglik_obs using constexpr.
     
     using time_type = typename STEPPER::time_type;
     
@@ -127,8 +126,7 @@ namespace odeintcpp {
       throw std::runtime_error("odeintcpp::integrate: unknown stepper");
     }
   }
-  
-  
+
   // in case you want to use a normalizing observer, bit of code dupl
   template <
     typename STATE,
