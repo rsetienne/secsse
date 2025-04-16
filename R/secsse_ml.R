@@ -26,7 +26,7 @@ master_ml <- function(phy,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::bulirsch_stoer",
-                      use_normalization = TRUE) {
+                      use_normalization = FALSE) {
   
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
@@ -299,7 +299,7 @@ secsse_ml <- function(phy,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::bulirsch_stoer",
-                      use_normalization = TRUE) {
+                      use_normalization = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -501,7 +501,7 @@ cla_secsse_ml <- function(phy,
                           atol = 1e-8,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer",
-                          use_normalization = TRUE) {
+                          use_normalization = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
