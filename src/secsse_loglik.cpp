@@ -46,7 +46,10 @@ namespace secsse {
     }
     const auto phy_edge = make_phy_edge_vector(rmatrix<const double>(forTime));
     auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates);
-    auto ll_res = calc_ll(Integrator<ODE>(std::move(od), method, atol, rtol, use_normalization), inodes, tstates);
+
+    auto ll_res = use_normalization ? calc_ll(Integrator<ODE, odeintcpp::normalize>(std::move(od), method, atol, rtol), inodes, tstates) :
+                                      calc_ll(Integrator<ODE, odeintcpp::no_normalization>(std::move(od), method, atol, rtol), inodes, tstates);
+
     auto T1 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> DT = (T1 - T0);
     Rcpp::NumericMatrix states_out;
@@ -75,8 +78,9 @@ namespace secsse {
                                    double rtol,
                                    bool use_normalization)  {
     auto init_state = std::vector<double>(y.begin(), y.end());
+
     if (use_normalization) {
-      double ll = 0.0;
+      odeintcpp::normalize norm;
       odeintcpp::integrate(method,
                            std::move(od),
                            &init_state,         // state vector
@@ -85,16 +89,18 @@ namespace secsse {
                            t * 0.01,
                            atol,
                            rtol,
-                           ll);
+                           norm);
     } else {
-       odeintcpp::integrate(method,
-                         std::move(od),
-                         &init_state,         // state vector
-                         0.0,                 // t0
-                         t,                   // t1
-                         t * 0.01,
-                         atol,
-                         rtol);
+        odeintcpp::no_normalization norm;
+        odeintcpp::integrate(method,
+                             std::move(od),
+                             &init_state,         // state vector
+                             0.0,                 // t0
+                             t,                   // t1
+                             t * 0.01,
+                             atol,
+                             rtol,
+                             norm);
     }
     return Rcpp::NumericVector(init_state.begin(), init_state.end());
   }
@@ -155,7 +161,9 @@ Rcpp::NumericVector ct_condition_cpp(const std::string rhs,
   } 
   else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
-    return ct_condition(std::make_unique<ode_cla<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol, use_normalization);
+
+    return ct_condition(std::make_unique<ode_cla<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol,
+                        use_normalization);
   } 
   else {
     throw std::runtime_error("ct_condition_cpp: unknown rhs");

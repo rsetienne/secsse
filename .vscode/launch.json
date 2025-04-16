@@ -12,7 +12,7 @@
       "type": "cppdbg",
       "request": "launch",
       // The binary, not the script
-      "program": "/Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/bin/exec/R",
+      "program": "/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/bin/exec/R",
       "args": [
         "--vanilla",
         "-e",
@@ -41,7 +41,7 @@
       "type": "cppdbg",
       "request": "launch",
       // The binary, not the script
-      "program": "/Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/bin/exec/R",
+      "program": "/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/bin/exec/R",
       "args": [
         "--vanilla",
         "-e",

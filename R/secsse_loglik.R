@@ -16,7 +16,7 @@ master_loglik <- function(parameter,
                           method = "odeint::bulirsch_stoer",
                           take_into_account_root_edge = FALSE,
                           display_warning = TRUE,
-                          use_normalization = FALSE) {
+                          use_normalization = TRUE) {
   
   if (is.list(phy)) {
     if (!inherits(phy, "phylo")) {
@@ -233,7 +233,7 @@ secsse_loglik <- function(parameter,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer",
                           display_warning = TRUE,
-                          use_normalization = FALSE) {
+                          use_normalization = TRUE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -273,7 +273,7 @@ multi_loglik <- function(parameter,
                          rtol = 1e-7,
                          method = "odeint::bulirsch_stoer",
                          display_warning = FALSE,
-                         use_normalization = FALSE) {
+                         use_normalization = TRUE) {
   
   res <- list()
   for (i in 1:length(phy)) {
@@ -417,7 +417,7 @@ cla_secsse_loglik <- function(parameter,
                               atol = 1e-8,
                               rtol = 1e-7,
                               display_warning = TRUE,
-                              use_normalization = FALSE) {
+                              use_normalization = TRUE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
