@@ -25,7 +25,8 @@ master_ml <- function(phy,
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
-                      method = "odeint::bulirsch_stoer") {
+                      method = "odeint::bulirsch_stoer",
+                      use_normalization = FALSE) {
   
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
@@ -158,7 +159,8 @@ master_ml <- function(phy,
                                         rtol = rtol,
                                         method = method,
                                         display_warning = FALSE,
-                                        verbose = ll_verbose)
+                                        verbose = ll_verbose,
+                                        use_normalization = use_normalization)
   # Function here
   if (verbose) print_init_ll(initloglik = initloglik)
 
@@ -194,7 +196,8 @@ master_ml <- function(phy,
                           rtol = rtol,
                           method = method,
                           display_warning = FALSE,
-                          verbose = ll_verbose)
+                          verbose = ll_verbose,
+                          use_normalization = use_normalization)
     if (out$conv != 0) {
       stop("Optimization has not converged. 
                  Try again with different initial values.")
@@ -295,7 +298,8 @@ secsse_ml <- function(phy,
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
-                      method = "odeint::bulirsch_stoer") {
+                      method = "odeint::bulirsch_stoer",
+                      use_normalization = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -320,7 +324,8 @@ secsse_ml <- function(phy,
             num_threads = num_threads,
             atol = atol,
             rtol = rtol,
-            method = method)
+            method = method,
+            use_normalization = use_normalization)
 }
 
 #' @keywords internal
@@ -362,7 +367,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     #rtol = rtol,
                                     #method = method,
                                     display_warning,
-                                    verbose) {
+                                    verbose,
+                                    use_normalization) {
   alltrpars <- c(trparsopt, trparsfix)
   if (max(alltrpars) > 1 || min(alltrpars) < 0) {
     loglik <- -Inf
@@ -394,7 +400,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                             method = method,
                             atol = atol,
                             rtol = rtol,
-                            display_warning = display_warning)
+                            display_warning = display_warning,
+                            use_normalization = use_normalization)
     
     if (is.nan(loglik) || is.na(loglik)) {
       warning("There are parameter values used which cause
@@ -493,7 +500,8 @@ cla_secsse_ml <- function(phy,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,
-                          method = "odeint::bulirsch_stoer") {
+                          method = "odeint::bulirsch_stoer",
+                          use_normalization = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -516,5 +524,6 @@ cla_secsse_ml <- function(phy,
             num_threads = num_threads,
             atol = atol,
             rtol = rtol,
-            method = method)
+            method = method,
+            use_normalization = use_normalization)
 }

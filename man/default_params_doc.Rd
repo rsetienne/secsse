@@ -71,7 +71,8 @@ default_params_doc(
   start_at_crown,
   optimmethod,
   display_warning,
-  take_into_account_root_edge
+  take_into_account_root_edge,
+  use_normalization
 )
 }
 \arguments{
@@ -301,6 +302,9 @@ is ultimately called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 \item{take_into_account_root_edge}{if TRUE, the LL integration is continued
 along the root edge. This also affects conditioning (as now, conditioning
 no longer needs to assume a speciation event at the start of the tree)}
+
+\item{use_normalization}{normalize the density vector during integration,
+more accurate but slower (default = FALSE)}
 }
 \value{
 Nothing

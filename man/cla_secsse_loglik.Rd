@@ -23,7 +23,8 @@ cla_secsse_loglik(
   method = "odeint::bulirsch_stoer",
   atol = 1e-08,
   rtol = 1e-07,
-  display_warning = TRUE
+  display_warning = TRUE,
+  use_normalization = FALSE
 )
 }
 \arguments{
@@ -88,6 +89,9 @@ no longer needs to assume a speciation event at the start of the tree)}
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
 
 \item{display_warning}{display a warning if necessary}
+
+\item{use_normalization}{normalize the density vector during integration,
+more accurate but slower (default = FALSE)}
 }
 \value{
 The loglikelihood of the data given the parameters

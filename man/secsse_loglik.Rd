@@ -23,7 +23,8 @@ secsse_loglik(
   atol = 1e-08,
   rtol = 1e-07,
   method = "odeint::bulirsch_stoer",
-  display_warning = TRUE
+  display_warning = TRUE,
+  use_normalization = FALSE
 )
 }
 \arguments{
@@ -88,6 +89,9 @@ no longer needs to assume a speciation event at the start of the tree)}
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
 
 \item{display_warning}{display a warning if necessary}
+
+\item{use_normalization}{normalize the density vector during integration,
+more accurate but slower (default = FALSE)}
 }
 \value{
 The loglikelihood of the data given the parameter.

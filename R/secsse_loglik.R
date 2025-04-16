@@ -15,7 +15,8 @@ master_loglik <- function(parameter,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer",
                           take_into_account_root_edge = FALSE,
-                          display_warning = TRUE) {
+                          display_warning = TRUE,
+                          use_normalization = FALSE) {
   
   if (is.list(phy)) {
     if (!inherits(phy, "phylo")) {
@@ -46,7 +47,8 @@ master_loglik <- function(parameter,
                         atol = atol,
                         rtol = rtol,
                         method = method,
-                        display_warning = display_warning))
+                        display_warning = display_warning,
+                        use_normalization = use_normalization))
   }
   
   lambdas <- parameter[[1]]
@@ -108,7 +110,8 @@ master_loglik <- function(parameter,
                         atol = atol,
                         rtol = rtol,
                         is_complete_tree = is_complete_tree,
-                        see_states = see_ancestral_states)
+                        see_states = see_ancestral_states,
+                        use_normalization = use_normalization)
   loglik <- calcul$loglik
   nodeM <- calcul$node_M
   mergeBranch <- calcul$merge_branch
@@ -127,7 +130,8 @@ master_loglik <- function(parameter,
                                            method = method,
                                            atol = atol,
                                            rtol = rtol,
-                                           see_states = see_ancestral_states)
+                                           see_states = see_ancestral_states,
+                                           use_normalization = use_normalization)
       loglik <- loglik + calcul2$loglik
       nodeM <- calcul2$states
       
@@ -227,7 +231,8 @@ secsse_loglik <- function(parameter,
                           atol = 1e-8,
                           rtol = 1e-7,
                           method = "odeint::bulirsch_stoer",
-                          display_warning = TRUE) {
+                          display_warning = TRUE,
+                          use_normalization = FALSE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -244,7 +249,8 @@ secsse_loglik <- function(parameter,
                 atol = atol,
                 rtol = rtol,
                 method = method,
-                display_warning = display_warning)
+                display_warning = display_warning,
+                use_normalization = use_normalization)
 }
 
 
@@ -265,7 +271,8 @@ multi_loglik <- function(parameter,
                          atol = 1e-8,
                          rtol = 1e-7,
                          method = "odeint::bulirsch_stoer",
-                         display_warning = FALSE) {
+                         display_warning = FALSE,
+                         use_normalization = FALSE) {
   
   res <- list()
   for (i in 1:length(phy)) {
@@ -314,7 +321,8 @@ multi_loglik <- function(parameter,
                                                       atol = atol,
                                                       rtol = rtol,
                                                       method = method,
-                                                      display_warning = display_warning)$loglik
+                                                      display_warning = display_warning,
+                                                      use_normalization = use_normalization)$loglik
     } else {
       res[[i]] <- secsse_loglik(parameter = parameter,
                                 phy = phy[[i]],
@@ -333,7 +341,8 @@ multi_loglik <- function(parameter,
                                 atol = atol,
                                 rtol = rtol,
                                 method = method,
-                                display_warning = display_warning) 
+                                display_warning = display_warning,
+                                use_normalization = use_normalization) 
     }
   }
   
@@ -439,7 +448,8 @@ cla_secsse_loglik <- function(parameter,
                               method = "odeint::bulirsch_stoer",
                               atol = 1e-8,
                               rtol = 1e-7,
-                              display_warning = TRUE) {
+                              display_warning = TRUE,
+                              use_normalization = FALSE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -456,5 +466,6 @@ cla_secsse_loglik <- function(parameter,
                 atol = atol,
                 rtol = rtol,
                 method = method,
-                display_warning = display_warning)
+                display_warning = display_warning,
+                use_normalization = use_normalization)
 }

@@ -260,7 +260,8 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                         num_threads = 1,
                                         atol = 1e-12,
                                         rtol = 1e-12,
-                                        method = "odeint::bulirsch_stoer") {
+                                        method = "odeint::bulirsch_stoer",
+                                        use_normalization = FALSE) {
   return(master_ml(phy = phy,
                    traits = traits,
                    num_concealed_states = num_concealed_states,
@@ -287,5 +288,6 @@ cla_secsse_ml_func_def_pars <- function(phy,
                    num_threads = num_threads,
                    atol = atol,
                    rtol = rtol,
-                   method = method))
+                   method = method,
+                   use_normalization = use_normalization))
 }

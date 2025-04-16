@@ -143,11 +143,13 @@ namespace secsse {
   public:
     using ode_type = ODE;
 
-    Integrator(std::unique_ptr<ode_type>&& od, const std::string& method, double atol, double rtol) : 
+    Integrator(std::unique_ptr<ode_type>&& od, const std::string& method, double atol, double rtol,
+               bool normalize) : 
       od_(std::move(od)),
       method_(method),
       atol_(atol),
-      rtol_(rtol)
+      rtol_(rtol),
+      use_normalization(normalize)
     {}
 
     size_t size() const noexcept { return od_->size(); }
@@ -162,8 +164,13 @@ namespace secsse {
 #endif
         auto& dnode = inode.desc[i];
         std::copy_n(std::begin(*dnode.state), 2 * d, std::begin(y[i]));
-        do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF);
-        dnode.loglik = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
+        
+        if (use_normalization) {
+          do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF, dnode.loglik);
+        } else {
+          do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF);
+          dnode.loglik = normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
+        }
       }
 #ifdef SECSSE_NESTED_PARALLELISM
       );
@@ -177,6 +184,11 @@ namespace secsse {
 
     void operator()(std::vector<double>& state, double t0, double t1) const {
       do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF);
+    }
+      
+    void operator()(std::vector<double>& state, double t0, double t1,
+                    double& loglik_obs) const {
+      do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF, loglik_obs);
     }
     
     void operator()(storing::dnode_t& dnode, size_t num_steps) const {
@@ -201,11 +213,25 @@ namespace secsse {
                            atol_,
                            rtol_);
     }
+    
+    void do_integrate(std::vector<double>& state, double t0, double t1, double dtf,
+                      double& loglik_obs) const {
+      odeintcpp::integrate(method_,
+                               od_.get(),
+                               &state,
+                               t0,
+                               t1,
+                               dtf * (t1 - t0),
+                               atol_,
+                               rtol_,
+                               loglik_obs);
+    }
 
     std::unique_ptr<ODE> od_;
     const std::string method_;
     const double atol_;
     const double rtol_;
+    bool use_normalization = false;
   };
     
 

@@ -3,6 +3,7 @@
 #' data, calculated for a single branch
 #' 
 #' @inheritParams default_params_doc
+#' @param break_up break up long branches (slower, but more accurate)
 #' @return The loglikelihood of the data given the parameter.
 #' @export
 secsse_single_branch_loglik <- function(parameter,
@@ -21,7 +22,8 @@ secsse_single_branch_loglik <- function(parameter,
                                         atol = 1e-8,
                                         rtol = 1e-7,
                                         method = "odeint::bulirsch_stoer",
-                                        display_warning = TRUE) {
+                                        display_warning = TRUE,
+                                        use_normalization = FALSE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -74,17 +76,12 @@ secsse_single_branch_loglik <- function(parameter,
                         method = method,
                         atol = atol,
                         rtol = rtol,
-                        see_states = see_ancestral_states)
+                        see_states = see_ancestral_states,
+                        use_normalization = use_normalization)
 
-  
-  
   loglik <- calcul$loglik
   nodeM <- calcul$states
   mergeBranch <- calcul$merge_branch
-  
- # cat("loglik: ", loglik, "\n")
-#  cat("nodeM: ", nodeM, "\n")
-#  cat("mergeBranch: ", mergeBranch, "\n")
 
   if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 

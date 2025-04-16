@@ -37,7 +37,7 @@ namespace secsse {
     }
     const auto phy_edge = make_phy_edge_vector(rmatrix<const double>(forTime));
     auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates);
-    auto integrator = Integrator<ODE>(std::move(od), method, atol, rtol);
+    auto integrator = Integrator<ODE>(std::move(od), method, atol, rtol, false);
     calc_ll(integrator, inodes, tstates);
 
     // integrate over each edge

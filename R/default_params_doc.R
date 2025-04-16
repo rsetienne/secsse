@@ -161,6 +161,8 @@
 #' @param take_into_account_root_edge if TRUE, the LL integration is continued
 #' along the root edge. This also affects conditioning (as now, conditioning
 #' no longer needs to assume a speciation event at the start of the tree)
+#' @param use_normalization normalize the density vector during integration,
+#' more accurate but slower (default = FALSE)
 #' @return Nothing
 #' @keywords internal
 #' @export
@@ -230,6 +232,7 @@ default_params_doc <- function(phy,
                                start_at_crown,
                                optimmethod,
                                display_warning,
-                               take_into_account_root_edge) {
+                               take_into_account_root_edge,
+                               use_normalization) {
   # Nothing
 }
