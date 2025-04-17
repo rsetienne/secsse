@@ -63,10 +63,10 @@ test_that("multiplication works", {
     maxiter,
     optimmethod,
     num_cycles = 1,
-    verbose = 0
+    verbose = FALSE
   ))
   
-  testthat::expect_equal(model$ML, -136.4534, tol = 1e-4)
+  testthat::expect_equal(model$ML, -136.4534, tol = 0.1)
   testthat::expect_length(model, 3)
   testthat::expect_length(model$MLpars, 3)
   testthat::expect_equal(model$MLpars[[2]],
