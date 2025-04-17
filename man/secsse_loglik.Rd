@@ -24,7 +24,7 @@ secsse_loglik(
   rtol = 1e-07,
   method = "odeint::bulirsch_stoer",
   display_warning = TRUE,
-  use_normalization = FALSE
+  use_normalization = TRUE
 )
 }
 \arguments{

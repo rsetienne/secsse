@@ -1,3 +1,12 @@
+
+# 3.3.0
+Version 3.3.0 normalizes evaluation of the loglikelihood at every integration
+step. This strongly reduces any numerical abberations that could previously
+occur. These mainly occured along long branches, where values could become so
+close to zero that they became too close to numerical precision. If absolutely
+desired, this normalization can be disabled by setting 'use_normalization' to
+FALSE.
+
 # 3.2.0
 
 - Added support for integration along the root edge

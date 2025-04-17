@@ -28,7 +28,7 @@ secsse_ml(
   atol = 1e-08,
   rtol = 1e-07,
   method = "odeint::bulirsch_stoer",
-  use_normalization = FALSE
+  use_normalization = TRUE
 )
 }
 \arguments{

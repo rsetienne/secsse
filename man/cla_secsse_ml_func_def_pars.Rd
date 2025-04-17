@@ -33,7 +33,7 @@ cla_secsse_ml_func_def_pars(
   atol = 1e-12,
   rtol = 1e-12,
   method = "odeint::bulirsch_stoer",
-  use_normalization = FALSE
+  use_normalization = TRUE
 )
 }
 \arguments{

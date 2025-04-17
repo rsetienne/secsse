@@ -24,7 +24,7 @@ cla_secsse_loglik(
   atol = 1e-08,
   rtol = 1e-07,
   display_warning = TRUE,
-  use_normalization = FALSE
+  use_normalization = TRUE
 )
 }
 \arguments{
