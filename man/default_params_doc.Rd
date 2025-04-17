@@ -304,7 +304,7 @@ along the root edge. This also affects conditioning (as now, conditioning
 no longer needs to assume a speciation event at the start of the tree)}
 
 \item{use_normalization}{normalize the density vector during integration,
-more accurate but slower (default = FALSE)}
+more accurate but slower (default = TRUE)}
 }
 \value{
 Nothing

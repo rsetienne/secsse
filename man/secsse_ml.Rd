@@ -114,7 +114,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
 
 \item{use_normalization}{normalize the density vector during integration,
-more accurate but slower (default = FALSE)}
+more accurate but slower (default = TRUE)}
 }
 \value{
 Parameter estimated and maximum likelihood

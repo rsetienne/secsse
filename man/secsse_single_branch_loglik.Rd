@@ -91,9 +91,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 \item{display_warning}{display a warning if necessary}
 
 \item{use_normalization}{normalize the density vector during integration,
-more accurate but slower (default = FALSE)}
-
-\item{break_up}{break up long branches (slower, but more accurate)}
+more accurate but slower (default = TRUE)}
 }
 \value{
 The loglikelihood of the data given the parameter.

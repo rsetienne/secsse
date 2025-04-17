@@ -3,7 +3,6 @@
 #' data, calculated for a single branch
 #' 
 #' @inheritParams default_params_doc
-#' @param break_up break up long branches (slower, but more accurate)
 #' @return The loglikelihood of the data given the parameter.
 #' @export
 secsse_single_branch_loglik <- function(parameter,
