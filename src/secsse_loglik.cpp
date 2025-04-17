@@ -47,9 +47,13 @@ namespace secsse {
     const auto phy_edge = make_phy_edge_vector(rmatrix<const double>(forTime));
     auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates);
 
-    auto ll_res = use_normalization ?
-         calc_ll(Integrator<ODE, odeintcpp::normalize>(       std::move(od), method, atol, rtol), inodes, tstates) :
-         calc_ll(Integrator<ODE, odeintcpp::no_normalization>(std::move(od), method, atol, rtol), inodes, tstates);
+    calc_ll_res ll_res;
+    if (use_normalization) {
+      ll_res  = calc_ll(Integrator<ODE, odeintcpp::normalize>(      std::move(od), method, atol, rtol), inodes, tstates);
+    } else {
+      ll_res = calc_ll(Integrator<ODE, odeintcpp::no_normalization>(std::move(od), method, atol, rtol), inodes, tstates);
+    }
+         
 
     auto T1 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> DT = (T1 - T0);
