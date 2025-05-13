@@ -83,7 +83,7 @@ master_loglik <- function(parameter,
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
   
-  d <- ncol(states) / 2
+  d <- ncol(states) / 3
   
   # with a complete tree, we need to re-calculate the states every time we
   # run, because they are dependent on mu.
@@ -116,13 +116,17 @@ master_loglik <- function(parameter,
   nodeM <- calcul$node_M
   mergeBranch <- calcul$merge_branch
   
-  if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
+  E <- nodeM[1:d]
+  S <- nodeM[(2*d + 1):(3 * d)]
+  
+  
+  # if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
   
   if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
     if (phy$root.edge > 0) {
       calcul2 <- calc_ll_single_branch_cpp(rhs = 
                                              if (using_cla) "ode_cla" else "ode_standard",
-                                           states = c(nodeM[1:d], mergeBranch),
+                                           states = c(E, mergeBranch, S),
                                            forTime = c(0, phy$root.edge),
                                            lambdas = lambdas,
                                            mus = mus,
@@ -163,9 +167,10 @@ master_loglik <- function(parameter,
                             weight_states,
                             lambdas,
                             nodeM,
-                            is_root_edge = take_into_account_root_edge)
+                            is_root_edge = take_into_account_root_edge,
+                            S)
   
-  wholeLike <- sum((mergeBranch2) * (weight_states))
+  wholeLike <- sum( (mergeBranch2) * (weight_states) )
   
   LL <- log(wholeLike) +
     loglik -
@@ -325,6 +330,9 @@ multi_loglik <- function(parameter,
                                                       display_warning = display_warning,
                                                       use_normalization = use_normalization)$loglik
     } else {
+      if (i == 292) {
+        a <- 5
+      }
       res[[i]] <- secsse_loglik(parameter = parameter,
                                 phy = phy[[i]],
                                 traits = traits[[i]],

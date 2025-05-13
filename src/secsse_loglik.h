@@ -155,28 +155,27 @@ namespace secsse {
 
     void operator()(terse::inode_t& inode) const {
       const auto d = size();
-      std::vector<double> y[2] = { std::vector<double>(2 * d), std::vector<double>(2 * d) };
+      std::vector<double> y[2] = { std::vector<double>(3 * d), std::vector<double>(3 * d) };
 #ifdef SECSSE_NESTED_PARALLELISM      
       tbb::parallel_for(0, 2, [&](size_t i) {
 #else
       for (size_t i = 0; i < 2; ++i) {
 #endif
         auto& dnode = inode.desc[i];
-        std::copy_n(std::begin(*dnode.state), 2 * d, std::begin(y[i]));
-        
-       
+        std::copy_n(std::begin(*dnode.state), 3 * d, std::begin(y[i]));
+  
         NORMALIZER norm;
         do_integrate(y[i], 0.0, dnode.time, SECSSE_DEFAULT_DTF, norm);
-        dnode.loglik = norm.loglik + normalize_loglik(std::begin(y[i]) + d, std::end(y[i]));
+        dnode.loglik = norm.loglik + normalize_loglik(std::begin(y[i]) + d, std::begin(y[i]) + 2 * d);
       }
 #ifdef SECSSE_NESTED_PARALLELISM
       );
 #endif      
-      inode.state->resize(2 * d);
+      inode.state->resize(3 * d);
       od_->mergebranch(y[0], y[1], *inode.state);
       inode.loglik = inode.desc[0].loglik 
                    + inode.desc[1].loglik 
-                   + normalize_loglik(std::begin(*inode.state) + d, std::end(*inode.state));
+                   + normalize_loglik(std::begin(*inode.state) + d, std::begin(*inode.state) + 2 * d);
     }
 
     void operator()(std::vector<double>& state, double t0, double t1,
@@ -256,7 +255,7 @@ namespace secsse {
     
     integrator(node_M, 0.0, root_node.desc[1].time);
     
-    normalize_loglik(std::begin(node_M) + d, std::end(node_M));
+    normalize_loglik(std::begin(node_M) + d, std::begin(node_M) + 2 * d);
     const auto tot_loglik = std::accumulate(std::begin(inodes), std::end(inodes), 0.0, [](auto& sum, const auto& node) { return sum + node.loglik; });
     return { tot_loglik, std::move(node_M), std::move(merge_branch) };
   }

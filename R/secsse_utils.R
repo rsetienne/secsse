@@ -714,7 +714,8 @@ condition <- function(cond,
                       weight_states,
                       lambdas,
                       nodeM,
-                      is_root_edge = FALSE) {
+                      is_root_edge = FALSE,
+                      S) {
 
     if (cond == "no_cond") {
       return(mergeBranch2)
@@ -724,7 +725,7 @@ condition <- function(cond,
     d <- length(lambdas)
     
     if (is_root_edge) {
-      return(mergeBranch2 / (1 - nodeM[1:d]))
+      return(mergeBranch2 / S)
     }
     
     if (is.list(lambdas)) {
@@ -733,14 +734,14 @@ condition <- function(cond,
             for (j in 1:lmb) {
                 pre_cond[j] <- sum(weight_states[j] *
                                        lambdas[[j]] *
-                                       (1 - nodeM[1:d][j]) ^ 2)
+                                       (S[j]) ^ 2)
             }
             mergeBranch2 <- mergeBranch2 / sum(pre_cond) # nolint
         }
 
         if (cond == "proper_cond") {
             pre_cond <- rep(NA, lmb) # nolint
-            prefactor <- ((1 - nodeM[1:d]) %o% (1 - nodeM[1:d]))
+            prefactor <- S %o% S
             for (j in 1:lmb) {
                 pre_cond[j] <- sum(lambdas[[j]] * prefactor)
             }
@@ -751,11 +752,11 @@ condition <- function(cond,
         if (cond == "maddison_cond") {
             mergeBranch2 <-
                 mergeBranch2 / sum(weight_states * lambdas *
-                                       (1 - nodeM[1:d]) ^ 2)
+                                       (S) ^ 2)
         }
 
         if (cond == "proper_cond") {
-            mergeBranch2 <- mergeBranch2 / (lambdas * (1 - nodeM[1:d]) ^ 2)
+            mergeBranch2 <- mergeBranch2 / (lambdas * (S) ^ 2)
         }
     }
     return(mergeBranch2)
@@ -852,6 +853,7 @@ create_states <- function(usetraits,
   } else {
     for (iii in 1:nb_tip) {
       states[iii, 1:d] <- rep(1 - sampling_fraction, num_concealed_states)
+      states[iii, (2 * d + 1):(3 * d)] <- rep(sampling_fraction, num_concealed_states)
     }
   }
   return(states)
@@ -897,9 +899,9 @@ build_states <- function(phy,
 
     nb_tip <- ape::Ntip(phy)
     nb_node <- phy$Nnode
-    ly <- length(traitStates) * 2 * num_concealed_states
+    ly <- length(traitStates) * 3 * num_concealed_states
     states <- matrix(ncol = ly, nrow = nb_tip + nb_node)
-    d <- ly / 2
+    d <- ly / 3
     ## In a example of 3 states, the names of the colums would be like:
     ##
     ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",

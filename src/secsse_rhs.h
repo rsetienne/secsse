@@ -176,10 +176,11 @@ namespace secsse {
                      const std::vector<double>& M,
                      std::vector<double>& out) const {
       const auto d = size();
-      assert(2 * d == out.size());
+      assert(3 * d == out.size());
       auto llv = vector_view_t<const double>(prec_.ll.data(), d);
       for (size_t i = 0; i < d; ++i) {
         out[i] = M[i];
+        out[i + 2 * d] = M[i + 2 * d];
         out[i + d] = 0.0;
         for (size_t j = 0; j < d; ++j, llv.advance(d)) {
           for (size_t k = 0; k < d; ++k) {
@@ -194,7 +195,6 @@ namespace secsse {
                     std::vector<double>& dxdt,
                     const double /* t */ ) const
     {
-      
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
         auto llv = vector_view_t<const double>(prec_.ll.data(), d);
@@ -203,16 +203,21 @@ namespace secsse {
         for (size_t i = 0; i < d; ++i, qv.advance(d)) {
           double dx0 = 0.0;
           double dxd = 0.0;
+          double dxs = 0.0;
           for (size_t j = 0; j < d; ++j, llv.advance(d), ++nzv) {
+            double dxs2 = 0.0;
             for (auto k : *nzv) {
-              dx0 += llv[k] * (x[j] * x[k]);
-              dxd += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+              dx0  += llv[k] * (x[j] * x[k]);
+              dxd  += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+              dxs2 += llv[k] * (x[j + 2 * d] * x[k + 2 * d]);
             }
             dx0 += (x[j] - x[i]) * qv[j];
             dxd += (x[j + d] - x[i + d]) * qv[j];
+            dxs += (x[j + d + d] - x[i + d + d]) * qv[j] - dxs2;
           }
-          dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i];
-          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]) * x[i + d];
+          dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i]; // E
+          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]) * x[i + d]; // D
+          dxdt[i + d + d] = dxs + (prec_.lambda_sum[i] - m_[i]) * x[i + d + d];  // S = 1 - E
         }
       }
       else if constexpr (variant == OdeVariant::complete_tree) {
