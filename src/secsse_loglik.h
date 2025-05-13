@@ -183,10 +183,10 @@ namespace secsse {
       do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF, norm);
     }
       
-      void operator()(std::vector<double>& state, double t0, double t1) const {
-        odeintcpp::no_normalization no_norm;
-        do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF, no_norm);
-      }
+    void operator()(std::vector<double>& state, double t0, double t1) const {
+      odeintcpp::no_normalization no_norm;
+      do_integrate(state, t0, t1, SECSSE_DEFAULT_DTF, no_norm);
+    }
 
     void operator()(storing::dnode_t& dnode, size_t num_steps) const {
       auto t0 = 0.0;

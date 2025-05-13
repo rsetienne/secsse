@@ -713,7 +713,6 @@ condition <- function(cond,
                       mergeBranch2,
                       weight_states,
                       lambdas,
-                      nodeM,
                       is_root_edge = FALSE,
                       S) {
 
