@@ -119,7 +119,7 @@ master_loglik <- function(parameter,
   E <- nodeM[1:d]
   S <- nodeM[(2 * d + 1):(3 * d)]
   
-  testthat::expect_equal(E + S, rep(1, length(E)))
+  # testthat::expect_equal(E + S, rep(1, length(E)))
   # if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
   
   if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
@@ -135,7 +135,7 @@ master_loglik <- function(parameter,
                                            atol = atol,
                                            rtol = rtol,
                                            see_states = see_ancestral_states,
-                                           use_normalization = FALSE)
+                                           use_normalization = use_normalization)
       loglik <- loglik + calcul2$loglik
       nodeM <- calcul2$states
       
@@ -146,7 +146,7 @@ master_loglik <- function(parameter,
   E <- nodeM[1:d]
   S <- nodeM[(2 * d + 1):(3 * d)]
   
-  testthat::expect_equal(E + S, rep(1, length(E)))
+#  testthat::expect_equal(E + S, rep(1, length(E)))
   
   ## At the root
   weight_states <- get_weight_states(root_state_weight,

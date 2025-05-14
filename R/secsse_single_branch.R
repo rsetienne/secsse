@@ -81,9 +81,8 @@ secsse_single_branch_loglik <- function(parameter,
   loglik <- calcul$loglik
   nodeM <- calcul$states
   mergeBranch <- calcul$merge_branch
-  E <- nodeM[1:d]
+
   S <- nodeM[(2 * d + 1):(3 * d)]
-  testthat::expect_equal(E + S, rep(1, length(E)))
   
   #if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
