@@ -121,6 +121,10 @@ master_loglik <- function(parameter,
   
   if (using_cla && !is_complete_tree) {
     # currently, S is not implemented in complete_tree LL
+    if (any(is.na(S))) {
+      S <- 1 - E
+    } 
+    
     av <- E + S
     for (x in av) {
       if (x < 1 - 1e-6 || x > 1 + 1e-6) {
