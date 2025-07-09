@@ -212,6 +212,7 @@ secsse_ml_func_def_pars <- function(phy,
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
+#' \dontrun{
 #'model <- cla_secsse_ml_func_def_pars(phylotree,
 #'traits,
 #'num_concealed_states,
@@ -231,6 +232,7 @@ secsse_ml_func_def_pars <- function(phy,
 #'maxiter,
 #'optimmethod,
 #'num_cycles = 1)
+#' }
 #'# ML -136.5796
 #' @export
 cla_secsse_ml_func_def_pars <- function(phy,
