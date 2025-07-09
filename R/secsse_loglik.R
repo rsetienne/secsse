@@ -124,7 +124,8 @@ master_loglik <- function(parameter,
     av <- E + S
     for (x in av) {
       if (x < 1 - 1e-6 || x > 1 + 1e-6) {
-        warning("E + S is incorrect")
+        warning("E + S is incorrect, possibly the calculation for S failed")
+        S <- 1 - E
       }
     }
   } else {
@@ -181,6 +182,7 @@ master_loglik <- function(parameter,
     E <- nodeM[1:d]
     S <- 1 - E
   }
+
   
   mergeBranch2 <- condition(cond,
                             mergeBranch,
@@ -188,23 +190,13 @@ master_loglik <- function(parameter,
                             lambdas,
                             is_root_edge = take_into_account_root_edge,
                             S)
-  
-  #cat("E: ", E, "\n")
-  #cat("nodeM: ", nodeM, "\n")
-  #cat("S: ", S, "\n")
-  #cat("mB2: ", mergeBranch2, "\n")
-  #cat("wt: ", weight_states, "\n")
-  
+
   wholeLike <- sum( (mergeBranch2) * (weight_states) )
   
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
-  
-  cat(wholeLike, "\n")
-  cat(loglik, "\n")
-  cat(loglik_penalty, "\n")
-  
+
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
     num_tips <- ape::Ntip(phy)
