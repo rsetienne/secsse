@@ -119,8 +119,21 @@ master_loglik <- function(parameter,
   E <- nodeM[1:d]
   S <- nodeM[(2 * d + 1):(3 * d)]
   
-  # testthat::expect_equal(E + S, rep(1, length(E)))
-  # if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
+  if (using_cla && !is_complete_tree) {
+    # currently, S is not implemented in complete_tree LL
+    av <- E + S
+    for (x in av) {
+      if (x < 1 - 1e-6 || x > 1 + 1e-6) {
+        warning("E + S is incorrect")
+      }
+    }
+  } else {
+    S <- 1 - E
+  }
+  
+  #cat("E: ", E, "\n")
+  #cat("S: ", S, "\n")
+  #cat("nodeM: ", nodeM, "\n")
   
   if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
     if (phy$root.edge > 0) {
@@ -143,10 +156,7 @@ master_loglik <- function(parameter,
     }
   }
   
-  E <- nodeM[1:d]
-  S <- nodeM[(2 * d + 1):(3 * d)]
-  
-#  testthat::expect_equal(E + S, rep(1, length(E)))
+ 
   
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
@@ -157,15 +167,20 @@ master_loglik <- function(parameter,
                                      d,
                                      is_cla = using_cla)
   
-  if (is_complete_tree) nodeM <- update_complete_tree(phy,
-                                                      lambdas,
-                                                      mus,
-                                                      q_matrix,
-                                                      method,
-                                                      atol,
-                                                      rtol,
-                                                      length(mergeBranch),
-                                                      use_normalization)
+  if (is_complete_tree) {
+    nodeM <- update_complete_tree(phy,
+                                  lambdas,
+                                  mus,
+                                  q_matrix,
+                                  method,
+                                  atol,
+                                  rtol,
+                                  length(mergeBranch),
+                                  use_normalization)
+    # TODO: fix this cheating way of implementing survival for CT
+    E <- nodeM[1:d]
+    S <- 1 - E
+  }
   
   mergeBranch2 <- condition(cond,
                             mergeBranch,
@@ -174,11 +189,21 @@ master_loglik <- function(parameter,
                             is_root_edge = take_into_account_root_edge,
                             S)
   
+  #cat("E: ", E, "\n")
+  #cat("nodeM: ", nodeM, "\n")
+  #cat("S: ", S, "\n")
+  #cat("mB2: ", mergeBranch2, "\n")
+  #cat("wt: ", weight_states, "\n")
+  
   wholeLike <- sum( (mergeBranch2) * (weight_states) )
   
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
+  
+  cat(wholeLike, "\n")
+  cat(loglik, "\n")
+  cat(loglik_penalty, "\n")
   
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
