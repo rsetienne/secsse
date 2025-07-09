@@ -249,13 +249,15 @@ namespace secsse {
     }
     // collect output
     const auto& root_node = inodes.back();    // the last calculated
-    const auto merge_branch = std::vector<double>(std::begin(*root_node.state) + d, std::begin(*root_node.state) + d + d);
+    const auto merge_branch = std::vector<double>(std::begin(*root_node.state) + d, 
+                                                  std::begin(*root_node.state) + d + d);
     std::vector<double> node_M{ *root_node.desc[1].state };
     
     
     integrator(node_M, 0.0, root_node.desc[1].time);
     
-    normalize_loglik(std::begin(node_M) + d, std::begin(node_M) + d + d);
+    normalize_loglik(std::begin(node_M) + d, 
+                     std::begin(node_M) + d + d);
     const auto tot_loglik = std::accumulate(std::begin(inodes), std::end(inodes), 0.0, [](auto& sum, const auto& node) { return sum + node.loglik; });
     return { tot_loglik, std::move(node_M), std::move(merge_branch) };
   }

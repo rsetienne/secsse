@@ -54,7 +54,7 @@ test_that("secsse gives the same result as hisse", {
 
   sampling_fraction <- c(0.8, 1)
 
-  y2 <- testthat::expect_warning(round(as.numeric(secsse_loglik(parameter = toCheck,
+  y2 <- testthat::expect_warning(round(as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                        phy = phy,
                                        traits = traits,
                                        num_concealed_states =

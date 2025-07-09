@@ -67,7 +67,8 @@ namespace odeintcpp {
     
       auto observer = [&norm](STATE &x, double t) {
         auto d = x.size() / 3;
-        norm.loglik += secsse::normalize_loglik(x.begin() + d, x.begin() + 2 * d);
+        norm.loglik += secsse::normalize_loglik(x.begin() + d,
+                                                x.begin() + d + d);
       };
       
       bno::integrate_adaptive(stepper, std::ref(ode), (*y),

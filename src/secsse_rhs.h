@@ -180,8 +180,8 @@ namespace secsse {
       auto llv = vector_view_t<const double>(prec_.ll.data(), d);
       for (size_t i = 0; i < d; ++i) {
         out[i] = M[i];
-        out[i + 2 * d] = M[i + 2 * d];
         out[i + d] = 0.0;
+        out[i + 2 * d] = M[i + 2 * d];
         for (size_t j = 0; j < d; ++j, llv.advance(d)) {
           for (size_t k = 0; k < d; ++k) {
             out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);

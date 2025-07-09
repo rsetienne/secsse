@@ -900,7 +900,9 @@ build_states <- function(phy,
     nb_node <- phy$Nnode
     ly <- length(traitStates) * 3 * num_concealed_states
     states <- matrix(ncol = ly, nrow = nb_tip + nb_node)
+
     d <- ly / 3
+
     ## In a example of 3 states, the names of the colums would be like:
     ##
     ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
