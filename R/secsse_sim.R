@@ -49,9 +49,6 @@ secsse_sim <- function(lambdas,
     stop("Every state must have a single rate of speciation and extinction")
   }
 
-  if (nrow(qs) != length(lambdas)) {
-    stop("Incorrect number of transition rates")
-  }
   diag(qs) <- 0
 
   if (is.null(pool_init_states)) {
@@ -132,8 +129,19 @@ secsse_sim <- function(lambdas,
     phy$edge <- phy$edge[-2, ]
     phy$edge <- matrix(data = phy$edge, nrow = 1) # important!
     phy$edge.length <- crown_age # this is now root age
+    
+    speciesTraits <- 1 + Ltable[, 5]
+   
+    true_traits <- names(mus)[speciesTraits]
+    obs_traits <- c()
+    for (i in seq_along(true_traits)) {
+      obs_traits[i] <- substr(true_traits[i], 1, (nchar(true_traits[i]) - 1))
+    }
+    initialState  <- names(mus)[1 + res$initial_state]
     return(list(phy = phy,
-                traits = res$traits[[1]],
+                true_traits = true_traits,
+                obs_traits = obs_traits,
+                initialState = initialState,
                 extinct = res$tracker[2],
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
