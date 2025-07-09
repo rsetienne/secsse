@@ -58,7 +58,10 @@ test_that("single branch check", {
                                               sampling_fraction = sf,
                                               cond = "no_cond")
   )
-  sz <- res2$nodeM * params[1]
+  
+  d <- length(mus)
+  
+  sz <- res2$nodeM[1:(d + d)] * params[1]
   prefact <- log(sum(abs(sz)))
   answ_normal <- (res1 - prefact) / 2
   answ_single_branch <- res2$loglik
