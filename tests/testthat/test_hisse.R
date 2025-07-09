@@ -39,14 +39,15 @@ test_that("secsse gives the same result as hisse", {
   )
   cond <- "maddison_cond"
   testthat::expect_warning(
-    y1 <- round(as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                                 phy = phy,
-                                                 traits = traits,
-                                                 num_concealed_states =
-                                                   num_concealed_states,
-                                                 cond = cond,
-                                                 root_state_weight = root_state_weight,
-                                                 sampling_fraction = sampling_fraction)
+    y1 <- round(as.numeric(
+      secsse::secsse_loglik(parameter = toCheck,
+                            phy = phy,
+                            traits = traits,
+                            num_concealed_states =
+                              num_concealed_states,
+                            cond = cond,
+                            root_state_weight = root_state_weight,
+                            sampling_fraction = sampling_fraction)
     ), 4)
   )
   
@@ -54,14 +55,15 @@ test_that("secsse gives the same result as hisse", {
   
   sampling_fraction <- c(0.8, 1)
   
-  y2 <- testthat::expect_warning(round(as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                                                        phy = phy,
-                                                                        traits = traits,
-                                                                        num_concealed_states =
-                                                                          num_concealed_states,
-                                                                        cond = cond,
-                                                                        root_state_weight = root_state_weight,
-                                                                        sampling_fraction = sampling_fraction)
+  y2 <- testthat::expect_warning(round(as.numeric(
+    secsse::secsse_loglik(parameter = toCheck,
+                          phy = phy,
+                          traits = traits,
+                          num_concealed_states =
+                            num_concealed_states,
+                          cond = cond,
+                          root_state_weight = root_state_weight,
+                          sampling_fraction = sampling_fraction)
   ), 4))
   
   testthat::expect_equal(-237.8611, y1, tolerance = 0.001)
