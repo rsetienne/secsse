@@ -38,11 +38,12 @@ Rcpp::List calc_ll_single_branch(std::unique_ptr<ODE> od,
   
   auto d = workhorse.size();
 
-  const auto loglik = norm.loglik + secsse::normalize_loglik(std::begin(states_out) + d, 
-                                                             std::end(states_out));
+  const auto loglik = norm.loglik + 
+                      secsse::normalize_loglik(std::begin(states_out) + d, 
+                                               std::begin(states_out) + d + d);
   
   const auto merge_branch = std::vector<double>(std::begin(states_out) + d, 
-                                                std::end(states_out));
+                                                std::begin(states_out) + d + d);
   
   return Rcpp::List::create(Rcpp::Named("loglik") = loglik,
                             Rcpp::Named("merge_branch") = merge_branch,

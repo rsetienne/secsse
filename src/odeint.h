@@ -61,14 +61,14 @@ namespace odeintcpp {
                  double t0, double t1, double dt,
                  NORMALIZER& norm) {
 
-    
     using time_type = typename STEPPER::time_type;
     
     if constexpr (std::is_same<NORMALIZER, normalize>::value) {
     
       auto observer = [&norm](STATE &x, double t) {
-        auto d = x.size() / 2;
-        norm.loglik += secsse::normalize_loglik(x.begin() + d, x.end());
+        auto d = x.size() / 3;
+        norm.loglik += secsse::normalize_loglik(x.begin() + d,
+                                                x.begin() + d + d);
       };
       
       bno::integrate_adaptive(stepper, std::ref(ode), (*y),

@@ -58,7 +58,7 @@ secsse_single_branch_loglik <- function(parameter,
   forTime <- setting_calculation$forTime
   forTime <- forTime[-2, ]
   
-  d <- ncol(states) / 2
+  d <- ncol(states) / 3
   
   if (!is.null(phy$root.edge)) {
       forTime[3] <- forTime[3] + phy$root.edge
@@ -82,7 +82,9 @@ secsse_single_branch_loglik <- function(parameter,
   nodeM <- calcul$states
   mergeBranch <- calcul$merge_branch
 
-  if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
+  S <- nodeM[(2 * d + 1):(3 * d)]
+  
+  #if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
 
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
@@ -96,8 +98,8 @@ secsse_single_branch_loglik <- function(parameter,
                             mergeBranch,
                             weight_states,
                             lambdas,
-                            nodeM,
-                            is_root_edge = TRUE)
+                            is_root_edge = TRUE,
+                            S)
   wholeLike <- sum((mergeBranch2) * (weight_states))
 
   LL <- log(wholeLike) +

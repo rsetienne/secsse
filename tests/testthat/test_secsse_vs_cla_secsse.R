@@ -38,12 +38,12 @@ test_that("secsse gives the same result as cla_secsse", {
                                                num_unique_traits = num_modeled_traits,
                                                first_time = TRUE)
   states <- setting_calculation$states
-  d <- ncol(states) / 2
-  new_states <- states[, c(1, 2, 3, 10, 11, 12)]
+  d <- ncol(states) / 3
+  new_states <- states[, c(1, 2, 3, 10, 11, 12, 19, 20, 21)]
   states <- new_states
   setting_calculation$states <- states
 
-  cla_secsse_LL <- cla_secsse_loglik(parameter = parameter,
+  cla_secsse_LL <- secsse::cla_secsse_loglik(parameter = parameter,
                                      phy = example_phy_GeoSSE,
                                      traits = traits,
                                      num_concealed_states = 3,
@@ -62,7 +62,7 @@ test_that("secsse gives the same result as cla_secsse", {
   pars <- parameter
   pars[[1]] <- c(lambdas[[1]][1, 1], lambdas[[2]][2, 2], lambdas[[3]][3, 3])
   
-  secsse_LL <- secsse_loglik(parameter = pars,
+  secsse_LL <- secsse::secsse_loglik(parameter = pars,
                              phy = example_phy_GeoSSE,
                              traits = traits,
                              num_concealed_states = num_concealed_states,

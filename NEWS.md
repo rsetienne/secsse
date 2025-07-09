@@ -1,3 +1,7 @@
+# 3.4.0
+Version 3.4.0 uses a separate calculation for 1 - E, e.g. one minus the local
+extinction rates to avoid numerical abberations. These are only used in the CLA
+calculations.
 
 # 3.3.0
 Version 3.3.0 normalizes evaluation of the loglikelihood at every integration

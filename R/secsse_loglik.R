@@ -83,7 +83,7 @@ master_loglik <- function(parameter,
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
   
-  d <- ncol(states) / 2
+  d <- ncol(states) / 3
   
   # with a complete tree, we need to re-calculate the states every time we
   # run, because they are dependent on mu.
@@ -116,13 +116,27 @@ master_loglik <- function(parameter,
   nodeM <- calcul$node_M
   mergeBranch <- calcul$merge_branch
   
-  if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
+  E <- nodeM[1:d]
+  S <- nodeM[(2 * d + 1):(3 * d)]
+  
+  if (using_cla && !is_complete_tree) {
+    # currently, S is not implemented in complete_tree LL
+    av <- E + S
+    for (x in av) {
+      if (x < 1 - 1e-6 || x > 1 + 1e-6) {
+        warning("E + S is incorrect, possibly the calculation for S failed")
+        S <- 1 - E
+      }
+    }
+  } else {
+    S <- 1 - E
+  }
   
   if (!is.null(phy$root.edge) && take_into_account_root_edge == TRUE ) {
     if (phy$root.edge > 0) {
       calcul2 <- calc_ll_single_branch_cpp(rhs = 
                                              if (using_cla) "ode_cla" else "ode_standard",
-                                           states = c(nodeM[1:d], mergeBranch),
+                                           states = c(E, mergeBranch, S),
                                            forTime = c(0, phy$root.edge),
                                            lambdas = lambdas,
                                            mus = mus,
@@ -139,6 +153,8 @@ master_loglik <- function(parameter,
     }
   }
   
+ 
+  
   ## At the root
   weight_states <- get_weight_states(root_state_weight,
                                      num_concealed_states,
@@ -148,29 +164,35 @@ master_loglik <- function(parameter,
                                      d,
                                      is_cla = using_cla)
   
-  if (is_complete_tree) nodeM <- update_complete_tree(phy,
-                                                      lambdas,
-                                                      mus,
-                                                      q_matrix,
-                                                      method,
-                                                      atol,
-                                                      rtol,
-                                                      length(mergeBranch),
-                                                      use_normalization)
+  if (is_complete_tree) {
+    nodeM <- update_complete_tree(phy,
+                                  lambdas,
+                                  mus,
+                                  q_matrix,
+                                  method,
+                                  atol,
+                                  rtol,
+                                  length(mergeBranch),
+                                  use_normalization)
+    # TODO: fix this cheating way of implementing survival for CT
+    E <- nodeM[1:d]
+    S <- 1 - E
+  }
+
   
   mergeBranch2 <- condition(cond,
                             mergeBranch,
                             weight_states,
                             lambdas,
-                            nodeM,
-                            is_root_edge = take_into_account_root_edge)
-  
-  wholeLike <- sum((mergeBranch2) * (weight_states))
+                            is_root_edge = take_into_account_root_edge,
+                            S)
+
+  wholeLike <- sum( (mergeBranch2) * (weight_states) )
   
   LL <- log(wholeLike) +
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
-  
+
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
     num_tips <- ape::Ntip(phy)
@@ -254,103 +276,6 @@ secsse_loglik <- function(parameter,
                 use_normalization = use_normalization)
 }
 
-
-#' @keywords internal
-multi_loglik <- function(parameter,
-                         phy,
-                         traits,
-                         num_concealed_states,
-                         cond = "proper_cond",
-                         root_state_weight = "proper_weights",
-                         sampling_fraction,
-                         setting_calculation = NULL,
-                         see_ancestral_states = FALSE,
-                         loglik_penalty = 0,
-                         is_complete_tree = FALSE,
-                         take_into_account_root_edge = FALSE,
-                         num_threads = 1,
-                         atol = 1e-8,
-                         rtol = 1e-7,
-                         method = "odeint::bulirsch_stoer",
-                         display_warning = FALSE,
-                         use_normalization = TRUE) {
-  
-  res <- list()
-  for (i in 1:length(phy)) {
-    if (is.list(sampling_fraction)) {
-      focal_sampling_fraction <- sampling_fraction[[i]]
-    } else {
-      focal_sampling_fraction <- sampling_fraction
-    }
-    
-    if (is.list(root_state_weight)) {
-      if (sum(is.na(root_state_weight[[i]])) || 
-          length(root_state_weight[[i]]) < 1) {
-        focal_root_state_weight <- "proper_weights"
-      } else {
-        focal_root_state_weight <- root_state_weight[[i]]
-      }
-    } else {
-      focal_root_state_weight <- root_state_weight
-    }
-    
-    focal_setting_calculation <- NULL
-    if (is.list(setting_calculation)) {
-      focal_setting_calculation <- setting_calculation[[i]]
-    }
-    
-    if (length(phy[[i]]$tip.label) == 1) {
-      res[[i]] <- secsse::secsse_single_branch_loglik(parameter = parameter,
-                                                      phy = phy[[i]],
-                                                      traits = traits[[i]],
-                                                      num_concealed_states =
-                                                        num_concealed_states,
-                                                      cond = cond,
-                                                      root_state_weight = 
-                                                        focal_root_state_weight,
-                                                      sampling_fraction = 
-                                                        focal_sampling_fraction,
-                                                      setting_calculation = 
-                                                        focal_setting_calculation,
-                                                      see_ancestral_states = FALSE,
-                                                      loglik_penalty = loglik_penalty,
-                                                      is_complete_tree = 
-                                                        is_complete_tree,
-                                                      take_into_account_root_edge = 
-                                                        take_into_account_root_edge,
-                                                      num_threads = num_threads,
-                                                      atol = atol,
-                                                      rtol = rtol,
-                                                      method = method,
-                                                      display_warning = display_warning,
-                                                      use_normalization = use_normalization)$loglik
-    } else {
-      res[[i]] <- secsse_loglik(parameter = parameter,
-                                phy = phy[[i]],
-                                traits = traits[[i]],
-                                num_concealed_states = num_concealed_states,
-                                cond = cond,
-                                root_state_weight = focal_root_state_weight,
-                                sampling_fraction = focal_sampling_fraction,
-                                setting_calculation = focal_setting_calculation,
-                                see_ancestral_states = FALSE,
-                                loglik_penalty = loglik_penalty,
-                                is_complete_tree = is_complete_tree,
-                                take_into_account_root_edge = 
-                                  take_into_account_root_edge,
-                                num_threads = num_threads,
-                                atol = atol,
-                                rtol = rtol,
-                                method = method,
-                                display_warning = display_warning,
-                                use_normalization = use_normalization) 
-    }
-  }
-  
-  ll <- do.call(sum, res)
-  
-  return(ll) 
-}
 
 #' @title Likelihood for SecSSE model, using Rcpp
 #' Loglikelihood calculation for the cla_SecSSE model given a set of parameters
