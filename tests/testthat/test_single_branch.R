@@ -115,10 +115,9 @@ test_that("single branch check", {
                                     sampling_fraction = sf,
                                     take_into_account_root_edge = TRUE,
                                     cond = "no_cond")
-
   brts <- ape::branching.times(focal_tree)
   bd_ll <- bd_loglik(pars1 = c(0.3,0.0),
-                     pars2 = c(0,0,0,0,2),
+                     pars2 = c(0,0,0,0,1),
                      brts = c(focal_tree$root.edge + max(brts), brts),
                      missnumspec = 0)
   testthat::expect_equal(bd_ll,secsse_ll)
