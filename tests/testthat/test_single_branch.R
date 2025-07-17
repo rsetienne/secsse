@@ -59,6 +59,13 @@ test_that("single branch check", {
                                               cond = "no_cond")
   )
   
+  secsse_ll <- res2$loglik
+  bd_ll <- bd_loglik(pars1 = c(0.3,0),
+                     pars2 = c(0,0,0,0,1),
+                     brts = phy$edge.length,
+                     missnumspec = 0)
+  testthat::expect_equal(bd_ll,secsse_ll)
+  
   d <- length(mus)
   
   sz <- res2$nodeM[1:(d + d)] * params[1]
