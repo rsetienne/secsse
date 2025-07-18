@@ -1,10 +1,8 @@
 test_that("single branch check", {
   set.seed(42)
   focal_tree <- ape::rphylo(n = 2, birth = 0.3 ,death = 0)
-  
   focal_tree$root.edge <- NULL
   traits <- c(1, 1)
-  
   num_concealed_states <- 2
   idparslist <- cla_id_paramPos(c(1, 2), num_concealed_states)
   idparslist$lambdas[1, ] <- rep(1, 2)
@@ -21,16 +19,13 @@ test_that("single branch check", {
 
   params <- c(0.3, 0.0, 0.0) # extinction and shifts to zero, to allow direct
                              # comparison
-  
   lambdas <- secsse::fill_in(idparslist[[1]], params)
   mus <- secsse::fill_in(idparslist[[2]], params)
   q_mat <- secsse::fill_in(idparslist[[3]], params)
-  
   parslist <- list()
   parslist[[1]] <- lambdas
   parslist[[2]] <- mus
   parslist[[3]] <- q_mat
-  
   sf <- c(1, 1)
   
   testthat::expect_warning(
@@ -61,7 +56,6 @@ test_that("single branch check", {
   )
   
   d <- length(mus)
-  
   sz <- res2$nodeM[1:(d + d)] * params[1]
   prefact <- log(sum(abs(sz)))
   answ_normal <- (res1 - prefact) / 2
@@ -97,7 +91,7 @@ test_that("single branch check", {
                                               cond = "no_cond")
   secsse_ll <- res3$loglik
   bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
-                          pars2 = c(0,0,0,0,1),
+                          pars2 = c(0,0,1,0,1),
                           brts = phy$edge.length,
                           missnumspec = 0)
   testthat::expect_equal(bd_ll,secsse_ll)
@@ -116,13 +110,13 @@ test_that("single branch check", {
                                     take_into_account_root_edge = TRUE,
                                     cond = "no_cond")
   brts <- ape::branching.times(focal_tree)
-  bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.0),
-                     pars2 = c(0,0,0,0,1),
+  bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
+                     pars2 = c(0,0,1,0,1),
                      brts = c(focal_tree$root.edge + max(brts), brts),
                      missnumspec = 0)
   testthat::expect_equal(bd_ll,secsse_ll)
   
-  # now the ultimate test of a tree with three tips and check loglik with stem age
+  # now the penultimate test of a tree with three tips and check loglik with stem age
 
   set.seed(42)
   focal_tree <- ape::rphylo(n = 3, birth = 0.3, death = 0)
@@ -136,10 +130,30 @@ test_that("single branch check", {
                                          take_into_account_root_edge = TRUE,
                                          cond = "no_cond")
   brts <- ape::branching.times(focal_tree)
-  bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.0),
-                     pars2 = c(0,0,0,0,1),
+  bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
+                     pars2 = c(0,0,1,0,1),
                      brts = c(focal_tree$root.edge + max(brts), brts),
                      missnumspec = 0)
+  testthat::expect_equal(bd_ll,secsse_ll)
+  
+  # now the ultimate test of a tree with four tips and check loglik with stem age
+  
+  set.seed(42)
+  focal_tree <- ape::rphylo(n = 4, birth = 0.3, death = 0)
+  focal_tree$root.edge <- 0.3
+  traits <- c(1, 1, 1, 1)
+  secsse_ll <- secsse::cla_secsse_loglik(parameter = parslist,
+                                         phy = focal_tree,
+                                         traits = traits,
+                                         num_concealed_states = num_concealed_states,
+                                         sampling_fraction = sf,
+                                         take_into_account_root_edge = TRUE,
+                                         cond = "no_cond")
+  brts <- ape::branching.times(focal_tree)
+  bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
+                          pars2 = c(0,0,1,0,1),
+                          brts = c(focal_tree$root.edge + max(brts), brts),
+                          missnumspec = 0)
   testthat::expect_equal(bd_ll,secsse_ll)
 })
 
