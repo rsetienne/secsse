@@ -155,6 +155,35 @@ test_that("single branch check", {
                           brts = c(focal_tree$root.edge + max(brts), brts),
                           missnumspec = 0)
   testthat::expect_equal(bd_ll,secsse_ll)
+  
+  # Now try on a multi-phylo data set
+  
+  set.seed(42)
+  focal_tree <- list()
+  class(focal_tree) <- "multiPhylo"
+  focal_tree[[1]] <- ape::rphylo(n = 4, birth = 0.3, death = 0)
+  focal_tree[[2]] <- ape::rphylo(n = 4, birth = 0.3, death = 0)
+  focal_tree[[1]]$root.edge <- 0.3
+  focal_tree[[2]]$root.edge <- 0.2
+  traits <- list()
+  traits[[1]] <- c(1, 1, 1, 1)
+  traits[[2]] <- c(1, 1, 1, 1)
+  secsse_ll <- secsse::cla_secsse_loglik(parameter = parslist,
+                                         phy = focal_tree,
+                                         traits = traits,
+                                         num_concealed_states = num_concealed_states,
+                                         sampling_fraction = sf,
+                                         take_into_account_root_edge = TRUE,
+                                         cond = "no_cond")
+  bd_ll <- 0
+  for(i in 1:2) {
+    brts <- ape::branching.times(focal_tree[[i]])
+    bd_ll <- bd_ll + DDD::bd_loglik(pars1 = c(0.3,0.1),
+                          pars2 = c(0,0,1,0,1),
+                          brts = c(focal_tree[[i]]$root.edge + max(brts), brts),
+                          missnumspec = 0)
+  }
+  testthat::expect_equal(bd_ll,secsse_ll)
 })
 
 test_that("root branch check", {
