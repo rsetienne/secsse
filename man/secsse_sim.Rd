@@ -11,11 +11,12 @@ secsse_sim(
   crown_age,
   num_concealed_states,
   pool_init_states = NULL,
+  sampling_fraction = NULL,
   max_spec = 1e+05,
   min_spec = 2,
   max_species_extant = TRUE,
   tree_size_hist = FALSE,
-  conditioning = "obs_states",
+  conditioning = "none",
   non_extinction = TRUE,
   verbose = FALSE,
   max_tries = 1e+06,
@@ -40,6 +41,11 @@ to the number of examined states in the dataset.}
 
 \item{pool_init_states}{pool of initial states at the crown, in case this is
 different from all available states, otherwise leave at NULL}
+
+\item{sampling_fraction}{vector that states the sampling proportion per
+trait state. It must have as many elements as there are trait states. When
+using a \code{multiPhylo} object, sampling fraction should be list where each
+entry in the list corresponds to the sampling proportion for each tree.}
 
 \item{max_spec}{Maximum number of species in the tree (please note that the
 tree is not conditioned on this number, but that this is a safeguard

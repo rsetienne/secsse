@@ -150,7 +150,7 @@ idparsopt <- c(1,2,3,5)
 initparsopt <- c(rep(intGuessLamba,3),rep((intGuessLamba/5),1))
 idparsfix <- c(0,4)
 parsfix <- c(0,0)
-tol <- c(1e-02, 1e-03, 1e-04)
+tol <- c(1e-02, 1e-03, 1e-03)
 maxiter <- 1000 * round((1.25)^length(idparsopt))
 optimmethod <- 'simplex'
 cond <- 'proper_cond'
@@ -174,5 +174,5 @@ optimmethod,
 num_cycles = 1,
 verbose = FALSE)
 # model$ML
-# [1] -16.04127
+# [1] -16.47099
 }

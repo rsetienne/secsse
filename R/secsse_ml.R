@@ -250,7 +250,7 @@ master_ml <- function(phy,
 #'initparsopt <- c(rep(intGuessLamba,3),rep((intGuessLamba/5),1))
 #'idparsfix <- c(0,4)
 #'parsfix <- c(0,0)
-#'tol <- c(1e-02, 1e-03, 1e-04)
+#'tol <- c(1e-02, 1e-03, 1e-03)
 #'maxiter <- 1000 * round((1.25)^length(idparsopt))
 #'optimmethod <- 'simplex'
 #'cond <- 'proper_cond'
@@ -274,7 +274,7 @@ master_ml <- function(phy,
 #'num_cycles = 1,
 #'verbose = FALSE)
 #'# model$ML
-#'# [1] -16.04127
+#'# [1] -16.47099
 #' @export
 secsse_ml <- function(phy,
                       traits,
@@ -436,7 +436,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'initparsopt <- c(rep(intGuessLamba,3))
 #'idparsfix <- c(0,4,5)
 #'parsfix <- c(0,0,0.01)
-#'tol <- c(1e-04, 1e-05, 1e-07)
+#'tol <- c(1e-03, 1e-03, 1e-03)
 #'maxiter <- 1000 * round((1.25) ^ length(idparsopt))
 #'optimmethod <- 'simplex'
 #'cond <- 'proper_cond'
@@ -460,7 +460,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'  num_cycles = 1,
 #'  num_threads = 1,
 #'  verbose = FALSE)
-#' # [1] -90.97626
+#' # [1] -90.9763
 #' @export
 cla_secsse_ml <- function(phy,
                           traits,
