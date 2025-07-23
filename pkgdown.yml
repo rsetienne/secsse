@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   complete_tree: complete_tree.html
@@ -7,8 +7,7 @@ articles:
   secsse_performance: secsse_performance.html
   sim_with_secsse: sim_with_secsse.html
   starting_secsse: starting_secsse.html
-last_built: 2024-04-30T13:17Z
+last_built: 2025-07-23T11:57Z
 urls:
   reference: https://rsetienne.github.io/secsse/reference
   article: https://rsetienne.github.io/secsse/articles
-

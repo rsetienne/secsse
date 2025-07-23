@@ -1,123 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://rsetienne.github.io/secsse/404.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/articles/complete_tree.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/articles/plotting_states.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/articles/secsse_performance.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/articles/sim_with_secsse.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/articles/starting_secsse.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/cla_id_paramPos.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/cla_secsse_loglik.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/cla_secsse_ml.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/cla_secsse_ml_func_def_pars.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/create_default_lambda_transition_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/create_default_shift_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/create_lambda_list.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/create_mu_vector.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/create_q_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/default_params_doc.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/event_times.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/example_phy_GeoSSE.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/expand_q_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/extract_par_vals.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/fill_in.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/id_paramPos.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/phylo_vignette.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/plot_state_exact.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/prepare_full_lambdas.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/q_doubletrans.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/secsse-package.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/secsse_loglik.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/secsse_loglik_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/secsse_ml.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/secsse_ml_func_def_pars.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/secsse_sim.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/sortingtraits.html</loc>
-  </url>
-  <url>
-    <loc>https://rsetienne.github.io/secsse/reference/traits.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://rsetienne.github.io/secsse/404.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/LICENSE-text.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/articles/complete_tree.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/articles/index.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/articles/plotting_states.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/articles/secsse_performance.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/articles/sim_with_secsse.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/articles/starting_secsse.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/authors.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/index.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/news/index.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/cla_id_paramPos.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/cla_secsse_loglik.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/cla_secsse_ml.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/cla_secsse_ml_func_def_pars.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/create_default_lambda_transition_matrix.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/create_default_shift_matrix.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/create_lambda_list.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/create_mu_vector.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/create_q_matrix.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/default_params_doc.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/event_times.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/example_phy_GeoSSE.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/expand_q_matrix.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/extract_par_vals.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/fill_in.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/id_paramPos.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/index.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/phylo_vignette.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/plot_idparslist.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/plot_state_exact.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/prepare_full_lambdas.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/q_doubletrans.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/secsse-package.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/secsse_loglik.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/secsse_loglik_eval.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/secsse_ml.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/secsse_ml_func_def_pars.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/secsse_sim.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/secsse_single_branch_loglik.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/sortingtraits.html</loc></url>
+<url><loc>https://rsetienne.github.io/secsse/reference/traits.html</loc></url>
 </urlset>
+
