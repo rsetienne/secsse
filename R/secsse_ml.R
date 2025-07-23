@@ -460,7 +460,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'  num_cycles = 1,
 #'  num_threads = 1,
 #'  verbose = FALSE)
-#' # [1] -90.9762
+#' # [1] -90.9763
 #' @export
 cla_secsse_ml <- function(phy,
                           traits,

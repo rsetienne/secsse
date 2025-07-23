@@ -185,7 +185,7 @@ functions_defining_params[[3]] <- function(){
  par_6 <- par_3 * factor_1
 }
 
-tol = c(1e-02, 1e-03, 1e-04)
+tol = c(1e-02, 1e-03, 1e-03)
 maxiter = 1000 * round((1.25)^length(idparsopt))
 optimmethod = "simplex"
 cond<-"proper_cond"
@@ -210,5 +210,5 @@ tol,
 maxiter,
 optimmethod,
 num_cycles = 1)
-# ML -136.5796
+# ML -136.5795
 }
