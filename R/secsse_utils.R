@@ -447,9 +447,9 @@ check_root_state_weight <- function(root_state_weight, traits) {
         #    stop("There need to be as many elements in root_state_weight 
         #   as there are traits.")
         #}
-        if (length(which(root_state_weight == 1)) != 1) {
-            stop("The root_state_weight needs only one 1.")
-        }
+        #if (length(which(root_state_weight == 1)) != 1) {
+        #    stop("The root_state_weight needs only one 1.")
+        #}
       if (sum(root_state_weight) > 1) {
         stop("Root state weights need to sum to 1")
       }
