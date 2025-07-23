@@ -62,7 +62,7 @@ test_that("single branch check", {
   answ_single_branch <- res2$loglik
   testthat::expect_equal(answ_normal, answ_single_branch)
   
-  # now chech that the single branch loglik is the same as DDD::bd_loglik
+  # now check that the single branch loglik is the same as DDD::bd_loglik
   
   secsse_ll <- res2$loglik
   bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.0),

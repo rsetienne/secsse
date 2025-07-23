@@ -294,7 +294,7 @@ effects at the crown.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"simplex"}. Alternative is \code{"subplex"}. Both are called from
-\code{\link[DDD:optimizer]{DDD::optimizer()}}, simplex is implemented natively in \link{DDD}, while subplex
+\code{\link[DDD:optimizer]{DDD::optimizer()}}, simplex is implemented natively in \pkg{DDD}, while subplex
 is ultimately called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
 \item{display_warning}{display a warning if necessary}

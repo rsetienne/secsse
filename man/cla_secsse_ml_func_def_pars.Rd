@@ -99,7 +99,7 @@ algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
 \code{"simplex"}. Alternative is \code{"subplex"}. Both are called from
-\code{\link[DDD:optimizer]{DDD::optimizer()}}, simplex is implemented natively in \link{DDD}, while subplex
+\code{\link[DDD:optimizer]{DDD::optimizer()}}, simplex is implemented natively in \pkg{DDD}, while subplex
 is ultimately called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
@@ -203,6 +203,7 @@ optimmethod = 'subplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
+\dontrun{
 model <- cla_secsse_ml_func_def_pars(phylotree,
 traits,
 num_concealed_states,
@@ -222,5 +223,6 @@ tol,
 maxiter,
 optimmethod,
 num_cycles = 1)
+}
 # ML -136.5796
 }

@@ -113,7 +113,7 @@
 #'  one is the trait associated information.
 #' @param optimmethod A string with method used for optimization. Default is
 #' `"simplex"`. Alternative is `"subplex"`. Both are called from 
-#' [DDD::optimizer()], simplex is implemented natively in [DDD], while subplex 
+#' [DDD::optimizer()], simplex is implemented natively in \pkg{DDD}, while subplex 
 #' is ultimately called from [subplex::subplex()].
 #' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
 #' @param initloglik A numeric with the value of loglikehood obtained prior to
