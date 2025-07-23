@@ -18,10 +18,13 @@ cla_secsse_loglik(
   see_ancestral_states = FALSE,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
+  take_into_account_root_edge = FALSE,
   num_threads = 1,
   method = "odeint::bulirsch_stoer",
   atol = 1e-08,
-  rtol = 1e-07
+  rtol = 1e-07,
+  display_warning = TRUE,
+  use_normalization = TRUE
 )
 }
 \arguments{
@@ -29,11 +32,15 @@ cla_secsse_loglik(
 mus and the third transition rates.}
 
 \item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
-branch lengths.}
+branch lengths. Alternatively, multiple phylogenetic trees can be provided
+as the \code{multiPhylo} class.}
 
 \item{traits}{vector with trait states for each tip in the phylogeny. The
 order of the states must be the same as the tree tips. For help, see
-\code{vignette("starting_secsse", package = "secsse")}.}
+\code{vignette("starting_secsse", package = "secsse")}. When providing a
+\code{multiPhylo} set of multiple phylognies, traits should be a list where
+each entry in the list corresponds to the matching phylogeny on that
+position.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
@@ -44,10 +51,14 @@ to the number of examined states in the dataset.}
 \item{root_state_weight}{the method to weigh the states:
 \code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
 It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state.}
+indicates state 1 was the root state. When
+using a \code{multiPhylo} object, root_state_weight should be list where each
+entry in the list corresponds to the root_state_weight for each tree.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
-trait state. It must have as many elements as there are trait states.}
+trait state. It must have as many elements as there are trait states. When
+using a \code{multiPhylo} object, sampling fraction should be list where each
+entry in the list corresponds to the sampling proportion for each tree.}
 
 \item{setting_calculation}{argument used internally to speed up calculation.
 It should be left blank (default : \code{setting_calculation = NULL}).}
@@ -62,6 +73,10 @@ be shown? Defaults to \code{FALSE}.}
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
 
+\item{take_into_account_root_edge}{if TRUE, the LL integration is continued
+along the root edge. This also affects conditioning (as now, conditioning
+no longer needs to assume a speciation event at the start of the tree)}
+
 \item{num_threads}{number of threads to be used. Default is one thread.}
 
 \item{method}{integration method used, available are:
@@ -72,6 +87,11 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
+
+\item{display_warning}{display a warning if necessary}
+
+\item{use_normalization}{normalize the density vector during integration,
+more accurate but slower (default = TRUE)}
 }
 \value{
 The loglikelihood of the data given the parameters

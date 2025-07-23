@@ -10,7 +10,10 @@ prepare_full_lambdas(traits, num_concealed_states, lambd_and_modeSpe)
 \arguments{
 \item{traits}{vector with trait states for each tip in the phylogeny. The
 order of the states must be the same as the tree tips. For help, see
-\code{vignette("starting_secsse", package = "secsse")}.}
+\code{vignette("starting_secsse", package = "secsse")}. When providing a
+\code{multiPhylo} set of multiple phylognies, traits should be a list where
+each entry in the list corresponds to the matching phylogeny on that
+position.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}

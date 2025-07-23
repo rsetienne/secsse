@@ -23,24 +23,30 @@ cla_secsse_ml_func_def_pars(
   sampling_fraction,
   tol = c(1e-04, 1e-05, 1e-07),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  optimmethod = "subplex",
+  optimmethod = "simplex",
   num_cycles = 1,
   loglik_penalty = 0,
   is_complete_tree = FALSE,
-  verbose = (optimmethod == "simplex"),
+  take_into_account_root_edge = FALSE,
+  verbose = TRUE,
   num_threads = 1,
   atol = 1e-12,
   rtol = 1e-12,
-  method = "odeint::bulirsch_stoer"
+  method = "odeint::bulirsch_stoer",
+  use_normalization = TRUE
 )
 }
 \arguments{
 \item{phy}{phylogenetic tree of class \code{phylo}, rooted and with
-branch lengths.}
+branch lengths. Alternatively, multiple phylogenetic trees can be provided
+as the \code{multiPhylo} class.}
 
 \item{traits}{vector with trait states for each tip in the phylogeny. The
 order of the states must be the same as the tree tips. For help, see
-\code{vignette("starting_secsse", package = "secsse")}.}
+\code{vignette("starting_secsse", package = "secsse")}. When providing a
+\code{multiPhylo} set of multiple phylognies, traits should be a list where
+each entry in the list corresponds to the matching phylogeny on that
+position.}
 
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
@@ -76,10 +82,14 @@ example.}
 \item{root_state_weight}{the method to weigh the states:
 \code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
 It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state.}
+indicates state 1 was the root state. When
+using a \code{multiPhylo} object, root_state_weight should be list where each
+entry in the list corresponds to the root_state_weight for each tree.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
-trait state. It must have as many elements as there are trait states.}
+trait state. It must have as many elements as there are trait states. When
+using a \code{multiPhylo} object, sampling fraction should be list where each
+entry in the list corresponds to the sampling proportion for each tree.}
 
 \item{tol}{A numeric vector with the maximum tolerance of the optimization
 algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
@@ -88,10 +98,9 @@ algorithm. Default is \code{c(1e-04, 1e-05, 1e-05)}.}
 \code{1000 * round((1.25) ^ length(idparsopt))}.}
 
 \item{optimmethod}{A string with method used for optimization. Default is
-\code{"subplex"}. Alternative is \code{"simplex"} and it shouldn't be used in normal
-conditions (only for debugging). Both are called from \code{\link[DDD:optimizer]{DDD::optimizer()}},
-simplex is implemented natively in \link{DDD}, while subplex is ultimately
-called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
+\code{"simplex"}. Alternative is \code{"subplex"}. Both are called from
+\code{\link[DDD:optimizer]{DDD::optimizer()}}, simplex is implemented natively in \pkg{DDD}, while subplex
+is ultimately called from \code{\link[subplex:subplex]{subplex::subplex()}}.}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to \code{Inf},
 the optimization will be repeated until the result is, within the
@@ -103,6 +112,10 @@ tolerance, equal to the starting values, with a maximum of 10 cycles.}
 \item{is_complete_tree}{logical specifying whether or not a tree with all its
 extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \emph{all} extinct lineages are present on the tree. Defaults to \code{FALSE}.}
+
+\item{take_into_account_root_edge}{if TRUE, the LL integration is continued
+along the root edge. This also affects conditioning (as now, conditioning
+no longer needs to assume a speciation event at the start of the tree)}
 
 \item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
 \code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
@@ -118,6 +131,9 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+
+\item{use_normalization}{normalize the density vector during integration,
+more accurate but slower (default = TRUE)}
 }
 \value{
 Parameter estimated and maximum likelihood
@@ -187,6 +203,7 @@ optimmethod = 'subplex'
 cond <- 'proper_cond'
 root_state_weight <- 'proper_weights'
 sampling_fraction <- c(1,1,1)
+\dontrun{
 model <- cla_secsse_ml_func_def_pars(phylotree,
 traits,
 num_concealed_states,
@@ -206,5 +223,6 @@ tol,
 maxiter,
 optimmethod,
 num_cycles = 1)
+}
 # ML -136.5796
 }

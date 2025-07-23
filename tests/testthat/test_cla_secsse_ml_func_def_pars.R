@@ -2,7 +2,7 @@ test_that("multiplication works", {
   
   set.seed(16)
   phylotree <- ape::rbdtree(0.07,0.001,Tmax=50)
-  startingpoint <- expect_output(
+  startingpoint <- testthat::expect_output(
     DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
   intGuessLamba <- startingpoint$lambda0
@@ -38,37 +38,36 @@ test_that("multiplication works", {
   
   tol = c(1e-02, 1e-03, 1e-04)
   maxiter = 100 * round((1.25)^length(idparsopt))
-  optimmethod = 'subplex'
   cond <- 'proper_cond'
   root_state_weight <- 'proper_weights'
   sampling_fraction <- c(1, 1, 1)
-  model <- expect_message(expect_warning(cla_secsse_ml_func_def_pars(
-    phylotree,
-    traits,
-    num_concealed_states,
-    idparslist,
-    idparsopt,
-    initparsopt,
-    idfactorsopt,
-    initfactors,
-    idparsfix,
-    parsfix,
-    idparsfuncdefpar,
-    functions_defining_params,
-    cond,
-    root_state_weight,
-    sampling_fraction,
-    tol,
-    maxiter,
-    optimmethod,
-    num_cycles = 1,
-    verbose = 0
-  )))
+  model <- testthat::expect_warning(
+    cla_secsse_ml_func_def_pars(phy = phylotree,
+                                traits = traits,
+                                num_concealed_states = num_concealed_states,
+                                idparslist = idparslist,
+                                idparsopt = idparsopt,
+                                initparsopt = initparsopt,
+                                idfactorsopt = idfactorsopt,
+                                initfactors = initfactors,
+                                idparsfix = idparsfix,
+                                parsfix = parsfix,
+                                idparsfuncdefpar = idparsfuncdefpar,
+                                functions_defining_params = functions_defining_params,
+                                cond = cond,
+                                root_state_weight = root_state_weight,
+                                sampling_fraction = sampling_fraction,
+                                tol = tol,
+                                maxiter = maxiter,
+                                optimmethod = "subplex",
+                                num_cycles = 1,
+                                verbose = FALSE
+  ))
   
-  expect_equal(model$ML, -136.5926599)
-  expect_length(model, 3)
-  expect_length(model$MLpars, 3)
-  expect_equal(model$MLpars[[2]],
+  testthat::expect_equal(model$ML, -136.4534, tol = 0.1)
+  testthat::expect_length(model, 3)
+  testthat::expect_length(model$MLpars, 3)
+  testthat::expect_equal(model$MLpars[[2]],
                c("0A" = 0,
                  "1A" = 0,
                  "2A" = 0,

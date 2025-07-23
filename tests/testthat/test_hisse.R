@@ -10,11 +10,11 @@ test_that("secsse gives the same result as hisse", {
               0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1,
               1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0,
               0, 0, 0, 0, 1, 1, 0, 0)
-
+  
   b <- c(0.04, 0.02, 0.03, 0.04)# lambda
   d <- c(0.03, 0.01, 0.01, 0.02)  # Mu
   userTransRate <- 0.2 # transition rate among trait states
-
+  
   ## Now our equivalent version, with only 2 states
   num_concealed_states <- 2
   sampling_fraction <- c(1, 1)
@@ -25,54 +25,63 @@ test_that("secsse gives the same result as hisse", {
   diag(toCheck[[3]]) <- NA
   root_state_weight <- "maddison_weights"
   cond <- "noCondit"
-
-  y <- secsse_loglik(parameter = toCheck,
-                     phy = phy,
-                     traits = traits,
-                     num_concealed_states = num_concealed_states,
-                     cond = cond,
-                     root_state_weight = root_state_weight,
-                     sampling_fraction = sampling_fraction)
+  
+  testthat::expect_warning(
+    
+    y <- secsse::secsse_loglik(parameter = toCheck,
+                               phy = phy,
+                               traits = traits,
+                               num_concealed_states = num_concealed_states,
+                               cond = cond,
+                               root_state_weight = root_state_weight,
+                               sampling_fraction = sampling_fraction)
+    
+  )
   cond <- "maddison_cond"
-  y1 <- round(as.numeric(secsse_loglik(parameter = toCheck,
-                                       phy = phy,
-                                       traits = traits,
-                                       num_concealed_states =
-                                         num_concealed_states,
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       sampling_fraction = sampling_fraction)
-  ), 4)
-
+  testthat::expect_warning(
+    y1 <- round(as.numeric(
+      secsse::secsse_loglik(parameter = toCheck,
+                            phy = phy,
+                            traits = traits,
+                            num_concealed_states =
+                              num_concealed_states,
+                            cond = cond,
+                            root_state_weight = root_state_weight,
+                            sampling_fraction = sampling_fraction)
+    ), 4)
+  )
+  
   ## Now with different sampling_fraction
-
+  
   sampling_fraction <- c(0.8, 1)
-
-  y2 <- round(as.numeric(secsse_loglik(parameter = toCheck,
-                                       phy = phy,
-                                       traits = traits,
-                                       num_concealed_states =
-                                         num_concealed_states,
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       sampling_fraction = sampling_fraction)
-  ), 4)
-
+  
+  y2 <- testthat::expect_warning(round(as.numeric(
+    secsse::secsse_loglik(parameter = toCheck,
+                          phy = phy,
+                          traits = traits,
+                          num_concealed_states =
+                            num_concealed_states,
+                          cond = cond,
+                          root_state_weight = root_state_weight,
+                          sampling_fraction = sampling_fraction)
+  ), 4))
+  
   testthat::expect_equal(-237.8611, y1, tolerance = 0.001)
   testthat::expect_equal(-243.8611, y2, tolerance = 0.001)
   # Parallel code doesn't work on CI unless running on windows
   if (!isTRUE(as.logical(Sys.getenv("CI"))) ||
       .Platform$OS.type == "windows") {
     testthat::skip_on_cran()
-
-    z4 <- as.numeric(secsse_loglik(parameter = toCheck,
-                                   phy = phy,
-                                   traits = traits,
-                                   num_concealed_states = num_concealed_states,
-                                   cond = cond,
-                                   root_state_weight = root_state_weight,
-                                   sampling_fraction = sampling_fraction,
-                                   num_threads = 4))
+    
+    z4 <- testthat::expect_warning(
+      as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                       phy = phy,
+                                       traits = traits,
+                                       num_concealed_states = num_concealed_states,
+                                       cond = cond,
+                                       root_state_weight = root_state_weight,
+                                       sampling_fraction = sampling_fraction,
+                                       num_threads = 4)))
     testthat::expect_equal(y2, z4, tolerance = 1e-4)
     # is different LL, diff 0.0118
   }

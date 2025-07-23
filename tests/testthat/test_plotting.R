@@ -14,7 +14,7 @@ test_that("normal plotting", {
    helper_function <- function(x) {
      return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
    }
-  testthat::expect_message(
+  testthat::expect_warning(
    px <- plot_state_exact(parameters = params,
                     phy = phy,
                     traits = traits,
@@ -52,37 +52,36 @@ test_that("cla plotting", {
   parsfix <- c(0, 0, 0.01)
   tol <- c(1e-04, 1e-05, 1e-07)
   maxiter <- 1000 * round((1.25) ^ length(idparsopt))
-  optimmethod <- "subplex"
+  optimmethod <- "simplex"
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-  testthat::expect_message(
   testthat::expect_warning(
     model_R <- cla_secsse_ml(
-      phylotree,
-      traits,
-      num_concealed_states,
-      idparslist,
-      idparsopt,
-      initparsopt,
-      idparsfix,
-      parsfix,
-      cond,
-      root_state_weight,
-      sampling_fraction,
-      tol,
-      maxiter,
-      optimmethod,
+      phy = phylotree,
+      traits = traits,
+      num_concealed_states = num_concealed_states,
+      idparslist = idparslist,
+      idparsopt = idparsopt,
+      initparsopt = initparsopt,
+      idparsfix = idparsfix,
+      parsfix = parsfix,
+      cond = cond,
+      root_state_weight = root_state_weight,
+      sampling_fraction = sampling_fraction,
+      tol = tol,
+      maxiter = maxiter,
+      optimmethod = optimmethod,
       num_cycles = 1,
       verbose = FALSE)
-  ))
+  )
 
   helper_function <- function(x) {
     return(sum(x[c(10, 13, 16)]) / sum(x))
   }
 
-  testthat::expect_message(
+  testthat::expect_warning(
     px <- secsse::plot_state_exact(parameters = model_R$MLpars,
                                    phy = phylotree,
                                    traits = traits,

@@ -61,7 +61,7 @@
 #'
 #'tol = c(1e-02, 1e-03, 1e-04)
 #'maxiter = 1000 * round((1.25)^length(idparsopt))
-#'optimmethod = "subplex"
+#'optimmethod = "simplex"
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction <- c(1,1,1)
@@ -104,10 +104,11 @@ secsse_ml_func_def_pars <- function(phy,
                                     tol = c(1E-4, 1E-5, 1E-7),
                                     maxiter = 1000 *
                                       round((1.25) ^ length(idparsopt)),
-                                    optimmethod = "subplex",
+                                    optimmethod = "simplex",
                                     num_cycles = 1,
                                     loglik_penalty = 0,
                                     is_complete_tree = FALSE,
+                                    take_into_account_root_edge = FALSE,
                                     num_threads = 1,
                                     atol = 1e-8,
                                     rtol = 1e-6,
@@ -133,6 +134,8 @@ secsse_ml_func_def_pars <- function(phy,
                    num_cycles = num_cycles,
                    loglik_penalty = loglik_penalty,
                    is_complete_tree = is_complete_tree,
+                   take_into_account_root_edge = 
+                     take_into_account_root_edge,
                    num_threads = num_threads,
                    atol = atol,
                    rtol = rtol,
@@ -209,6 +212,7 @@ secsse_ml_func_def_pars <- function(phy,
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
+#' \dontrun{
 #'model <- cla_secsse_ml_func_def_pars(phylotree,
 #'traits,
 #'num_concealed_states,
@@ -228,6 +232,7 @@ secsse_ml_func_def_pars <- function(phy,
 #'maxiter,
 #'optimmethod,
 #'num_cycles = 1)
+#' }
 #'# ML -136.5796
 #' @export
 cla_secsse_ml_func_def_pars <- function(phy,
@@ -248,15 +253,17 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                         tol = c(1e-04, 1e-05, 1e-07),
                                         maxiter = 1000 *
                                           round((1.25) ^ length(idparsopt)),
-                                        optimmethod = "subplex",
+                                        optimmethod = "simplex",
                                         num_cycles = 1,
                                         loglik_penalty = 0,
                                         is_complete_tree = FALSE,
-                                        verbose = (optimmethod == "simplex"),
+                                        take_into_account_root_edge = FALSE,
+                                        verbose = TRUE,
                                         num_threads = 1,
                                         atol = 1e-12,
                                         rtol = 1e-12,
-                                        method = "odeint::bulirsch_stoer") {
+                                        method = "odeint::bulirsch_stoer",
+                                        use_normalization = TRUE) {
   return(master_ml(phy = phy,
                    traits = traits,
                    num_concealed_states = num_concealed_states,
@@ -278,9 +285,11 @@ cla_secsse_ml_func_def_pars <- function(phy,
                    num_cycles = num_cycles,
                    loglik_penalty = loglik_penalty,
                    is_complete_tree = is_complete_tree,
+                   take_into_account_root_edge = take_into_account_root_edge,
                    verbose = verbose,
                    num_threads = num_threads,
                    atol = atol,
                    rtol = rtol,
-                   method = method))
+                   method = method,
+                   use_normalization = use_normalization))
 }

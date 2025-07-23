@@ -4,10 +4,14 @@
 #' inherited by the relevant functions.
 #'
 #' @param phy phylogenetic tree of class `phylo`, rooted and with
-#'  branch lengths.
+#'  branch lengths. Alternatively, multiple phylogenetic trees can be provided
+#'  as the `multiPhylo` class.
 #' @param traits vector with trait states for each tip in the phylogeny. The 
 #'  order of the states must be the same as the tree tips. For help, see 
-#'  `vignette("starting_secsse", package = "secsse")`.
+#'  `vignette("starting_secsse", package = "secsse")`. When providing a
+#'  `multiPhylo` set of multiple phylognies, traits should be a list where 
+#'  each entry in the list corresponds to the matching phylogeny on that
+#'  position.
 #' @param num_concealed_states number of concealed states, generally equivalent
 #'  to the number of examined states in the dataset.
 #' @param idparslist overview of parameters and their values.
@@ -31,9 +35,13 @@
 #' @param root_state_weight the method to weigh the states:
 #'  `"maddison_weights"`, `"proper_weights"` (default) or `"equal_weights"`.
 #'  It can also be specified for the root state: the vector `c(1, 0, 0)` 
-#'  indicates state 1 was the root state.
+#'  indicates state 1 was the root state. When
+#'  using a `multiPhylo` object, root_state_weight should be list where each
+#'  entry in the list corresponds to the root_state_weight for each tree.
 #' @param sampling_fraction vector that states the sampling proportion per
-#'  trait state. It must have as many elements as there are trait states.
+#'  trait state. It must have as many elements as there are trait states. When
+#'  using a `multiPhylo` object, sampling fraction should be list where each
+#'  entry in the list corresponds to the sampling proportion for each tree.
 #' @param tol A numeric vector with the maximum tolerance of the optimization 
 #'  algorithm. Default is `c(1e-04, 1e-05, 1e-05)`.
 #' @param maxiter max number of iterations. Default is
@@ -103,11 +111,10 @@
 #'  parameters.
 #' @param trait_info data frame where first column has species ids and the second
 #'  one is the trait associated information.
-#' @param optimmethod A string with method used for optimization. Default is 
-#'  `"subplex"`. Alternative is `"simplex"` and it shouldn't be used in normal 
-#'  conditions (only for debugging). Both are called from [DDD::optimizer()], 
-#'  simplex is implemented natively in [DDD], while subplex is ultimately
-#'  called from [subplex::subplex()].
+#' @param optimmethod A string with method used for optimization. Default is
+#' `"simplex"`. Alternative is `"subplex"`. Both are called from 
+#' [DDD::optimizer()], simplex is implemented natively in \pkg{DDD}, while subplex 
+#' is ultimately called from [subplex::subplex()].
 #' @param lambd_and_modeSpe a matrix with the 4 models of speciation possible.
 #' @param initloglik A numeric with the value of loglikehood obtained prior to
 #'  optimisation. Only used internally.
@@ -121,10 +128,6 @@
 #'  of the likelihood.
 #' @param model used model, choice of `"ETD"` (Examined Traits Diversification),
 #'  `"CTD"` (Concealed Traits Diversification) or `"CR"` (Constant Rate).
-#' @param concealed_spec_rates vector specifying the rate indicators for each
-#'  concealed state, length should be identical to `num_concealed_states`. If 
-#'  left empty when using the CTD model, it is assumed that all available 
-#'  speciation rates are distributed uniformly over the concealed states.
 #' @param shift_matrix matrix of shifts, indicating in order:
 #'  1. starting state (typically the column in the transition matrix)
 #'  2. ending state (typically the row in the transition matrix)
@@ -154,7 +157,12 @@
 #' @param ml_pars resulting parameter estimates as returned by for instance
 #'  [cla_secsse_ml()], having the same structure as `param_post`.
 #' @param mu_vector previously defined mus - used to choose indicator number.
-#'
+#' @param display_warning display a warning if necessary
+#' @param take_into_account_root_edge if TRUE, the LL integration is continued
+#' along the root edge. This also affects conditioning (as now, conditioning
+#' no longer needs to assume a speciation event at the start of the tree)
+#' @param use_normalization normalize the density vector during integration,
+#' more accurate but slower (default = TRUE)
 #' @return Nothing
 #' @keywords internal
 #' @export
@@ -209,7 +217,6 @@ default_params_doc <- function(phy,
                                state_names,
                                transition_matrix,
                                model,
-                               concealed_spec_rates,
                                shift_matrix,
                                q_matrix,
                                lambda_list,
@@ -223,6 +230,9 @@ default_params_doc <- function(phy,
                                max_species_extant,
                                tree_size_hist,
                                start_at_crown,
-                               optimmethod) {
+                               optimmethod,
+                               display_warning,
+                               take_into_account_root_edge,
+                               use_normalization) {
   # Nothing
 }

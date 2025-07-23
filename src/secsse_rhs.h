@@ -138,7 +138,7 @@ namespace secsse {
       ll.resize(n * d * d, 0.0);
       nz.resize(n * d, {});
       auto llv = vector_view_t<double>{ll.data(), d};
-      auto nzv =nz.begin();
+      auto nzv = nz.begin();
       for (int i = 0; i < Rll.size(); ++i) {
         // we all love deeply nested loops...
         rmatrix<const double> mr(Rcpp::as<Rcpp::NumericMatrix>(Rll[i]));
@@ -163,6 +163,7 @@ namespace secsse {
     const ode_cla_precomp_t prec_;
 
   public:
+
     ode_cla(const Rcpp::List ll,
             const Rcpp::NumericVector& m,
             const Rcpp::NumericMatrix& q)
@@ -175,11 +176,12 @@ namespace secsse {
                      const std::vector<double>& M,
                      std::vector<double>& out) const {
       const auto d = size();
-      assert(2 * d == out.size());
+      assert(3 * d == out.size());
       auto llv = vector_view_t<const double>(prec_.ll.data(), d);
       for (size_t i = 0; i < d; ++i) {
         out[i] = M[i];
         out[i + d] = 0.0;
+        out[i + 2 * d] = M[i + 2 * d];
         for (size_t j = 0; j < d; ++j, llv.advance(d)) {
           for (size_t k = 0; k < d; ++k) {
             out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
@@ -191,7 +193,7 @@ namespace secsse {
 
     void operator()(const std::vector<double>& x,
                     std::vector<double>& dxdt,
-                    const double /* t */) const
+                    const double /* t */ ) const
     {
       const auto d = size();
       if constexpr (variant == OdeVariant::normal_tree) {
@@ -201,16 +203,21 @@ namespace secsse {
         for (size_t i = 0; i < d; ++i, qv.advance(d)) {
           double dx0 = 0.0;
           double dxd = 0.0;
+          double dxs = 0.0;
           for (size_t j = 0; j < d; ++j, llv.advance(d), ++nzv) {
+            double dxs2 = 0.0;
             for (auto k : *nzv) {
-              dx0 += llv[k] * (x[j] * x[k]);
-              dxd += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+              dx0  += llv[k] * (x[j] * x[k]);
+              dxd  += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
+              dxs2 += llv[k] * (x[j + 2 * d] * x[k + 2 * d]);
             }
             dx0 += (x[j] - x[i]) * qv[j];
             dxd += (x[j + d] - x[i + d]) * qv[j];
+            dxs += (x[j + d + d] - x[i + d + d]) * qv[j] - dxs2;
           }
-          dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i];
-          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]) * x[i + d];
+          dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i]; // E
+          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]) * x[i + d]; // D
+          dxdt[i + d + d] = dxs + (prec_.lambda_sum[i] - m_[i]) * x[i + d + d];  // S = 1 - E
         }
       }
       else if constexpr (variant == OdeVariant::complete_tree) {
@@ -241,5 +248,4 @@ namespace secsse {
       }
     }
   };
-
 } // namespace secsse

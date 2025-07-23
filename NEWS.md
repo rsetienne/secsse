@@ -1,3 +1,34 @@
+# 3.4.0
+Version 3.4.0 uses a separate calculation for 1 - E, e.g. one minus the local
+extinction rates to avoid numerical abberations. These are only used in the CLA
+calculations.
+
+# 3.3.0
+Version 3.3.0 normalizes evaluation of the loglikelihood at every integration
+step. This strongly reduces any numerical abberations that could previously
+occur. These mainly occured along long branches, where values could become so
+close to zero that they became too close to numerical precision. If absolutely
+desired, this normalization can be disabled by setting 'use_normalization' to
+FALSE.
+
+# 3.2.0
+
+- Added support for integration along the root edge
+- Added support for single-branch trees
+- Added function to calculate the loglikelihood as calculated along a single 
+branch
+- Added support for calculating the likelihood across multiple phylogenies, 
+assuming that all phylogenies are subject to the same diversification regime.
+- Added support for performing Maximum Likelihood across multiple phylogenies
+- Reduced the number of warnings displayed during LL and ML calculation. 
+- Changed ape::ultrametric checking to use the variance (option = 2), to reduce
+this falsely triggering.
+
+# 3.1.2
+
+Added the function 'plot_idparslist', which provides code to visualize the
+rates in the idparslist setup, using ggplot.
+
 # 3.1.0
 
 Version 3.1.0 fixes a bug in the simulation code that caused trait changes

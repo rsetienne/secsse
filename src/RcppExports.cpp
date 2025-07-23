@@ -33,8 +33,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_ll_cpp
-Rcpp::List calc_ll_cpp(const std::string& rhs, const Rcpp::IntegerVector& ances, const Rcpp::NumericMatrix& states, const Rcpp::NumericMatrix& forTime, const Rcpp::RObject& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string& method, double atol, double rtol, bool is_complete_tree, bool see_states);
-RcppExport SEXP _secsse_calc_ll_cpp(SEXP rhsSEXP, SEXP ancesSEXP, SEXP statesSEXP, SEXP forTimeSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP, SEXP see_statesSEXP) {
+Rcpp::List calc_ll_cpp(const std::string& rhs, const Rcpp::IntegerVector& ances, const Rcpp::NumericMatrix& states, const Rcpp::NumericMatrix& forTime, const Rcpp::RObject& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string& method, double atol, double rtol, bool is_complete_tree, bool see_states, bool use_normalization);
+RcppExport SEXP _secsse_calc_ll_cpp(SEXP rhsSEXP, SEXP ancesSEXP, SEXP statesSEXP, SEXP forTimeSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP is_complete_treeSEXP, SEXP see_statesSEXP, SEXP use_normalizationSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -50,13 +50,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
     Rcpp::traits::input_parameter< bool >::type is_complete_tree(is_complete_treeSEXP);
     Rcpp::traits::input_parameter< bool >::type see_states(see_statesSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_ll_cpp(rhs, ances, states, forTime, lambdas, mus, Q, method, atol, rtol, is_complete_tree, see_states));
+    Rcpp::traits::input_parameter< bool >::type use_normalization(use_normalizationSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_ll_cpp(rhs, ances, states, forTime, lambdas, mus, Q, method, atol, rtol, is_complete_tree, see_states, use_normalization));
     return rcpp_result_gen;
 END_RCPP
 }
 // ct_condition_cpp
-Rcpp::NumericVector ct_condition_cpp(const std::string rhs, const Rcpp::NumericVector& state, const double t, const Rcpp::RObject& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string& method, double atol, double rtol);
-RcppExport SEXP _secsse_ct_condition_cpp(SEXP rhsSEXP, SEXP stateSEXP, SEXP tSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP) {
+Rcpp::NumericVector ct_condition_cpp(const std::string rhs, const Rcpp::NumericVector& state, const double t, const Rcpp::RObject& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string& method, double atol, double rtol, bool use_normalization);
+RcppExport SEXP _secsse_ct_condition_cpp(SEXP rhsSEXP, SEXP stateSEXP, SEXP tSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP use_normalizationSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -69,7 +70,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type atol(atolSEXP);
     Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
-    rcpp_result_gen = Rcpp::wrap(ct_condition_cpp(rhs, state, t, lambdas, mus, Q, method, atol, rtol));
+    Rcpp::traits::input_parameter< bool >::type use_normalization(use_normalizationSEXP);
+    rcpp_result_gen = Rcpp::wrap(ct_condition_cpp(rhs, state, t, lambdas, mus, Q, method, atol, rtol, use_normalization));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -100,12 +102,34 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calc_ll_single_branch_cpp
+Rcpp::List calc_ll_single_branch_cpp(const std::string& rhs, const Rcpp::NumericVector& states, const Rcpp::NumericVector& forTime, const Rcpp::RObject& lambdas, const Rcpp::NumericVector& mus, const Rcpp::NumericMatrix& Q, const std::string& method, double atol, double rtol, bool see_states, bool use_normalization);
+RcppExport SEXP _secsse_calc_ll_single_branch_cpp(SEXP rhsSEXP, SEXP statesSEXP, SEXP forTimeSEXP, SEXP lambdasSEXP, SEXP musSEXP, SEXP QSEXP, SEXP methodSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP see_statesSEXP, SEXP use_normalizationSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type rhs(rhsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type forTime(forTimeSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::RObject& >::type lambdas(lambdasSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type atol(atolSEXP);
+    Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
+    Rcpp::traits::input_parameter< bool >::type see_states(see_statesSEXP);
+    Rcpp::traits::input_parameter< bool >::type use_normalization(use_normalizationSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_ll_single_branch_cpp(rhs, states, forTime, lambdas, mus, Q, method, atol, rtol, see_states, use_normalization));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_secsse_eval_cpp", (DL_FUNC) &_secsse_eval_cpp, 12},
-    {"_secsse_calc_ll_cpp", (DL_FUNC) &_secsse_calc_ll_cpp, 12},
-    {"_secsse_ct_condition_cpp", (DL_FUNC) &_secsse_ct_condition_cpp, 9},
+    {"_secsse_calc_ll_cpp", (DL_FUNC) &_secsse_calc_ll_cpp, 13},
+    {"_secsse_ct_condition_cpp", (DL_FUNC) &_secsse_ct_condition_cpp, 10},
     {"_secsse_secsse_sim_cpp", (DL_FUNC) &_secsse_secsse_sim_cpp, 17},
+    {"_secsse_calc_ll_single_branch_cpp", (DL_FUNC) &_secsse_calc_ll_single_branch_cpp, 11},
     {NULL, NULL, 0}
 };
 
