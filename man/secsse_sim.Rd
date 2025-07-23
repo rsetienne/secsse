@@ -16,7 +16,7 @@ secsse_sim(
   min_spec = 2,
   max_species_extant = TRUE,
   tree_size_hist = FALSE,
-  conditioning = "obs_states",
+  conditioning = "none",
   non_extinction = TRUE,
   verbose = FALSE,
   max_tries = 1e+06,

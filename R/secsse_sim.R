@@ -128,7 +128,7 @@ secsse_sim <- function(lambdas,
     tips_to_remove <- c()
     for (i in seq_along(sampling_fraction)) {
       trait_tips <- which(res$obs_traits == all_traits[i])
-      to_keep <- rbinom(length(trait_tips), 1, sampling_fraction[i]) # sampling fraction is survival probability
+      to_keep <- stats::rbinom(length(trait_tips), 1, sampling_fraction[i]) # sampling fraction is survival probability
       trait_tips_for_removal <- trait_tips[to_keep == 0]
       tips_to_remove <- c(tips_to_remove, trait_tips_for_removal)
     }
