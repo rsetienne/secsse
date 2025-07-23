@@ -686,3 +686,120 @@ test_that("test comparison classe", {
   testthat::expect_true(max(found1[, 2]) == max(found2[, 2]))
   testthat::expect_true(max(found1[, 2]) == 0)
 })
+
+
+
+test_that("test secsse_sim sampling_fraction", {
+  testthat::skip_on_cran()
+  
+  lambda_shift <- secsse::create_default_lambda_transition_matrix()
+  lambda_list <- secsse::create_lambda_list(transition_matrix = lambda_shift)
+  mus <- secsse::create_mu_vector(state_names = c(0, 1),
+                                  num_concealed_states = 2,
+                                  lambda_list = lambda_list)
+  q_mat <- secsse::create_default_shift_matrix(mu_vector = mus)
+  q_mat <- secsse::create_q_matrix(state_names = c(0, 1),
+                                   num_concealed_states = 2,
+                                   shift_matrix = q_mat)  
+  
+  spec_rate <- 0.5
+  crown_age <- 10
+  
+  
+  pars <- c(spec_rate, spec_rate, 0.0, 0.1, 0.1)
+  lambda_p <- secsse::fill_in(lambda_list, pars)
+  mu_p <- secsse::fill_in(mus, pars)
+  q_mat_p <- secsse::fill_in(q_mat, pars)
+  
+  found_secsse <- c()
+  found_bd <- c()
+  for (i in 1:100) {
+      focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = crown_age,
+                                   num_concealed_states = 2,
+                                   max_spec = 1000,
+                                   seed = i)
+      tree_size_1 <- length(focal_tree$phy$tip.label)
+      found_secsse[i] <- tree_size_1
+      focal_tree <- ape::rbdtree(birth  = spec_rate, death = 0, Tmax = crown_age)
+      tree_size_1 <- length(focal_tree$tip.label)
+      
+      found_bd[i] <- tree_size_1
+  }
+  testthat::expect_equal(mean(found_secsse), mean(found_bd), tolerance = 0.2)
+  testthat::expect_equal(median(found_secsse), median(found_bd), tolerance = 0.3)
+
+  # now we add sampling fraction
+  found_secsse_2 <- c()
+  for (i in 1:1000) {
+    
+    focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                     mus = mu_p,
+                                     qs = q_mat_p,
+                                     crown_age = crown_age,
+                                     num_concealed_states = 2,
+                                     sampling_fraction = c(0.5, 0.5))
+    tree_size_1 <- length(focal_tree$phy$tip.label)
+    found_secsse_2[i] <- tree_size_1
+  }
+  testthat::expect_equal(mean(found_secsse_2), 0.5 * mean(found_secsse),
+                         tolerance = 0.2)  
+  
+  # biased sampling fraction
+  # we need higher transition rates to generate trees with equal tip frequencies
+  for (sf in seq(0.1, 0.9, by = 0.1)) {
+    found_secsse_2 <- c()
+    num_zeros <- c()
+    num_ones <- c()
+    for (i in 1:100) {
+      
+      focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                       mus = mu_p,
+                                       qs = q_mat_p,
+                                       crown_age = crown_age,
+                                       num_concealed_states = 2,
+                                       sampling_fraction = c(sf, 1),
+                                       seed = i)
+      tree_size_1 <- length(focal_tree$phy$tip.label)
+      found_secsse_2[i] <- tree_size_1
+      num_zeros[i] <- length(which(focal_tree$obs_traits == "0"))
+      num_ones[i] <- length(which(focal_tree$obs_traits == "1"))
+    }
+    
+    frac <- (1 + sf) / 2
+    
+    testthat::expect_equal(1 / frac * mean(found_secsse_2), mean(found_secsse),
+                           tolerance = 0.5) 
+    testthat::expect_equal(median(num_zeros / num_ones), sf, tolerance = 0.1)
+  }
+  
+  for (sf in seq(0.1, 0.9, by = 0.1)) {
+    found_secsse_2 <- c()
+    num_zeros <- c()
+    num_ones <- c()
+    for (i in 1:100) {
+      
+      focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                       mus = mu_p,
+                                       qs = q_mat_p,
+                                       crown_age = crown_age,
+                                       num_concealed_states = 2,
+                                       sampling_fraction = c(1, sf),
+                                       seed = i)
+      tree_size_1 <- length(focal_tree$phy$tip.label)
+      found_secsse_2[i] <- tree_size_1
+      num_zeros[i] <- length(which(focal_tree$obs_traits == "0"))
+      num_ones[i]  <- length(which(focal_tree$obs_traits == "1"))
+    }
+    
+    frac <- (1 + sf) / 2
+    
+    testthat::expect_equal(1 / frac * mean(found_secsse_2), mean(found_secsse),
+                           tolerance = 0.5) 
+    testthat::expect_equal(median(num_ones / num_zeros), sf, tolerance = 0.1)
+  }
+})
+
+

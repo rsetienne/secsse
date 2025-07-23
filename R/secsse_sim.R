@@ -27,11 +27,12 @@ secsse_sim <- function(lambdas,
                        crown_age,
                        num_concealed_states,
                        pool_init_states = NULL,
+                       sampling_fraction = NULL,
                        max_spec = 1e5,
                        min_spec = 2,
                        max_species_extant = TRUE,
                        tree_size_hist = FALSE,
-                       conditioning = "obs_states",
+                       conditioning = "none",
                        non_extinction = TRUE,
                        verbose = FALSE,
                        max_tries = 1e6,
@@ -93,6 +94,73 @@ secsse_sim <- function(lambdas,
     condition_vec <- -1 + indices
   } 
   
+  res <- generate_phy(mus,
+                      lambdas,
+                      qs,
+                      crown_age,
+                      max_spec,
+                      max_species_extant,
+                      min_spec,
+                      pool_init_states,
+                      conditioning,
+                      num_concealed_states,
+                      non_extinction,
+                      verbose,
+                      max_tries,
+                      seed,
+                      condition_vec,
+                      tree_size_hist,
+                      start_at_crown,
+                      drop_extinct) 
+  
+  if (res$status == "success" || res$status == "single_species_tree") {
+    if (sum(sampling_fraction) == length(sampling_fraction) ||
+        is.null(sampling_fraction)) {
+      return(res) # sampling fraction = 1
+    }
+    
+    # if not, we have to subsample
+    all_traits <- names(mus)
+    for (i in 1:length(all_traits)) {
+      all_traits[i] <- substr(all_traits[i], 1, (nchar(all_traits[i]) - 1))
+    }
+    all_traits <- unique(all_traits) # these are now all observed traits
+    tips_to_remove <- c()
+    for (i in seq_along(sampling_fraction)) {
+      trait_tips <- which(res$obs_traits == all_traits[i])
+      to_keep <- rbinom(length(trait_tips), 1, sampling_fraction[i]) # sampling fraction is survival probability
+      trait_tips_for_removal <- trait_tips[to_keep == 0]
+      tips_to_remove <- c(tips_to_remove, trait_tips_for_removal)
+    }
+    # now we need to remove all the tips
+    if (length(tips_to_remove) > 0) {
+      res$obs_traits <- res$obs_traits[-tips_to_remove]
+      res$true_traits <- res$true_traits[-tips_to_remove]
+      res$phy <- ape::drop.tip(res$phy, tips_to_remove)
+    }
+  }
+  return(res)
+}
+
+#' @keywords internal
+generate_phy <- function(mus,
+                         lambdas,
+                         qs,
+                         crown_age,
+                         max_spec,
+                         max_species_extant,
+                         min_spec,
+                         pool_init_states,
+                         conditioning,
+                         num_concealed_states,
+                         non_extinction,
+                         verbose,
+                         max_tries,
+                         seed,
+                         condition_vec,
+                         tree_size_hist,
+                         start_at_crown,
+                         drop_extinct) {
   res <- secsse_sim_cpp(mus,
                         lambdas,
                         qs,
@@ -110,10 +178,11 @@ secsse_sim <- function(lambdas,
                         condition_vec,
                         tree_size_hist,
                         start_at_crown)
-
+  
   if (length(res) < 1) { # this happens upon a throw
     return(list(phy = "ds",
-                traits = 0))
+                traits = 0,
+                status = "error"))
   }
   
   Ltable        <- res$ltable
@@ -131,7 +200,7 @@ secsse_sim <- function(lambdas,
     phy$edge.length <- crown_age # this is now root age
     
     speciesTraits <- 1 + Ltable[, 5]
-   
+    
     true_traits <- names(mus)[speciesTraits]
     obs_traits <- c()
     for (i in seq_along(true_traits)) {
@@ -146,7 +215,8 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
-                size_hist = out_hist))
+                size_hist = out_hist,
+                status = "single_species_tree"))
     
     
   } else if (sum(Ltable[, 4] == -1) < 2) {
@@ -157,9 +227,10 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
-                size_hist = out_hist))
+                size_hist = out_hist,
+                status = "extinction"))
   }
-
+  
   if (sum(res$tracker) >= max_tries) {
     warning("Couldn't simulate a tree in enough tries,
             try increasing max_tries")
@@ -170,25 +241,26 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
-                size_hist = out_hist))
+                size_hist = out_hist,
+                status = "not enough tries"))
   }
-
   
-
+  
+  
   initialState  <- names(mus)[1 + res$initial_state]
   Ltable[, 1]   <- crown_age - Ltable[, 1] # simulation starts at 0,
-                                           # not at crown age
+  # not at crown age
   notmin1 <- which(Ltable[, 4] != -1)
   Ltable[notmin1, 4] <- crown_age - c(Ltable[notmin1, 4])
   Ltable[which(Ltable[, 4] == crown_age + 1), 4] <- -1
-
+  
   # indices       <- seq(1, length(res$traits), by = 2)
   speciesTraits <- 1 + Ltable[, 5]
   used_id <- abs(Ltable[, 3])
-
+  
   #phy <- DDD::L2phylo(Ltable, dropextinct = drop_extinct)
   phy <- treestats::l_to_phylo(Ltable, drop_extinct = drop_extinct)
-
+  
   if (drop_extinct) {
     to_drop <- which(Ltable[, 4] != -1)
     if (length(to_drop) > 0) {
@@ -196,12 +268,12 @@ secsse_sim <- function(lambdas,
       speciesTraits <- speciesTraits[-to_drop]
     }
   }
-
+  
   true_traits <- sortingtraits(data.frame(cbind(paste0("t", used_id),
-                                             speciesTraits),
+                                                speciesTraits),
                                           row.names = NULL),
                                phy)
-
+  
   true_traits <- names(mus)[true_traits]
   obs_traits <- c()
   for (i in seq_along(true_traits)) {
@@ -209,7 +281,7 @@ secsse_sim <- function(lambdas,
   }
   
   if (sum(Ltable[, 4] < 0)) {
-      return(list(phy = phy,
+    return(list(phy = phy,
                 true_traits = true_traits,
                 obs_traits = obs_traits,
                 initialState = initialState,
@@ -217,7 +289,8 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
-                size_hist = out_hist))
+                size_hist = out_hist,
+                status = "success"))
   } else {
     warning("simulation did not meet minimal requirements")
     return(list(phy = "ds",
@@ -226,6 +299,7 @@ secsse_sim <- function(lambdas,
                 overshoot = res$tracker[3],
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
-                size_hist = out_hist))
+                size_hist = out_hist,
+                status = "requirements not met"))
   }
 }
