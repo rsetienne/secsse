@@ -253,8 +253,8 @@ more accurate but slower (default = TRUE)</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example of how to set the arguments for a ML search.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span>all<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example of how to set the arguments for an ML search. The ML search is</span></span></span>
+<span class="r-in"><span><span class="co"># stopped after 10 iterations to keep the run time short.</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rsetienne.github.io/secsse/">secsse</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DDD</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">16</span><span class="op">)</span></span></span>
@@ -313,12 +313,11 @@ more accurate but slower (default = TRUE)</p></dd>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">tol</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e-02</span>, <span class="fl">1e-03</span>, <span class="fl">1e-04</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">maxiter</span> <span class="op">=</span> <span class="fl">1000</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1.25</span><span class="op">)</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">idparsopt</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">optimmethod</span> <span class="op">=</span> <span class="st">'subplex'</span></span></span>
 <span class="r-in"><span><span class="va">cond</span> <span class="op">&lt;-</span> <span class="st">'proper_cond'</span></span></span>
 <span class="r-in"><span><span class="va">root_state_weight</span> <span class="op">&lt;-</span> <span class="st">'proper_weights'</span></span></span>
 <span class="r-in"><span><span class="va">sampling_fraction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">maxiter</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">cla_secsse_ml_func_def_pars</span><span class="op">(</span><span class="va">phylotree</span>,</span></span>
 <span class="r-in"><span><span class="va">traits</span>,</span></span>
 <span class="r-in"><span><span class="va">num_concealed_states</span>,</span></span>
@@ -338,8 +337,24 @@ more accurate but slower (default = TRUE)</p></dd>
 <span class="r-in"><span><span class="va">maxiter</span>,</span></span>
 <span class="r-in"><span><span class="va">optimmethod</span>,</span></span>
 <span class="r-in"><span>num_cycles <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-<span class="r-in"><span><span class="co"># ML -136.5796</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Note: you set some transitions as impossible to happen.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.298934331988</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating the likelihood for the initial parameters.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The loglikelihood for the initial parameter values is -138.298934331988</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Optimizing the likelihood - this may take a while.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.298934331988</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> -19.6874997974797 0.0565371031208431 4 -Inf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 -19.6874997974797 4 -Inf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 -2.25 -Inf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2.57370518668921 2.57370518668921 -0.166666666666667 -Inf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 1.23970037744085 0.428571428571429 -756.458030945448</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> -19.6874997974797 -0.380096751677633 0.875 -Inf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 4.08936171714845 -0.164220824193095 1.22222222222222 -Inf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 0.0565371031208431 4 -440.773246835226</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 1.23970037744085 4 -429.554227389694</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.435774310919359 0.435774310919359 1.22222222222222 -318.572024860541</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Optimization has not converged. Try again with different initial values or increase the number of iterations.</span>
+<span class="r-in"><span><span class="co"># ML -136.5796 if run till completion</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
