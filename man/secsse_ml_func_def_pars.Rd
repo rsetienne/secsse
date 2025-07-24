@@ -135,8 +135,7 @@ are functions of other parameters and/or factors.
 }
 \examples{
 # Example of how to set the arguments for an ML search.
-donttest(
-rm(list=ls(all=TRUE))
+donttest{
 library(secsse)
 library(DDD)
 set.seed(16)
@@ -212,5 +211,5 @@ optimmethod,
 num_cycles = 1)
 print(model$ML)
 # ML -136.45265
-)
+}
 }

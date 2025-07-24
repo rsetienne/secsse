@@ -145,8 +145,8 @@ functions of other parameters and/or factors. Offers the option of
 cladogenesis
 }
 \examples{
-# Example of how to set the arguments for a ML search.
-rm(list=ls(all=TRUE))
+# Example of how to set the arguments for an ML search.
+donttest{
 library(secsse)
 library(DDD)
 set.seed(16)
@@ -225,4 +225,5 @@ optimmethod,
 num_cycles = 1)
 }
 # ML -136.5796
+}
 }

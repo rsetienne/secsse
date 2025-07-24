@@ -9,7 +9,7 @@
 #' @return Parameter estimates and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for an ML search.
-#'donttest(
+#'donttest{
 #'library(secsse)
 #'library(DDD)
 #'set.seed(16)
@@ -85,7 +85,7 @@
 #'num_cycles = 1)
 #'print(model$ML)
 #'# ML -136.45265
-#')
+#'}
 #' @export
 secsse_ml_func_def_pars <- function(phy,
                                     traits,
@@ -156,7 +156,7 @@ secsse_ml_func_def_pars <- function(phy,
 #' @return Parameter estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for an ML search.
-#'donttest(
+#'donttest{
 #'library(secsse)
 #'library(DDD)
 #'set.seed(16)
@@ -235,7 +235,7 @@ secsse_ml_func_def_pars <- function(phy,
 #'num_cycles = 1)
 #' }
 #'# ML -136.5796
-#')
+#'}
 #' @export
 cla_secsse_ml_func_def_pars <- function(phy,
                                         traits,
