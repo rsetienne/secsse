@@ -8,8 +8,8 @@
 #' 
 #' @return Parameter estimates and maximum likelihood
 #' @examples
-#'# Example of how to set the arguments for an ML search.
-#'donttest{
+#'# Example of how to set the arguments for an ML search. The ML search is stopped
+#'after 10 iterations to keep run time short.
 #'library(secsse)
 #'library(DDD)
 #'set.seed(16)
@@ -59,11 +59,11 @@
 #'}
 #'
 #'tol = c(1e-03, 1e-03, 1e-03)
-#'maxiter = 1000 * round((1.25)^length(idparsopt))
 #'optimmethod = "simplex"
 #'cond<-"proper_cond"
 #'root_state_weight <- "proper_weights"
 #'sampling_fraction <- c(1,1,1)
+#'maxiter <- 10
 #'model <- secsse_ml_func_def_pars(phylotree,
 #'traits,
 #'num_concealed_states,
@@ -84,8 +84,7 @@
 #'optimmethod,
 #'num_cycles = 1)
 #'print(model$ML)
-#'# ML -136.45265
-#'}
+#'# ML -136.45265 if run till completion
 #' @export
 secsse_ml_func_def_pars <- function(phy,
                                     traits,
@@ -155,8 +154,8 @@ secsse_ml_func_def_pars <- function(phy,
 #' 
 #' @return Parameter estimated and maximum likelihood
 #' @examples
-#'# Example of how to set the arguments for an ML search.
-#'donttest{
+#'# Example of how to set the arguments for an ML search. The ML search is
+#' stopped at 10 iterations to keep the run time short.
 #'library(secsse)
 #'library(DDD)
 #'set.seed(16)
@@ -208,12 +207,11 @@ secsse_ml_func_def_pars <- function(phy,
 #'}
 #'
 #'tol = c(1e-02, 1e-03, 1e-04)
-#'maxiter = 1000 * round((1.25)^length(idparsopt))
 #'optimmethod = 'subplex'
 #'cond <- 'proper_cond'
 #'root_state_weight <- 'proper_weights'
 #'sampling_fraction <- c(1,1,1)
-#' \dontrun{
+#'maxiter <- 10
 #'model <- cla_secsse_ml_func_def_pars(phylotree,
 #'traits,
 #'num_concealed_states,
@@ -233,9 +231,7 @@ secsse_ml_func_def_pars <- function(phy,
 #'maxiter,
 #'optimmethod,
 #'num_cycles = 1)
-#' }
-#'# ML -136.5796
-#'}
+#'# ML -136.5796 if run till completion
 #' @export
 cla_secsse_ml_func_def_pars <- function(phy,
                                         traits,
