@@ -28,14 +28,13 @@ test_that("single branch check", {
   parslist[[3]] <- q_mat
   sf <- c(1, 1)
   
-  testthat::expect_message(
-    res1 <- secsse::cla_secsse_loglik(parameter = parslist,
+  res1 <- secsse::cla_secsse_loglik(parameter = parslist,
                                     phy = focal_tree,
                                     traits = traits,
                                     num_concealed_states = num_concealed_states,
                                     sampling_fraction = sf,
-                                    cond = "no_cond")
-  )
+                                    cond = "no_cond",
+                                    display_warning = FALSE)
   
   # create phylogeny with single branch:
   
@@ -45,15 +44,14 @@ test_that("single branch check", {
   phy$tip.label <- phy$tip.label[-2]
   traits <- traits[-2]
   
-  testthat::expect_message(
   res2 <- secsse::secsse_single_branch_loglik(parameter = parslist,
                                               phy = phy,
                                               traits = traits,
                                               num_concealed_states = 
                                                 num_concealed_states,
                                               sampling_fraction = sf,
-                                              cond = "no_cond")
-  )
+                                              cond = "no_cond",
+                                              display_warning = FALSE)
   
   d <- length(mus)
   sz <- res2$nodeM[1:(d + d)] * params[1]
@@ -82,15 +80,14 @@ test_that("single branch check", {
   parslist[[2]] <- mus
   parslist[[3]] <- q_mat
   sf <- c(1, 1)
-  testthat::expect_message(
   res3 <- secsse::secsse_single_branch_loglik(parameter = parslist,
                                               phy = phy,
                                               traits = traits,
                                               num_concealed_states = 
                                                 num_concealed_states,
                                               sampling_fraction = sf,
-                                              cond = "no_cond")
-  )
+                                              cond = "no_cond",
+                                              display_warning = FALSE)
   secsse_ll <- res3$loglik
   bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
                           pars2 = c(0,0,1,0,1),
@@ -104,14 +101,14 @@ test_that("single branch check", {
   focal_tree <- ape::rphylo(n = 2, birth = 0.3, death = 0)
   focal_tree$root.edge <- 0.3
   traits <- c(1, 1)
-  testthat::expect_message(
   secsse_ll <- secsse::cla_secsse_loglik(parameter = parslist,
                                     phy = focal_tree,
                                     traits = traits,
                                     num_concealed_states = num_concealed_states,
                                     sampling_fraction = sf,
                                     take_into_account_root_edge = TRUE,
-                                    cond = "no_cond"))
+                                    cond = "no_cond",
+                                    display_warning = FALSE)
   brts <- ape::branching.times(focal_tree)
   bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
                      pars2 = c(0,0,1,0,1),
@@ -126,7 +123,6 @@ test_that("single branch check", {
   focal_tree <- ape::rphylo(n = 3, birth = 0.3, death = 0)
   focal_tree$root.edge <- 0.3
   traits <- c(1, 1, 1)
-  testthat::expect_message(
   secsse_ll <- secsse::cla_secsse_loglik(parameter = parslist,
                                          phy = focal_tree,
                                          traits = traits,
@@ -134,7 +130,8 @@ test_that("single branch check", {
                                            num_concealed_states,
                                          sampling_fraction = sf,
                                          take_into_account_root_edge = TRUE,
-                                         cond = "no_cond"))
+                                         cond = "no_cond",
+                                         display_warning = FALSE)
   brts <- ape::branching.times(focal_tree)
   bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
                      pars2 = c(0,0,1,0,1),
@@ -149,7 +146,6 @@ test_that("single branch check", {
   focal_tree <- ape::rphylo(n = 4, birth = 0.3, death = 0)
   focal_tree$root.edge <- 0.3
   traits <- c(1, 1, 1, 1)
-  testthat::expect_message(
   secsse_ll <- secsse::cla_secsse_loglik(parameter = parslist,
                                          phy = focal_tree,
                                          traits = traits,
@@ -157,7 +153,8 @@ test_that("single branch check", {
                                             num_concealed_states,
                                          sampling_fraction = sf,
                                          take_into_account_root_edge = TRUE,
-                                         cond = "no_cond"))
+                                         cond = "no_cond",
+                                         display_warning = FALSE)
   brts <- ape::branching.times(focal_tree)
   bd_ll <- DDD::bd_loglik(pars1 = c(0.3,0.1),
                           pars2 = c(0,0,1,0,1),
@@ -177,7 +174,6 @@ test_that("single branch check", {
   traits <- list()
   traits[[1]] <- c(1, 1, 1, 1)
   traits[[2]] <- c(1, 1, 1, 1)
-  testthat::expect_message(
   secsse_ll <- secsse::cla_secsse_loglik(parameter = parslist,
                                          phy = focal_tree,
                                          traits = traits,
@@ -185,7 +181,8 @@ test_that("single branch check", {
                                            num_concealed_states,
                                          sampling_fraction = sf,
                                          take_into_account_root_edge = TRUE,
-                                         cond = "no_cond"))
+                                         cond = "no_cond",
+                                         display_warning = FALSE)
   bd_ll <- 0
   for(i in 1:2) {
     brts <- ape::branching.times(focal_tree[[i]])
@@ -232,39 +229,36 @@ test_that("root branch check", {
   
   sf <- c(1, 1)
   
-  testthat::expect_message(
-    res1 <- secsse::cla_secsse_loglik(parameter = parslist,
-                                      phy = focal_tree,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      sampling_fraction = sf,
-                                      cond = "no_cond")
-  )
+  res1 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                    phy = focal_tree,
+                                    traits = traits,
+                                    num_concealed_states =
+                                      num_concealed_states,
+                                    sampling_fraction = sf,
+                                    cond = "no_cond",
+                                    display_warning = FALSE)
   # create phylogeny with a root branch:
   
   focal_tree$root.edge <- 3
-  testthat::expect_message(
-    res2 <- secsse::cla_secsse_loglik(parameter = parslist,
-                                      phy = focal_tree,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      sampling_fraction = sf,
-                                      cond = "no_cond")
-  )
+  res2 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                    phy = focal_tree,
+                                    traits = traits,
+                                    num_concealed_states =
+                                      num_concealed_states,
+                                    sampling_fraction = sf,
+                                    cond = "no_cond",
+                                    display_warning = FALSE)
   
-  testthat::expect_message(
-    res3 <- secsse::cla_secsse_loglik(parameter = parslist,
-                                      phy = focal_tree,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      sampling_fraction = sf,
-                                      cond = "no_cond",
-                                      take_into_account_root_edge = TRUE)
-  )
-  
+  res3 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                    phy = focal_tree,
+                                    traits = traits,
+                                    num_concealed_states =
+                                      num_concealed_states,
+                                    sampling_fraction = sf,
+                                    cond = "no_cond",
+                                    take_into_account_root_edge = TRUE,
+                                    display_warning = FALSE)
+
   testthat::expect_equal(res1, res2)
   testthat::expect_lt(res3, res1)
 })

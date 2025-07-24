@@ -16,30 +16,32 @@ test_that("loglik for different integrators", {
   root_state_weight <- "maddison_weights"
   cond <- "noCondit"
   
-  loglik1 <- testthat::expect_message(as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                      phy = phy,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = cond,
-                                      root_state_weight = root_state_weight,
-                                      sampling_fraction = sampling_fraction)
-  ))
+  loglik1 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states =
+                                                num_concealed_states,
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              display_warning = FALSE)
+  )
   
   for (integ_method in c("odeint::runge_kutta_cash_karp54", 
                          "odeint::runge_kutta_fehlberg78", 
                          "odeint::runge_kutta_dopri5", 
                          "odeint::bulirsch_stoer",
                          "odeint::runge_kutta4")) {
-    loglik2 <- testthat::expect_warning(as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                        phy = phy,
-                                        traits = traits,
-                                        num_concealed_states =
-                                          num_concealed_states,
-                                        cond = cond,
-                                        root_state_weight = root_state_weight,
-                                        sampling_fraction = sampling_fraction,
-                                        method = integ_method)))
+    loglik2 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                                phy = phy,
+                                                traits = traits,
+                                                num_concealed_states =
+                                                  num_concealed_states,
+                                                cond = cond,
+                                                root_state_weight = root_state_weight,
+                                                sampling_fraction = sampling_fraction,
+                                                method = integ_method,
+                                                display_warning = FALSE))
     testthat::expect_equal(loglik1, loglik2, tolerance = 0.01)
   }
 })  

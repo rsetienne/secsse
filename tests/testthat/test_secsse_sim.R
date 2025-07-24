@@ -27,26 +27,24 @@ test_that("test secsse_sim", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
   
-  testthat::expect_warning(
-    model_R <- secsse::cla_secsse_ml(
-      phylotree,
-      traits,
-      num_concealed_states,
-      idparslist,
-      idparsopt,
-      initparsopt,
-      idparsfix,
-      parsfix,
-      cond,
-      root_state_weight,
-      sampling_fraction,
-      tol,
-      maxiter,
-      optimmethod,
-      num_cycles = 1,
-      verbose = FALSE)
-  )
-  
+  model_R <- secsse::cla_secsse_ml(
+    phylotree,
+    traits,
+    num_concealed_states,
+    idparslist,
+    idparsopt,
+    initparsopt,
+    idparsfix,
+    parsfix,
+    cond,
+    root_state_weight,
+    sampling_fraction,
+    tol,
+    maxiter,
+    optimmethod,
+    num_cycles = 1,
+    verbose = FALSE)
+
   qs <- model_R$MLpars[[3]]
   diag(qs) <- 0
   
