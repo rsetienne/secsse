@@ -185,6 +185,20 @@ generate_phy <- function(mus,
                 status = "error"))
   }
   
+  if (sum(res$tracker) >= max_tries) {
+    warning("Couldn't simulate a tree in enough tries,
+            try increasing max_tries")
+    
+    return(list(phy = "ds",
+                traits = 0,
+                extinct = res$tracker[2],
+                overshoot = res$tracker[3],
+                conditioning = res$tracker[4],
+                small = res$tracker[6],
+                size_hist = out_hist,
+                status = "not enough tries"))
+  }
+  
   Ltable        <- res$ltable
   
   out_hist <- 0
@@ -231,19 +245,7 @@ generate_phy <- function(mus,
                 status = "extinction"))
   }
   
-  if (sum(res$tracker) >= max_tries) {
-    warning("Couldn't simulate a tree in enough tries,
-            try increasing max_tries")
-    
-    return(list(phy = "ds",
-                traits = 0,
-                extinct = res$tracker[2],
-                overshoot = res$tracker[3],
-                conditioning = res$tracker[4],
-                small = res$tracker[6],
-                size_hist = out_hist,
-                status = "not enough tries"))
-  }
+  
   
   
   
@@ -280,7 +282,7 @@ generate_phy <- function(mus,
     obs_traits[i] <- substr(true_traits[i], 1, (nchar(true_traits[i]) - 1))
   }
   
-  if (sum(Ltable[, 4] < 0)) {
+  if (sum(Ltable[, 4] < 0) > 0) {
     return(list(phy = phy,
                 true_traits = true_traits,
                 obs_traits = obs_traits,
