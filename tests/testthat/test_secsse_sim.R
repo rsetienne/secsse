@@ -27,26 +27,24 @@ test_that("test secsse_sim", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
   
-  testthat::expect_warning(
-    model_R <- secsse::cla_secsse_ml(
-      phylotree,
-      traits,
-      num_concealed_states,
-      idparslist,
-      idparsopt,
-      initparsopt,
-      idparsfix,
-      parsfix,
-      cond,
-      root_state_weight,
-      sampling_fraction,
-      tol,
-      maxiter,
-      optimmethod,
-      num_cycles = 1,
-      verbose = FALSE)
-  )
-  
+  model_R <- secsse::cla_secsse_ml(
+    phylotree,
+    traits,
+    num_concealed_states,
+    idparslist,
+    idparsopt,
+    initparsopt,
+    idparsfix,
+    parsfix,
+    cond,
+    root_state_weight,
+    sampling_fraction,
+    tol,
+    maxiter,
+    optimmethod,
+    num_cycles = 1,
+    verbose = FALSE)
+
   qs <- model_R$MLpars[[3]]
   diag(qs) <- 0
   
@@ -713,6 +711,7 @@ test_that("test secsse_sim sampling_fraction", {
   
   found_secsse <- c()
   found_bd <- c()
+  set.seed(42)
   for (i in 1:100) {
       focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
                                    mus = mu_p,
@@ -732,9 +731,9 @@ test_that("test secsse_sim sampling_fraction", {
   testthat::expect_equal(median(found_secsse), median(found_bd), tolerance = 0.3)
 
   # now we add sampling fraction
+  set.seed(42)
   found_secsse_2 <- c()
   for (i in 1:1000) {
-    
     focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
                                      mus = mu_p,
                                      qs = q_mat_p,
@@ -749,12 +748,12 @@ test_that("test secsse_sim sampling_fraction", {
   
   # biased sampling fraction
   # we need higher transition rates to generate trees with equal tip frequencies
+  set.seed(42)
   for (sf in seq(0.1, 0.9, by = 0.1)) {
     found_secsse_2 <- c()
     num_zeros <- c()
     num_ones <- c()
     for (i in 1:100) {
-      
       focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
                                        mus = mu_p,
                                        qs = q_mat_p,
@@ -775,12 +774,12 @@ test_that("test secsse_sim sampling_fraction", {
     testthat::expect_equal(median(num_zeros / num_ones), sf, tolerance = 0.1)
   }
   
+  set.seed(42)
   for (sf in seq(0.1, 0.9, by = 0.1)) {
     found_secsse_2 <- c()
     num_zeros <- c()
     num_ones <- c()
     for (i in 1:100) {
-      
       focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
                                        mus = mu_p,
                                        qs = q_mat_p,

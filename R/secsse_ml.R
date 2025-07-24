@@ -199,8 +199,8 @@ master_ml <- function(phy,
                           verbose = ll_verbose,
                           use_normalization = use_normalization)
     if (out$conv != 0) {
-      stop("Optimization has not converged. 
-                 Try again with different initial values.")
+      warning("Optimization has not converged. Try again with different initial values or increase the number of iterations.")
+      out2 <- out
     } else {
       ml_pars1 <- secsse_transform_parameters(as.numeric(unlist(out$par)),
                                               trparsfix,

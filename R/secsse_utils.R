@@ -1157,7 +1157,7 @@ check_ml_conditions <- function(traits,
   
   if (anyDuplicated(c(unique(sort(as.vector(idparslist[[3]]))),
                       idparsfix[which(parsfix == 0)])) != 0) {
-    warning("Note: you set some transitions as impossible to happen.")
+    message("Note: you set some transitions as impossible to happen.")
   }
   
   if (min(initparsopt) <= 0.0) {

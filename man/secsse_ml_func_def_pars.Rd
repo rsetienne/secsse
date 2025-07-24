@@ -2,8 +2,7 @@
 % Please edit documentation in R/secsse_ml_func_def_pars.R
 \name{secsse_ml_func_def_pars}
 \alias{secsse_ml_func_def_pars}
-\title{Maximum likehood estimation for (SecSSE) with parameter as complex
-functions.}
+\title{Maximum likehood estimation for (SecSSE) complex functions as parameter}
 \usage{
 secsse_ml_func_def_pars(
   phy,
@@ -127,16 +126,16 @@ no longer needs to assume a speciation event at the start of the tree)}
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
 }
 \value{
-Parameter estimated and maximum likelihood
+Parameter estimates and maximum likelihood
 }
 \description{
 Maximum likehood estimation under Several examined and concealed
-States-dependent Speciation and Extinction (SecSSE) where some paramaters
+States-dependent Speciation and Extinction (SecSSE) where some parameters
 are functions of other parameters and/or factors.
 }
 \examples{
-# Example of how to set the arguments for a ML search.
-rm(list=ls(all=TRUE))
+# Example of how to set the arguments for an ML search. The ML search is stopped
+# after 10 iterations to keep run time short.
 library(secsse)
 library(DDD)
 set.seed(16)
@@ -185,12 +184,12 @@ functions_defining_params[[3]] <- function(){
  par_6 <- par_3 * factor_1
 }
 
-tol = c(1e-02, 1e-03, 1e-03)
-maxiter = 1000 * round((1.25)^length(idparsopt))
+tol = c(1e-03, 1e-03, 1e-03)
 optimmethod = "simplex"
 cond<-"proper_cond"
 root_state_weight <- "proper_weights"
 sampling_fraction <- c(1,1,1)
+maxiter <- 10
 model <- secsse_ml_func_def_pars(phylotree,
 traits,
 num_concealed_states,
@@ -210,5 +209,6 @@ tol,
 maxiter,
 optimmethod,
 num_cycles = 1)
-# ML -136.5795
+print(model$ML)
+# ML -136.45265 if run till completion
 }

@@ -57,25 +57,23 @@ test_that("cla plotting", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-  testthat::expect_warning(
-    model_R <- cla_secsse_ml(
-      phy = phylotree,
-      traits = traits,
-      num_concealed_states = num_concealed_states,
-      idparslist = idparslist,
-      idparsopt = idparsopt,
-      initparsopt = initparsopt,
-      idparsfix = idparsfix,
-      parsfix = parsfix,
-      cond = cond,
-      root_state_weight = root_state_weight,
-      sampling_fraction = sampling_fraction,
-      tol = tol,
-      maxiter = maxiter,
-      optimmethod = optimmethod,
-      num_cycles = 1,
-      verbose = FALSE)
-  )
+  model_R <- secsse::cla_secsse_ml(
+    phy = phylotree,
+    traits = traits,
+    num_concealed_states = num_concealed_states,
+    idparslist = idparslist,
+    idparsopt = idparsopt,
+    initparsopt = initparsopt,
+    idparsfix = idparsfix,
+    parsfix = parsfix,
+    cond = cond,
+    root_state_weight = root_state_weight,
+    sampling_fraction = sampling_fraction,
+    tol = tol,
+    maxiter = maxiter,
+    optimmethod = optimmethod,
+    num_cycles = 1,
+    verbose = FALSE)
 
   helper_function <- function(x) {
     return(sum(x[c(10, 13, 16)]) / sum(x))

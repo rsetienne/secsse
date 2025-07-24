@@ -17,8 +17,18 @@ test_that("the loglik for the complete tree", {
   root_state_weight <- "maddison_weights"
   cond <- "noCondit"
 
-  loglik1 <- testthat::expect_warning(
-             as.numeric(secsse::secsse_loglik(parameter = toCheck,
+  loglik1 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states =
+                                                num_concealed_states,
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = TRUE,
+                                              display_warning = FALSE)
+  )
+  loglik2 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
                                       num_concealed_states =
@@ -26,18 +36,7 @@ test_that("the loglik for the complete tree", {
                                       cond = cond,
                                       root_state_weight = root_state_weight,
                                       sampling_fraction = sampling_fraction,
-                                      is_complete_tree = TRUE)
-  ))
-  loglik2 <- testthat::expect_warning(
-              as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                      phy = phy,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = cond,
-                                      root_state_weight = root_state_weight,
-                                      sampling_fraction = sampling_fraction)
-              )
+                                      display_warning = FALSE)
   )
   # check that the likelihood for a specifically complete tree without
   # extinct lineages with 0 extinction
@@ -46,28 +45,26 @@ test_that("the loglik for the complete tree", {
   testthat::expect_equal(loglik1, loglik2)
 
   toCheck[[2]][] <- 0.05
-  loglik3 <- testthat::expect_warning(as.numeric(
-                secsse::secsse_loglik(parameter = toCheck,
-                                      phy = phy,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = cond,
-                                      root_state_weight = root_state_weight,
-                                      sampling_fraction = sampling_fraction,
-                                      is_complete_tree = TRUE))
-  )
-  loglik4 <- testthat::expect_warning(as.numeric(
-    secsse::secsse_loglik(parameter = toCheck,
-                                      phy = phy,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = cond,
-                                      root_state_weight = root_state_weight,
-                                      sampling_fraction = sampling_fraction,
-                                      is_complete_tree = FALSE))
-  )
+  loglik3 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states =
+                                                num_concealed_states,
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = TRUE,
+                                              display_warning = FALSE))
+  loglik4 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states =
+                                                num_concealed_states,
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = FALSE,
+                                              display_warning = FALSE))
   # check that when the extinction rate is not zero,
   # the likelihood of treating the tree as
   # extant-species only is larger than treating it as a complete tree
@@ -84,20 +81,20 @@ test_that("the loglik for the complete tree", {
   # out <- DDD::dd_sim(pars = c(0.4, 0.1, 40), age = 15)
   # phy <- out$tas
   # traits <- sample(c(0,1),ape::Ntip(phy),replace = T)
-  loglik5 <- testthat::expect_warning(as.numeric(
-    secsse::secsse_loglik(parameter = toCheck,
-                                      phy = phy,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = cond,
-                                      root_state_weight = root_state_weight,
-                                      sampling_fraction = sampling_fraction,
-                                      is_complete_tree = TRUE)))
+  loglik5 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
+                                              phy = phy,
+                                              traits = traits,
+                                              num_concealed_states =
+                                                num_concealed_states,
+                                              cond = cond,
+                                              root_state_weight = root_state_weight,
+                                              sampling_fraction = sampling_fraction,
+                                              is_complete_tree = TRUE,
+                                              display_warning = FALSE))
   testthat::expect_equal(loglik5,
                          -303.4003,
                          tolerance = 1E-4) # TJ: hardcoded modified LL
-
+  
   lambdas <- list()
   for (i in 1:4) {
     lambdas[[i]] <- matrix(0, ncol = 4, nrow = 4, byrow = TRUE)
@@ -106,26 +103,25 @@ test_that("the loglik for the complete tree", {
 
   parameter <- toCheck
   parameter[[1]] <- lambdas
-
-  loglik7 <- testthat::expect_warning(
-    secsse::secsse_loglik(parameter = parameter,
-                           phy = phy,
-                           traits = traits,
-                           num_concealed_states = num_concealed_states,
-                           cond = cond,
-                           root_state_weight = root_state_weight,
-                           sampling_fraction = sampling_fraction,
-                           setting_calculation = NULL,
-                           see_ancestral_states = FALSE,
-                           loglik_penalty = 0,
-                           is_complete_tree = TRUE))
-  testthat::expect_equal(loglik7, loglik5) # not true ?
+  
+  loglik7 <- secsse::secsse_loglik(parameter = parameter,
+                                   phy = phy,
+                                   traits = traits,
+                                   num_concealed_states = num_concealed_states,
+                                   cond = cond,
+                                   root_state_weight = root_state_weight,
+                                   sampling_fraction = sampling_fraction,
+                                   setting_calculation = NULL,
+                                   see_ancestral_states = FALSE,
+                                   loglik_penalty = 0,
+                                   is_complete_tree = TRUE,
+                                   display_warning = FALSE)
+  testthat::expect_equal(loglik7, loglik5)
 
   # Parallel code doesn't work on CI
   testthat::skip_on_cran()
   testthat::skip_on_ci()
-  loglik6 <- testthat::expect_warning(as.numeric(
-    secsse::secsse_loglik(parameter = toCheck,
+  loglik6 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
                                       num_concealed_states =
@@ -134,11 +130,11 @@ test_that("the loglik for the complete tree", {
                                       root_state_weight = root_state_weight,
                                       sampling_fraction = sampling_fraction,
                                       is_complete_tree = TRUE,
-                                      num_threads = 4)))
+                                      num_threads = 4,
+                                      display_warning = FALSE))
   testthat::expect_equal(loglik6, loglik5, tolerance = 1E-4)
 
-  loglik8 <- testthat::expect_warning(
-    secsse::secsse_loglik(parameter = parameter,
+  loglik8 <- secsse::secsse_loglik(parameter = parameter,
                            phy = phy,
                            traits = traits,
                            num_concealed_states = num_concealed_states,
@@ -146,6 +142,7 @@ test_that("the loglik for the complete tree", {
                            root_state_weight = root_state_weight,
                            sampling_fraction = sampling_fraction,
                            is_complete_tree = TRUE,
-                           num_threads = 4))
+                           num_threads = 4,
+                           display_warning = FALSE)
   testthat::expect_equal(loglik8, loglik7, tolerance = 1e-5)
 })
