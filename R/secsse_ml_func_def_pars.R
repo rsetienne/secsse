@@ -9,7 +9,7 @@
 #' @return Parameter estimates and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for an ML search.
-#'donttest{
+#'donttest(
 #'rm(list=ls(all=TRUE))
 #'library(secsse)
 #'library(DDD)
@@ -86,7 +86,7 @@
 #'num_cycles = 1)
 #'print(model$ML)
 #'# ML -136.45265
-#'}
+#')
 #' @export
 secsse_ml_func_def_pars <- function(phy,
                                     traits,
