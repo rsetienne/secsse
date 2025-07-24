@@ -135,7 +135,7 @@ are functions of other parameters and/or factors.
 }
 \examples{
 # Example of how to set the arguments for an ML search. The ML search is stopped
-after 10 iterations to keep run time short.
+# after 10 iterations to keep run time short.
 library(secsse)
 library(DDD)
 set.seed(16)

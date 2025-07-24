@@ -146,7 +146,7 @@ cladogenesis
 }
 \examples{
 # Example of how to set the arguments for an ML search. The ML search is
-stopped at 10 iterations to keep the run time short.
+# stopped after 10 iterations to keep the run time short.
 library(secsse)
 library(DDD)
 set.seed(16)
