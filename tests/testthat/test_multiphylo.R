@@ -35,7 +35,7 @@ test_that("multi phylo", {
   sf <- c(1, 1)
   
   focal_tree$root.edge <- NULL
-  testthat::expect_warning(
+  testthat::expect_message(
   res1 <- secsse::cla_secsse_loglik(parameter = parslist,
                                     phy = focal_tree,
                                     traits = traits,
@@ -53,7 +53,7 @@ test_that("multi phylo", {
   trait_list[[1]] <- traits
   trait_list[[2]] <- traits
   
-  testthat::expect_warning(
+  testthat::expect_message(
   res2 <- secsse::cla_secsse_loglik(parameter = parslist,
                                     phy = trees,
                                     traits = trait_list,
@@ -67,7 +67,7 @@ test_that("multi phylo", {
   sf_list[[1]] <- sf
   sf_list[[2]] <- sf
   
-  testthat::expect_warning(
+  testthat::expect_message(
     res3 <- secsse::cla_secsse_loglik(parameter = parslist,
                                       phy = trees,
                                       traits = trait_list,
@@ -107,7 +107,7 @@ test_that("multi phylo ML", {
   sampling_fraction <- c(1, 1, 1)
   
   # Expect warning because some transitions are set to be impossible
-  testthat::expect_warning(
+  testthat::expect_message(
     model_R <- cla_secsse_ml(
       phy = phylotree,
       traits = traits,
@@ -142,7 +142,7 @@ test_that("multi phylo ML", {
   }
   
   class(phylo_list) <- "multiPhylo"
-  testthat::expect_warning(
+  testthat::expect_message(
   multi_R <- cla_secsse_ml(
     phy = phylo_list,
     traits = trait_list,
@@ -166,7 +166,7 @@ test_that("multi phylo ML", {
   testthat::expect_true(all.equal(model_R$MLpars, multi_R$MLpars))
   
   # repeat with list:
-  testthat::expect_warning(
+  testthat::expect_message(
     multi_R <- cla_secsse_ml(
       phy = phylo_list,
       traits = trait_list,

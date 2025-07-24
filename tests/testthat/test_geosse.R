@@ -70,7 +70,7 @@ test_that("secsse gives the same result as GeoSSE", {
     setting_calculation$states <- new_states
 
     # -191.9567
-    testthat::expect_warning(
+    testthat::expect_message(
     secsse_cla_LL <- secsse::secsse_loglik(parameter,
                                    example_phy_GeoSSE,
                                    traits,
@@ -88,7 +88,7 @@ test_that("secsse gives the same result as GeoSSE", {
 
     # Parallel code doesn't work on CI
     testthat::skip_on_cran()
-    testthat::expect_warning(
+    testthat::expect_message(
     secsse_cla_LL3 <- secsse::secsse_loglik(parameter,
                                     example_phy_GeoSSE,
                                     traits,

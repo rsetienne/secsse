@@ -16,7 +16,7 @@ test_that("loglik for different integrators", {
   root_state_weight <- "maddison_weights"
   cond <- "noCondit"
   
-  loglik1 <- testthat::expect_warning(as.numeric(secsse::secsse_loglik(parameter = toCheck,
+  loglik1 <- testthat::expect_message(as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
                                       num_concealed_states =

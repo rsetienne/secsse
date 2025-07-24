@@ -28,7 +28,7 @@ test_that("trying a short ML search: cla_secsse", {
   sampling_fraction <- c(1, 1, 1)
 
   # Expect warning because some transitions are set to be impossible
-  testthat::expect_warning(
+  testthat::expect_message(
     model_R <- cla_secsse_ml(
       phy = phylotree,
       traits = traits,

@@ -41,7 +41,7 @@ test_that("multiplication works", {
   cond <- 'proper_cond'
   root_state_weight <- 'proper_weights'
   sampling_fraction <- c(1, 1, 1)
-  model <- testthat::expect_warning(
+  model <- testthat::expect_message(
     cla_secsse_ml_func_def_pars(phy = phylotree,
                                 traits = traits,
                                 num_concealed_states = num_concealed_states,

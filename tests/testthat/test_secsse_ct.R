@@ -17,7 +17,7 @@ test_that("the loglik for the complete tree", {
   root_state_weight <- "maddison_weights"
   cond <- "noCondit"
 
-  loglik1 <- testthat::expect_warning(
+  loglik1 <- testthat::expect_message(
              as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
@@ -28,7 +28,7 @@ test_that("the loglik for the complete tree", {
                                       sampling_fraction = sampling_fraction,
                                       is_complete_tree = TRUE)
   ))
-  loglik2 <- testthat::expect_warning(
+  loglik2 <- testthat::expect_message(
               as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
@@ -46,7 +46,7 @@ test_that("the loglik for the complete tree", {
   testthat::expect_equal(loglik1, loglik2)
 
   toCheck[[2]][] <- 0.05
-  loglik3 <- testthat::expect_warning(as.numeric(
+  loglik3 <- testthat::expect_message(as.numeric(
                 secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
@@ -57,7 +57,7 @@ test_that("the loglik for the complete tree", {
                                       sampling_fraction = sampling_fraction,
                                       is_complete_tree = TRUE))
   )
-  loglik4 <- testthat::expect_warning(as.numeric(
+  loglik4 <- testthat::expect_message(as.numeric(
     secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
@@ -84,7 +84,7 @@ test_that("the loglik for the complete tree", {
   # out <- DDD::dd_sim(pars = c(0.4, 0.1, 40), age = 15)
   # phy <- out$tas
   # traits <- sample(c(0,1),ape::Ntip(phy),replace = T)
-  loglik5 <- testthat::expect_warning(as.numeric(
+  loglik5 <- testthat::expect_message(as.numeric(
     secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
@@ -107,7 +107,7 @@ test_that("the loglik for the complete tree", {
   parameter <- toCheck
   parameter[[1]] <- lambdas
 
-  loglik7 <- testthat::expect_warning(
+  loglik7 <- testthat::expect_message(
     secsse::secsse_loglik(parameter = parameter,
                            phy = phy,
                            traits = traits,
@@ -124,7 +124,7 @@ test_that("the loglik for the complete tree", {
   # Parallel code doesn't work on CI
   testthat::skip_on_cran()
   testthat::skip_on_ci()
-  loglik6 <- testthat::expect_warning(as.numeric(
+  loglik6 <- testthat::expect_message(as.numeric(
     secsse::secsse_loglik(parameter = toCheck,
                                       phy = phy,
                                       traits = traits,
@@ -137,7 +137,7 @@ test_that("the loglik for the complete tree", {
                                       num_threads = 4)))
   testthat::expect_equal(loglik6, loglik5, tolerance = 1E-4)
 
-  loglik8 <- testthat::expect_warning(
+  loglik8 <- testthat::expect_message(
     secsse::secsse_loglik(parameter = parameter,
                            phy = phy,
                            traits = traits,

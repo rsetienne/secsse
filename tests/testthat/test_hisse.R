@@ -26,7 +26,7 @@ test_that("secsse gives the same result as hisse", {
   root_state_weight <- "maddison_weights"
   cond <- "noCondit"
   
-  testthat::expect_warning(
+  testthat::expect_message(
     
     y <- secsse::secsse_loglik(parameter = toCheck,
                                phy = phy,
@@ -38,7 +38,7 @@ test_that("secsse gives the same result as hisse", {
     
   )
   cond <- "maddison_cond"
-  testthat::expect_warning(
+  testthat::expect_message(
     y1 <- round(as.numeric(
       secsse::secsse_loglik(parameter = toCheck,
                             phy = phy,
@@ -55,7 +55,7 @@ test_that("secsse gives the same result as hisse", {
   
   sampling_fraction <- c(0.8, 1)
   
-  y2 <- testthat::expect_warning(round(as.numeric(
+  y2 <- testthat::expect_message(round(as.numeric(
     secsse::secsse_loglik(parameter = toCheck,
                           phy = phy,
                           traits = traits,
@@ -73,7 +73,7 @@ test_that("secsse gives the same result as hisse", {
       .Platform$OS.type == "windows") {
     testthat::skip_on_cran()
     
-    z4 <- testthat::expect_warning(
+    z4 <- testthat::expect_message(
       as.numeric(secsse::secsse_loglik(parameter = toCheck,
                                        phy = phy,
                                        traits = traits,
