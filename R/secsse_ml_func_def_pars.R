@@ -1,15 +1,15 @@
-#' Maximum likehood estimation for (SecSSE) with parameter as complex
-#' functions.
+#' Maximum likehood estimation for (SecSSE) complex functions as parameter
 #' 
 #' Maximum likehood estimation under Several examined and concealed
-#' States-dependent Speciation and Extinction (SecSSE) where some paramaters
+#' States-dependent Speciation and Extinction (SecSSE) where some parameters
 #' are functions of other parameters and/or factors.
 #' 
 #' @inheritParams default_params_doc
 #' 
-#' @return Parameter estimated and maximum likelihood
+#' @return Parameter estimates and maximum likelihood
 #' @examples
-#'# Example of how to set the arguments for a ML search.
+#'# Example of how to set the arguments for an ML search.
+#'donttest{
 #'rm(list=ls(all=TRUE))
 #'library(secsse)
 #'library(DDD)
@@ -59,7 +59,7 @@
 #'  par_6 <- par_3 * factor_1
 #'}
 #'
-#'tol = c(1e-02, 1e-03, 1e-03)
+#'tol = c(1e-03, 1e-03, 1e-03)
 #'maxiter = 1000 * round((1.25)^length(idparsopt))
 #'optimmethod = "simplex"
 #'cond<-"proper_cond"
@@ -84,7 +84,9 @@
 #'maxiter,
 #'optimmethod,
 #'num_cycles = 1)
-#'# ML -136.5795
+#'print(model$ML)
+#'# ML -136.45265
+#'}
 #' @export
 secsse_ml_func_def_pars <- function(phy,
                                     traits,
