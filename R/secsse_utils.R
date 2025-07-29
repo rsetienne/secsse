@@ -819,9 +819,8 @@ create_states <- function(usetraits,
     if (anyNA(usetraits)) {
         nas <- which(is.na(traits))
         for (iii in seq_along(nas)) {
-            states[nas[iii], ] <- c(1 - rep(sampling_fraction,
-                                            num_concealed_states),
-                                rep(sampling_fraction, num_concealed_states))
+          states[nas[iii], ] <- c(1 - rep(sampling_fraction,num_concealed_states),
+                                  rep(sampling_fraction, num_concealed_states))
         }
     }
 
@@ -889,7 +888,6 @@ build_states <- function(phy,
             traitStates <- 1:num_unique_traits
         }
     }
-    
     obs_traits <- unique(traits[, 1])
     obs_traits <- obs_traits[!is.na(obs_traits)]
     if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
@@ -903,10 +901,10 @@ build_states <- function(phy,
 
     d <- ly / 3
 
-    ## In a example of 3 states, the names of the colums would be like:
+    ## In a example of 3 states, the names of the columns would be like:
     ##
     ## colnames(states) <- c("E0A","E1A","E2A","E0B","E1B","E2B",
-    ##                   "D0A","D1A","D2A","D0B","D1B","D2B")
+    ##                   "D0A","D1A","D2A","D0B","D1B","D2B","S0A","S1A","S2A","S0B","S1B","S2B")
     states[1:nb_tip, ] <- 0
     ## I repeat the process of state assignment as many times as columns I have
     for (iv in seq_len(ncol(traits))) {

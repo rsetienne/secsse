@@ -407,7 +407,7 @@ secsse_loglik_choosepar <- function(trparsopt,
 #'
 #' @inheritParams default_params_doc
 #' 
-#' @return Parameter estimated and maximum likelihood
+#' @return Parameters estimated and maximum likelihood
 #' @examples
 #'# Example of how to set the arguments for a ML search.
 #'library(secsse)

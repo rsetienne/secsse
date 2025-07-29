@@ -202,7 +202,8 @@ master_loglik <- function(parameter,
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):(nrow(states)), ]
     ancestral_states <-
-      ancestral_states[, -1 * (1:(ncol(ancestral_states) / 2))]
+      ancestral_states[, (1/3 * ncol(ancestral_states) + 1):(2/3 * ncol(ancestral_states))]
+    
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL, states = states))
   } else {

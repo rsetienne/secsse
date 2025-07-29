@@ -185,6 +185,13 @@ generate_phy <- function(mus,
                 status = "error"))
   }
   
+  
+  
+  Ltable        <- res$ltable
+  
+  out_hist <- 0
+  if (tree_size_hist == TRUE) out_hist <- res$hist_tree_size
+  
   if (sum(res$tracker) >= max_tries) {
     warning("Couldn't simulate a tree in enough tries,
             try increasing max_tries")
@@ -198,11 +205,6 @@ generate_phy <- function(mus,
                 size_hist = out_hist,
                 status = "not enough tries"))
   }
-  
-  Ltable        <- res$ltable
-  
-  out_hist <- 0
-  if (tree_size_hist == TRUE) out_hist <- res$hist_tree_size
   
   if (start_at_crown == FALSE && sum(Ltable[, 4] == -1) == 1) {
     # fake phy
