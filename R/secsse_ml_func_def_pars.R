@@ -112,7 +112,7 @@ secsse_ml_func_def_pars <- function(phy,
                                     num_threads = 1,
                                     atol = 1e-8,
                                     rtol = 1e-6,
-                                    method = "odeint::bulirsch_stoer") {
+                                    method = "odeint::runge_kutta_cash_karp54") {
   return(master_ml(phy = phy,
                    traits = traits,
                    num_concealed_states = num_concealed_states,
@@ -260,7 +260,7 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                         num_threads = 1,
                                         atol = 1e-12,
                                         rtol = 1e-12,
-                                        method = "odeint::bulirsch_stoer",
+                                        method = "odeint::runge_kutta_cash_karp54",
                                         use_normalization = TRUE) {
   return(master_ml(phy = phy,
                    traits = traits,

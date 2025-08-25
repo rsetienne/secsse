@@ -25,7 +25,7 @@ master_ml <- function(phy,
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
-                      method = "odeint::bulirsch_stoer",
+                      method = "odeint::runge_kutta_cash_karp54",
                       use_normalization = TRUE) {
   
   structure_func <- NULL
@@ -298,7 +298,7 @@ secsse_ml <- function(phy,
                       num_threads = 1,
                       atol = 1e-8,
                       rtol = 1e-7,
-                      method = "odeint::bulirsch_stoer",
+                      method = "odeint::runge_kutta_cash_karp54",
                       use_normalization = TRUE) {
   master_ml(phy = phy,
             traits = traits,
@@ -484,7 +484,7 @@ cla_secsse_ml <- function(phy,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,
-                          method = "odeint::bulirsch_stoer",
+                          method = "odeint::runge_kutta_cash_karp54",
                           use_normalization = TRUE) {
   master_ml(phy = phy,
             traits = traits,

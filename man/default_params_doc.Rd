@@ -149,7 +149,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \item{method}{integration method used, available are:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
-\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
 
 \item{parameter}{list where first vector represents lambdas, the second
 mus and the third transition rates.}

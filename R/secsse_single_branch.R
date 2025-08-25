@@ -20,7 +20,7 @@ secsse_single_branch_loglik <- function(parameter,
                                         num_threads = 1,
                                         atol = 1e-8,
                                         rtol = 1e-7,
-                                        method = "odeint::bulirsch_stoer",
+                                        method = "odeint::runge_kutta_cash_karp54",
                                         display_warning = TRUE,
                                         use_normalization = TRUE) {
   lambdas <- parameter[[1]]

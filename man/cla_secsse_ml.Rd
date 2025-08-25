@@ -27,7 +27,7 @@ cla_secsse_ml(
   num_threads = 1,
   atol = 1e-08,
   rtol = 1e-07,
-  method = "odeint::bulirsch_stoer",
+  method = "odeint::runge_kutta_cash_karp54",
   use_normalization = TRUE
 )
 }
@@ -111,13 +111,13 @@ no longer needs to assume a speciation event at the start of the tree)}
 \item{method}{integration method used, available are:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
-\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
 
 \item{use_normalization}{normalize the density vector during integration,
 more accurate but slower (default = TRUE)}
 }
 \value{
-Parameter estimated and maximum likelihood
+Parameters estimated and maximum likelihood
 }
 \description{
 Maximum likehood estimation under Several examined and concealed

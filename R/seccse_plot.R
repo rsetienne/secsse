@@ -38,7 +38,7 @@ secsse_loglik_eval <- function(parameter,
                                num_threads = 1,
                                atol = 1e-8,
                                rtol = 1e-7,
-                               method = "odeint::bulirsch_stoer",
+                               method = "odeint::runge_kutta_cash_karp54",
                                num_steps = 100) {
   RcppParallel::setThreadOptions(numThreads = num_threads)
   lambdas <- parameter[[1]]
@@ -138,7 +138,7 @@ plot_state_exact <- function(parameters,
                              cond = "proper_cond",
                              root_state_weight = "proper_weights",
                              is_complete_tree = FALSE,
-                             method = "odeint::bulirsch_stoer",
+                             method = "odeint::runge_kutta_cash_karp54",
                              atol = 1e-16,
                              rtol = 1e-16,
                              num_steps = 100,

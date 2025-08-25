@@ -48,7 +48,8 @@ test_that("trying a short ML search: cla_secsse", {
       verbose = FALSE)
   )
 
-  testthat::expect_equal(model_R$ML, -16.1342246206186)
+  testthat::expect_equal(model_R$ML, -16.1342246206186,
+                         tol = 1e-3)
   
   # we have to translate to lambda matrices to test the following:
   param_posit <- idparslist

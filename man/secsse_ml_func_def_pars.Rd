@@ -30,7 +30,7 @@ secsse_ml_func_def_pars(
   num_threads = 1,
   atol = 1e-08,
   rtol = 1e-06,
-  method = "odeint::bulirsch_stoer"
+  method = "odeint::runge_kutta_cash_karp54"
 )
 }
 \arguments{
@@ -123,7 +123,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 \item{method}{integration method used, available are:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
-\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
 }
 \value{
 Parameter estimates and maximum likelihood

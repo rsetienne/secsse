@@ -105,7 +105,7 @@ if (run_this_code) {
   diag(toCheck[[3]]) <- NA
   root_state_weight <- "proper_weights"
   use_fortran <- TRUE
-  methode <- "odeint::bulirsch_stoer"
+  methode <- "odeint::runge_kutta_cash_karp54"
   cond <- "noCondit"
   
   # the different secsse versions have similar, but not identical 

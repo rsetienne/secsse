@@ -55,7 +55,7 @@ test_that("secsse gives the same result as cla_secsse", {
                                      loglik_penalty = 0,
                                      is_complete_tree = FALSE,
                                      num_threads = 1,
-                                     method = "odeint::bulirsch_stoer",
+                                     method = "odeint::runge_kutta_cash_karp54",
                                      atol = 1e-8,
                                      rtol = 1e-7)
   
@@ -76,7 +76,7 @@ test_that("secsse gives the same result as cla_secsse", {
                              num_threads = 1,
                              atol = 1e-8,
                              rtol = 1e-7,
-                             method = "odeint::bulirsch_stoer")
+                             method = "odeint::runge_kutta_cash_karp54")
   
   testthat::expect_equal(secsse_LL, cla_secsse_LL,tolerance = 1e-5)
 })

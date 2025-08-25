@@ -61,7 +61,7 @@
 #' @param method integration method used, available are:
 #'  `"odeint::runge_kutta_cash_karp54"`, `"odeint::runge_kutta_fehlberg78"`,
 #'  `"odeint::runge_kutta_dopri5"`, `"odeint::bulirsch_stoer"` and
-#'  `"odeint::runge_kutta4"`. Default method is: `"odeint::bulirsch_stoer"`.
+#'  `"odeint::runge_kutta4"`. Default method is: `"odeint::runge_kutta_cash_karp54"`.
 #' @param parameter list where first vector represents lambdas, the second 
 #'  mus and the third transition rates.
 #' @param setting_calculation argument used internally to speed up calculation.

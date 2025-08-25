@@ -20,7 +20,7 @@ cla_secsse_loglik(
   is_complete_tree = FALSE,
   take_into_account_root_edge = FALSE,
   num_threads = 1,
-  method = "odeint::bulirsch_stoer",
+  method = "odeint::runge_kutta_cash_karp54",
   atol = 1e-08,
   rtol = 1e-07,
   display_warning = TRUE,
@@ -82,7 +82,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 \item{method}{integration method used, available are:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
-\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
 
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 
