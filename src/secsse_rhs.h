@@ -209,15 +209,16 @@ namespace secsse {
             for (auto k : *nzv) {
               dx0  += llv[k] * (x[j] * x[k]);
               dxd  += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
-              dxs2 += llv[k] * (x[j + 2 * d] * x[k + 2 * d]);
+              //dxs2 += llv[k] * (x[j + d + d] * x[k + d + d]);
+              dxs2 += llv[k]  * (x[j + d + d] + x[k + d + d] - x[i + d + d] - x[j + d + d] * x[k + d + d]);
             }
-            dx0 += (x[j] - x[i]) * qv[j];
-            dxd += (x[j + d] - x[i + d]) * qv[j];
-            dxs += (x[j + d + d] - x[i + d + d]) * qv[j] - dxs2;
+            dx0 += (x[j]         - x[i])         * qv[j];
+            dxd += (x[j + d]     - x[i + d])     * qv[j];
+            dxs += (x[j + d + d] - x[i + d + d]) * qv[j] + dxs2;
           }
-          dxdt[i] = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i]; // E
-          dxdt[i + d] = dxd - (prec_.lambda_sum[i] + m_[i]) * x[i + d]; // D
-          dxdt[i + d + d] = dxs + (prec_.lambda_sum[i] - m_[i]) * x[i + d + d];  // S = 1 - E
+          dxdt[i]         = dx0 + m_[i] - (prec_.lambda_sum[i] + m_[i]) * x[i];          // E
+          dxdt[i + d]     = dxd         - (prec_.lambda_sum[i] + m_[i]) * x[i + d];      // D
+          dxdt[i + d + d] = dxs +       -  (m_[i]) * x[i + d + d];  // S = 1 - E
         }
       }
       else if constexpr (variant == OdeVariant::complete_tree) {
