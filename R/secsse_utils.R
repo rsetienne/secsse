@@ -819,7 +819,7 @@ create_states <- function(usetraits,
     if (anyNA(usetraits)) {
         nas <- which(is.na(traits))
         for (iii in seq_along(nas)) {
-          states[nas[iii], ] <- c(1 - rep(sampling_fraction,num_concealed_states),
+         states[nas[iii], ] <- c(1 - rep(sampling_fraction, num_concealed_states),
                                   rep(sampling_fraction, 2 * num_concealed_states))
         }
     }

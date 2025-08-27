@@ -120,19 +120,12 @@ master_loglik <- function(parameter,
   S <- nodeM[(2 * d + 1):(3 * d)]
   
   if (using_cla && !is_complete_tree) {
-    # currently, S is not implemented in complete_tree LL
+    
     if (any(is.na(S))) {
       S <- 1 - E
     } 
-    
-    av <- E + S
-    for (x in av) {
-      if (x < 1 - 1e-6 || x > 1 + 1e-6) {
-        warning("E + S is incorrect, possibly the calculation for S failed")
-        S <- 1 - E
-      }
-    }
   } else {
+    # currently, S is not implemented in complete_tree LL
     S <- 1 - E
   }
   

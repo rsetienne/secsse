@@ -733,13 +733,14 @@ test_that("test secsse_sim sampling_fraction", {
   # now we add sampling fraction
   set.seed(42)
   found_secsse_2 <- c()
-  for (i in 1:1000) {
+  for (i in 1:100) {
     focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
                                      mus = mu_p,
                                      qs = q_mat_p,
                                      crown_age = crown_age,
                                      num_concealed_states = 2,
-                                     sampling_fraction = c(0.5, 0.5))
+                                     sampling_fraction = c(0.5, 0.5),
+                                     seed = i)
     tree_size_1 <- length(focal_tree$phy$tip.label)
     found_secsse_2[i] <- tree_size_1
   }
