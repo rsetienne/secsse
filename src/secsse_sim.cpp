@@ -124,7 +124,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
     }
 
     if (verbose) {
-      if (cnt % 1000 == 0) {
+      if (cnt % 100 == 0) {
         Rcpp::Rcout << "extinct: " << tracker[extinct] << " "
                     << "large: "   << tracker[overshoot] << " "
                     << "cond: "    << tracker[conditioning] << " "

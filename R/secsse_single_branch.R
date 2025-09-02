@@ -109,5 +109,7 @@ secsse_single_branch_loglik <- function(parameter,
   return(list("loglik" = LL,
               "nodeM" = nodeM,
               "merge_branch" = mergeBranch,
-              "merge_branch2" = mergeBranch2))
+              "merge_branch2" = mergeBranch2,
+              "S" = S,
+              "E" = nodeM[1:d]))
 }

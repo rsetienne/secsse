@@ -268,6 +268,7 @@ struct secsse_sim {
       }
 
       event_type event = draw_event();
+
       apply_event(event);
 
       if (track_crowns[0] < 1 || track_crowns[1] < 1) {

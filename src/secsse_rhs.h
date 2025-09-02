@@ -181,7 +181,7 @@ namespace secsse {
       for (size_t i = 0; i < d; ++i) {
         out[i] = M[i];
         out[i + d] = 0.0;
-        out[i + 2 * d] = M[i + 2 * d];
+        out[i + d + d] = M[i + d + d];
         for (size_t j = 0; j < d; ++j, llv.advance(d)) {
           for (size_t k = 0; k < d; ++k) {
             out[i + d] += llv[k] * (N[j + d] * M[k + d] + M[j + d] * N[k + d]);
@@ -209,7 +209,6 @@ namespace secsse {
             for (auto k : *nzv) {
               dx0  += llv[k] * (x[j] * x[k]);
               dxd  += llv[k] * (x[j] * x[k + d] + x[j + d] * x[k]);
-              //dxs2 += llv[k] * (x[j + d + d] * x[k + d + d]);
               dxs2 += llv[k]  * (x[j + d + d] + x[k + d + d] - x[i + d + d] - x[j + d + d] * x[k + d + d]);
             }
             dx0 += (x[j]         - x[i])         * qv[j];
