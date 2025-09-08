@@ -512,7 +512,8 @@ test_that("test comparison bisse", {
                                    min_spec = 10,
                                    pool_init_states = c("S"),
                                    start_at_crown = FALSE,
-                                   verbose = TRUE)
+                                   verbose = TRUE,
+                                   seed = r)
     
     local_stats <- c(length(sim_tree$phy$tip.label))
     freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
@@ -684,8 +685,6 @@ test_that("test comparison classe", {
   testthat::expect_true(max(found1[, 2]) == max(found2[, 2]))
   testthat::expect_true(max(found1[, 2]) == 0)
 })
-
-
 
 test_that("test secsse_sim sampling_fraction", {
   testthat::skip_on_cran()

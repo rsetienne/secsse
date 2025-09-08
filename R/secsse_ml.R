@@ -26,7 +26,8 @@ master_ml <- function(phy,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::runge_kutta_cash_karp54",
-                      use_normalization = TRUE) {
+                      use_normalization = TRUE,
+                      return_root_state = FALSE) {
   
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
@@ -113,20 +114,20 @@ master_ml <- function(phy,
       }
       
       setting_calculation[[i]] <- build_initStates_time(phy = input_phy,
-                                                   traits = input_traits,
-                                                   num_concealed_states =
-                                                     num_concealed_states,
-                                                   sampling_fraction =
-                                                     input_sampling_fraction,
-                                                   is_complete_tree =
-                                                     is_complete_tree,
-                                                   mus = mus,
-                                                   num_unique_traits = 
-                                                     num_modeled_traits,
-                                                   first_time = FALSE,
-                                                   traitStates = 
-                                                     get_trait_states(idparslist,
-                                                                      num_concealed_states, FALSE))
+                                                        traits = input_traits,
+                                                        num_concealed_states =
+                                                          num_concealed_states,
+                                                        sampling_fraction =
+                                                          input_sampling_fraction,
+                                                        is_complete_tree =
+                                                          is_complete_tree,
+                                                        mus = mus,
+                                                        num_unique_traits = 
+                                                          num_modeled_traits,
+                                                        first_time = FALSE,
+                                                        traitStates = 
+                                                          get_trait_states(idparslist,
+                                                                           num_concealed_states, FALSE))
     }
   }
   
@@ -160,10 +161,11 @@ master_ml <- function(phy,
                                         method = method,
                                         display_warning = FALSE,
                                         verbose = ll_verbose,
-                                        use_normalization = use_normalization)
+                                        use_normalization = use_normalization,
+                                        return_root_state = FALSE)
   # Function here
   if (verbose) print_init_ll(initloglik = initloglik)
-
+  
   if (initloglik == -Inf) {
     stop("The initial parameter values have a likelihood that is 
              equal to 0 or below machine precision. 
@@ -197,7 +199,8 @@ master_ml <- function(phy,
                           method = method,
                           display_warning = FALSE,
                           verbose = ll_verbose,
-                          use_normalization = use_normalization)
+                          use_normalization = use_normalization,
+                          return_root_state = FALSE)
     if (out$conv != 0) {
       warning("Optimization has not converged. Try again with different initial values or increase the number of iterations.")
       out2 <- out
@@ -208,9 +211,48 @@ master_ml <- function(phy,
                                               idparsfix,
                                               idparslist,
                                               structure_func)
-      out2 <- list(MLpars = ml_pars1,
-                   ML = as.numeric(unlist(out$fvalues)),
-                   conv = out$conv)
+      
+      if (!return_root_state) {
+        out2 <- list(MLpars = ml_pars1,
+                     ML = as.numeric(unlist(out$fvalues)),
+                     conv = out$conv)
+      } else {
+        # we have to recover the root state by re-calculating the LL
+        root_res <- master_loglik(parameter = ml_pars1,
+                                  phy = phy,
+                                  traits = traits,
+                                  num_concealed_states =
+                                    num_concealed_states,
+                                  cond = cond,
+                                  root_state_weight =
+                                    root_state_weight,
+                                  sampling_fraction =
+                                    sampling_fraction,
+                                  setting_calculation =
+                                    setting_calculation,
+                                  see_ancestral_states =
+                                    see_ancestral_states,
+                                  loglik_penalty = loglik_penalty,
+                                  is_complete_tree =
+                                    is_complete_tree,
+                                  take_into_account_root_edge =
+                                    take_into_account_root_edge,
+                                  num_threads = num_threads,
+                                  method = method,
+                                  atol = atol,
+                                  rtol = rtol,
+                                  display_warning = FALSE,
+                                  use_normalization = use_normalization,
+                                  return_root_state = TRUE)
+        if (as.numeric(unlist(out$fvalues)) != root_res$LL) {
+          warning("recalculating the root state resulted in a different LL")
+        }
+        
+        out2 <- list(MLpars = ml_pars1,
+                     ML = as.numeric(unlist(out$fvalues)),
+                     conv = out$conv,
+                     root_state = root_res$root_state)
+      }
     }
   }
   return(out2)
@@ -299,7 +341,8 @@ secsse_ml <- function(phy,
                       atol = 1e-8,
                       rtol = 1e-7,
                       method = "odeint::runge_kutta_cash_karp54",
-                      use_normalization = TRUE) {
+                      use_normalization = TRUE,
+                      return_root_state = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -325,7 +368,8 @@ secsse_ml <- function(phy,
             atol = atol,
             rtol = rtol,
             method = method,
-            use_normalization = use_normalization)
+            use_normalization = use_normalization,
+            return_root_state = return_root_state)
 }
 
 #' @keywords internal
@@ -352,7 +396,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     method,
                                     display_warning,
                                     verbose,
-                                    use_normalization) {
+                                    use_normalization,
+                                    return_root_state) {
   alltrpars <- c(trparsopt, trparsfix)
   if (max(alltrpars) > 1 || min(alltrpars) < 0) {
     loglik <- -Inf
@@ -385,7 +430,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                             atol = atol,
                             rtol = rtol,
                             display_warning = display_warning,
-                            use_normalization = use_normalization)
+                            use_normalization = use_normalization,
+                            return_root_state = return_root_state)
     
     if (is.nan(loglik) || is.na(loglik)) {
       warning("There are parameter values used which cause
@@ -485,7 +531,8 @@ cla_secsse_ml <- function(phy,
                           atol = 1e-8,
                           rtol = 1e-7,
                           method = "odeint::runge_kutta_cash_karp54",
-                          use_normalization = TRUE) {
+                          use_normalization = TRUE,
+                          return_root_state = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -509,5 +556,6 @@ cla_secsse_ml <- function(phy,
             atol = atol,
             rtol = rtol,
             method = method,
-            use_normalization = use_normalization)
+            use_normalization = use_normalization,
+            return_root_state = return_root_state)
 }

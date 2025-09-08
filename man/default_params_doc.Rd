@@ -308,7 +308,10 @@ no longer needs to assume a speciation event at the start of the tree)}
 more accurate but slower (default = TRUE)}
 
 \item{return_root_state}{if TRUE, returns the state of the system at the
-root, this can be useful to use as the starting point of a simulation.}
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).}
 }
 \value{
 Nothing
