@@ -22,7 +22,8 @@ secsse_single_branch_loglik <- function(parameter,
                                         rtol = 1e-7,
                                         method = "odeint::runge_kutta_cash_karp54",
                                         display_warning = TRUE,
-                                        use_normalization = TRUE) {
+                                        use_normalization = TRUE,
+                                        return_root_state = FALSE) {
   lambdas <- parameter[[1]]
   mus <- parameter[[2]]
   parameter[[3]][is.na(parameter[[3]])] <- 0
@@ -66,6 +67,9 @@ secsse_single_branch_loglik <- function(parameter,
   
   RcppParallel::setThreadOptions(numThreads = num_threads)
   
+  return_states <- see_ancestral_states
+  if (return_root_state) return_states = TRUE
+  
   calcul <- calc_ll_single_branch_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
                         states = states[1, ],
                         forTime = c(0, forTime[3]),
@@ -75,7 +79,7 @@ secsse_single_branch_loglik <- function(parameter,
                         method = method,
                         atol = atol,
                         rtol = rtol,
-                        see_states = see_ancestral_states,
+                        see_states = return_states,
                         use_normalization = use_normalization)
 
   loglik <- calcul$loglik
@@ -106,8 +110,18 @@ secsse_single_branch_loglik <- function(parameter,
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
   
+  root_state <- NULL
+  if (return_root_state) {
+    states <- calcul$states
+    num_tips <- ape::Ntip(phy)
+    root_no <- num_tips + 1
+    root_state <- states[root_no, ]
+    colnames(root_state) <- names(mus)
+  }
+  
   return(list("loglik" = LL,
               "nodeM" = nodeM,
               "merge_branch" = mergeBranch,
-              "merge_branch2" = mergeBranch2))
+              "merge_branch2" = mergeBranch2,
+              "root_state" = root_state))
 }

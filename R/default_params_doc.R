@@ -163,6 +163,8 @@
 #' no longer needs to assume a speciation event at the start of the tree)
 #' @param use_normalization normalize the density vector during integration,
 #' more accurate but slower (default = TRUE)
+#' @param return_root_state if TRUE, returns the state of the system at the 
+#' root, this can be useful to use as the starting point of a simulation.
 #' @return Nothing
 #' @keywords internal
 #' @export
@@ -233,6 +235,7 @@ default_params_doc <- function(phy,
                                optimmethod,
                                display_warning,
                                take_into_account_root_edge,
-                               use_normalization) {
+                               use_normalization,
+                               return_root_state) {
   # Nothing
 }

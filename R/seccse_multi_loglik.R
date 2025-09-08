@@ -16,9 +16,11 @@ multi_loglik <- function(parameter,
                          rtol = 1e-7,
                          method = "odeint::runge_kutta_cash_karp54",
                          display_warning = FALSE,
-                         use_normalization = TRUE) {
+                         use_normalization = TRUE,
+                         return_root_state = FALSE) {
   
   res <- list()
+  root_states <- list()
   for (i in 1:length(phy)) {
     if (is.list(sampling_fraction)) {
       focal_sampling_fraction <- sampling_fraction[[i]]
@@ -68,10 +70,7 @@ multi_loglik <- function(parameter,
                                                       display_warning = display_warning,
                                                       use_normalization = use_normalization)$loglik
     } else {
-      if (i == 292) {
-        a <- 5
-      }
-      res[[i]] <- secsse_loglik(parameter = parameter,
+      local_res <- secsse_loglik(parameter = parameter,
                                 phy = phy[[i]],
                                 traits = traits[[i]],
                                 num_concealed_states = num_concealed_states,
@@ -89,11 +88,23 @@ multi_loglik <- function(parameter,
                                 rtol = rtol,
                                 method = method,
                                 display_warning = display_warning,
-                                use_normalization = use_normalization) 
+                                use_normalization = use_normalization,
+                                return_root_state = return_root_state) 
+      
+      if (return_root_state) {
+        root_states[[i]] <- local_res$root_state
+      } else {
+        res[[i]] <- local_res
+      }
     }
   }
   
   ll <- do.call(sum, res)
+  
+  if (return_root_state) {
+    return(list(LL = ll,
+                root_state = root_states))
+  }
   
   return(ll) 
 }

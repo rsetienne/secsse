@@ -16,7 +16,8 @@ master_loglik <- function(parameter,
                           method = "odeint::runge_kutta_cash_karp54",
                           take_into_account_root_edge = FALSE,
                           display_warning = TRUE,
-                          use_normalization = TRUE) {
+                          use_normalization = TRUE,
+                          return_root_state = FALSE) {
   
   if (is.list(phy)) {
     if (!inherits(phy, "phylo")) {
@@ -48,7 +49,8 @@ master_loglik <- function(parameter,
                         rtol = rtol,
                         method = method,
                         display_warning = display_warning,
-                        use_normalization = use_normalization))
+                        use_normalization = use_normalization,
+                        return_root_state = return_root_state))
   }
   
   lambdas <- parameter[[1]]
@@ -99,6 +101,9 @@ master_loglik <- function(parameter,
   }
   
   RcppParallel::setThreadOptions(numThreads = num_threads)
+  return_states = see_ancestral_states
+  if (return_root_state) return_states = TRUE
+  
   calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
                         ances = ances,
                         states = states,
@@ -110,7 +115,7 @@ master_loglik <- function(parameter,
                         atol = atol,
                         rtol = rtol,
                         is_complete_tree = is_complete_tree,
-                        see_states = see_ancestral_states,
+                        see_states = return_states,
                         use_normalization = use_normalization)
   loglik <- calcul$loglik
   nodeM <- calcul$node_M
@@ -141,7 +146,7 @@ master_loglik <- function(parameter,
                                            method = method,
                                            atol = atol,
                                            rtol = rtol,
-                                           see_states = see_ancestral_states,
+                                           see_states = return_states,
                                            use_normalization = use_normalization)
       loglik <- loglik + calcul2$loglik
       nodeM <- calcul2$states
@@ -199,9 +204,19 @@ master_loglik <- function(parameter,
     
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL, states = states))
-  } else {
-    return(LL)
+  } 
+  
+  if (return_root_state) {
+    states <- calcul$states
+    num_tips <- ape::Ntip(phy)
+    root_no <- num_tips + 1
+    root_state <- states[root_no, ]
+    colnames(root_state) <- names(mus)
+    return(list(LL = LL,
+                root_state = root_state))
   }
+  
+  return(LL)
 }
 
 #' @title Likelihood for SecSSE model
@@ -253,7 +268,8 @@ secsse_loglik <- function(parameter,
                           rtol = 1e-7,
                           method = "odeint::runge_kutta_cash_karp54",
                           display_warning = TRUE,
-                          use_normalization = TRUE) {
+                          use_normalization = TRUE,
+                          return_root_state = FALSE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -271,7 +287,8 @@ secsse_loglik <- function(parameter,
                 rtol = rtol,
                 method = method,
                 display_warning = display_warning,
-                use_normalization = use_normalization)
+                use_normalization = use_normalization,
+                return_root_state = return_root_state)
 }
 
 
@@ -340,7 +357,8 @@ cla_secsse_loglik <- function(parameter,
                               atol = 1e-8,
                               rtol = 1e-7,
                               display_warning = TRUE,
-                              use_normalization = TRUE) {
+                              use_normalization = TRUE,
+                              return_root_state = FALSE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -358,5 +376,6 @@ cla_secsse_loglik <- function(parameter,
                 rtol = rtol,
                 method = method,
                 display_warning = display_warning,
-                use_normalization = use_normalization)
+                use_normalization = use_normalization,
+                return_root_state = return_root_state)
 }

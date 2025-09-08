@@ -72,7 +72,8 @@ default_params_doc(
   optimmethod,
   display_warning,
   take_into_account_root_edge,
-  use_normalization
+  use_normalization,
+  return_root_state
 )
 }
 \arguments{
@@ -305,6 +306,9 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{use_normalization}{normalize the density vector during integration,
 more accurate but slower (default = TRUE)}
+
+\item{return_root_state}{if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation.}
 }
 \value{
 Nothing

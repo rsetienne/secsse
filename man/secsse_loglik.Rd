@@ -24,7 +24,8 @@ secsse_loglik(
   rtol = 1e-07,
   method = "odeint::runge_kutta_cash_karp54",
   display_warning = TRUE,
-  use_normalization = TRUE
+  use_normalization = TRUE,
+  return_root_state = FALSE
 )
 }
 \arguments{
@@ -92,6 +93,9 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{use_normalization}{normalize the density vector during integration,
 more accurate but slower (default = TRUE)}
+
+\item{return_root_state}{if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation.}
 }
 \value{
 The loglikelihood of the data given the parameter.
