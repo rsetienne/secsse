@@ -165,6 +165,25 @@ test_that("test secsse_sim init_state_probs and complete tree", {
                                    drop_extinct = FALSE)
   testthat::expect_true(focal_tree$initialState %in% c("0A", "1B"))
   
+  
+  for (i in 1:4) {
+    init_prob <- c(0, 0, 0, 0)
+    init_prob[i] <- 1
+    init_states <- c("0A", "1A", "0B", "1B")
+    chosen_state <- init_states[i]
+    focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = 10,
+                                   num_concealed_states = 2,
+                                   init_state_probs = init_prob,
+                                   max_spec = 100,
+                                   seed = 21,
+                                   drop_extinct = FALSE)
+    
+     testthat::expect_true(focal_tree$initialState == chosen_state)
+  }
+  
   pars <- c(0.5, 0.3, 0.2, 0.1, 0.1)
   
   mu_p <- secsse::fill_in(mus, pars)
