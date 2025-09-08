@@ -288,7 +288,8 @@ struct secsse_sim {
   }
 
   void evolve_until_crown() {
-      while (L.size() < 2) {
+      
+    while(true) {
         update_rates();
         double dt = draw_dt();
         t += dt;
@@ -324,7 +325,11 @@ struct secsse_sim {
           default:
               break;
         }
+        
+        // stop when we reach two species
+        if (L.size() >= 2) break; 
 
+        // stop if all are extinct
         if (track_crowns[0] + track_crowns[1] < 1) break;
       }
   }

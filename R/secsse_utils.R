@@ -1306,8 +1306,13 @@ plot_idparslist <- function(idparslist,
 #' @keywords internal
 get_root_state <- function(ancestral_states, phy, mus, d) {
   num_tips <- ape::Ntip(phy)
-  root_no <- num_tips + 1
-  root_state <- ancestral_states[root_no, (d + 1):(d + d)]
+  if (num_tips == 1) {
+    root_state <- ancestral_states[(d + 1):(d + d)]
+  } else {
+    root_no <- num_tips + 1
+    root_state <- ancestral_states[root_no, (d + 1):(d + d)]
+  }
+  
   names(root_state) <- names(mus)
   return(root_state)
 } 

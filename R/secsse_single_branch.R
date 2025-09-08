@@ -111,7 +111,7 @@ secsse_single_branch_loglik <- function(parameter,
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
   
   root_state <- NULL
-  if (return_root_state) {
+  if (return_root_state == TRUE) {
     root_state <- get_root_state(calcul$states,
                                  phy,
                                  mus,

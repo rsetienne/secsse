@@ -45,7 +45,7 @@ multi_loglik <- function(parameter,
     }
     
     if (length(phy[[i]]$tip.label) == 1) {
-      res[[i]] <- secsse::secsse_single_branch_loglik(parameter = parameter,
+      local_res <- secsse::secsse_single_branch_loglik(parameter = parameter,
                                                       phy = phy[[i]],
                                                       traits = traits[[i]],
                                                       num_concealed_states =
@@ -68,7 +68,12 @@ multi_loglik <- function(parameter,
                                                       rtol = rtol,
                                                       method = method,
                                                       display_warning = display_warning,
-                                                      use_normalization = use_normalization)$loglik
+                                                      use_normalization = use_normalization,
+                                                      return_root_state = return_root_state)
+      if (return_root_state) {
+        root_states[[i]] <- local_res$root_state
+      } 
+      res[[i]] <- local_res$loglik
     } else {
       local_res <- secsse_loglik(parameter = parameter,
                                 phy = phy[[i]],
@@ -93,6 +98,7 @@ multi_loglik <- function(parameter,
       
       if (return_root_state) {
         root_states[[i]] <- local_res$root_state
+        res[[i]] <- local_res$LL
       } else {
         res[[i]] <- local_res
       }
