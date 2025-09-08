@@ -207,13 +207,11 @@ master_loglik <- function(parameter,
   } 
   
   if (return_root_state) {
-    states <- calcul$states
-    num_tips <- ape::Ntip(phy)
-    root_no <- num_tips + 1
-    root_state <- states[root_no, ]
-    colnames(root_state) <- names(mus)
     return(list(LL = LL,
-                root_state = root_state))
+                root_state = get_root_state(calcul$states,
+                                             phy,
+                                             mus,
+                                             d)))
   }
   
   return(LL)

@@ -1301,3 +1301,13 @@ plot_idparslist <- function(idparslist,
   return(list("plot_qmat" = plot_qmat,
               "plot_lambda" = plot_lambda))
 }
+
+
+#' @keywords internal
+get_root_state <- function(ancestral_states, phy, mus, d) {
+  num_tips <- ape::Ntip(phy)
+  root_no <- num_tips + 1
+  root_state <- ancestral_states[root_no, (d + 1):(d + d)]
+  names(root_state) <- names(mus)
+  return(root_state)
+} 
