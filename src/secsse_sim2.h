@@ -188,9 +188,9 @@ struct secsse_sim {
   const size_t num_states;
   const double max_t;
   const size_t max_spec;
-  const std::vector<double> init_states;
-  const bool non_extinction;
   const bool max_spec_extant;
+  const std::vector<double> init_state_probs;
+  const bool non_extinction;
   const bool crown_start;
 
   finish_type run_info;
@@ -211,9 +211,9 @@ struct secsse_sim {
              mus(m),
              num_states(m.size()), max_t(mt),
              max_spec(max_s),
-             init_states(init),
              non_extinction(ne),
              max_spec_extant(max_s_e),
+             init_state_probs(init), 
              crown_start(start_at_crown),
              run_info(not_run_yet),
              t(0.0) {
@@ -228,9 +228,9 @@ struct secsse_sim {
     t = 0.0;
 
     // randomly draw initial trait
-    std::uniform_int_distribution<size_t> d(0, init_states.size() - 1);
-    auto index = d(rndgen_);
-    init_state = init_states[index];
+    std::discrete_distribution<> init_trait_dist(init_state_probs.begin(), 
+                                                 init_state_probs.end());
+    init_state = init_trait_dist(rndgen_);
 
     run_info = not_run_yet;
 

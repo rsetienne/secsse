@@ -14,7 +14,7 @@
 #' Simulation is performed with a randomly
 #' sampled initial trait at the crown - if you, however - want a specific,
 #' single, trait used at the crown, you can reduce the possible traits by
-#' modifying `pool_init_states`.
+#' modifying `init_state_probs`.
 #'
 #' By default, the algorithm keeps simulating until it generates a tree where
 #' both crown lineages survive to the present - this is to ensure that the tree
@@ -26,7 +26,7 @@ secsse_sim <- function(lambdas,
                        qs,
                        crown_age,
                        num_concealed_states,
-                       pool_init_states = NULL,
+                       init_state_probs = NULL,
                        sampling_fraction = NULL,
                        max_spec = 1e5,
                        min_spec = 2,
@@ -52,29 +52,26 @@ secsse_sim <- function(lambdas,
 
   diag(qs) <- 0
 
-  if (is.null(pool_init_states)) {
-    pool_init_states <- -1 + (seq_along(mus))
+  if (is.null(init_state_probs)) {
+    num_init_states <- length(mus)
+    init_state_probs <- rep(1 / num_init_states, num_init_states)
   } else {
-    if (is.numeric(pool_init_states)) {
-      stop("pool of initial states needs to be characters,
-           e.g. c('0A', '1B') etc")
-    }
-
-    # now we have to match the indices
-    all_states <- names(mus)
-    indices <- which(all_states %in% pool_init_states)
-    if (length(indices) < 1) {
-      # most likely states without hidden labels have been provided
-      letters_conceal <- LETTERS[1:num_concealed_states]
-      all_states2 <- c()
-      for (i in 1:length(pool_init_states)) {
-        for (j in 1:length(letters_conceal)) {
-          all_states2 <- c(all_states2, paste0(pool_init_states[i], letters_conceal[j]))
-        }
+    if (is.character(init_state_probs)) {
+      # only picked characters are chosen
+      
+      num_picked <- sum(names(mus) %in% init_state_probs)
+      if (num_picked < 1) {
+        stop("you failed to select one of the initial states, did you perhaps
+             forget to specify the concealed state?")
       }
-      indices <- which(all_states %in% all_states2)
+      
+      num_init_states <- length(mus)
+      new_init_state_probs <- rep(0, num_init_states)
+      new_init_state_probs[names(mus) %in% init_state_probs] <- 1
+      init_state_probs <- new_init_state_probs
     }
-    pool_init_states <- -1 + indices
+    
+    init_state_probs <- init_state_probs / sum(init_state_probs)
   }
 
   if (is.null(seed)) seed <- -1
@@ -101,7 +98,7 @@ secsse_sim <- function(lambdas,
                       max_spec,
                       max_species_extant,
                       min_spec,
-                      pool_init_states,
+                      init_state_probs,
                       conditioning,
                       num_concealed_states,
                       non_extinction,
@@ -150,7 +147,7 @@ generate_phy <- function(mus,
                          max_spec,
                          max_species_extant,
                          min_spec,
-                         pool_init_states,
+                         init_state_probs,
                          conditioning,
                          num_concealed_states,
                          non_extinction,
@@ -168,7 +165,7 @@ generate_phy <- function(mus,
                         max_spec,
                         max_species_extant,
                         min_spec,
-                        pool_init_states,
+                        init_state_probs,
                         conditioning,
                         num_concealed_states,
                         non_extinction,

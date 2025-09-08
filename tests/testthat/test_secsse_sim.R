@@ -127,7 +127,7 @@ test_that("test secsse_sim 2", {
 })
 
 
-test_that("test secsse_sim pool_init_states and complete tree", {
+test_that("test secsse_sim init_state_probs and complete tree", {
   lambda_shift <- secsse::create_default_lambda_transition_matrix()
   lambda_list <- secsse::create_lambda_list(transition_matrix = lambda_shift)
   mus <- secsse::create_mu_vector(state_names = c(0, 1),
@@ -148,7 +148,7 @@ test_that("test secsse_sim pool_init_states and complete tree", {
                                    qs = q_mat_p,
                                    crown_age = 10,
                                    num_concealed_states = 2,
-                                   pool_init_states = c("0A"),
+                                   init_state_probs = c("0A"),
                                    max_spec = 100,
                                    seed = 21,
                                    drop_extinct = FALSE)
@@ -159,22 +159,11 @@ test_that("test secsse_sim pool_init_states and complete tree", {
                                    qs = q_mat_p,
                                    crown_age = 10,
                                    num_concealed_states = 2,
-                                   pool_init_states = c("0A", "1B"),
+                                   init_state_probs = c("0A", "1B"),
                                    max_spec = 100,
                                    seed = 21,
                                    drop_extinct = FALSE)
   testthat::expect_true(focal_tree$initialState %in% c("0A", "1B"))
-  
-  focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
-                                   mus = mu_p,
-                                   qs = q_mat_p,
-                                   crown_age = 10,
-                                   num_concealed_states = 2,
-                                   pool_init_states = c("0"),
-                                   max_spec = 100,
-                                   seed = 21,
-                                   drop_extinct = FALSE)
-  testthat::expect_true(focal_tree$initialState %in% c("0A", "0B"))
   
   pars <- c(0.5, 0.3, 0.2, 0.1, 0.1)
   
@@ -201,7 +190,6 @@ test_that("test secsse_sim pool_init_states and complete tree", {
   }
   testthat::expect_gt(length(focal_tree$size_hist), 0)
 })
-
 
 test_that("test trait shift", {
   states <- c("S", "G")
@@ -251,7 +239,7 @@ test_that("test trait shift", {
                                   crown_age = crown_age_used,
                                   num_concealed_states = 2,
                                   conditioning = "none",
-                                  pool_init_states = c("S"))
+                                 init_state_probs = c("SA", "SB"))
   )
 
   spec_S <- 1e-10
@@ -265,7 +253,7 @@ test_that("test trait shift", {
                                  crown_age = 100,
                                  num_concealed_states = 2,
                                  conditioning = "none",
-                                 pool_init_states = c("S"))
+                                 init_state_probs = c("SA", "SB"))
   
   testthat::expect_true(length(which(sim_tree$obs_traits == "S")) == 0)
 })
@@ -314,7 +302,7 @@ test_that("test mutate away shift", {
                                  crown_age = crown_age_used,
                                  num_concealed_states = 2,
                                  conditioning = "none",
-                                 pool_init_states = c("D"))
+                                 init_state_probs = c("DA", "DB"))
   
   testthat::expect_true(length(sim_tree$phy$tip.label) == 2)
   
@@ -406,8 +394,9 @@ test_that("test comparison musse", {
                                    num_concealed_states = 3,
                                    conditioning = "none",
                                    min_spec = 10,
-                                   pool_init_states = c("S"),
-                                   start_at_crown = FALSE)
+                                   init_state_probs = c("SA", "SB"),
+                                   start_at_crown = FALSE,
+                                   seed = r)
     
     local_stats <- c(length(sim_tree$phy$tip.label))
     freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
@@ -510,7 +499,7 @@ test_that("test comparison bisse", {
                                    num_concealed_states = 2,
                                    conditioning = "none",
                                    min_spec = 10,
-                                   pool_init_states = c("S"),
+                                   init_state_probs = c("SA", "SB"),
                                    start_at_crown = FALSE,
                                    verbose = TRUE,
                                    seed = r)
@@ -550,7 +539,6 @@ test_that("test comparison bisse", {
     a2 <- found2[, i]
     b <- t.test(a1, a2)
     testthat::expect_true(b$p.value > 0.05)
- #   cat(i, mean(a1), mean(a2), b$p.value, "\n")
   }
 })
 
@@ -650,7 +638,7 @@ test_that("test comparison classe", {
                                    num_concealed_states = 3,
                                    conditioning = "none",
                                    min_spec = 10,
-                                   pool_init_states = c("G"),
+                                   init_state_probs = c("GA", "GB", "GC"),
                                    start_at_crown = FALSE)
     
     freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
@@ -748,7 +736,6 @@ test_that("test secsse_sim sampling_fraction", {
   
   # biased sampling fraction
   # we need higher transition rates to generate trees with equal tip frequencies
-  set.seed(42)
   for (sf in seq(0.1, 0.9, by = 0.1)) {
     found_secsse_2 <- c()
     num_zeros <- c()
@@ -760,7 +747,7 @@ test_that("test secsse_sim sampling_fraction", {
                                        crown_age = crown_age,
                                        num_concealed_states = 2,
                                        sampling_fraction = c(sf, 1),
-                                       seed = i)
+                                       seed = i * 2)
       tree_size_1 <- length(focal_tree$phy$tip.label)
       found_secsse_2[i] <- tree_size_1
       num_zeros[i] <- length(which(focal_tree$obs_traits == "0"))
@@ -768,13 +755,11 @@ test_that("test secsse_sim sampling_fraction", {
     }
     
     frac <- (1 + sf) / 2
-    
     testthat::expect_equal(1 / frac * mean(found_secsse_2), mean(found_secsse),
                            tolerance = 0.5) 
     testthat::expect_equal(median(num_zeros / num_ones), sf, tolerance = 0.1)
   }
   
-  set.seed(42)
   for (sf in seq(0.1, 0.9, by = 0.1)) {
     found_secsse_2 <- c()
     num_zeros <- c()
@@ -786,7 +771,7 @@ test_that("test secsse_sim sampling_fraction", {
                                        crown_age = crown_age,
                                        num_concealed_states = 2,
                                        sampling_fraction = c(1, sf),
-                                       seed = i)
+                                       seed = i * 2)
       tree_size_1 <- length(focal_tree$phy$tip.label)
       found_secsse_2[i] <- tree_size_1
       num_zeros[i] <- length(which(focal_tree$obs_traits == "0"))
@@ -800,5 +785,3 @@ test_that("test secsse_sim sampling_fraction", {
     testthat::expect_equal(median(num_ones / num_zeros), sf, tolerance = 0.1)
   }
 })
-
-

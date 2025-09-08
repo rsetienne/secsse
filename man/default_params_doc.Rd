@@ -36,7 +36,7 @@ default_params_doc(
   mus,
   qs,
   crown_age,
-  pool_init_states,
+  init_state_probs,
   maxSpec,
   conditioning,
   non_extinction,
@@ -174,8 +174,11 @@ generally in the form of a matrix.}
 \item{crown_age}{crown age of the tree, tree will be simulated conditional
 on non-extinction and this crown age.}
 
-\item{pool_init_states}{pool of initial states at the crown, in case this is
-different from all available states, otherwise leave at NULL}
+\item{init_state_probs}{The user can provide a vector with probabilities of
+observing each state at the root, the root state is then drawn from this
+distribution. Alternatively, the user can provide a vector of characters
+representing the full names (including the concealed state) of states used
+to initialize the root (e.g. '0A', not '0').}
 
 \item{conditioning}{can be \code{"obs_states"}, \code{"true_states"} or \code{"none"}, the
 tree is simulated until one is generated that contains all observed states
