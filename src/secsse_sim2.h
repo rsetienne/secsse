@@ -270,9 +270,11 @@ struct secsse_sim {
       event_type event = draw_event();
       apply_event(event);
 
-      if (track_crowns[0] < 1 || track_crowns[1] < 1) {
-        run_info = extinct;
-        break;
+      if (!crown_start) {
+        if (track_crowns[0] < 1 || track_crowns[1] < 1) {
+          run_info = extinct;
+          break;
+        }
       }
 
       if (max_spec_extant) {
