@@ -25,7 +25,6 @@ enum event_type {shift, speciation, extinction, max_num};
 enum finish_type {done, extinct, overshoot, conditioning, not_run_yet,
                   max_types};
 
-
 struct species_info {
   species_info(const std::vector<double>& m,
                const std::vector<double>& l,
@@ -270,7 +269,7 @@ struct secsse_sim {
       event_type event = draw_event();
       apply_event(event);
 
-      if (!crown_start) {
+      if (crown_start) {
         if (track_crowns[0] < 1 || track_crowns[1] < 1) {
           run_info = extinct;
           break;
