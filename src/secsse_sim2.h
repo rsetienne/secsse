@@ -166,9 +166,10 @@ struct secsse_sim {
   const size_t num_states;
   const double max_t;
   const size_t max_spec;
-  const std::vector<double> init_state_probs;
+  
   const bool non_extinction;
   const bool max_spec_extant;
+  const std::vector<double> init_state_probs;
   const bool crown_start;
 
   finish_type run_info;
