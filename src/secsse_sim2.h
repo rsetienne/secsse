@@ -29,15 +29,9 @@ struct species_info {
   species_info(const std::vector<double>& m,
                const std::vector<double>& l,
                const std::vector<double>& s) :
-    trait_mu(m), trait_lambda(l), trait_qs(s),
-    max_mu(calc_max(m)),
-    max_la(calc_max(l)),
-    max_qs(calc_max(s)) {
+    trait_mu(m), trait_lambda(l), trait_qs(s) {
   }
 
-  double calc_max(const std::vector<double>& v) {
-    return *std::max_element(v.begin(), v.end());
-  }
 
   double mu(size_t trait) const {
     return trait_mu[trait];
@@ -51,25 +45,10 @@ struct species_info {
     return trait_qs[trait];
   }
 
-  double max_ext()const  {
-    return max_mu;
-  }
-
-  double max_spec() const {
-    return max_la;
-  }
-
-  double max_shift() const {
-    return max_qs;
-  }
-
  private:
   const std::vector<double> trait_mu;
   const std::vector<double> trait_lambda;
   const std::vector<double> trait_qs;
-  const double max_mu = 0.0;
-  const double max_la = 0.0;
-  const double max_qs = 0.0;
 };
 
 
