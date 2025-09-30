@@ -166,9 +166,9 @@ struct secsse_sim {
   const size_t num_states;
   const double max_t;
   const size_t max_spec;
-  const bool max_spec_extant;
   const std::vector<double> init_state_probs;
   const bool non_extinction;
+  const bool max_spec_extant;
   const bool crown_start;
 
   finish_type run_info;
@@ -191,7 +191,7 @@ struct secsse_sim {
              max_spec(max_s),
              non_extinction(ne),
              max_spec_extant(max_s_e),
-             init_state_probs(init), 
+             init_state_probs(init),
              crown_start(start_at_crown),
              run_info(not_run_yet),
              t(0.0) {
@@ -206,7 +206,7 @@ struct secsse_sim {
     t = 0.0;
 
     // randomly draw initial trait
-    std::discrete_distribution<> init_trait_dist(init_state_probs.begin(), 
+    std::discrete_distribution<> init_trait_dist(init_state_probs.begin(),
                                                  init_state_probs.end());
     init_state = init_trait_dist(rndgen_);
 
@@ -268,8 +268,7 @@ struct secsse_sim {
   }
 
   void evolve_until_crown() {
-      
-    while(true) {
+    while (true) {
         update_rates();
         double dt = draw_dt();
         t += dt;
@@ -305,9 +304,9 @@ struct secsse_sim {
           default:
               break;
         }
-        
+
         // stop when we reach two species
-        if (L.size() >= 2) break; 
+        if (L.size() >= 2) break;
 
         // stop if all are extinct
         if (track_crowns[0] + track_crowns[1] < 1) break;
