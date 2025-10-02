@@ -176,6 +176,8 @@ struct secsse_sim {
   int init_state;
   double t;
 
+  const bool verbose;
+
   secsse_sim(const std::vector<double>& m,
              const num_mat_mat& l,
              const num_mat& q,
@@ -185,7 +187,8 @@ struct secsse_sim {
              const std::vector<double>& init,
              const bool& ne,
              int seed,
-             bool start_at_crown) :
+             bool start_at_crown,
+             bool verb) :
              trait_info(m, update_lambdas(l), update_qs_row_sums(q)),
              mus(m),
              num_states(m.size()), max_t(mt),
@@ -195,7 +198,8 @@ struct secsse_sim {
              init_state_probs(init),
              crown_start(start_at_crown),
              run_info(not_run_yet),
-             t(0.0) {
+             t(0.0),
+             verbose(verb) {
     // randomize randomizer
     rndgen_.seed((seed < 0) ? std::random_device {}() : seed);
     init_state = 0;
@@ -214,6 +218,14 @@ struct secsse_sim {
     run_info = not_run_yet;
 
     L.clear();
+    int updateFreq = static_cast<int>(max_t / 20);
+    if (updateFreq < 1) updateFreq = 1;
+    
+    if (verbose) {
+      Rcpp::Rcout << "\n0--------25--------50--------75--------100\n";
+      Rcpp::Rcout << "*";
+    }
+
 
     if (crown_start) {
       auto crown_states = root_speciation(init_state);
@@ -237,10 +249,22 @@ struct secsse_sim {
 
     track_crowns = {1, 1};
 
+    int prev_t = 0;
+
     while (true) {
       update_rates();
       double dt = draw_dt();
       t += dt;
+
+      if (verbose) {
+       auto current_t = static_cast<int>(t);
+       if (current_t - prev_t > 0) {
+          if (current_t % updateFreq == 0) {
+               Rcpp::Rcout << "**";
+               prev_t = current_t;
+          }
+        }
+      }
 
       if (t > max_t)  {
         run_info = done; break;
@@ -265,6 +289,7 @@ struct secsse_sim {
           run_info = overshoot; break;
         }
       }
+      //std::cerr << t << " " << track_crowns[0] + track_crowns[1] << "\n";
     }
   }
 

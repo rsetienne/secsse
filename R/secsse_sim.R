@@ -110,6 +110,10 @@ secsse_sim <- function(lambdas,
                       start_at_crown,
                       drop_extinct) 
   
+  if (res$status == "not enough tries") {
+    return(res)
+  }
+  
   if (length(res$phy$tip.label) != length(res$obs_traits)) {
     cat("something went wrong, please report this to the package maintainer")
   }
