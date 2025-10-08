@@ -121,8 +121,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
           case extinct: Rcpp::Rcout << "extinct, retrying\n"; break;
           case overshoot: Rcpp::Rcout << "too big, retrying\n"; break;
           case conditioning: Rcpp::Rcout << "failing conditioning, retrying\n"; break;
-        case not_run_yet: std::cout << "not run yet\n"; break;
-        case max_types: std::cout << "wtf\n"; break;
+          case not_run_yet: Rcpp::Rcout << "not run yet\n"; break;
+          case max_types: Rcpp::Rcout << "wtf\n"; break;
         }
       }
       if (sim.run_info == done) {
@@ -137,8 +137,8 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
           case extinct: Rcpp::Rcout << "extinct, retrying\n"; break;
           case overshoot: Rcpp::Rcout << "too big, retrying\n"; break;
           case conditioning: Rcpp::Rcout << "failing conditioning, retrying\n"; break;
-        case not_run_yet: std::cout << "not run yet\n"; break;
-        case max_types: std::cout << "wtf\n"; break;
+        case not_run_yet: Rcpp::Rcout << "not run yet\n"; break;
+        case max_types: Rcpp::Rcout << "wtf\n"; break;
         }
         if (sim.run_info != extinct) {
           Rcpp::Rcout << "too small tree, retrying\n";
