@@ -18,7 +18,7 @@
 #include <iostream>
 #include <numeric>
 
-#include "mutable_dist.h"
+#include "mutable_dist.h"  // NOLINT [build/include_subdir]
 
 using num_mat     = std::vector< std::vector<double >>;
 using num_mat_mat = std::vector<num_mat>;
@@ -61,7 +61,8 @@ struct ltab_species {
   enum info_index {time, p_id, self_id, extinct_time, trait_val};
 
   ltab_species(double brts, int parent, int ID, double death,
-               double trait, const species_info& spec, int ind, event_dist& draw_dist) :
+               double trait, const species_info& spec,
+               int ind, event_dist& draw_dist) :
     index(ind) {
     data_[time] = brts;
     data_[p_id] = static_cast<double>(parent);
@@ -72,7 +73,7 @@ struct ltab_species {
     rates[extinction] = spec.mu(trait);
     rates[speciation] = spec.lambda(trait);
     rates[shift]      = spec.shift(trait);
-      
+
     draw_dist[extinction].push_back(rates[extinction]);
     draw_dist[speciation].push_back(rates[speciation]);
     draw_dist[shift].push_back(rates[shift]);
@@ -90,7 +91,9 @@ struct ltab_species {
     return(data_[trait_val]);
   }
 
-  void set_trait(double new_val, const species_info& spec, event_dist& draw_dist) {
+  void set_trait(double new_val,
+                 const species_info& spec,
+                 event_dist& draw_dist) {
     data_[trait_val] = new_val;
     rates[extinction] = spec.mu(new_val);
     rates[speciation] = spec.lambda(new_val);
@@ -139,7 +142,7 @@ struct ltab_species {
   double shift_rate() const {
     return rates[shift];
   }
-    
+
   void update_dist(event_dist& draw_dist) const {
     draw_dist[extinction].change_val(index, rates[extinction]);
     draw_dist[speciation].change_val(index, rates[speciation]);
@@ -174,10 +177,9 @@ struct secsse_sim {
   std::vector< ltab_species > L;
 
   std::vector< lambda_dist > lambda_distributions;
-    
+
   event_dist draw_dist;
-    
-    
+
   vec_dist qs_dist;
   const species_info trait_info;
 
@@ -228,7 +230,9 @@ struct secsse_sim {
     init_state = 0;
     track_crowns = {0, 0};
     rates = {0.0, 0.0, 0.0};
-    for (size_t i = 0; i < event_type::max_num; ++i) draw_dist.push_back(mutable_distribution());
+    for (size_t i = 0; i < event_type::max_num; ++i) {
+        draw_dist.push_back(mutable_distribution());
+    }
   }
 
   void run() {
@@ -247,18 +251,20 @@ struct secsse_sim {
     }
     int updateFreq = static_cast<int>(max_t / 20);
     if (updateFreq < 1) updateFreq = 1;
-    
-    bool print_bar = false;
 
+    bool print_bar = false;
 
     if (crown_start) {
       auto crown_states = root_speciation(init_state);
       L.push_back(ltab_species(0.0,   0, -1, -1,
-                               std::get<0>(crown_states), trait_info, 0, draw_dist));
+                               std::get<0>(crown_states),
+                               trait_info, 0, draw_dist));
       L.push_back(ltab_species(0.0,  -1,  2, -1,
-                               std::get<1>(crown_states), trait_info, 1, draw_dist));
+                               std::get<1>(crown_states),
+                               trait_info, 1, draw_dist));
     } else {
-      L.push_back(ltab_species(0.0,  0, -1, -1, init_state, trait_info, 0, draw_dist));
+      L.push_back(ltab_species(0.0,  0, -1, -1, init_state,
+                               trait_info, 0, draw_dist));
       track_crowns = {1, 0};
       evolve_until_crown();
       if (t > max_t) {
@@ -285,16 +291,13 @@ struct secsse_sim {
        if (current_t - prev_t > 0) {
           if (current_t % updateFreq == 0) {
               if (print_bar == false) {
-                  Rcpp::Rcout << "\n0--------25--------50--------75--------100\n";
+                Rcpp::Rcout << "\n0--------25--------50--------75--------100\n";
                 Rcpp::Rcout << "*";
-                  print_bar = true;
+                print_bar = true;
               }
               Rcpp::Rcout << "**";
               prev_t = current_t;
-        //      Rcpp::Rcout << t << " " << L[0].get_trait() << " " << L[1].get_trait() << "\n";
-         //     Rcpp::Rcout << t << " " << track_crowns[0] << " " << track_crowns[1] << "\n";
           }
-          
         }
       }
 
@@ -321,7 +324,6 @@ struct secsse_sim {
           run_info = overshoot; break;
         }
       }
-      //std::cerr << t << " " << track_crowns[0] + track_crowns[1] << "\n";
     }
   }
 
@@ -469,16 +471,9 @@ struct secsse_sim {
   }
 
   void update_rates() {
-    /*rates = {0.0, 0.0, 0.0};
-    for (const auto& i : L) {
-        auto r = i.get_rates();
-        rates[0] += r[0];
-        rates[1] += r[1];
-        rates[2] += r[2];
-    }*/
-	rates[extinction] = draw_dist[extinction].cdf_.back();
-	rates[speciation] = draw_dist[speciation].cdf_.back();
-	rates[shift] = draw_dist[shift].cdf_.back();
+    rates[extinction] = draw_dist[extinction].cdf_.back();
+    rates[speciation] = draw_dist[speciation].cdf_.back();
+    rates[shift] = draw_dist[shift].cdf_.back();
   }
 
   event_type draw_event() {
