@@ -116,7 +116,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
           case done:          Rcpp::Rcout << "done\n"; break;
           case extinct:       Rcpp::Rcout << "extinct, retrying\n"; break;
           case overshoot:     Rcpp::Rcout << "too big, retrying\n"; break;
-          case conditioning:  Rcpp::Rcout << "failing conditioning, retrying\n"; 
+          case conditioning:  Rcpp::Rcout << "failing conditioning, retrying\n";
                                           break;
           case not_run_yet:   Rcpp::Rcout << "not run yet\n"; break;
           case max_types:     Rcpp::Rcout << "wtf\n"; break;
@@ -133,7 +133,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
           case done:          Rcpp::Rcout << "done\n"; break;
           case extinct:       Rcpp::Rcout << "extinct, retrying\n"; break;
           case overshoot:     Rcpp::Rcout << "too big, retrying\n"; break;
-          case conditioning:  Rcpp::Rcout << "failing conditioning, retrying\n"; 
+          case conditioning:  Rcpp::Rcout << "failing conditioning, retrying\n";
                                                   break;
         case not_run_yet:     Rcpp::Rcout << "not run yet\n"; break;
         case max_types:       Rcpp::Rcout << "wtf\n"; break;
