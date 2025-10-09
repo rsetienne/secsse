@@ -1,4 +1,6 @@
 # 3.6.0
+- changed the default integration method to "odeint::runge_kutta_cash_karp54",
+although a bit slower, this method is more numerically stable.
 - fixed lack of sorting of numeric traits in the function `q_doubletrans`
 - fixed an error in preparing the state matrices when NAs were present in the 
 traits
