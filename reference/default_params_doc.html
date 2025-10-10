@@ -9,7 +9,7 @@ inherited by the relevant functions."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ inherited by the relevant functions.</p>
 <span>  <span class="va">mus</span>,</span>
 <span>  <span class="va">qs</span>,</span>
 <span>  <span class="va">crown_age</span>,</span>
-<span>  <span class="va">pool_init_states</span>,</span>
+<span>  <span class="va">init_state_probs</span>,</span>
 <span>  <span class="va">maxSpec</span>,</span>
 <span>  <span class="va">conditioning</span>,</span>
 <span>  <span class="va">non_extinction</span>,</span>
@@ -118,7 +118,8 @@ inherited by the relevant functions.</p>
 <span>  <span class="va">optimmethod</span>,</span>
 <span>  <span class="va">display_warning</span>,</span>
 <span>  <span class="va">take_into_account_root_edge</span>,</span>
-<span>  <span class="va">use_normalization</span></span>
+<span>  <span class="va">use_normalization</span>,</span>
+<span>  <span class="va">return_root_state</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -242,7 +243,7 @@ extinct species is provided. If set to <code>TRUE</code>, it also assumes that a
 <dd><p>integration method used, available are:
 <code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
 <code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
-<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::runge_kutta_cash_karp54"</code>.</p></dd>
 
 
 <dt id="arg-parameter">parameter<a class="anchor" aria-label="anchor" href="#arg-parameter"></a></dt>
@@ -283,9 +284,12 @@ generally in the form of a matrix.</p></dd>
 on non-extinction and this crown age.</p></dd>
 
 
-<dt id="arg-pool-init-states">pool_init_states<a class="anchor" aria-label="anchor" href="#arg-pool-init-states"></a></dt>
-<dd><p>pool of initial states at the crown, in case this is
-different from all available states, otherwise leave at NULL</p></dd>
+<dt id="arg-init-state-probs">init_state_probs<a class="anchor" aria-label="anchor" href="#arg-init-state-probs"></a></dt>
+<dd><p>The user can provide a vector with probabilities of
+observing each state at the root, the root state is then drawn from this
+distribution. Alternatively, the user can provide a vector of characters
+representing the full names (including the concealed state) of states used
+to initialize the root (e.g. '0A', not '0').</p></dd>
 
 
 <dt id="arg-conditioning">conditioning<a class="anchor" aria-label="anchor" href="#arg-conditioning"></a></dt>
@@ -480,6 +484,14 @@ no longer needs to assume a speciation event at the start of the tree)</p></dd>
 <dt id="arg-use-normalization">use_normalization<a class="anchor" aria-label="anchor" href="#arg-use-normalization"></a></dt>
 <dd><p>normalize the density vector during integration,
 more accurate but slower (default = TRUE)</p></dd>
+
+
+<dt id="arg-return-root-state">return_root_state<a class="anchor" aria-label="anchor" href="#arg-return-root-state"></a></dt>
+<dd><p>if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).</p></dd>
 
 </dl></div>
     <div class="section level2">

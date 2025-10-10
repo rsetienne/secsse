@@ -13,7 +13,7 @@ cladogenesis"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,8 +83,9 @@ cladogenesis</p>
 <span>  num_threads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  atol <span class="op">=</span> <span class="fl">1e-12</span>,</span>
 <span>  rtol <span class="op">=</span> <span class="fl">1e-12</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"odeint::bulirsch_stoer"</span>,</span>
-<span>  use_normalization <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  method <span class="op">=</span> <span class="st">"odeint::runge_kutta_cash_karp54"</span>,</span>
+<span>  use_normalization <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_root_state <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -238,12 +239,20 @@ no longer needs to assume a speciation event at the start of the tree)</p></dd>
 <dd><p>integration method used, available are:
 <code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
 <code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
-<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::runge_kutta_cash_karp54"</code>.</p></dd>
 
 
 <dt id="arg-use-normalization">use_normalization<a class="anchor" aria-label="anchor" href="#arg-use-normalization"></a></dt>
 <dd><p>normalize the density vector during integration,
 more accurate but slower (default = TRUE)</p></dd>
+
+
+<dt id="arg-return-root-state">return_root_state<a class="anchor" aria-label="anchor" href="#arg-return-root-state"></a></dt>
+<dd><p>if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -338,21 +347,21 @@ more accurate but slower (default = TRUE)</p></dd>
 <span class="r-in"><span><span class="va">optimmethod</span>,</span></span>
 <span class="r-in"><span>num_cycles <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Note: you set some transitions as impossible to happen.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.298934331988</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.29893433203</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating the likelihood for the initial parameters.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The loglikelihood for the initial parameter values is -138.298934331988</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The loglikelihood for the initial parameter values is -138.29893433203</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Optimizing the likelihood - this may take a while.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.298934331988</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 4 -138.29893433203</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -19.6874997974797 0.0565371031208431 4 -Inf</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 -19.6874997974797 4 -Inf</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 0.0565371031208431 -2.25 -Inf</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 2.57370518668921 2.57370518668921 -0.166666666666667 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 1.23970037744085 0.428571428571429 -756.458030945448</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 1.23970037744085 0.428571428571429 -756.458030948603</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -19.6874997974797 -0.380096751677633 0.875 -Inf</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 4.08936171714845 -0.164220824193095 1.22222222222222 -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 0.0565371031208431 4 -440.773246835226</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 1.23970037744085 4 -429.554227389694</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.435774310919359 0.435774310919359 1.22222222222222 -318.572024860541</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.23970037744085 0.0565371031208431 4 -440.773246837265</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0565371031208431 1.23970037744085 4 -429.554227390291</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0.435774310919359 0.435774310919359 1.22222222222222 -318.572024861172</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Optimization has not converged. Try again with different initial values or increase the number of iterations.</span>
 <span class="r-in"><span><span class="co"># ML -136.5796 if run till completion</span></span></span>
 </code></pre></div>

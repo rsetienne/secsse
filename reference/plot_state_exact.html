@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,7 @@
 <span>  cond <span class="op">=</span> <span class="st">"proper_cond"</span>,</span>
 <span>  root_state_weight <span class="op">=</span> <span class="st">"proper_weights"</span>,</span>
 <span>  is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"odeint::bulirsch_stoer"</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"odeint::runge_kutta_cash_karp54"</span>,</span>
 <span>  atol <span class="op">=</span> <span class="fl">1e-16</span>,</span>
 <span>  rtol <span class="op">=</span> <span class="fl">1e-16</span>,</span>
 <span>  num_steps <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -125,7 +125,7 @@ extinct species is provided. If set to <code>TRUE</code>, it also assumes that a
 <dd><p>integration method used, available are:
 <code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
 <code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
-<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::runge_kutta_cash_karp54"</code>.</p></dd>
 
 
 <dt id="arg-atol">atol<a class="anchor" aria-label="anchor" href="#arg-atol"></a></dt>

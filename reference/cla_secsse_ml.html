@@ -9,7 +9,7 @@ States-dependent Speciation and Extinction (SecSSE) with cladogenetic option"></
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,8 +73,9 @@ States-dependent Speciation and Extinction (SecSSE) with cladogenetic option</p>
 <span>  num_threads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  atol <span class="op">=</span> <span class="fl">1e-08</span>,</span>
 <span>  rtol <span class="op">=</span> <span class="fl">1e-07</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"odeint::bulirsch_stoer"</span>,</span>
-<span>  use_normalization <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  method <span class="op">=</span> <span class="st">"odeint::runge_kutta_cash_karp54"</span>,</span>
+<span>  use_normalization <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_root_state <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -206,17 +207,25 @@ no longer needs to assume a speciation event at the start of the tree)</p></dd>
 <dd><p>integration method used, available are:
 <code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
 <code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
-<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::runge_kutta_cash_karp54"</code>.</p></dd>
 
 
 <dt id="arg-use-normalization">use_normalization<a class="anchor" aria-label="anchor" href="#arg-use-normalization"></a></dt>
 <dd><p>normalize the density vector during integration,
 more accurate but slower (default = TRUE)</p></dd>
 
+
+<dt id="arg-return-root-state">return_root_state<a class="anchor" aria-label="anchor" href="#arg-return-root-state"></a></dt>
+<dd><p>if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Parameter estimated and maximum likelihood</p>
+    <p>Parameters estimated and maximum likelihood</p>
     </div>
 
     <div class="section level2">
@@ -280,82 +289,82 @@ more accurate but slower (default = TRUE)</p></dd>
 <span class="r-in"><span> num_threads <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span> verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Note: you set some transitions as impossible to happen.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 15.6042898684248 15.6042898684248 15.6042898684248 -121.487683644503 initial </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 16.3845043618461 16.3845043618461 14.2366516329269 -115.872102944723 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 16.3845043618461 16.3845043618461 14.2366516329269 -115.872102944723 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 16.1164115482592 15.8564618714564 13.4435417361893 -112.708848926855 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 16.661129036425 17.8616456533575 11.7804033067207 -106.427344244374 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 18.8748937365321 16.661129036425 10.7024010667367 -102.649990642589 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7 18.8748937365321 17.5464711985784 8.83574291518734 -96.8407390014834 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8 23.7499826152845 21.2672928057985 6.8803975853617 -92.1784039041511 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9 34.9835268796627 19.2372760644554 5.34799248335495 -90.118153445057 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 contract outside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18 33.8535718517169 22.6933092609064 4.81579185777643 -89.8916336320649 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19 40.0611420950045 21.5954238570094 4.64166201307183 -89.8907284337715 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20 40.0611420950045 21.5954238570094 4.64166201307183 -89.8907284337715 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 38.7838963866625 22.09252160483 4.68738843123826 -89.8892656096984 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22 38.7838963866625 22.09252160483 4.68738843123826 -89.8892656096984 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23 36.0332588409853 22.4146047038665 4.73313430169762 -89.8867773517614 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24 36.0332588409853 22.4146047038665 4.73313430169762 -89.8867773517614 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 36.0332588409853 22.4146047038665 4.73313430169762 -89.8867773517614 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26 36.0332588409853 22.4146047038665 4.73313430169762 -89.8867773517614 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27 33.7939708537398 23.1619267394853 4.67617743982144 -89.8846392966006 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28 32.9570145766782 22.9967027764633 4.76019916146665 -89.8845175271118 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29 28.8858477767871 25.9077673007118 4.66368227158788 -89.882769361436 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30 25.5641274625481 27.7298236564981 4.63398478686598 -89.8786891959933 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31 22.2163034259215 31.395418958883 4.70407868110388 -89.8743828184079 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32 22.2163034259215 31.395418958883 4.70407868110388 -89.8743828184079 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33 20.0301019807209 33.1020565748236 4.72372769998256 -89.8702085435553 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34 20.0301019807209 33.1020565748236 4.72372769998256 -89.8702085435553 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35 20.0301019807209 33.1020565748236 4.72372769998256 -89.8702085435553 contract outside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36 20.0301019807209 33.1020565748236 4.72372769998256 -89.8702085435553 contract outside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37 20.0301019807209 33.1020565748236 4.72372769998256 -89.8702085435553 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38 19.2007230053455 33.5964443113748 4.73425605791087 -89.8687093432768 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39 21.852133724945 29.7262450758438 4.71093041222478 -89.8681250737671 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40 21.852133724945 29.7262450758438 4.71093041222478 -89.8681250737671 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41 20.4365061188632 30.575466286766 4.69143428701633 -89.8641759306454 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42 20.4365061188632 30.575466286766 4.69143428701633 -89.8641759306454 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43 20.4365061188632 30.575466286766 4.69143428701633 -89.8641759306454 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44 21.4498889292796 26.902167800435 4.68802298364535 -89.8561107507925 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45 21.4498889292796 26.902167800435 4.68802298364535 -89.8561107507925 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46 21.4498889292796 26.902167800435 4.68802298364535 -89.8561107507925 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47 22.1288807686561 23.2912492321529 4.6175356044978 -89.8453677814197 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48 18.8060270739465 25.1791704795815 4.67267401030954 -89.8381782639351 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49 23.7069393574904 19.1938996609292 4.65026318942184 -89.8333474179573 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50 21.1666443055712 16.4805975240266 4.56592684998421 -89.8164896536086 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51 19.1592610465612 14.9769117628143 4.65280890366182 -89.8023542183295 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52 19.1592610465612 14.9769117628143 4.65280890366182 -89.8023542183295 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53 19.1592610465612 14.9769117628143 4.65280890366182 -89.8023542183295 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54 16.7816791253283 16.063236451579 4.60155492072445 -89.7960967620457 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55 16.7816791253283 16.063236451579 4.60155492072445 -89.7960967620457 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56 16.4024847909521 15.9381640876111 4.67219593044267 -89.7956269434704 contract outside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68 14.3888583685557 13.8854168337677 4.61844421632923 -89.7902277035283 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 69 14.479947109031 14.3019139360004 4.632966660664 -89.790134364218 contract outside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70 14.479947109031 14.3019139360004 4.632966660664 -89.790134364218 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71 14.3165211694009 14.4426137546406 4.62620711474184 -89.7900933522345 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72 14.3165211694009 14.4426137546406 4.62620711474184 -89.7900933522345 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73 14.3165211694009 14.4426137546406 4.62620711474184 -89.7900933522345 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74 14.3165211694009 14.4426137546406 4.62620711474184 -89.7900933522345 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75 14.3165211694009 14.4426137546406 4.62620711474184 -89.7900933522345 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76 14.2700219864961 14.2521569922074 4.62904905591931 -89.790083734614 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 15.6042898684248 15.6042898684248 15.6042898684248 -121.487688555362 initial </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 16.3845043618461 16.3845043618461 14.2366516329269 -115.87210515215 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 16.3845043618461 16.3845043618461 14.2366516329269 -115.87210515215 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 15.8564618714564 16.1164115482592 13.4435417361893 -112.708850473379 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 17.8616456533575 16.661129036425 11.7804033067207 -106.427345504873 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 16.661129036425 18.8748937365321 10.7024010667367 -102.649991462868 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 17.5464711985784 18.8748937365321 8.83574291518734 -96.8407395467205 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8 21.2672928057985 23.7499826152845 6.8803975853617 -92.1784042042333 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9 19.2372760644554 34.9835268796627 5.34799248335495 -90.1181535926296 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 contract outside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 22.6933092609064 33.8535718517169 4.81579185777643 -89.8916337567571 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 21.5954238570094 40.0611420950045 4.64166201307183 -89.8907285434026 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 21.5954238570094 40.0611420950045 4.64166201307183 -89.8907285434026 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 22.09252160483 38.7838963866625 4.68738843123826 -89.8892657403911 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 22.09252160483 38.7838963866625 4.68738843123826 -89.8892657403911 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 22.4146047038665 36.0332588409853 4.73313430169762 -89.8867774721457 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 22.4146047038665 36.0332588409853 4.73313430169762 -89.8867774721457 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25 22.4146047038665 36.0332588409853 4.73313430169762 -89.8867774721457 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26 22.4146047038665 36.0332588409853 4.73313430169762 -89.8867774721457 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27 23.1619267394853 33.7939708537398 4.67617743982144 -89.8846394388549 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28 22.9967027764633 32.9570145766782 4.76019916146665 -89.8845176846956 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29 25.9077673007118 28.8858477767871 4.66368227158788 -89.8827694880962 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30 27.7298236564981 25.5641274625481 4.63398478686598 -89.8786893066793 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31 31.395418958883 22.2163034259215 4.70407868110388 -89.8743829342342 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32 31.395418958883 22.2163034259215 4.70407868110388 -89.8743829342342 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33 33.1020565748236 20.0301019807209 4.72372769998256 -89.8702086639009 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34 33.1020565748236 20.0301019807209 4.72372769998256 -89.8702086639009 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35 33.1020565748236 20.0301019807209 4.72372769998256 -89.8702086639009 contract outside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36 33.1020565748236 20.0301019807209 4.72372769998256 -89.8702086639009 contract outside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37 33.1020565748236 20.0301019807209 4.72372769998256 -89.8702086639009 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38 33.5964443113748 19.2007230053455 4.73425605791087 -89.8687094544291 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39 29.7262450758438 21.852133724945 4.71093041222478 -89.8681251857471 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40 29.7262450758438 21.852133724945 4.71093041222478 -89.8681251857471 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41 30.575466286766 20.4365061188632 4.69143428701633 -89.8641760452911 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42 30.575466286766 20.4365061188632 4.69143428701633 -89.8641760452911 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43 30.575466286766 20.4365061188632 4.69143428701633 -89.8641760452911 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44 26.902167800435 21.4498889292796 4.68802298364535 -89.8561108566437 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45 26.902167800435 21.4498889292796 4.68802298364535 -89.8561108566437 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46 26.902167800435 21.4498889292796 4.68802298364535 -89.8561108566437 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47 23.2912492321529 22.1288807686561 4.6175356044978 -89.8453679007587 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48 25.1791704795815 18.8060270739465 4.67267401030954 -89.8381783694394 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49 19.1938996609292 23.7069393574904 4.65026318942184 -89.8333475178622 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50 16.4805975240266 21.1666443055712 4.56592684998421 -89.8164897620991 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51 14.9769117628143 19.1592610465612 4.65280890366182 -89.8023543431036 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52 14.9769117628143 19.1592610465612 4.65280890366182 -89.8023543431036 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53 14.9769117628143 19.1592610465612 4.65280890366182 -89.8023543431036 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 54 16.063236451579 16.7816791253283 4.60155492072445 -89.7960968434354 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 55 16.063236451579 16.7816791253283 4.60155492072445 -89.7960968434354 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56 15.9381640876111 16.4024847909521 4.67219593044267 -89.7956270297493 contract outside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 57 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 58 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 60 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 61 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 62 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 63 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 64 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 65 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 66 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 67 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 68 13.8854168337677 14.3888583685557 4.61844421632923 -89.7902278102615 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 69 14.3019139360004 14.479947109031 4.632966660664 -89.7901344817794 contract outside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 70 14.3019139360004 14.479947109031 4.632966660664 -89.7901344817794 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71 14.4426137546406 14.3165211694009 4.62620711474184 -89.7900934687737 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 72 14.4426137546406 14.3165211694009 4.62620711474184 -89.7900934687737 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 73 14.4426137546406 14.3165211694009 4.62620711474184 -89.7900934687737 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 74 14.4426137546406 14.3165211694009 4.62620711474184 -89.7900934687737 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 75 14.4426137546406 14.3165211694009 4.62620711474184 -89.7900934687737 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 76 14.2521569922074 14.2700219864961 4.62904905591931 -89.7900838525261 contract inside </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Optimization has terminated successfully. </span>
 <span class="r-in"><span><span class="co"># [1] -90.9763</span></span></span>
 </code></pre></div>

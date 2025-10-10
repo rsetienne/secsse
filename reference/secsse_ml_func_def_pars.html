@@ -11,7 +11,7 @@ are functions of other parameters and/or factors."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +79,8 @@ are functions of other parameters and/or factors.</p>
 <span>  num_threads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  atol <span class="op">=</span> <span class="fl">1e-08</span>,</span>
 <span>  rtol <span class="op">=</span> <span class="fl">1e-06</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"odeint::bulirsch_stoer"</span></span>
+<span>  method <span class="op">=</span> <span class="st">"odeint::runge_kutta_cash_karp54"</span>,</span>
+<span>  return_root_state <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -227,7 +228,15 @@ no longer needs to assume a speciation event at the start of the tree)</p></dd>
 <dd><p>integration method used, available are:
 <code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
 <code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
-<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::runge_kutta_cash_karp54"</code>.</p></dd>
+
+
+<dt id="arg-return-root-state">return_root_state<a class="anchor" aria-label="anchor" href="#arg-return-root-state"></a></dt>
+<dd><p>if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -320,17 +329,17 @@ no longer needs to assume a speciation event at the start of the tree)</p></dd>
 <span class="r-in"><span><span class="va">optimmethod</span>,</span></span>
 <span class="r-in"><span>num_cycles <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Note: you set some transitions as impossible to happen.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0565371031208431 0.0565371031208431 4 -138.298928431335 initial </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.0593639582768853 0.0509284124003145 4.20000000000001 -137.992302682084 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.0537252944328596 0.0509284124003145 4.41666666666667 -137.649429014236 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.0565371031208431 0.0453789553777978 4.90909090909091 -137.365572445483 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.0565371031208431 0.0344540282301516 5.19047619047621 -136.872934641923 expand </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.051859055237338 0.0362589643945071 5.61016949152544 -136.832861284528 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693655428475 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693655428475 contract outside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693655428475 reflect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693655428475 contract inside </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693655428475 contract outside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0565371031208431 0.0565371031208431 4 -138.298934553027 initial </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.0593639582768853 0.0509284124003145 4.20000000000001 -137.992309626735 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.0537252944328596 0.0509284124003145 4.41666666666667 -137.649434791941 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.0565371031208431 0.0453789553777978 4.90909090909091 -137.365580447333 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.0565371031208431 0.0344540282301516 5.19047619047621 -136.872942801612 expand </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.051859055237338 0.0362589643945071 5.61016949152544 -136.832868258171 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693662720223 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693662720223 contract outside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693662720223 reflect </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693662720223 contract inside </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.056223939100232 0.0267047506917309 6.31250000000001 -136.693662720223 contract outside </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Maximum number of iterations has been exceeded. </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Optimization has not converged. Try again with different initial values or increase the number of iterations.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">ML</span><span class="op">)</span></span></span>

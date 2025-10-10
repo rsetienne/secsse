@@ -11,7 +11,7 @@ data, returning also the likelihoods along the branches"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@ data, returning also the likelihoods along the branches</p>
 <span>  num_threads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  atol <span class="op">=</span> <span class="fl">1e-08</span>,</span>
 <span>  rtol <span class="op">=</span> <span class="fl">1e-07</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"odeint::bulirsch_stoer"</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"odeint::runge_kutta_cash_karp54"</span>,</span>
 <span>  num_steps <span class="op">=</span> <span class="fl">100</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -154,7 +154,7 @@ extinct species is provided. If set to <code>TRUE</code>, it also assumes that a
 <dd><p>integration method used, available are:
 <code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
 <code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
-<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::runge_kutta_cash_karp54"</code>.</p></dd>
 
 
 <dt id="arg-num-steps">num_steps<a class="anchor" aria-label="anchor" href="#arg-num-steps"></a></dt>
@@ -225,7 +225,7 @@ evaluation</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [31,]    6    2 0.619133999    0    0    0    0 0.09850443 0.78821695</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [32,]    6    2 0.696525749    0    0    0    0 0.10774457 0.76616246</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [33,]    6    2 0.773917499    0    0    0    0 0.11640881 0.74495202</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [34,]    6    7 0.000000000    0    0    0    0 0.32533264 0.32533264</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [34,]    6    7 0.000000000    0    0    0    0 0.32533265 0.32533265</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [35,]    6    7 0.027691500    0    0    0    0 0.32271192 0.32271192</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [36,]    6    7 0.055383001    0    0    0    0 0.32012191 0.32012191</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [37,]    6    7 0.083074501    0    0    0    0 0.31756216 0.31756216</span>
@@ -253,7 +253,7 @@ evaluation</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [59,]    5    6 0.008387995    0    0    0    0 0.10305757 0.65499711</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [60,]    5    6 0.011183994    0    0    0    0 0.10316371 0.65417809</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [61,]    5    6 0.013979992    0    0    0    0 0.10326953 0.65336031</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [62,]    5    6 0.016775991    0    0    0    0 0.10337504 0.65254377</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [62,]    5    6 0.016775991    0    0    0    0 0.10337505 0.65254376</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [63,]    5    6 0.019571989    0    0    0    0 0.10348024 0.65172845</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [64,]    5    6 0.022367987    0    0    0    0 0.10358513 0.65091436</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [65,]    5    6 0.025163986    0    0    0    0 0.10368970 0.65010151</span>
@@ -294,12 +294,12 @@ evaluation</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [33,] 0.120760151 0.799879260</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [34,] 0.174667355 0.174667355</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [35,] 0.175009400 0.175009400</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [36,] 0.175334247 0.175334247</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [36,] 0.175334246 0.175334246</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [37,] 0.175642204 0.175642204</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [38,] 0.175933579 0.175933579</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [39,] 0.176208671 0.176208671</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [40,] 0.176467777 0.176467777</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [41,] 0.176711188 0.176711188</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41,] 0.176711187 0.176711187</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [42,] 0.176939189 0.176939189</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [43,] 0.177152064 0.177152064</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [44,] 0.177350089 0.177350089</span>
@@ -314,15 +314,15 @@ evaluation</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [53,] 0.829996198 0.104392289</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [54,] 0.811576291 0.114489160</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [55,] 0.793712291 0.124021207</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [56,] 0.031454686 0.208346471</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [57,] 0.031690079 0.208334742</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58,] 0.031925006 0.208322892</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [56,] 0.031454687 0.208346470</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [57,] 0.031690079 0.208334741</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58,] 0.031925006 0.208322891</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [59,] 0.032159467 0.208310921</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [60,] 0.032393463 0.208298830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [61,] 0.032626995 0.208286618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [62,] 0.032860064 0.208274287</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [60,] 0.032393463 0.208298829</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [61,] 0.032626996 0.208286618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [62,] 0.032860065 0.208274286</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [63,] 0.033092671 0.208261835</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [64,] 0.033324815 0.208249265</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [64,] 0.033324816 0.208249264</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [65,] 0.033556499 0.208236575</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [66,] 0.033787722 0.208223766</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -333,8 +333,8 @@ evaluation</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,]    0    0    0    0 0.4243298 0.4297629 0.07433059 0.07157672    0     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]    0    0    0    0 0.1027372 0.6574616 0.03145469 0.20834647    0     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [7,]    0    0    0    0 0.3253326 0.3253326 0.17466736 0.17466736    0     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]    0    0    0    0 0.1027373 0.6574616 0.03145469 0.20834647    0     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [7,]    0    0    0    0 0.3253326 0.3253326 0.17466735 0.17466735    0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,11] [,12]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]     1     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2,]     1     1</span>
@@ -345,7 +345,7 @@ evaluation</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [7,]     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $duration</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000295653</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000123791</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

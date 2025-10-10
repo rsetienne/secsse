@@ -11,7 +11,7 @@ and data using Rcpp"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,11 +67,12 @@ and data using Rcpp</p>
 <span>  is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  take_into_account_root_edge <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  num_threads <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"odeint::bulirsch_stoer"</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"odeint::runge_kutta_cash_karp54"</span>,</span>
 <span>  atol <span class="op">=</span> <span class="fl">1e-08</span>,</span>
 <span>  rtol <span class="op">=</span> <span class="fl">1e-07</span>,</span>
 <span>  display_warning <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  use_normalization <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  use_normalization <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_root_state <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -160,7 +161,7 @@ no longer needs to assume a speciation event at the start of the tree)</p></dd>
 <dd><p>integration method used, available are:
 <code>"odeint::runge_kutta_cash_karp54"</code>, <code>"odeint::runge_kutta_fehlberg78"</code>,
 <code>"odeint::runge_kutta_dopri5"</code>, <code>"odeint::bulirsch_stoer"</code> and
-<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::bulirsch_stoer"</code>.</p></dd>
+<code>"odeint::runge_kutta4"</code>. Default method is: <code>"odeint::runge_kutta_cash_karp54"</code>.</p></dd>
 
 
 <dt id="arg-atol">atol<a class="anchor" aria-label="anchor" href="#arg-atol"></a></dt>
@@ -178,6 +179,14 @@ no longer needs to assume a speciation event at the start of the tree)</p></dd>
 <dt id="arg-use-normalization">use_normalization<a class="anchor" aria-label="anchor" href="#arg-use-normalization"></a></dt>
 <dd><p>normalize the density vector during integration,
 more accurate but slower (default = TRUE)</p></dd>
+
+
+<dt id="arg-return-root-state">return_root_state<a class="anchor" aria-label="anchor" href="#arg-return-root-state"></a></dt>
+<dd><p>if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -333,7 +342,7 @@ more accurate but slower (default = TRUE)</p></dd>
 <span class="r-in"><span>                 setting_calculation <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>                 see_ancestral_states <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>                 loglik_penalty <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Deduced names and order of used states to be: 1, 2, 0</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Deduced names and order of used states to be: 0, 1, 2</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> if this is incorrect, consider passing states as matching numeric </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   ordering, e.g. 1 for the first state, 2 for the second etc.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] -42.18407</span>

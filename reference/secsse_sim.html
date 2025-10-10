@@ -6,7 +6,7 @@ is typically a list of matrices.
 Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying pool_init_states.
+modifying init_state_probs.
 By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree
 has a crown age that matches the used crown age. You can modify
@@ -17,7 +17,7 @@ is typically a list of matrices.
 Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying pool_init_states.
+modifying init_state_probs.
 By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree
 has a crown age that matches the used crown age. You can modify
@@ -29,7 +29,7 @@ has a crown age that matches the used crown age. You can modify
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,7 @@ is typically a list of matrices.</p>
 <p>Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying <code>pool_init_states</code>.</p>
+modifying <code>init_state_probs</code>.</p>
 <p>By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree
 has a crown age that matches the used crown age. You can modify
@@ -86,7 +86,7 @@ has a crown age that matches the used crown age. You can modify
 <span>  <span class="va">qs</span>,</span>
 <span>  <span class="va">crown_age</span>,</span>
 <span>  <span class="va">num_concealed_states</span>,</span>
-<span>  pool_init_states <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  init_state_probs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sampling_fraction <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_spec <span class="op">=</span> <span class="fl">1e+05</span>,</span>
 <span>  min_spec <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -129,9 +129,12 @@ on non-extinction and this crown age.</p></dd>
 to the number of examined states in the dataset.</p></dd>
 
 
-<dt id="arg-pool-init-states">pool_init_states<a class="anchor" aria-label="anchor" href="#arg-pool-init-states"></a></dt>
-<dd><p>pool of initial states at the crown, in case this is
-different from all available states, otherwise leave at NULL</p></dd>
+<dt id="arg-init-state-probs">init_state_probs<a class="anchor" aria-label="anchor" href="#arg-init-state-probs"></a></dt>
+<dd><p>The user can provide a vector with probabilities of
+observing each state at the root, the root state is then drawn from this
+distribution. Alternatively, the user can provide a vector of characters
+representing the full names (including the concealed state) of states used
+to initialize the root (e.g. '0A', not '0').</p></dd>
 
 
 <dt id="arg-sampling-fraction">sampling_fraction<a class="anchor" aria-label="anchor" href="#arg-sampling-fraction"></a></dt>
