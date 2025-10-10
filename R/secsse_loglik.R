@@ -13,10 +13,11 @@ master_loglik <- function(parameter,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,
-                          method = "odeint::bulirsch_stoer",
+                          method = "odeint::runge_kutta_cash_karp54",
                           take_into_account_root_edge = FALSE,
                           display_warning = TRUE,
-                          use_normalization = TRUE) {
+                          use_normalization = TRUE,
+                          return_root_state = FALSE) {
   
   if (is.list(phy)) {
     if (!inherits(phy, "phylo")) {
@@ -48,7 +49,8 @@ master_loglik <- function(parameter,
                         rtol = rtol,
                         method = method,
                         display_warning = display_warning,
-                        use_normalization = use_normalization))
+                        use_normalization = use_normalization,
+                        return_root_state = return_root_state))
   }
   
   lambdas <- parameter[[1]]
@@ -99,6 +101,9 @@ master_loglik <- function(parameter,
   }
   
   RcppParallel::setThreadOptions(numThreads = num_threads)
+  return_states = see_ancestral_states
+  if (return_root_state) return_states = TRUE
+  
   calcul <- calc_ll_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
                         ances = ances,
                         states = states,
@@ -110,7 +115,7 @@ master_loglik <- function(parameter,
                         atol = atol,
                         rtol = rtol,
                         is_complete_tree = is_complete_tree,
-                        see_states = see_ancestral_states,
+                        see_states = return_states,
                         use_normalization = use_normalization)
   loglik <- calcul$loglik
   nodeM <- calcul$node_M
@@ -120,19 +125,12 @@ master_loglik <- function(parameter,
   S <- nodeM[(2 * d + 1):(3 * d)]
   
   if (using_cla && !is_complete_tree) {
-    # currently, S is not implemented in complete_tree LL
+    
     if (any(is.na(S))) {
       S <- 1 - E
     } 
-    
-    av <- E + S
-    for (x in av) {
-      if (x < 1 - 1e-6 || x > 1 + 1e-6) {
-        warning("E + S is incorrect, possibly the calculation for S failed")
-        S <- 1 - E
-      }
-    }
   } else {
+    # currently, S is not implemented in complete_tree LL
     S <- 1 - E
   }
   
@@ -148,7 +146,7 @@ master_loglik <- function(parameter,
                                            method = method,
                                            atol = atol,
                                            rtol = rtol,
-                                           see_states = see_ancestral_states,
+                                           see_states = return_states,
                                            use_normalization = use_normalization)
       loglik <- loglik + calcul2$loglik
       nodeM <- calcul2$states
@@ -206,9 +204,17 @@ master_loglik <- function(parameter,
     
     rownames(ancestral_states) <- ances
     return(list(ancestral_states = ancestral_states, LL = LL, states = states))
-  } else {
-    return(LL)
+  } 
+  
+  if (return_root_state) {
+    return(list(LL = LL,
+                root_state = get_root_state(calcul$states,
+                                             phy,
+                                             mus,
+                                             d)))
   }
+  
+  return(LL)
 }
 
 #' @title Likelihood for SecSSE model
@@ -258,9 +264,10 @@ secsse_loglik <- function(parameter,
                           num_threads = 1,
                           atol = 1e-8,
                           rtol = 1e-7,
-                          method = "odeint::bulirsch_stoer",
+                          method = "odeint::runge_kutta_cash_karp54",
                           display_warning = TRUE,
-                          use_normalization = TRUE) {
+                          use_normalization = TRUE,
+                          return_root_state = FALSE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -278,7 +285,8 @@ secsse_loglik <- function(parameter,
                 rtol = rtol,
                 method = method,
                 display_warning = display_warning,
-                use_normalization = use_normalization)
+                use_normalization = use_normalization,
+                return_root_state = return_root_state)
 }
 
 
@@ -343,11 +351,12 @@ cla_secsse_loglik <- function(parameter,
                               is_complete_tree = FALSE,
                               take_into_account_root_edge = FALSE,
                               num_threads = 1,
-                              method = "odeint::bulirsch_stoer",
+                              method = "odeint::runge_kutta_cash_karp54",
                               atol = 1e-8,
                               rtol = 1e-7,
                               display_warning = TRUE,
-                              use_normalization = TRUE) {
+                              use_normalization = TRUE,
+                              return_root_state = FALSE) {
   master_loglik(parameter = parameter,
                 phy = phy,
                 traits = traits,
@@ -365,5 +374,6 @@ cla_secsse_loglik <- function(parameter,
                 rtol = rtol,
                 method = method,
                 display_warning = display_warning,
-                use_normalization = use_normalization)
+                use_normalization = use_normalization,
+                return_root_state = return_root_state)
 }

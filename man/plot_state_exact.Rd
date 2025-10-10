@@ -13,7 +13,7 @@ plot_state_exact(
   cond = "proper_cond",
   root_state_weight = "proper_weights",
   is_complete_tree = FALSE,
-  method = "odeint::bulirsch_stoer",
+  method = "odeint::runge_kutta_cash_karp54",
   atol = 1e-16,
   rtol = 1e-16,
   num_steps = 100,
@@ -61,7 +61,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \item{method}{integration method used, available are:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
-\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
 
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 

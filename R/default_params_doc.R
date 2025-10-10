@@ -61,7 +61,7 @@
 #' @param method integration method used, available are:
 #'  `"odeint::runge_kutta_cash_karp54"`, `"odeint::runge_kutta_fehlberg78"`,
 #'  `"odeint::runge_kutta_dopri5"`, `"odeint::bulirsch_stoer"` and
-#'  `"odeint::runge_kutta4"`. Default method is: `"odeint::bulirsch_stoer"`.
+#'  `"odeint::runge_kutta4"`. Default method is: `"odeint::runge_kutta_cash_karp54"`.
 #' @param parameter list where first vector represents lambdas, the second 
 #'  mus and the third transition rates.
 #' @param setting_calculation argument used internally to speed up calculation.
@@ -78,8 +78,11 @@
 #'  generally in the form of a matrix.
 #' @param crown_age crown age of the tree, tree will be simulated conditional
 #'  on non-extinction and this crown age.
-#' @param pool_init_states pool of initial states at the crown, in case this is
-#'  different from all available states, otherwise leave at NULL
+#' @param init_state_probs The user can provide a vector with probabilities of
+#' observing each state at the root, the root state is then drawn from this
+#' distribution. Alternatively, the user can provide a vector of characters
+#' representing the full names (including the concealed state) of states used 
+#' to initialize the root (e.g. '0A', not '0').
 #' @param max_spec Maximum number of species in the tree (please note that the
 #'  tree is not conditioned on this number, but that this is a safeguard 
 #'  against generating extremely large trees).
@@ -163,6 +166,11 @@
 #' no longer needs to assume a speciation event at the start of the tree)
 #' @param use_normalization normalize the density vector during integration,
 #' more accurate but slower (default = TRUE)
+#' @param return_root_state if TRUE, returns the state of the system at the 
+#' root, this can be useful to use as the starting point of a simulation. When 
+#' used in ML, after finishing the ML optimization, the found optimum is 
+#' evaluated one more time to retrieve the root state (to avoid having to 
+#' store the root state every ML evaluation).
 #' @return Nothing
 #' @keywords internal
 #' @export
@@ -197,7 +205,7 @@ default_params_doc <- function(phy,
                                mus,
                                qs,
                                crown_age,
-                               pool_init_states,
+                               init_state_probs,
                                maxSpec,
                                conditioning,
                                non_extinction,
@@ -233,6 +241,7 @@ default_params_doc <- function(phy,
                                optimmethod,
                                display_warning,
                                take_into_account_root_edge,
-                               use_normalization) {
+                               use_normalization,
+                               return_root_state) {
   # Nothing
 }

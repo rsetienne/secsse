@@ -69,7 +69,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                           double max_species,
                           bool max_species_extant,
                           double min_species,
-                          const std::vector<double>& init_states,
+                          const std::vector<double>& init_state_probs,
                           std::string condition,
                           int num_concealed_states,
                           bool non_extinction,
@@ -91,10 +91,11 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  max_time,
                  max_species,
                  max_species_extant,
-                 init_states,
+                 init_state_probs,
                  non_extinction,
                  seed,
-                 start_at_crown);
+                 start_at_crown,
+                 verbose);
   std::array<double, 6> tracker = {0, 0, 0, 0, 0, 0};
   std::vector<int> tree_size_hist;
   if (return_tree_size_hist) tree_size_hist = std::vector<int>(max_tries, -1);
@@ -110,12 +111,38 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                              m_R.size(),
                              conditioning_vec);
 
+      if (verbose) {
+        switch (sim.run_info) {
+          case done:          Rcpp::Rcout << "done\n"; break;
+          case extinct:       Rcpp::Rcout << "extinct, retrying\n"; break;
+          case overshoot:     Rcpp::Rcout << "too big, retrying\n"; break;
+          case conditioning:  Rcpp::Rcout << "failing conditioning, retrying\n";
+                                          break;
+          case not_run_yet:   Rcpp::Rcout << "not run yet\n"; break;
+          case max_types:     Rcpp::Rcout << "wtf\n"; break;
+        }
+      }
       if (sim.run_info == done) {
         break;
       } else {
         tracker[ sim.run_info ]++;
       }
     } else {    // if not reached minimum size
+      if (verbose) {
+        switch (sim.run_info) {
+          case done:          Rcpp::Rcout << "done\n"; break;
+          case extinct:       Rcpp::Rcout << "extinct, retrying\n"; break;
+          case overshoot:     Rcpp::Rcout << "too big, retrying\n"; break;
+          case conditioning:  Rcpp::Rcout << "failing conditioning, retrying\n";
+                                                  break;
+        case not_run_yet:     Rcpp::Rcout << "not run yet\n"; break;
+        case max_types:       Rcpp::Rcout << "wtf\n"; break;
+        }
+        if (sim.run_info != extinct) {
+          Rcpp::Rcout << "too small tree, retrying\n";
+        }
+      }
+
       if (sim.run_info == extinct) {
         tracker[extinct]++;
       } else {

@@ -52,5 +52,6 @@ test_that("trying a short ML search: secsse_ml & parallel procedure", {
     )
   )
 
-  testthat::expect_equal(model$ML, -29.89993)
+  testthat::expect_equal(model$ML, -29.89993,
+                         tol = 1e-3)
 })
