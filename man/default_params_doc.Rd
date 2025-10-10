@@ -36,7 +36,7 @@ default_params_doc(
   mus,
   qs,
   crown_age,
-  pool_init_states,
+  init_state_probs,
   maxSpec,
   conditioning,
   non_extinction,
@@ -72,7 +72,8 @@ default_params_doc(
   optimmethod,
   display_warning,
   take_into_account_root_edge,
-  use_normalization
+  use_normalization,
+  return_root_state
 )
 }
 \arguments{
@@ -149,7 +150,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \item{method}{integration method used, available are:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
-\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
 
 \item{parameter}{list where first vector represents lambdas, the second
 mus and the third transition rates.}
@@ -173,8 +174,11 @@ generally in the form of a matrix.}
 \item{crown_age}{crown age of the tree, tree will be simulated conditional
 on non-extinction and this crown age.}
 
-\item{pool_init_states}{pool of initial states at the crown, in case this is
-different from all available states, otherwise leave at NULL}
+\item{init_state_probs}{The user can provide a vector with probabilities of
+observing each state at the root, the root state is then drawn from this
+distribution. Alternatively, the user can provide a vector of characters
+representing the full names (including the concealed state) of states used
+to initialize the root (e.g. '0A', not '0').}
 
 \item{conditioning}{can be \code{"obs_states"}, \code{"true_states"} or \code{"none"}, the
 tree is simulated until one is generated that contains all observed states
@@ -305,6 +309,12 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{use_normalization}{normalize the density vector during integration,
 more accurate but slower (default = TRUE)}
+
+\item{return_root_state}{if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).}
 }
 \value{
 Nothing

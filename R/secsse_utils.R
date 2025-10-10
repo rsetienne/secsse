@@ -168,6 +168,10 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
     }
     uniq_traits <- unique(traits)
     uniq_traits <- uniq_traits[!is.na(uniq_traits)]
+    if (is.numeric(uniq_traits)) {
+      uniq_traits <- sort(uniq_traits)
+    }
+    
     all_names <- get_state_names(state_names = uniq_traits,
                                  num_concealed_states = length(uniq_traits))
     colnames(Q) <- all_names
@@ -819,8 +823,8 @@ create_states <- function(usetraits,
     if (anyNA(usetraits)) {
         nas <- which(is.na(traits))
         for (iii in seq_along(nas)) {
-          states[nas[iii], ] <- c(1 - rep(sampling_fraction,num_concealed_states),
-                                  rep(sampling_fraction, num_concealed_states))
+         states[nas[iii], ] <- c(1 - rep(sampling_fraction, num_concealed_states),
+                                  rep(sampling_fraction, 2 * num_concealed_states))
         }
     }
 
@@ -1301,3 +1305,18 @@ plot_idparslist <- function(idparslist,
   return(list("plot_qmat" = plot_qmat,
               "plot_lambda" = plot_lambda))
 }
+
+
+#' @keywords internal
+get_root_state <- function(ancestral_states, phy, mus, d) {
+  num_tips <- ape::Ntip(phy)
+  if (num_tips == 1) {
+    root_state <- ancestral_states[(d + 1):(d + d)]
+  } else {
+    root_no <- num_tips + 1
+    root_state <- ancestral_states[root_no, (d + 1):(d + d)]
+  }
+  
+  names(root_state) <- names(mus)
+  return(root_state)
+} 

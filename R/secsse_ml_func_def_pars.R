@@ -112,7 +112,8 @@ secsse_ml_func_def_pars <- function(phy,
                                     num_threads = 1,
                                     atol = 1e-8,
                                     rtol = 1e-6,
-                                    method = "odeint::bulirsch_stoer") {
+                                    method = "odeint::runge_kutta_cash_karp54",
+                                    return_root_state = FALSE) {
   return(master_ml(phy = phy,
                    traits = traits,
                    num_concealed_states = num_concealed_states,
@@ -139,7 +140,8 @@ secsse_ml_func_def_pars <- function(phy,
                    num_threads = num_threads,
                    atol = atol,
                    rtol = rtol,
-                   method = method))
+                   method = method,
+                   return_root_state = return_root_state))
 }
 
 #' Maximum likehood estimation for (SecSSE) with parameter as complex
@@ -260,8 +262,9 @@ cla_secsse_ml_func_def_pars <- function(phy,
                                         num_threads = 1,
                                         atol = 1e-12,
                                         rtol = 1e-12,
-                                        method = "odeint::bulirsch_stoer",
-                                        use_normalization = TRUE) {
+                                        method = "odeint::runge_kutta_cash_karp54",
+                                        use_normalization = TRUE,
+                                        return_root_state = FALSE) {
   return(master_ml(phy = phy,
                    traits = traits,
                    num_concealed_states = num_concealed_states,
@@ -289,5 +292,6 @@ cla_secsse_ml_func_def_pars <- function(phy,
                    atol = atol,
                    rtol = rtol,
                    method = method,
-                   use_normalization = use_normalization))
+                   use_normalization = use_normalization,
+                   return_root_state = return_root_state))
 }

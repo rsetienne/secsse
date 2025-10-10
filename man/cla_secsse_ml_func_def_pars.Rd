@@ -32,8 +32,9 @@ cla_secsse_ml_func_def_pars(
   num_threads = 1,
   atol = 1e-12,
   rtol = 1e-12,
-  method = "odeint::bulirsch_stoer",
-  use_normalization = TRUE
+  method = "odeint::runge_kutta_cash_karp54",
+  use_normalization = TRUE,
+  return_root_state = FALSE
 )
 }
 \arguments{
@@ -130,10 +131,16 @@ no longer needs to assume a speciation event at the start of the tree)}
 \item{method}{integration method used, available are:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
-\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::bulirsch_stoer"}.}
+\code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
 
 \item{use_normalization}{normalize the density vector during integration,
 more accurate but slower (default = TRUE)}
+
+\item{return_root_state}{if TRUE, returns the state of the system at the
+root, this can be useful to use as the starting point of a simulation. When
+used in ML, after finishing the ML optimization, the found optimum is
+evaluated one more time to retrieve the root state (to avoid having to
+store the root state every ML evaluation).}
 }
 \value{
 Parameter estimated and maximum likelihood

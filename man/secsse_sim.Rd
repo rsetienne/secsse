@@ -10,7 +10,7 @@ secsse_sim(
   qs,
   crown_age,
   num_concealed_states,
-  pool_init_states = NULL,
+  init_state_probs = NULL,
   sampling_fraction = NULL,
   max_spec = 1e+05,
   min_spec = 2,
@@ -39,8 +39,11 @@ on non-extinction and this crown age.}
 \item{num_concealed_states}{number of concealed states, generally equivalent
 to the number of examined states in the dataset.}
 
-\item{pool_init_states}{pool of initial states at the crown, in case this is
-different from all available states, otherwise leave at NULL}
+\item{init_state_probs}{The user can provide a vector with probabilities of
+observing each state at the root, the root state is then drawn from this
+distribution. Alternatively, the user can provide a vector of characters
+representing the full names (including the concealed state) of states used
+to initialize the root (e.g. '0A', not '0').}
 
 \item{sampling_fraction}{vector that states the sampling proportion per
 trait state. It must have as many elements as there are trait states. When
@@ -99,7 +102,7 @@ is typically a list of matrices.
 Simulation is performed with a randomly
 sampled initial trait at the crown - if you, however - want a specific,
 single, trait used at the crown, you can reduce the possible traits by
-modifying \code{pool_init_states}.
+modifying \code{init_state_probs}.
 
 By default, the algorithm keeps simulating until it generates a tree where
 both crown lineages survive to the present - this is to ensure that the tree

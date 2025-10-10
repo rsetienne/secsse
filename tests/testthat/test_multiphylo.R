@@ -122,7 +122,8 @@ test_that("multi phylo ML", {
       verbose = FALSE)
   )
   
-  testthat::expect_equal(model_R$ML, -16.1342246206186)
+  testthat::expect_equal(model_R$ML, -16.1342246206186,
+                         tol = 1e-3)
   
   # and now let's do multi phylo stuff!
   
