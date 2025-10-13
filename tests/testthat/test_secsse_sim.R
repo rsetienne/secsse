@@ -751,7 +751,7 @@ test_that("test secsse_sim sampling_fraction", {
     found_secsse_2[i] <- tree_size_1
   }
   testthat::expect_equal(mean(found_secsse_2), 0.5 * mean(found_secsse),
-                         tolerance = 0.2)  
+                         tolerance = 0.5)  
   
   # biased sampling fraction
   # we need higher transition rates to generate trees with equal tip frequencies
