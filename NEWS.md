@@ -1,18 +1,29 @@
-# 3.4.0
-Version 3.4.0 uses a separate calculation for 1 - E, e.g. one minus the local
-extinction rates to avoid numerical abberations. These are only used in the CLA
+# 3.6.0
+- changed the default integration method to "odeint::runge_kutta_cash_karp54",
+although a bit slower, this method is more numerically stable.
+- fixed lack of sorting of numeric traits in the function `q_doubletrans`
+- fixed an error in preparing the state matrices when NAs were present in the 
+traits
+- ML and LL functions now optionally also return the root state, which in turn
+can be used to in `secsse_sim` as a starting point at the root / crown of the
+tree.
+- updated simulations to sample species using a binary search, instead of using
+stochastic acceptance
+
+# 3.5.0
+Version 3.5.0 uses a separate calculation for 1 - E, e.g. one minus the local
+extinction rates to avoid numerical aberrations. These are only used in the CLA
 calculations.
 
 # 3.3.0
-Version 3.3.0 normalizes evaluation of the loglikelihood at every integration
-step. This strongly reduces any numerical abberations that could previously
-occur. These mainly occured along long branches, where values could become so
+Version 3.3.0 normalizes evaluation of the log likelihood at every integration
+step. This strongly reduces any numerical aberrations that could previously
+occur. These mainly occurred along long branches, where values could become so
 close to zero that they became too close to numerical precision. If absolutely
 desired, this normalization can be disabled by setting 'use_normalization' to
 FALSE.
 
 # 3.2.0
-
 - Added support for integration along the root edge
 - Added support for single-branch trees
 - Added function to calculate the loglikelihood as calculated along a single 

@@ -168,6 +168,10 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
     }
     uniq_traits <- unique(traits)
     uniq_traits <- uniq_traits[!is.na(uniq_traits)]
+    if (is.numeric(uniq_traits)) {
+      uniq_traits <- sort(uniq_traits)
+    }
+    
     all_names <- get_state_names(state_names = uniq_traits,
                                  num_concealed_states = length(uniq_traits))
     colnames(Q) <- all_names
