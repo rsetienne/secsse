@@ -4,13 +4,13 @@ test_that("single branch check", {
   focal_tree$root.edge <- NULL
   traits <- c(1, 1)
   num_concealed_states <- 2
-  idparslist <- cla_id_paramPos(c(1, 2), num_concealed_states)
+  idparslist <- secsse::cla_id_paramPos(c(1, 2), num_concealed_states)
   idparslist$lambdas[1, ] <- rep(1, 2)
   idparslist[[2]][] <- 2
   masterBlock <- matrix(3, ncol = 2, nrow = 2, byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
-  idparslist[[3]] <- q_doubletrans(c(1, 2), masterBlock, diff.conceal)
+  idparslist[[3]] <- secsse::q_doubletrans(c(1, 2), masterBlock, diff.conceal)
   idparslist[[1]] <- secsse::prepare_full_lambdas(c(1, 2),
                                                   num_concealed_states,
                                                   idparslist[[1]])
