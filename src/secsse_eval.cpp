@@ -27,7 +27,8 @@ Rcpp::List eval(std::unique_ptr<ODE> od,
                 size_t num_steps)
 {
   auto num_threads = get_rcpp_num_threads();
-  auto global_control = tbb::global_control(tbb::global_control::max_allowed_parallelism, num_threads);
+  auto global_control = 
+    tbb::global_control(tbb::global_control::max_allowed_parallelism, num_threads);
   
   auto T0 = std::chrono::high_resolution_clock::now();
   
