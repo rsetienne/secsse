@@ -60,7 +60,7 @@ secsse_loglik_eval <- function(parameter,
                                                traitStates = 
                                                  get_trait_states(parameter,
                                                                   num_concealed_states))
-  eval_cpp(rhs = if (is.list(lambdas)) "ode_cla" else "ode_standard",
+  answ <- eval_cpp(rhs = if (is.list(lambdas)) "ode_cla" else "ode_standard",
            ances = setting_calculation$ances,
            states = setting_calculation$states,
            forTime = setting_calculation$forTime,
@@ -72,6 +72,8 @@ secsse_loglik_eval <- function(parameter,
            rtol = rtol,
            is_complete_tree = is_complete_tree,
            num_steps = num_steps)
+  RcppParallel::setThreadOptions(numThreads = 1)
+  return(answ)
 }
 
 #' Plot the local probability along a tree

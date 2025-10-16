@@ -224,6 +224,9 @@ master_loglik <- function(parameter,
     loglik -
     penalty(pars = parameter, loglik_penalty = loglik_penalty)
   
+  # reset number of threads:
+  RcppParallel::setThreadOptions(numThreads = 1)
+  
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
     num_tips <- ape::Ntip(phy)

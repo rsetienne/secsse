@@ -118,6 +118,9 @@ secsse_single_branch_loglik <- function(parameter,
                                  d)
   }
   
+  # reset number of threads
+  RcppParallel::setThreadOptions(numThreads = 1)
+  
   return(list("loglik" = LL,
               "nodeM" = nodeM,
               "merge_branch" = mergeBranch,
