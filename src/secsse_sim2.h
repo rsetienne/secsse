@@ -226,9 +226,9 @@ struct secsse_sim {
              t(0.0),
              verbose(verb) {
     // randomize randomizer
-    
+
     int used_seed = (seed < 0) ? std::random_device {}() : seed;
-    
+
     rndgen_.seed(used_seed);
     if (verbose) {
       Rcpp::Rcout << "used seed: " << used_seed << "\n";
@@ -548,7 +548,6 @@ struct secsse_sim {
 
   void check_states(size_t num_traits,
                     size_t num_concealed_states) {
-    
     auto total_num_traits = num_concealed_states > 0 ?
                               num_traits / num_concealed_states :
                               num_traits;
