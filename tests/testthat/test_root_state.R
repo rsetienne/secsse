@@ -64,8 +64,6 @@ test_that("root state cla LL", {
                                          return_root_state = TRUE,
                                          display_warning = FALSE)
   
-  
-
    root_s <- ances_res$ancestral_states[1, ]
    rs <- as.vector(root_res$root_state)
    testthat::expect_true(all.equal(root_s, rs))

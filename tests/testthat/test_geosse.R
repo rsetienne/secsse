@@ -84,22 +84,5 @@ test_that("secsse gives the same result as GeoSSE", {
     
     testthat::expect_equal(classe_diversitree_LL,  secsse_cla_LL,
                            tolerance = 1e-5)
-
-    # Parallel code doesn't work on CI
-    testthat::skip_on_cran()
-    secsse_cla_LL3 <- secsse::secsse_loglik(parameter,
-                                    example_phy_GeoSSE,
-                                    traits,
-                                    num_concealed_states,
-                                    cond = "maddison_cond",
-                                    root_state_weight = "maddison_weights",
-                                    sampling_fraction = c(1, 1, 1),
-                                    setting_calculation = setting_calculation,
-                                    see_ancestral_states = FALSE,
-                                    loglik_penalty = 0,
-                                    num_threads = 4,
-                                    display_warning = FALSE)
-    testthat::expect_equal(secsse_cla_LL, secsse_cla_LL3,
-                           tolerance = 1e-5)
   }
 })

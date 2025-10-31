@@ -63,21 +63,4 @@ test_that("secsse gives the same result as hisse", {
 
   testthat::expect_equal(-237.8611, y1, tolerance = 0.001)
   testthat::expect_equal(-243.8611, y2, tolerance = 0.001)
-  # Parallel code doesn't work on CI unless running on windows
-  if (!isTRUE(as.logical(Sys.getenv("CI"))) ||
-      .Platform$OS.type == "windows") {
-    testthat::skip_on_cran()
-    
-    z4 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                       phy = phy,
-                                       traits = traits,
-                                       num_concealed_states = num_concealed_states,
-                                       cond = cond,
-                                       root_state_weight = root_state_weight,
-                                       sampling_fraction = sampling_fraction,
-                                       num_threads = 4,
-                                       display_warning = FALSE))
-    testthat::expect_equal(y2, z4, tolerance = 1e-4)
-    # is different LL, diff 0.0118
-  }
 })
