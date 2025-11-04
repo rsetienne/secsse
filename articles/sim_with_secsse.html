@@ -195,12 +195,15 @@ of observed and concealed states are present at the tips:</p>
 <span>                               conditioning <span class="op">=</span> <span class="st">"true_states"</span>,</span>
 <span>                               seed <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="va">sim_tree</span><span class="op">$</span><span class="va">obs_traits</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "1" "1" "1" "0" "1" "1" "1" "1" "1" "1" "1" "0" "0" "0" "0" "0" "1" "1" "1"</span></span>
-<span><span class="co">## [20] "1" "1" "1"</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "1" "1" "0" "0" "0" "1" "1" "1" "1" "1" "1" "1" "0" "1" "1" "0" "1" "1" "1"</span></span>
+<span><span class="co">## [20] "0" "0" "0" "1" "1" "1" "0" "0" "0" "0" "0" "0" "0" "0" "0" "0" "0" "0" "0"</span></span>
+<span><span class="co">## [39] "0" "1" "0" "0" "1" "1" "0" "0" "0" "0" "0" "1" "1" "1" "1"</span></span></code></pre>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim_tree</span><span class="op">$</span><span class="va">true_traits</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "1B" "1A" "1A" "0A" "1B" "1B" "1B" "1B" "1B" "1B" "1B" "0A" "0A" "0A" "0A"</span></span>
-<span><span class="co">## [16] "0A" "1A" "1A" "1A" "1A" "1B" "1B"</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "1A" "1A" "0A" "0A" "0A" "1A" "1A" "1A" "1A" "1A" "1A" "1A" "0A" "1A" "1A"</span></span>
+<span><span class="co">## [16] "0A" "1A" "1A" "1A" "0A" "0A" "0A" "1A" "1B" "1A" "0A" "0A" "0A" "0A" "0A"</span></span>
+<span><span class="co">## [31] "0A" "0A" "0A" "0B" "0B" "0A" "0A" "0B" "0B" "1A" "0A" "0A" "1A" "1A" "0A"</span></span>
+<span><span class="co">## [46] "0A" "0B" "0B" "0A" "1A" "1A" "1A" "1A"</span></span></code></pre>
 <p>Here, we have only explored a two-state system and the differences
 may not be very large, but for large numbers of states, such
 conditioning might yield very different trees.</p>
