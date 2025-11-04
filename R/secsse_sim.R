@@ -91,7 +91,8 @@ secsse_sim <- function(lambdas,
     condition_vec <- -1 + indices
   } 
   
-  res <- generate_phy(mus,
+  while(TRUE) {
+    res <- generate_phy(mus,
                       lambdas,
                       qs,
                       crown_age,
@@ -110,39 +111,48 @@ secsse_sim <- function(lambdas,
                       start_at_crown,
                       drop_extinct) 
   
-  if (res$status == "not enough tries") {
-    return(res)
-  }
-  
-  if (length(res$phy$tip.label) != length(res$obs_traits)) {
-    cat("something went wrong, please report this to the package maintainer")
-  }
-  
-  if (res$status == "success" || res$status == "single_species_tree") {
-    if (sum(sampling_fraction) == length(sampling_fraction) ||
-        is.null(sampling_fraction)) {
-      return(res) # sampling fraction = 1
+    if (res$status == "not enough tries") {
+      return(res)
     }
     
-    # if not, we have to subsample
-    all_traits <- names(mus)
-    for (i in 1:length(all_traits)) {
-      all_traits[i] <- substr(all_traits[i], 1, (nchar(all_traits[i]) - 1))
+    if (length(res$phy$tip.label) != length(res$obs_traits)) {
+      message("something went wrong, please report this to the package maintainer")
     }
-    all_traits <- unique(all_traits) # these are now all observed traits
-    tips_to_remove <- c()
-    for (i in seq_along(sampling_fraction)) {
-      trait_tips <- which(res$obs_traits == all_traits[i])
-      to_keep <- stats::rbinom(length(trait_tips), 1, sampling_fraction[i]) # sampling fraction is survival probability
-      trait_tips_for_removal <- trait_tips[to_keep == 0]
-      tips_to_remove <- c(tips_to_remove, trait_tips_for_removal)
-    }
-    # now we need to remove all the tips
-    if (length(tips_to_remove) > 0) {
-      res$obs_traits <- res$obs_traits[-tips_to_remove]
-      res$true_traits <- res$true_traits[-tips_to_remove]
-      res$phy <- ape::drop.tip(res$phy, tips_to_remove)
-    }
+  
+    if (res$status == "success" || res$status == "single_species_tree") {
+      if (sum(sampling_fraction) == length(sampling_fraction) ||
+          is.null(sampling_fraction)) {
+        return(res) # sampling fraction = 1
+      }
+      
+      # if not, we have to subsample
+      set.seed(seed)
+      all_traits <- names(mus)
+      for (i in 1:length(all_traits)) {
+        all_traits[i] <- substr(all_traits[i], 1, (nchar(all_traits[i]) - 1))
+      }
+      all_traits <- unique(all_traits) # these are now all observed traits
+      tips_to_remove <- c()
+      for (i in seq_along(sampling_fraction)) {
+        trait_tips <- which(res$obs_traits == all_traits[i])
+        to_keep <- stats::rbinom(length(trait_tips), 1, sampling_fraction[i]) # sampling fraction is survival probability
+        trait_tips_for_removal <- trait_tips[to_keep == 0]
+        tips_to_remove <- c(tips_to_remove, trait_tips_for_removal)
+      }
+      # now we need to remove all the tips
+      if (length(tips_to_remove) > 0) {
+        res$obs_traits <- res$obs_traits[-tips_to_remove]
+        res$true_traits <- res$true_traits[-tips_to_remove]
+        res$phy <- ape::drop.tip(res$phy, tips_to_remove)
+      }
+    
+      if (is.null(res$phy)) {
+        warning("sampling removed all tips, trying again with new seed")
+        seed = sample(1:1e9, 1)
+      } else {
+        return(res)
+      }
+  }
   }
   return(res)
 }

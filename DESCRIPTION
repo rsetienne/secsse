@@ -71,5 +71,5 @@ URL: https://rsetienne.github.io/secsse/,
     https://github.com/rsetienne/secsse
 BugReports: https://github.com/rsetienne/secsse/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)

@@ -79,7 +79,7 @@ namespace secsse {
                      const std::vector<double>& M,
                      std::vector<double>& out) const {
       const auto d = size();
-      assert(2 * d == out.size());
+      assert(3 * d == out.size());
       for (size_t i = 0; i < d; ++i) {
         out[i] = M[i];
         out[i + d] = M[i + d] * N[i + d] * l_[i];

@@ -511,17 +511,19 @@ test_that("test comparison bisse", {
   found2 <- c()
   
   for (r in 1:num_repl) {
-    sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
-                                   mus = sim_mu_vector_etd,
-                                   qs = sim_q_matrix_etd,
-                                   crown_age = crown_age_used,
-                                   num_concealed_states = 2,
-                                   conditioning = "none",
-                                   min_spec = 10,
-                                   init_state_probs = c("SA", "SB"),
-                                   start_at_crown = FALSE,
-                                   verbose = TRUE,
-                                   seed = r)
+    testthat::expect_output(
+      sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                     mus = sim_mu_vector_etd,
+                                     qs = sim_q_matrix_etd,
+                                     crown_age = crown_age_used,
+                                     num_concealed_states = 2,
+                                     conditioning = "none",
+                                     min_spec = 10,
+                                     init_state_probs = c("SA", "SB"),
+                                     start_at_crown = FALSE,
+                                     verbose = TRUE,
+                                     seed = r)
+    )
     
     local_stats <- c(length(sim_tree$phy$tip.label))
     freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
