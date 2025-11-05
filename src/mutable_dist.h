@@ -9,8 +9,7 @@
 #define mutable_dist_h
 
 #include <vector>
-
-
+#include <random>
 
 struct mutable_distribution {
     
@@ -49,7 +48,5 @@ struct mutable_distribution {
     std::vector<double> probs_;
     std::uniform_real_distribution<> unif_dist = std::uniform_real_distribution<>(0, 1.0);
 };
-
-
 
 #endif /* mutable_dist_h */

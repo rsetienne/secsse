@@ -29,6 +29,35 @@ master_ml <- function(phy,
                       use_normalization = TRUE,
                       return_root_state = FALSE) {
   
+  print_arguments(phy,
+                  traits,
+                  num_concealed_states,
+                  idparslist,
+                  idparsopt,
+                  initparsopt,
+                  idparsfix,
+                  parsfix,
+                  cond,
+                  root_state_weight,
+                  sampling_fraction,
+                  tol,
+                  maxiter,
+                  optimmethod,
+                  num_cycles,
+                  loglik_penalty,
+                  is_complete_tree,
+                  take_into_account_root_edge,
+                  verbose,
+                  num_threads,
+                  atol,
+                  rtol,
+                  method,
+                  use_normalization)
+  
+  
+  
+  
+  
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
     structure_func <- set_and_check_structure_func(idparsfuncdefpar,
