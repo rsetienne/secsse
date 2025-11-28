@@ -226,7 +226,9 @@ master_loglik <- function(parameter,
   
   # reset number of threads:
   RcppParallel::setThreadOptions(numThreads = 1)
-  
+
+  result <- list()
+  result$LL <- LL
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
     num_tips <- ape::Ntip(phy)
@@ -235,18 +237,22 @@ master_loglik <- function(parameter,
       ancestral_states[, (1/3 * ncol(ancestral_states) + 1):(2/3 * ncol(ancestral_states))]
     
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states, LL = LL, states = states))
+    colnames(ancestral_states) <- names(mus)
+    colnames(states) <- c(paste("E",names(mus), sep = '_'),
+                          paste("D",names(mus), sep = '_'),
+                          paste("S",names(mus), sep = '_'))
+    result$ancestral_states <- ancestral_states
+    result$states = states
   } 
   
   if (return_root_state) {
-    return(list(LL = LL,
-                root_state = get_root_state(calcul$states,
-                                            phy,
-                                            mus,
-                                            d)))
+    root_state <- get_root_state(calcul$states,
+                                 phy,
+                                 mus,
+                                 d)
+    result$root_state <- root_state
   }
-  
-  return(LL)
+  return(result)
 }
 
 #' @title Likelihood for SecSSE model
@@ -254,7 +260,21 @@ master_loglik <- function(parameter,
 #' data
 #' 
 #' @inheritParams default_params_doc
-#' @return The loglikelihood of the data given the parameter.
+#' @return A list with the following elements:
+#' $LL the loglikelihood of the data (phylogeny + tip states) given the
+#' parameters (speciation, extinction, transition rates).
+#' If see_ancestral_states = TRUE, then there will be two additional elements:
+#' $ancestral_states: a matrix with the probabilities of each state at the
+#' internal nodes
+#' $states: a matrix with the probabilities E, D (normalized) and S that are used
+#' in the calculations. The ancestral_states matrix is a submatrix of this matrix.
+#' This matrix is mostly used for package developers.
+#' If return_root_state = TRUE, then there will be one additional element:
+#' $root_state: vector with probabilities of each state at the root. This vector
+#' is the same as the top row of $ancestral_states
+#' We have used the shorthand description of "probabilities of each state",
+#' but technically, the probabilities are the normalized probabilities D of the
+#' data given each state at the internal nodes.
 #' @examples
 #' rm(list = ls(all = TRUE))
 #' library(secsse)
