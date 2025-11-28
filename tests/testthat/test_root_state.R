@@ -66,7 +66,7 @@ test_that("root state cla LL", {
   
    root_s <- ances_res$ancestral_states[1, ]
    rs <- root_res$root_state
-   testthat::expect_true(all.equal(root_s, rs))
+   testthat::expect_true(all.equal(root_s, as.numeric(rs)))
 })
 
 test_that("root state ML", {
@@ -130,5 +130,5 @@ test_that("root state ML", {
                                            sampling_fraction = sampling_fraction,
                                            display_warning = FALSE)
     ances_res <- ances_res$ancestral_states[1, ]
-    testthat::expect_equal(ances_res, model$root_state)  
+    testthat::expect_equal(ances_res, as.numeric(model$root_state))  
 })
