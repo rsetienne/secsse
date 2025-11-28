@@ -52,11 +52,11 @@ test_that("cla plotting", {
   parsfix <- c(0, 0, 0.01)
   tol <- c(1e-04, 1e-05, 1e-07)
   maxiter <- 1000 * round((1.25) ^ length(idparsopt))
-  optimmethod <- "simplex"
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
+  testthat::expect_output(
   model_R <- secsse::cla_secsse_ml(
     phy = phylotree,
     traits = traits,
@@ -71,10 +71,10 @@ test_that("cla plotting", {
     sampling_fraction = sampling_fraction,
     tol = tol,
     maxiter = maxiter,
-    optimmethod = optimmethod,
     num_cycles = 1,
     verbose = FALSE)
-
+)
+  
   helper_function <- function(x) {
     return(sum(x[c(10, 13, 16)]) / sum(x))
   }
