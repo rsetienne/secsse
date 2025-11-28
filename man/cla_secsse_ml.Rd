@@ -29,7 +29,8 @@ cla_secsse_ml(
   rtol = 1e-07,
   method = "odeint::runge_kutta_cash_karp54",
   use_normalization = TRUE,
-  return_root_state = FALSE
+  return_root_state = FALSE,
+  see_ancestral_states = FALSE
 )
 }
 \arguments{
@@ -122,6 +123,9 @@ root, this can be useful to use as the starting point of a simulation. When
 used in ML, after finishing the ML optimization, the found optimum is
 evaluated one more time to retrieve the root state (to avoid having to
 store the root state every ML evaluation).}
+
+\item{see_ancestral_states}{Boolean for whether the ancestral states for each
+of the internal nodes should be output. Defaults to \code{FALSE}.}
 }
 \value{
 Parameters estimated and maximum likelihood

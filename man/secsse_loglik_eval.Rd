@@ -58,7 +58,7 @@ using a \code{multiPhylo} object, sampling fraction should be list where each
 entry in the list corresponds to the sampling proportion for each tree.}
 
 \item{setting_calculation}{argument used internally to speed up calculation.
-It should be left blank (default : \code{setting_calculation = NULL}).}
+This should be left blank (default : \code{setting_calculation = NULL}).}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is
 0 (no penalty).}
