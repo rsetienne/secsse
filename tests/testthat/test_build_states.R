@@ -20,7 +20,7 @@ test_that("build states basic", {
 test_that("build states multi info", {
   phy <- ape::rphylo(3, 1, 0)
   traits <- c(1, 2, 2)
-  traits2 <- c(1, 1, 1)
+  traits2 <- c(2, 2, 2)
   traits <- cbind(traits, traits2)
   
   
@@ -33,9 +33,9 @@ test_that("build states multi info", {
   E_part <- res[1:3, 1:4]
   testthat::expect_equal(sum(E_part), 0)
   D_part <- res[1:3, 5:8]
-  testthat::expect_equal(D_part[1, ], c(1, 0, 1, 0))
-  testthat::expect_equal(D_part[2, ], c(1, 1, 1, 1))
-  testthat::expect_equal(D_part[3, ], c(1, 1, 1, 1))
+  testthat::expect_equal(D_part[1, ], c(1, 1, 1, 1))
+  testthat::expect_equal(D_part[2, ], c(0, 1, 0, 1))
+  testthat::expect_equal(D_part[3, ], c(0, 1, 0, 1))
 })
 
 test_that("build states NAs", {
