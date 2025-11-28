@@ -65,7 +65,7 @@ test_that("root state cla LL", {
                                          display_warning = FALSE)
   
    root_s <- ances_res$ancestral_states[1, ]
-   rs <- as.vector(root_res$root_state)
+   rs <- root_res$root_state
    testthat::expect_true(all.equal(root_s, rs))
 })
 
@@ -101,7 +101,7 @@ test_that("root state ML", {
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
 
-    model <- secsse::secsse_ml(
+  model <- secsse::secsse_ml(
       phy = phylotree,
       traits = traits,
       num_concealed_states = num_concealed_states,
@@ -130,5 +130,5 @@ test_that("root state ML", {
                                            sampling_fraction = sampling_fraction,
                                            display_warning = FALSE)
     ances_res <- ances_res$ancestral_states[1, ]
-    testthat::expect_equal(ances_res, as.vector(model$root_state))  
+    testthat::expect_equal(ances_res, model$root_state)  
 })

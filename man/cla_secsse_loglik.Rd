@@ -101,7 +101,8 @@ evaluated one more time to retrieve the root state (to avoid having to
 store the root state every ML evaluation).}
 }
 \value{
-The loglikelihood of the data given the parameters
+A List with property LL: The loglikelihood of the data given the
+parameters, and potentially the root state.
 }
 \description{
 Likelihood for SecSSE model, using Rcpp

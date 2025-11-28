@@ -55,7 +55,7 @@ test_that("secsse gives the same result as GeoSSE", {
 
     num_modeled_traits <- ncol(q) / floor(num_concealed_states)
 
-    setting_calculation <- build_initStates_time(example_phy_GeoSSE,
+    setting_calculation <- secsse:::build_initStates_time(example_phy_GeoSSE,
                                                  traits,
                                                  num_concealed_states,
                                                  sampling_fraction = c(1, 1, 1),
