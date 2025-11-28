@@ -227,6 +227,11 @@ master_loglik <- function(parameter,
   # reset number of threads:
   RcppParallel::setThreadOptions(numThreads = 1)
 
+  if (!see_ancestral_states && !return_root_state) {
+    return(LL)
+  }
+  
+  
   result <- list()
   result$LL <- LL
   if (see_ancestral_states == TRUE) {
@@ -348,7 +353,8 @@ secsse_loglik <- function(parameter,
 #' 
 #' @inheritParams default_params_doc
 #' 
-#' @return The loglikelihood of the data given the parameters
+#' @return A List with property LL: The loglikelihood of the data given the 
+#' parameters, and potentially the root state.
 #' @examples
 #'rm(list=ls(all=TRUE))
 #'library(secsse)

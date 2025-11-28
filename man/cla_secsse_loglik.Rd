@@ -62,10 +62,10 @@ using a \code{multiPhylo} object, sampling fraction should be list where each
 entry in the list corresponds to the sampling proportion for each tree.}
 
 \item{setting_calculation}{argument used internally to speed up calculation.
-It should be left blank (default : \code{setting_calculation = NULL}).}
+This should be left blank (default : \code{setting_calculation = NULL}).}
 
-\item{see_ancestral_states}{Boolean for whether the ancestral states should
-be shown? Defaults to \code{FALSE}.}
+\item{see_ancestral_states}{Boolean for whether the ancestral states for each
+of the internal nodes should be output. Defaults to \code{FALSE}.}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is
 0 (no penalty).}
@@ -101,7 +101,8 @@ evaluated one more time to retrieve the root state (to avoid having to
 store the root state every ML evaluation).}
 }
 \value{
-The loglikelihood of the data given the parameters
+A List with property LL: The loglikelihood of the data given the
+parameters, and potentially the root state.
 }
 \description{
 Likelihood for SecSSE model, using Rcpp

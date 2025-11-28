@@ -463,7 +463,7 @@ secsse_loglik_choosepar <- function(trparsopt,
                             rtol = rtol,
                             display_warning = display_warning,
                             use_normalization = use_normalization,
-                            return_root_state = return_root_state)$LL
+                            return_root_state = FALSE)
     
     if (is.nan(loglik) || is.na(loglik)) {
       warning("There are parameter values used which cause
