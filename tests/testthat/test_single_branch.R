@@ -56,7 +56,7 @@ test_that("single branch check", {
   d <- length(mus)
   sz <- res2$nodeM[1:(d + d)] * params[1]
   prefact <- log(sum(abs(sz)))
-  answ_normal <- (res1$LL - prefact) / 2
+  answ_normal <- (res1 - prefact) / 2
   answ_single_branch <- res2$loglik
   testthat::expect_equal(answ_normal, answ_single_branch)
   
@@ -114,7 +114,7 @@ test_that("single branch check", {
                      pars2 = c(0,0,1,0,1),
                      brts = c(focal_tree$root.edge + max(brts), brts),
                      missnumspec = 0)
-  testthat::expect_equal(bd_ll,secsse_ll$LL)
+  testthat::expect_equal(bd_ll,secsse_ll)
   
   # now the penultimate test of a tree with three tips and check loglik 
   # with stem age
@@ -137,7 +137,7 @@ test_that("single branch check", {
                      pars2 = c(0,0,1,0,1),
                      brts = c(focal_tree$root.edge + max(brts), brts),
                      missnumspec = 0)
-  testthat::expect_equal(bd_ll,secsse_ll$LL)
+  testthat::expect_equal(bd_ll,secsse_ll)
   
   # now the ultimate test of a tree with four tips and check loglik
   # with stem age
@@ -160,7 +160,7 @@ test_that("single branch check", {
                           pars2 = c(0,0,1,0,1),
                           brts = c(focal_tree$root.edge + max(brts), brts),
                           missnumspec = 0)
-  testthat::expect_equal(bd_ll,secsse_ll$LL)
+  testthat::expect_equal(bd_ll,secsse_ll)
   
   # Now try on a multi-phylo data set
   
@@ -260,5 +260,5 @@ test_that("root branch check", {
                                     display_warning = FALSE)
 
   testthat::expect_equal(res1, res2)
-  testthat::expect_lt(res3$LL, res1$LL)
+  testthat::expect_lt(res3, res1)
 })

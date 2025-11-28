@@ -100,7 +100,7 @@ multi_loglik <- function(parameter,
         root_states[[i]] <- local_res$root_state
         res[[i]] <- local_res$LL
       } else {
-        res[[i]] <- local_res$LL
+        res[[i]] <- local_res
       }
     }
   }
