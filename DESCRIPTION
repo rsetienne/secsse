@@ -42,7 +42,7 @@ Description: Simultaneously infers state-dependent diversification across
 Depends: R (>= 4.2.0)
 Imports: 
  utils,
- DDD (>= 5.0),
+ DDD (>= 5.2.4),
  ape,
  geiger,
  Rcpp (>= 1.0.10),
