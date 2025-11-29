@@ -238,6 +238,8 @@ master_loglik <- function(parameter,
     states <- calcul$states
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):(nrow(states)), ]
+    print(dim(ancestral_states))
+    print((1/3 * ncol(ancestral_states) + 1):(2/3 * ncol(ancestral_states)))
     ancestral_states <-
       ancestral_states[, (1/3 * ncol(ancestral_states) + 1):(2/3 * ncol(ancestral_states))]
     
