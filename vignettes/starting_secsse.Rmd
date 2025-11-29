@@ -266,7 +266,7 @@ initial values. We can do so as follows:
 ```{r ETD_ML_init}
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep all zeros at zero
-initparsopt <- rep(0.1, 8)
+initparsopt <- rep(0.3, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 ```
@@ -401,7 +401,7 @@ used for the ETD model to perform our maximum likelihood:
 ```{r CTD_ML}
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep all zeros at zero
-initparsopt <- rep(0.1, 8)
+initparsopt <- rep(0.3, 8)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 
@@ -504,7 +504,7 @@ q_matrix
 ```{r CR_ML}
 idparsopt <- 1:6 # our maximum rate parameter was 6
 idparsfix <- c(0) # we want to keep all zeros at zero
-initparsopt <- rep(0.1, 6)
+initparsopt <- rep(0.3, 6)
 initparsfix <- c(0.0) # all zeros remain at zero.
 sampling_fraction <- c(1, 1)
 

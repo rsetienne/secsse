@@ -65,13 +65,13 @@
 #' @param parameter list where first vector represents lambdas, the second 
 #'  mus and the third transition rates.
 #' @param setting_calculation argument used internally to speed up calculation.
-#'  It should be left blank (default : `setting_calculation = NULL`).
+#'  This should be left blank (default : `setting_calculation = NULL`).
 #' @param loglik_penalty the size of the penalty for all parameters; default is
 #'  0 (no penalty).
 #' @param num_steps number of substeps to show intermediate likelihoods
 #'  along a branch.
-#' @param see_ancestral_states Boolean for whether the ancestral states should 
-#'  be shown? Defaults to `FALSE`.
+#' @param see_ancestral_states Boolean for whether the ancestral states for each
+#'  of the internal nodes should be output. Defaults to `FALSE`.
 #' @param lambdas speciation rates, in the form of a list of matrices.
 #' @param mus extinction rates, in the form of a vector.
 #' @param qs The Q matrix, for example the result of function q_doubletrans, but

@@ -156,13 +156,13 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 mus and the third transition rates.}
 
 \item{setting_calculation}{argument used internally to speed up calculation.
-It should be left blank (default : \code{setting_calculation = NULL}).}
+This should be left blank (default : \code{setting_calculation = NULL}).}
 
 \item{num_steps}{number of substeps to show intermediate likelihoods
 along a branch.}
 
-\item{see_ancestral_states}{Boolean for whether the ancestral states should
-be shown? Defaults to \code{FALSE}.}
+\item{see_ancestral_states}{Boolean for whether the ancestral states for each
+of the internal nodes should be output. Defaults to \code{FALSE}.}
 
 \item{lambdas}{speciation rates, in the form of a list of matrices.}
 
