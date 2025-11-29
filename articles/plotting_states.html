@@ -84,7 +84,7 @@ a simple tree, with almost trivial traits:</p>
 <span><span class="va">traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">phy</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_states_files/figure-html/starting_conditions-1.png" width="576"></p>
+<p><img src="plotting_states_files/figure-html/starting_conditions-1.png" class="r-plt" width="576"></p>
 <p>A typical likelihood calculation would look like (assuming 2 observed
 and 2 hidden traits):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -106,32 +106,32 @@ and 2 hidden traits):</p>
 <span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span></code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ll</span></span></code></pre></div>
-<pre><code><span><span class="co">## $ancestral_states</span></span>
-<span><span class="co">##        [,1]      [,2]       [,3]       [,4]</span></span>
+<pre><code><span><span class="co">## $LL</span></span>
+<span><span class="co">## [1] -8.605749</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $ancestral_states</span></span>
+<span><span class="co">##          0A        1A         0B         1B</span></span>
 <span><span class="co">## 7 0.4243298 0.4297629 0.07433058 0.07157672</span></span>
 <span><span class="co">## 6 0.1027373 0.6574616 0.03145469 0.20834647</span></span>
 <span><span class="co">## 5 0.3253326 0.3253326 0.17466735 0.17466735</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## $LL</span></span>
-<span><span class="co">## [1] -8.605749</span></span>
-<span><span class="co">## </span></span>
 <span><span class="co">## $states</span></span>
-<span><span class="co">##      [,1] [,2] [,3] [,4]      [,5]      [,6]       [,7]       [,8] [,9] [,10]</span></span>
-<span><span class="co">## [1,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1     1</span></span>
-<span><span class="co">## [2,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1     1</span></span>
-<span><span class="co">## [3,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1     1</span></span>
-<span><span class="co">## [4,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1     1</span></span>
-<span><span class="co">## [5,]    0    0    0    0 0.4243298 0.4297629 0.07433058 0.07157672    0     0</span></span>
-<span><span class="co">## [6,]    0    0    0    0 0.1027373 0.6574616 0.03145469 0.20834647    0     0</span></span>
-<span><span class="co">## [7,]    0    0    0    0 0.3253326 0.3253326 0.17466735 0.17466735    0     0</span></span>
-<span><span class="co">##      [,11] [,12]</span></span>
-<span><span class="co">## [1,]     1     1</span></span>
-<span><span class="co">## [2,]     1     1</span></span>
-<span><span class="co">## [3,]     1     1</span></span>
-<span><span class="co">## [4,]     1     1</span></span>
-<span><span class="co">## [5,]     0     0</span></span>
-<span><span class="co">## [6,]     0     0</span></span>
-<span><span class="co">## [7,]     0     0</span></span></code></pre>
+<span><span class="co">##      E_0A E_1A E_0B E_1B      D_0A      D_1A       D_0B       D_1B S_0A S_1A</span></span>
+<span><span class="co">## [1,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1    1</span></span>
+<span><span class="co">## [2,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1    1</span></span>
+<span><span class="co">## [3,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1    1</span></span>
+<span><span class="co">## [4,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1    1</span></span>
+<span><span class="co">## [5,]    0    0    0    0 0.4243298 0.4297629 0.07433058 0.07157672    0    0</span></span>
+<span><span class="co">## [6,]    0    0    0    0 0.1027373 0.6574616 0.03145469 0.20834647    0    0</span></span>
+<span><span class="co">## [7,]    0    0    0    0 0.3253326 0.3253326 0.17466735 0.17466735    0    0</span></span>
+<span><span class="co">##      S_0B S_1B</span></span>
+<span><span class="co">## [1,]    1    1</span></span>
+<span><span class="co">## [2,]    1    1</span></span>
+<span><span class="co">## [3,]    1    1</span></span>
+<span><span class="co">## [4,]    1    1</span></span>
+<span><span class="co">## [5,]    0    0</span></span>
+<span><span class="co">## [6,]    0    0</span></span>
+<span><span class="co">## [7,]    0    0</span></span></code></pre>
 <p>If we want to visualize the change in trait probabilities across the
 tree, we can use the function ‘plot_state_exact’. To use this function,
 we need to provide a helper function that can translate the posterior
@@ -140,22 +140,22 @@ observed and 2 hidden traits, we observe the following states
 reconstructed along the nodes:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ll</span><span class="op">$</span><span class="va">states</span></span></code></pre></div>
-<pre><code><span><span class="co">##      [,1] [,2] [,3] [,4]      [,5]      [,6]       [,7]       [,8] [,9] [,10]</span></span>
-<span><span class="co">## [1,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1     1</span></span>
-<span><span class="co">## [2,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1     1</span></span>
-<span><span class="co">## [3,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1     1</span></span>
-<span><span class="co">## [4,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1     1</span></span>
-<span><span class="co">## [5,]    0    0    0    0 0.4243298 0.4297629 0.07433058 0.07157672    0     0</span></span>
-<span><span class="co">## [6,]    0    0    0    0 0.1027373 0.6574616 0.03145469 0.20834647    0     0</span></span>
-<span><span class="co">## [7,]    0    0    0    0 0.3253326 0.3253326 0.17466735 0.17466735    0     0</span></span>
-<span><span class="co">##      [,11] [,12]</span></span>
-<span><span class="co">## [1,]     1     1</span></span>
-<span><span class="co">## [2,]     1     1</span></span>
-<span><span class="co">## [3,]     1     1</span></span>
-<span><span class="co">## [4,]     1     1</span></span>
-<span><span class="co">## [5,]     0     0</span></span>
-<span><span class="co">## [6,]     0     0</span></span>
-<span><span class="co">## [7,]     0     0</span></span></code></pre>
+<pre><code><span><span class="co">##      E_0A E_1A E_0B E_1B      D_0A      D_1A       D_0B       D_1B S_0A S_1A</span></span>
+<span><span class="co">## [1,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1    1</span></span>
+<span><span class="co">## [2,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1    1</span></span>
+<span><span class="co">## [3,]    0    0    0    0 0.0000000 1.0000000 0.00000000 1.00000000    1    1</span></span>
+<span><span class="co">## [4,]    0    0    0    0 1.0000000 0.0000000 1.00000000 0.00000000    1    1</span></span>
+<span><span class="co">## [5,]    0    0    0    0 0.4243298 0.4297629 0.07433058 0.07157672    0    0</span></span>
+<span><span class="co">## [6,]    0    0    0    0 0.1027373 0.6574616 0.03145469 0.20834647    0    0</span></span>
+<span><span class="co">## [7,]    0    0    0    0 0.3253326 0.3253326 0.17466735 0.17466735    0    0</span></span>
+<span><span class="co">##      S_0B S_1B</span></span>
+<span><span class="co">## [1,]    1    1</span></span>
+<span><span class="co">## [2,]    1    1</span></span>
+<span><span class="co">## [3,]    1    1</span></span>
+<span><span class="co">## [4,]    1    1</span></span>
+<span><span class="co">## [5,]    0    0</span></span>
+<span><span class="co">## [6,]    0    0</span></span>
+<span><span class="co">## [7,]    0    0</span></span></code></pre>
 <p>Here, the first four rows indicate the tip states, whilst the later
 three rows indicate the states at the internal nodes (with the last row
 indicating the root, in this case). The columns indicate the four
@@ -186,7 +186,7 @@ per branch provides a very accurate approximation:</p>
 <span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: Removed 6 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/exact-1.png" width="576"></p>
+<p><img src="plotting_states_files/figure-html/exact-1.png" class="r-plt" width="576"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
 <span>                 phy <span class="op">=</span> <span class="va">phy</span>,</span>
@@ -200,7 +200,7 @@ per branch provides a very accurate approximation:</p>
 <span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span>
 <span><span class="co">## Removed 6 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/exact-2.png" width="576"></p>
+<p><img src="plotting_states_files/figure-html/exact-2.png" class="r-plt" width="576"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
 <span>                 phy <span class="op">=</span> <span class="va">phy</span>,</span>
@@ -214,7 +214,7 @@ per branch provides a very accurate approximation:</p>
 <span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span>
 <span><span class="co">## Removed 6 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/exact-3.png" width="576"></p>
+<p><img src="plotting_states_files/figure-html/exact-3.png" class="r-plt" width="576"></p>
 </div>
 <div class="section level2">
 <h2 id="using-cla-secsse">Using CLA secsse<a class="anchor" aria-label="anchor" href="#using-cla-secsse"></a>
@@ -278,7 +278,7 @@ that the first 9 states are the extinction rates:</p>
 <span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: Removed 22 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/plot%20cla-1.png" width="576"></p>
+<p><img src="plotting_states_files/figure-html/plot%20cla-1.png" class="r-plt" width="576"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -291,7 +291,7 @@ that the first 9 states are the extinction rates:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

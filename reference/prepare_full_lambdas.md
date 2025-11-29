@@ -1,0 +1,64 @@
+# Prepares the entire set of lambda matrices for cla_secsse. It provides the set of matrices containing all the speciation rates
+
+Prepares the entire set of lambda matrices for cla_secsse. It provides
+the set of matrices containing all the speciation rates
+
+## Usage
+
+``` r
+prepare_full_lambdas(traits, num_concealed_states, lambd_and_modeSpe)
+```
+
+## Arguments
+
+- traits:
+
+  vector with trait states for each tip in the phylogeny. The order of
+  the states must be the same as the tree tips. For help, see
+  [`vignette("starting_secsse", package = "secsse")`](https://rsetienne.github.io/secsse/articles/starting_secsse.md).
+  When providing a `multiPhylo` set of multiple phylognies, traits
+  should be a list where each entry in the list corresponds to the
+  matching phylogeny on that position.
+
+- num_concealed_states:
+
+  number of concealed states, generally equivalent to the number of
+  examined states in the dataset.
+
+- lambd_and_modeSpe:
+
+  a matrix with the 4 models of speciation possible.
+
+## Value
+
+A list of lambdas, its length would be the same than the number of trait
+states \* num_concealed_states..
+
+## Examples
+
+``` r
+set.seed(13)
+phylotree <- ape::rcoal(12, tip.label = 1:12)
+traits <- sample(c(0, 1, 2),
+                 ape::Ntip(phylotree), replace = TRUE)
+num_concealed_states <- 3
+# the idparlist for a ETD model (dual state inheritance model of evolution)
+# would be set like this:
+idparlist <- secsse::cla_id_paramPos(traits, num_concealed_states)
+lambd_and_modeSpe <- idparlist$lambdas
+lambd_and_modeSpe[1, ] <- c(1, 1, 1, 2, 2, 2, 3, 3, 3)
+idparlist[[1]] <- lambd_and_modeSpe
+idparlist[[2]][] <- 0
+masterBlock <- matrix(4, ncol = 3, nrow = 3, byrow = TRUE)
+diag(masterBlock) <- NA
+idparlist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+# Now, internally, clasecsse sorts the lambda matrices, so they look like
+#  a list with 9 matrices, corresponding to the 9 states
+# (0A,1A,2A,0B, etc)
+
+parameter <- idparlist
+lambda_and_modeSpe <- parameter$lambdas
+lambda_and_modeSpe[1, ] <- c(0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.01, 0.01, 0.01)
+parameter[[1]] <- prepare_full_lambdas(traits, num_concealed_states,
+                                       lambda_and_modeSpe)
+```

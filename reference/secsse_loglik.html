@@ -128,12 +128,12 @@ entry in the list corresponds to the sampling proportion for each tree.</p></dd>
 
 <dt id="arg-setting-calculation">setting_calculation<a class="anchor" aria-label="anchor" href="#arg-setting-calculation"></a></dt>
 <dd><p>argument used internally to speed up calculation.
-It should be left blank (default : <code>setting_calculation = NULL</code>).</p></dd>
+This should be left blank (default : <code>setting_calculation = NULL</code>).</p></dd>
 
 
 <dt id="arg-see-ancestral-states">see_ancestral_states<a class="anchor" aria-label="anchor" href="#arg-see-ancestral-states"></a></dt>
-<dd><p>Boolean for whether the ancestral states should
-be shown? Defaults to <code>FALSE</code>.</p></dd>
+<dd><p>Boolean for whether the ancestral states for each
+of the internal nodes should be output. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-loglik-penalty">loglik_penalty<a class="anchor" aria-label="anchor" href="#arg-loglik-penalty"></a></dt>
@@ -191,7 +191,21 @@ store the root state every ML evaluation).</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The loglikelihood of the data given the parameter.</p>
+    <p>A list with the following elements:
+$LL the loglikelihood of the data (phylogeny + tip states) given the
+parameters (speciation, extinction, transition rates).
+If see_ancestral_states = TRUE, then there will be two additional elements:
+$ancestral_states: a matrix with the probabilities of each state at the
+internal nodes
+$states: a matrix with the probabilities E, D (normalized) and S that are used
+in the calculations. The ancestral_states matrix is a submatrix of this matrix.
+This matrix is mostly used for package developers.
+If return_root_state = TRUE, then there will be one additional element:
+$root_state: vector with probabilities of each state at the root. This vector
+is the same as the top row of $ancestral_states
+We have used the shorthand description of "probabilities of each state",
+but technically, the probabilities are the normalized probabilities D of the
+data given each state at the internal nodes.</p>
     </div>
 
     <div class="section level2">
@@ -235,7 +249,7 @@ store the root state every ML evaluation).</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
