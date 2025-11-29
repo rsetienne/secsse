@@ -100,9 +100,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 along the root edge. This also affects conditioning (as now, conditioning
 no longer needs to assume a speciation event at the start of the tree)}
 
-\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
-\code{FALSE}, optimizer output will be shown.}
+\item{verbose}{sets verbose output; default is \code{TRUE}.}
 
 \item{num_threads}{number of threads to be used. Default is one thread.}
 
@@ -110,7 +108,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{method}{integration method used, available are:
+\item{method}{ODE integration method. Choose from:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
