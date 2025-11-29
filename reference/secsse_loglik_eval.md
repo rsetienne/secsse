@@ -103,7 +103,7 @@ secsse_loglik_eval(
 
 - method:
 
-  integration method used, available are:
+  ODE integration method. Choose from:
   `"odeint::runge_kutta_cash_karp54"`,
   `"odeint::runge_kutta_fehlberg78"`, `"odeint::runge_kutta_dopri5"`,
   `"odeint::bulirsch_stoer"` and `"odeint::runge_kutta4"`. Default
@@ -296,6 +296,6 @@ secsse_loglik_eval(parameter = params,
 #> [7,]     0     0
 #> 
 #> $duration
-#> [1] 0.000121878
+#> [1] 0.00013379
 #> 
 ```

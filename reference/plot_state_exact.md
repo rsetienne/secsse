@@ -79,7 +79,7 @@ plot_state_exact(
 
 - method:
 
-  integration method used, available are:
+  ODE integration method. Choose from:
   `"odeint::runge_kutta_cash_karp54"`,
   `"odeint::runge_kutta_fehlberg78"`, `"odeint::runge_kutta_dopri5"`,
   `"odeint::bulirsch_stoer"` and `"odeint::runge_kutta4"`. Default
@@ -103,9 +103,7 @@ plot_state_exact(
 
 - verbose:
 
-  sets verbose output; default is `TRUE` when `optimmethod` is
-  `"simplex"`. If `optimmethod` is set to `"simplex"`, then even if set
-  to `FALSE`, optimizer output will be shown.
+  sets verbose output; default is `TRUE`.
 
 ## Value
 

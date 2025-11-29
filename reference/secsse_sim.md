@@ -115,9 +115,7 @@ secsse_sim(
 
 - verbose:
 
-  sets verbose output; default is `TRUE` when `optimmethod` is
-  `"simplex"`. If `optimmethod` is set to `"simplex"`, then even if set
-  to `FALSE`, optimizer output will be shown.
+  sets verbose output; default is `TRUE`.
 
 - max_tries:
 

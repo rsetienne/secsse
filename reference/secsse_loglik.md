@@ -117,7 +117,7 @@ secsse_loglik(
 
 - method:
 
-  integration method used, available are:
+  ODE integration method. Choose from:
   `"odeint::runge_kutta_cash_karp54"`,
   `"odeint::runge_kutta_fehlberg78"`, `"odeint::runge_kutta_dopri5"`,
   `"odeint::bulirsch_stoer"` and `"odeint::runge_kutta4"`. Default
