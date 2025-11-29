@@ -77,7 +77,7 @@ master_ml <- function(phy,
                   initparsopt)
   
   optimpars <- c(tol, maxiter, verbose)
-  
+
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
   
   if (!is.list(traits)) {

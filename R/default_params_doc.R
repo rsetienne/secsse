@@ -52,13 +52,11 @@
 #' @param is_complete_tree logical specifying whether or not a tree with all its
 #'  extinct species is provided. If set to `TRUE`, it also assumes that all 
 #'  *all* extinct lineages are present on the tree. Defaults to `FALSE`.
-#' @param verbose sets verbose output; default is `TRUE` when `optimmethod` is
-#'  `"simplex"`. If `optimmethod` is set to `"simplex"`, then even if set to 
-#'  `FALSE`, optimizer output will be shown.
+#' @param verbose sets verbose output; default is `TRUE`.
 #' @param num_threads number of threads to be used. Default is one thread.
 #' @param atol A numeric specifying the absolute tolerance of integration.
 #' @param rtol A numeric specifying the relative tolerance of integration.
-#' @param method integration method used, available are:
+#' @param method ODE integration method. Choose from:
 #'  `"odeint::runge_kutta_cash_karp54"`, `"odeint::runge_kutta_fehlberg78"`,
 #'  `"odeint::runge_kutta_dopri5"`, `"odeint::bulirsch_stoer"` and
 #'  `"odeint::runge_kutta4"`. Default method is: `"odeint::runge_kutta_cash_karp54"`.

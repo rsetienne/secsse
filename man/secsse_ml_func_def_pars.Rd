@@ -121,7 +121,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{method}{integration method used, available are:
+\item{method}{ODE integration method. Choose from:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
