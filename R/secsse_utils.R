@@ -1170,7 +1170,7 @@ check_ml_conditions <- function(traits,
 #' @keywords internal
 get_trait_states <- function(idparslist,
                              num_concealed_states,
-                             display_warning = TRUE) {
+                             display_warning = FALSE) {
   trait_names <- names(idparslist[[1]])
   if (is.null(trait_names)) trait_names <- names(idparslist[[2]])
   if (is.null(trait_names)) trait_names <- colnames(idparslist[[3]])
