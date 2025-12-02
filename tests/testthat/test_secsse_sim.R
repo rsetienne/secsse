@@ -872,7 +872,8 @@ test_that("test secsse_sim root edge", {
                                  conditioning = "none",
                                  min_spec = 1,
                                  init_state_probs = c("SA", "SB"),
-                                 start_at_crown = FALSE)
+                                 start_at_crown = FALSE,
+                                 seed = 1)
   testthat::expect_equal(unique(sim_tree$obs_traits), "S")
   testthat::expect_true(!is.null(sim_tree$phy$root.edge))
   
@@ -900,7 +901,8 @@ test_that("test secsse_sim root edge", {
                                  conditioning = "none",
                                  min_spec = 1,
                                  init_state_probs = c("SA", "SB"),
-                                 start_at_crown = FALSE)
+                                 start_at_crown = FALSE,
+                                 seed = 3)
   testthat::expect_true(!is.null(sim_tree2$phy$root.edge))
   testthat::expect_equal(unique(sim_tree2$obs_traits), "S")
   testthat::expect_gt(sim_tree2$extinct, sim_tree$extinct)

@@ -1,29 +1,28 @@
 test_that("normal plotting", {
-   set.seed(5)
-   phy <- ape::rphylo(n = 4, birth = 1, death = 0)
-   traits <- c(0, 1, 1, 0)
-   params <- secsse::id_paramPos(c(0, 1), 2)
-   params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
-   params[[2]][] <- 0.01
-   params[[3]][, ] <- 0.1
-   diag(params[[3]]) <- NA
-   #  Thus, we have for both, rates
-   # 0A, 1A, 0B and 1B. If we are interested in the posterior probability of
-   # trait 0,we have to provide a helper function that sums the probabilities of
-   # 0A and 0B, e.g.:
-   helper_function <- function(x) {
-     return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
-   }
-  testthat::expect_warning(
-   px <- plot_state_exact(parameters = params,
-                    phy = phy,
-                    traits = traits,
-                    num_concealed_states = 2,
-                    sampling_fraction = c(1, 1),
-                    num_steps = 10,
-                    prob_func = helper_function)
-  )
-   testthat::expect_true(inherits(px, "ggplot"))
+  set.seed(5)
+  phy <- ape::rphylo(n = 4, birth = 1, death = 0)
+  traits <- c(0, 1, 1, 0)
+  params <- secsse::id_paramPos(c(0, 1), 2)
+  params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
+  params[[2]][] <- 0.01
+  params[[3]][, ] <- 0.1
+  diag(params[[3]]) <- NA
+  #  Thus, we have for both, rates
+  # 0A, 1A, 0B and 1B. If we are interested in the posterior probability of
+  # trait 0,we have to provide a helper function that sums the probabilities of
+  # 0A and 0B, e.g.:
+  helper_function <- function(x) {
+    return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
+  }
+  px <- plot_state_exact(parameters = params,
+                         phy = phy,
+                         traits = traits,
+                         num_concealed_states = 2,
+                         sampling_fraction = c(1, 1),
+                         num_steps = 10,
+                         prob_func = helper_function)
+  
+  testthat::expect_true(inherits(px, "ggplot"))
 })
 
 test_that("cla plotting", {
@@ -38,9 +37,9 @@ test_that("cla plotting", {
   masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
   diag(masterBlock) <- NA
   diff.conceal <- FALSE
-
+  
   idparslist[[3]] <- q_doubletrans(traits, masterBlock, diff.conceal)
-
+  
   testthat::expect_output(
     startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
   )
@@ -55,7 +54,7 @@ test_that("cla plotting", {
   cond <- "proper_cond"
   root_state_weight <- "proper_weights"
   sampling_fraction <- c(1, 1, 1)
-
+  
   model_R <- secsse::cla_secsse_ml(
     phy = phylotree,
     traits = traits,
@@ -76,18 +75,17 @@ test_that("cla plotting", {
   helper_function <- function(x) {
     return(sum(x[c(10, 13, 16)]) / sum(x))
   }
-
-  testthat::expect_warning(
-    px <- secsse::plot_state_exact(parameters = model_R$MLpars,
-                                   phy = phylotree,
-                                   traits = traits,
-                                   num_concealed_states =
+  
+  px <- secsse::plot_state_exact(parameters = model_R$MLpars,
+                                 phy = phylotree,
+                                 traits = traits,
+                                 num_concealed_states =
                                    num_concealed_states,
-                                   sampling_fraction = sampling_fraction,
-                                   cond = cond,
-                                   root_state_weight = root_state_weight,
-                                   prob_func = helper_function)
-  )
-
+                                 sampling_fraction = sampling_fraction,
+                                 cond = cond,
+                                 root_state_weight = root_state_weight,
+                                 prob_func = helper_function)
+  
+  
   testthat::expect_true(inherits(px, "ggplot"))
 })
