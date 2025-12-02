@@ -139,4 +139,14 @@ test_that("test q_doubletrans", {
   a1 <- unique(as.vector(a1))
   a2 <- unique(as.vector(a2))
   testthat::expect_gt(length(a2), length(a1))
+  
+  # trigger alternative route, I don't know why this route exists
+  masterBlock <- matrix(5.1, ncol = 3, nrow = 3, byrow = TRUE)
+  diag(masterBlock) <- NA
+  a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  
+  a1 <- unique(as.vector(a1))
+  a2 <- unique(as.vector(a2))
+  testthat::expect_gt(length(a2), length(a1))
 })

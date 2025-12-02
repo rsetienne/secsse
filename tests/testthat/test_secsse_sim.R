@@ -124,6 +124,20 @@ test_that("test secsse_sim 2", {
     vx <- geiger::is.extinct(focal_tree$phy)
     testthat::expect_true(length(vx) > 0)
   }
+  
+  # test verbose output
+  testthat::expect_output(
+    focal_tree2 <- secsse::secsse_sim(lambdas = lambda_p,
+                      mus = mu_p,
+                      qs = q_mat_p,
+                      crown_age = 10,
+                      num_concealed_states = 2,
+                      max_spec = 100,
+                      seed = 21,
+                      verbose = TRUE,
+                      drop_extinct = FALSE)
+  )
+  testthat::expect_equal(focal_tree, focal_tree2)
 })
 
 
@@ -806,3 +820,89 @@ test_that("test secsse_sim sampling_fraction", {
     testthat::expect_equal(median(num_ones / num_zeros), sf, tolerance = 0.1)
   }
 })
+
+
+test_that("test secsse_sim root edge", {
+
+  states <- c("S", "G")
+  
+  spec_matrix <- c("S", "S", "S", 1)
+  spec_matrix <- rbind(spec_matrix, c("G", "G", "G", 2))
+  lambda_list <- secsse::create_lambda_list(state_names = states,
+                                            num_concealed_states = 2,
+                                            transition_matrix = spec_matrix,
+                                            model = "ETD")
+  
+  mu_vector <- secsse::create_mu_vector(state_names = states,
+                                        num_concealed_states = 2,
+                                        model = "ETD",
+                                        lambda_list = lambda_list)
+  
+  shift_matrix <- c("S", "G", 5)
+  shift_matrix <- rbind(shift_matrix, c("G", "S", 6))
+  
+  q_matrix <- secsse::create_q_matrix(state_names = states,
+                                      num_concealed_states = 2,
+                                      shift_matrix = shift_matrix,
+                                      diff.conceal = TRUE)
+  idparslist <- list()
+  idparslist[[1]] <- lambda_list
+  idparslist[[2]] <- mu_vector
+  idparslist[[3]] <- q_matrix
+  
+  spec_S <- 0.1
+  spec_G <- 0
+  ext_S <- ext_G <- 0.0
+  q_SG <- 0.0
+  q_GS <- 0
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  
+  crown_age_used <- 10
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
+  
+
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 min_spec = 1,
+                                 init_state_probs = c("SA", "SB"),
+                                 start_at_crown = FALSE)
+  testthat::expect_equal(unique(sim_tree$obs_traits), "S")
+  testthat::expect_true(!is.null(sim_tree$phy$root.edge))
+  
+  # and now including extinction
+  
+  spec_S <- 0.2
+  spec_G <- 0
+  ext_S <- ext_G <- 0.15
+  q_SG <- 0
+  q_GS <- 0
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  
+  crown_age_used <- 10
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
+  sim_q_matrix_etd    <- secsse::fill_in(idparslist[[3]], used_params)
+  
+  
+  sim_tree2 <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 min_spec = 1,
+                                 init_state_probs = c("SA", "SB"),
+                                 start_at_crown = FALSE)
+  testthat::expect_true(!is.null(sim_tree2$phy$root.edge))
+  testthat::expect_equal(unique(sim_tree2$obs_traits), "S")
+  testthat::expect_gt(sim_tree2$extinct, sim_tree$extinct)
+})  
+      
