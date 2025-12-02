@@ -97,23 +97,24 @@ parameters and constraints.
 
 #### Note on assigning ambiguity to taxon trait states
 
-If the user wishes to assign a taxon to multiple trait states, because he/she is
-unsure which state best describes the taxon, he/she can use `NA`. `NA` is used
+If the user wishes to assign a taxon to multiple trait states, because she/he is
+unsure which state best describes the taxon, she/he can use `NA`. `NA` is used
 when there is no information on possible state at all; for example when a state
 was not measured or a taxon is unavailable for inspection. `NA` means a taxon is
 equally likely to pertain to any state. In case the user does have some
 information, for example if a taxon can pertain to multiple states, or if there
 is uncertainty regarding state but one or multiple states can with certainty be
 excluded, secsse offers flexibility to handle ambiguity. In this case, the user
-only needs to supply a trait file, with at least four columns, one for the taxon
-name, and three for trait state. Below, we show an example of what the trait
+only needs to supply a trait matrix, with at least N + 1 columns, one column for
+the taxon name, and N equal to the number of unique states (3 in the example) . 
+Below, we show an example of what the trait
 info should be like (the column with species' names has been removed). If a
 taxon may pertain to trait state 1 or 3, but not to 2, the three columns should 
 have at least the values 1 and a 3, but never 2 (species in the third row). On
 the other hand, the species in the fifth row can pertain to all states: the
 first column would have a 1, the second a 2, the third a 3 (although if you only
 have this type of ambiguity, it is easier to assign `NA` and use a single-column
-data file).
+setup).
 
 ```{r}
 #       traits traits traits
