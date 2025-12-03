@@ -123,6 +123,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
         }
       }
       if (sim.run_info == done) {
+        tracker[ done ]++;
         break;
       } else {
         tracker[ sim.run_info ]++;

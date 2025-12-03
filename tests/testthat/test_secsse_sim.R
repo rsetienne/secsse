@@ -819,6 +819,21 @@ test_that("test secsse_sim sampling_fraction", {
                            tolerance = 0.5) 
     testthat::expect_equal(median(num_ones / num_zeros), sf, tolerance = 0.1)
   }
+  
+  
+  # now test something where due to the sampling fraction, it goes extinct
+  # This will actually generate multiple warnings, but I can not make them explicit
+  # all here.
+  testthat::expect_warning(
+  focal_tree <- secsse::secsse_sim(lambdas = lambda_p,
+                                   mus = mu_p,
+                                   qs = q_mat_p,
+                                   crown_age = crown_age,
+                                   num_concealed_states = 2,
+                                   sampling_fraction = c(0.0, 0.0),
+                                   seed = 42,
+                                   max_tries = 2)
+  )
 })
 
 
