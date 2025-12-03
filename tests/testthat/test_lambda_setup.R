@@ -136,9 +136,20 @@ test_that("test q_doubletrans", {
   a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
   a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
   
-  a1 <- unique(as.vector(a1))
-  a2 <- unique(as.vector(a2))
-  testthat::expect_gt(length(a2), length(a1))
+  a1v <- unique(as.vector(a1))
+  a2v <- unique(as.vector(a2))
+  testthat::expect_gt(length(a2v), length(a1v))
+  
+  # test deprecated function
+  testthat::expect_warning(
+  a1_1 <- secsse::expand_q_matrix(masterBlock,
+                                  num_concealed_states = num_concealed_states,
+                                  diff.conceal = FALSE),
+  "This function is deprecated, please use q_doubletrans, piping result
+          to q_doubletrans, this may introduce inaccuracies."
+  )
+  # checking as vector, because expand_q_matrix mangles the trait names
+  testthat::expect_equal(as.vector(a1), as.vector(a1_1))
   
   # trigger alternative route, I don't know why this route exists
   masterBlock <- matrix(5.1, ncol = 3, nrow = 3, byrow = TRUE)
@@ -149,4 +160,9 @@ test_that("test q_doubletrans", {
   a1 <- unique(as.vector(a1))
   a2 <- unique(as.vector(a2))
   testthat::expect_gt(length(a2), length(a1))
+  
+ 
+  
+  
+  
 })
