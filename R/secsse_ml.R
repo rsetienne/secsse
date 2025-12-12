@@ -100,7 +100,7 @@ master_ml <- function(phy,
                                                  num_modeled_traits,
                                                  traitStates = 
                                                    get_trait_states(idparslist,
-                                                                    num_concealed_states, FALSE))
+                                                                    num_concealed_states, verbose))
     if (length(phy$tip.label) == 1) {
       setting_calculation$states <- setting_calculation$states[-2, ]
       setting_calculation$forTime <- setting_calculation$forTime[-2, ]
@@ -141,7 +141,7 @@ master_ml <- function(phy,
                                                         first_time = FALSE,
                                                         traitStates = 
                                                           get_trait_states(idparslist,
-                                                                           num_concealed_states, FALSE))
+                                                                           num_concealed_states, verbose))
     }
   }
   

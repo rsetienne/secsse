@@ -41,8 +41,8 @@ test_that("multi phylo", {
                                     cond = "no_cond",
                                     display_warning = FALSE)
   trees <- list()
-  trees[[1]]<- focal_tree
-  trees[[2]]<- focal_tree
+  trees[[1]] <- focal_tree
+  trees[[2]] <- focal_tree
   
   class(trees) <- "multiPhylo"
   
@@ -71,6 +71,40 @@ test_that("multi phylo", {
                                     cond = "no_cond",
                                     display_warning = FALSE)
   testthat::expect_equal(2*res1, res3)
+  
+  # let's get root states
+  res4 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                    phy = trees,
+                                    traits = trait_list,
+                                    num_concealed_states = num_concealed_states,
+                                    sampling_fraction = sf_list,
+                                    cond = "no_cond",
+                                    display_warning = FALSE,
+                                    return_root_state = TRUE)
+  testthat::expect_true(is.list(res4))
+  testthat::expect_equal(length(res4$root_state), 2)  
+  testthat::expect_equal(length(res4$root_state[[1]]), num_concealed_states ^ 2)
+  
+  # now, let's do multiphylo with a single branch tree
+  
+  fake_tree <- ape::rphylo(n = 2, birth = 1, death = 0)
+  fake_tree$edge.length <- c(1)
+  fake_tree$node.label <- NULL
+  fake_tree$edge <- as.matrix(fake_tree$edge[-2, ], nrow = 1)
+  fake_tree$tip.label <- fake_tree$tip.label[-2]
+  trees[[3]] <- fake_tree
+  trait_list[[3]] <- 1
+  sf_list[[3]] <- c(1, 1)
+  
+  res5 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                    phy = trees,
+                                    traits = trait_list,
+                                    num_concealed_states = num_concealed_states,
+                                    sampling_fraction = sf_list,
+                                    cond = "no_cond",
+                                    display_warning = FALSE)
+  # spec rate is 0.3, branch length is 1MY
+  testthat::expect_equal(res5 + params[1], res3, tol = 1e-2)
 })
 
 test_that("multi phylo ML", {
@@ -186,3 +220,62 @@ test_that("multi phylo ML", {
   testthat::expect_true(all.equal(model_R$MLpars, multi_R$MLpars))
 })
 
+test_that("multi phylo abuse", {
+  focal_tree <- ape::rphylo(n = 3, birth = 0.3 ,death = 0)
+  
+  traits <- c(1, 1, 1)
+  
+  num_concealed_states <- 2
+  idparslist <- cla_id_paramPos(c(1, 2), num_concealed_states)
+  idparslist$lambdas[1, ] <- rep(1, 2)
+  idparslist[[2]][] <- 2
+  masterBlock <- matrix(3, ncol = 2, nrow = 2, byrow = TRUE)
+  diag(masterBlock) <- NA
+  diff.conceal <- FALSE
+  idparslist[[3]] <- q_doubletrans(c(1, 2), masterBlock, diff.conceal)
+  idparslist[[1]] <- secsse::prepare_full_lambdas(c(1, 2),
+                                                  num_concealed_states,
+                                                  idparslist[[1]])
+  
+  params <- c(0.3, 0.0, 0.0) # extinction and shifts to zero, to allow direct
+  # comparison
+  
+  lambdas <- secsse::fill_in(idparslist[[1]], params)
+  mus <- secsse::fill_in(idparslist[[2]], params)
+  q_mat <- secsse::fill_in(idparslist[[3]], params)
+  
+  parslist <- list()
+  parslist[[1]] <- lambdas
+  parslist[[2]] <- mus
+  parslist[[3]] <- q_mat
+  
+  sf <- c(1, 1)
+
+  trees <- list()
+  trees[[1]] <- focal_tree
+  trees[[2]] <- focal_tree
+  
+  trait_list <- list()
+  trait_list[[1]] <- traits
+  trait_list[[2]] <- traits
+  
+  testthat::expect_error(
+  res2 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                    phy = trees,
+                                    traits = trait_list,
+                                    num_concealed_states = num_concealed_states,
+                                    sampling_fraction = sf),
+  "when providing multiple phylogenies, make sure to use the multiPhylo class"
+  )
+
+  class(trees) <- "multiPhylo"
+  
+  testthat::expect_error(
+    res2 <- secsse::cla_secsse_loglik(parameter = parslist,
+                                      phy = trees,
+                                      traits = traits,
+                                      num_concealed_states = num_concealed_states,
+                                      sampling_fraction = sf),
+    "traits needs to be supplied as a list now that there are multiple phylogenies"
+  )
+})
