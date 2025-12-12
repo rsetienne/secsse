@@ -1008,11 +1008,11 @@ get_weight_states <- function(root_state_weight,
           if (pi[which.max(abs(pi))] < 0) {
             pi <- -pi
           }
-          pi <- pi/sum(pi)
           if (any(pi < 0) && max(abs(pi[which(pi < 0)])) > 1E-10) {
             warning('Substantial negative weights detected')
           }
           pi[which(pi < 0)] <- 0
+          pi <- pi/sum(pi)
           weight_states <- pi
         }
     }
