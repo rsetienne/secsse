@@ -1,4 +1,4 @@
-test_that("stationary weights are computed correctly") {
+test_that("stationary weights are computed correctly", {
   Sys.unsetenv("R_TESTS")
   Q <- matrix(c(0,3,2,0), 2, 2, byrow = T)
   weight_states <- get_weight_states(root_state_weight = 'stationary_weights',
@@ -26,7 +26,8 @@ test_that("stationary weights are computed correctly") {
                                      is_cla = NA,
                                      Q = q)
   testthat::expect_equal(as.numeric(weight_states),c(0.4905660,0.2452830,0.2641509), tol = 1E-6)
-}
+})
+
 test_that("secsse works with stationary weights", {
   Sys.unsetenv("R_TESTS")
   

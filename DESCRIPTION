@@ -50,7 +50,8 @@ Imports:
  ggplot2,
  tibble,
  rlang,
- treestats
+ treestats,
+ pracma
 Suggests: 
  diversitree,
  phytools,
