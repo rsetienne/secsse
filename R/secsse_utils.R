@@ -1002,6 +1002,7 @@ get_weight_states <- function(root_state_weight,
         }
         
         if (root_state_weight == "stationary_weights") {
+          diag(Q) <- 0
           diag(Q) <- -rowSums(Q)
           pi <- pracma::null(t(Q))
           if (pi[which.max(abs(pi))] < 0) {
@@ -1011,6 +1012,7 @@ get_weight_states <- function(root_state_weight,
           if (any(pi < 0) && max(abs(pi[which(pi < 0)])) > 1E-10) {
             warning('Substantial negative weights detected')
           }
+          pi[which(pi < 0)] <- 0
           weight_states <- pi
         }
     }
