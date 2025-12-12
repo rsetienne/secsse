@@ -460,9 +460,10 @@ check_root_state_weight <- function(root_state_weight, traits) {
     } else {
         if (any(root_state_weight == "maddison_weights" |
                 root_state_weight == "equal_weights" |
-                root_state_weight == "proper_weights") == FALSE) {
+                root_state_weight == "proper_weights" | 
+                root_state_weight == "stationary_weights") == FALSE) {
             stop("The root_state_weight must be any of 
-           maddison_weights, equal_weights, or proper_weights.")
+           maddison_weights, equal_weights, proper_weights or stationary_weights.")
         }
     }
 }
@@ -968,7 +969,8 @@ get_weight_states <- function(root_state_weight,
                               lambdas,
                               nodeM,
                               d,
-                              is_cla = FALSE) {
+                              is_cla = FALSE,
+                              Q) {
 
     if (is.numeric(root_state_weight)) {
         weight_states <- rep(root_state_weight / num_concealed_states,
@@ -998,8 +1000,20 @@ get_weight_states <- function(root_state_weight,
         if (root_state_weight == "equal_weights") {
             weight_states <- rep(1 / length(mergeBranch), length(mergeBranch))
         }
+        
+        if (root_state_weight == "stationary_weights") {
+          diag(Q) <- -rowSums(Q)
+          pi <- pracma::null(t(Q))
+          if (pi[which.max(abs(pi))] < 0) {
+            pi <- -pi
+          }
+          pi <- pi/sum(pi)
+          if (any(pi < 0) && max(abs(pi[which(pi < 0)])) > 1E-10) {
+            warning('Substantial negative weights detected')
+          }
+          weight_states <- pi
+        }
     }
-
     return(weight_states)
 }
 

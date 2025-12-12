@@ -193,7 +193,8 @@ master_loglik <- function(parameter,
                                      lambdas,
                                      nodeM,
                                      d,
-                                     is_cla = using_cla)
+                                     is_cla = using_cla,
+                                     Q = q_matrix)
   
   if (is_complete_tree) {
     nodeM <- update_complete_tree(phy,

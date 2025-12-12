@@ -97,7 +97,8 @@ secsse_single_branch_loglik <- function(parameter,
                                      lambdas,
                                      nodeM,
                                      d,
-                                     is_cla = using_cla)
+                                     is_cla = using_cla,
+                                     Q = q_matrix)
   mergeBranch2 <- condition(cond,
                             mergeBranch,
                             weight_states,
