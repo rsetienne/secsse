@@ -1005,15 +1005,28 @@ get_weight_states <- function(root_state_weight,
           diag(Q) <- 0
           diag(Q) <- -rowSums(Q)
           pi <- pracma::null(t(Q))
-          if (pi[which.max(abs(pi))] < 0) {
-            pi <- -pi
+          diff <- 1
+          dimpi2 <- dim(pi)[[2]]
+          if (dimpi2 > 1) {
+            warning('Null space of transition matrix is multidimensional;
+                    the most even dimension is used for weighing the likelihood.')
           }
-          if (any(pi < 0) && max(abs(pi[which(pi < 0)])) > 1E-10) {
-            warning('Substantial negative weights detected')
+          for(i in 1:dimpi2) {
+            if (pi[which.max(abs(pi[,i])),i] < 0) {
+              pi[,i] <- -pi[,i]
+            }
+            if (any(pi[,i] < 0) && max(abs(pi[which(pi[,i] < 0),i])) > 1E-10) {
+              warning('Substantial negative weights detected.')
+            }
+            pi[which(pi[,i] < 0),i] <- 0
+            pi[,i] <- pi[,i]/sum(pi[,i])
+            diff_new <- abs(max(pi[,i])) - abs(min(pi[,i]))
+            if (diff_new < diff) {
+               diff <- diff_new
+               i_choice <- i
+            }
           }
-          pi[which(pi < 0)] <- 0
-          pi <- pi/sum(pi)
-          weight_states <- pi
+          weight_states <- pi[,i_choice]
         }
     }
     return(weight_states)
