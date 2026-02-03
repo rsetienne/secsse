@@ -117,9 +117,43 @@ create_q_matrix_int <- function(masterBlock,
 #' param_posit <- id_paramPos(traits,num_concealed_states)
 #' param_posit[[3]] <- myQ
 #' @export
-q_doubletrans <- function(traits, masterBlock, diff.conceal) {
+q_doubletrans <- function(traits, masterBlock ,diff.conceal) {
+  return(q_doubletrans_old(traits, masterBlock ,diff.conceal))
+}
+ 
+
+#' @title Basic Qmatrix
+#' Sets a Q matrix where double transitions are not allowed
+#' 
+#' @inheritParams default_params_doc
+#' 
+#' @return Q matrix that includes both examined and concealed states, it should
+#' be declared as the third element of idparslist.
+#' @description This function expands the Q_matrix, but it does so assuming
+#' that the number of concealed traits is equal to the number of examined
+#' traits, if you have a different number, you should consider looking at
+#' the function [expand_q_matrix()].
+#' @examples
+#' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
+#' # For a three-state trait
+#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
+#' diag(masterBlock) <- NA
+#' masterBlock[1,2] <- 6
+#' masterBlock[1,3] <- 7
+#' masterBlock[2,1] <- 8
+#' masterBlock[2,3] <- 9
+#' masterBlock[3,1] <- 10
+#' masterBlock[3,2] <- 11
+#' myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
+#' # now, it can replace the Q matrix from id_paramPos
+#' num_concealed_states <- 3
+#' param_posit <- id_paramPos(traits,num_concealed_states)
+#' param_posit[[3]] <- myQ
+#' @export
+q_doubletrans_old <- function(traits, masterBlock, diff.conceal) {
     if (diff.conceal == TRUE &&
         all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
+      
         integersmasterBlock <- floor(masterBlock)
         factorBlock <- signif(masterBlock - integersmasterBlock, digits = 2)
 
@@ -178,6 +212,97 @@ q_doubletrans <- function(traits, masterBlock, diff.conceal) {
     rownames(Q) <- all_names
     return(Q)
 }
+
+#' @title Basic Qmatrix
+#' Sets a Q matrix where double transitions are not allowed
+#' 
+#' @inheritParams default_params_doc
+#' 
+#' @return Q matrix that includes both examined and concealed states, it should
+#' be declared as the third element of idparslist.
+#' @description This function expands the Q_matrix, but it does so assuming
+#' that the number of concealed traits is equal to the number of examined
+#' traits, if you have a different number, you should consider looking at
+#' the function [expand_q_matrix()].
+#' @examples
+#' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
+#' # For a three-state trait
+#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
+#' diag(masterBlock) <- NA
+#' masterBlock[1,2] <- 6
+#' masterBlock[1,3] <- 7
+#' masterBlock[2,1] <- 8
+#' masterBlock[2,3] <- 9
+#' masterBlock[3,1] <- 10
+#' masterBlock[3,2] <- 11
+#' myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
+#' # now, it can replace the Q matrix from id_paramPos
+#' num_concealed_states <- 3
+#' param_posit <- id_paramPos(traits,num_concealed_states)
+#' param_posit[[3]] <- myQ
+#' @export
+q_doubletrans_new <- function(traits,
+                              master_block,
+                              diff.conceal,
+                              num_concealed_states = NULL) {
+
+  n_obs_traits <- length(sort(unique(traits)))
+  if (is.null(num_concealed_states)) num_concealed_states <- n_obs_traits
+  
+  Q <- matrix(data = 0,
+              nrow = n_obs_traits * num_concealed_states,
+              ncol = n_obs_traits * num_concealed_states)
+  
+  uniq_obs_rates <- sort(unique(c(masterBlock)))
+  uniq_obs_rates <- uniq_obs_rates[!is.na(uniq_obs_rates)]
+  uniq_obs_rates <- uniq_obs_rates[uniq_obs_rates > 0]
+  max_obs_rate <- max(uniq_obs_rates)
+  new_conceal_rates <- 
+    (max_obs_rate + 1):(max_obs_rate + length(uniq_obs_rates))
+  if (diff.conceal == FALSE) {
+    new_conceal_rates <- uniq_obs_rates
+  }
+
+  for (i in 1:ncol(Q)) {
+    for (j in 1:nrow(Q)) {
+      if (i == j) next
+      
+      obs_trait  <- (c(i, j) - 1) %% n_obs_traits + 1
+      conc_trait <- (c(i, j) - 1) %/% n_obs_traits + 1
+      move_obs   <- abs(diff(obs_trait))
+      move_conc  <- abs(diff(conc_trait))
+      
+      new_rate <- 0
+      
+      if (move_obs > 0 && move_conc == 0) {
+        
+        new_rate <- masterBlock[obs_trait[1], obs_trait[2]]
+        
+      } else if (move_conc > 0 && move_obs == 0) {
+        new_rate <- masterBlock[conc_trait[1], conc_trait[2]]
+        if (new_rate > 0) {
+          conc_index <- which(uniq_obs_rates == new_rate)
+          new_rate   <- new_conceal_rates[conc_index]
+        }
+      }
+      
+      Q[i, j] <- new_rate 
+    }
+  }
+  uniq_traits <- unique(traits)
+  uniq_traits <- uniq_traits[!is.na(uniq_traits)]
+  if (is.numeric(uniq_traits)) {
+    uniq_traits <- sort(uniq_traits)
+  }
+  
+  all_names <- get_state_names(state_names = uniq_traits,
+                               num_concealed_states = num_concealed_states)
+  colnames(Q) <- all_names
+  rownames(Q) <- all_names
+  diag(Q) <- NA
+  return(Q)
+}
+
 
 
 #' @title Data checking and trait sorting
