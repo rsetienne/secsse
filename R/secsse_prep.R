@@ -145,9 +145,7 @@ create_q_matrix <- function(state_names,
                             diff.conceal = FALSE) {
 
   total_num_states <- length(state_names)
-  if (total_num_states != num_concealed_states) {
-    stop("number of concealed states has to be equal to the number of observed states")
-  }
+
   trans_matrix <- matrix(0, ncol = total_num_states,
                          nrow = total_num_states)
 
@@ -161,9 +159,11 @@ create_q_matrix <- function(state_names,
 
   diag(trans_matrix) <- NA
 
-  trans_matrix <- secsse::q_doubletrans(traits = state_names,
-                                        masterBlock = trans_matrix,
-                                        diff.conceal = diff.conceal)
+  trans_matrix <- 
+    secsse::q_doubletrans(traits = state_names,
+                          masterBlock = trans_matrix,
+                          diff.conceal = diff.conceal,
+                          num_concealed_states = num_concealed_states)
   
   all_state_names <- get_state_names(state_names, num_concealed_states)
   colnames(trans_matrix) <- all_state_names
