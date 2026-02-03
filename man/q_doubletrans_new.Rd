@@ -7,7 +7,7 @@ Sets a Q matrix where double transitions are not allowed}
 \usage{
 q_doubletrans_new(
   traits,
-  master_block,
+  masterBlock,
   diff.conceal,
   num_concealed_states = NULL
 )
@@ -19,6 +19,9 @@ order of the states must be the same as the tree tips. For help, see
 \code{multiPhylo} set of multiple phylognies, traits should be a list where
 each entry in the list corresponds to the matching phylogeny on that
 position.}
+
+\item{masterBlock}{matrix of transitions among only examined states, \code{NA} in
+the main diagonal, used to build the full transition rates matrix.}
 
 \item{diff.conceal}{Boolean stating if the concealed states should be
 different. E.g. that the transition rates for the concealed

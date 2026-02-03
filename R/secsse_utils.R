@@ -242,7 +242,7 @@ q_doubletrans_old <- function(traits, masterBlock, diff.conceal) {
 #' param_posit[[3]] <- myQ
 #' @export
 q_doubletrans_new <- function(traits,
-                              master_block,
+                              masterBlock,
                               diff.conceal,
                               num_concealed_states = NULL) {
 
