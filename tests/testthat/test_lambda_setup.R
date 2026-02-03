@@ -165,13 +165,10 @@ test_that("test q_doubletrans", {
   num_concealed_states <- 3
   masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
   diag(masterBlock) <- NA
-  a1 <- q_doubletrans_old(traits, masterBlock, diff.conceal = FALSE)
-  a2 <- q_doubletrans_new(traits, masterBlock, diff.conceal = FALSE)
-  testthat::expect_equal(as.vector(a1), as.vector(a2))
-  
-  a1 <- q_doubletrans_old(traits, masterBlock, diff.conceal = TRUE)
-  a2 <- q_doubletrans_new(traits, masterBlock, diff.conceal = TRUE)
-  testthat::expect_equal(as.vector(a1), as.vector(a2))
+  a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  testthat::expect_equal(max(a1, na.rm = TRUE), 5)
+  testthat::expect_equal(max(a2, na.rm = TRUE), 6)
   
   # less trivial example
   traits <- c(1, 2, 3)
@@ -179,15 +176,13 @@ test_that("test q_doubletrans", {
                           2, 0, 3, 
                           0, 4, 0), ncol = 3, nrow = 3, byrow = TRUE)
   diag(masterBlock) <- NA
-  a1 <- q_doubletrans_old(traits, masterBlock, diff.conceal = FALSE)
-  a2 <- q_doubletrans_new(traits, masterBlock, diff.conceal = FALSE)
-  testthat::expect_equal(as.vector(a1), as.vector(a2))
+  a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  testthat::expect_equal(max(a1, na.rm = TRUE), 4)
+  testthat::expect_equal(max(a2, na.rm = TRUE), 8)
   
-  a1 <- q_doubletrans_old(traits, masterBlock, diff.conceal = TRUE)
-  a2 <- q_doubletrans_new(traits, masterBlock, diff.conceal = TRUE)
-  testthat::expect_true(all.equal(a1, a2))
-  
-  a2 <- q_doubletrans_new(traits, masterBlock, diff.conceal = TRUE,
+ 
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE,
                           num_concealed_states = 2)
   ref_mat <- matrix(c(0, 1, 0, 5, 0, 0,
                       2, 0, 3, 0, 5 ,0,
@@ -197,5 +192,4 @@ test_that("test q_doubletrans", {
                       0, 0, 6, 0, 4, 0), nrow = 6, byrow = TRUE)
   diag(ref_mat) <- NA
   testthat::expect_equal(as.vector(a2), as.vector(ref_mat))
-  
 })

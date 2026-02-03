@@ -96,155 +96,30 @@ create_q_matrix_int <- function(masterBlock,
 #' 
 #' @return Q matrix that includes both examined and concealed states, it should
 #' be declared as the third element of idparslist.
-#' @description This function expands the Q_matrix, but it does so assuming
-#' that the number of concealed traits is equal to the number of examined
-#' traits, if you have a different number, you should consider looking at
-#' the function [expand_q_matrix()].
+#' @description This function expands the Q_matrix. If the number of concealed
+#' states is not explicitly set by the user, it is assumed to be identical
+#' to the number of observed states.
 #' @examples
-#' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
+#' traits <- sample(c(0, 1, 2), 45, replace = TRUE) # get some traits
 #' # For a three-state trait
-#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
+#' masterBlock <- matrix(99, ncol = 3, nrow = 3, byrow = TRUE)
 #' diag(masterBlock) <- NA
-#' masterBlock[1,2] <- 6
-#' masterBlock[1,3] <- 7
-#' masterBlock[2,1] <- 8
-#' masterBlock[2,3] <- 9
-#' masterBlock[3,1] <- 10
-#' masterBlock[3,2] <- 11
-#' myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
+#' masterBlock[1, 2] <- 6
+#' masterBlock[1, 3] <- 7
+#' masterBlock[2, 1] <- 8
+#' masterBlock[2, 3] <- 9
+#' masterBlock[3, 1] <- 10
+#' masterBlock[3, 2] <- 11
+#' myQ <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
 #' # now, it can replace the Q matrix from id_paramPos
 #' num_concealed_states <- 3
 #' param_posit <- id_paramPos(traits,num_concealed_states)
 #' param_posit[[3]] <- myQ
 #' @export
-q_doubletrans <- function(traits, masterBlock ,diff.conceal) {
-  return(q_doubletrans_old(traits, masterBlock ,diff.conceal))
-}
- 
-
-#' @title Basic Qmatrix
-#' Sets a Q matrix where double transitions are not allowed
-#' 
-#' @inheritParams default_params_doc
-#' 
-#' @return Q matrix that includes both examined and concealed states, it should
-#' be declared as the third element of idparslist.
-#' @description This function expands the Q_matrix, but it does so assuming
-#' that the number of concealed traits is equal to the number of examined
-#' traits, if you have a different number, you should consider looking at
-#' the function [expand_q_matrix()].
-#' @examples
-#' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-#' # For a three-state trait
-#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
-#' diag(masterBlock) <- NA
-#' masterBlock[1,2] <- 6
-#' masterBlock[1,3] <- 7
-#' masterBlock[2,1] <- 8
-#' masterBlock[2,3] <- 9
-#' masterBlock[3,1] <- 10
-#' masterBlock[3,2] <- 11
-#' myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
-#' # now, it can replace the Q matrix from id_paramPos
-#' num_concealed_states <- 3
-#' param_posit <- id_paramPos(traits,num_concealed_states)
-#' param_posit[[3]] <- myQ
-#' @export
-q_doubletrans_old <- function(traits, masterBlock, diff.conceal) {
-    if (diff.conceal == TRUE &&
-        all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
-      
-        integersmasterBlock <- floor(masterBlock)
-        factorBlock <- signif(masterBlock - integersmasterBlock, digits = 2)
-
-        factorstoExpand <- unique(sort(c(factorBlock)))
-        factorstoExpand <- factorstoExpand[factorstoExpand > 0]
-        newshareFac <-
-            (max(factorstoExpand * 10) + 1):(max(factorstoExpand * 10) +
-                                                 length(factorstoExpand))
-        newshareFac <- newshareFac / 10
-
-        for (iii in seq_along(newshareFac)) {
-            factorBlock[which(factorBlock == factorstoExpand[iii])] <-
-                newshareFac[iii]
-        }
-
-        ntraits <- length(sort(unique(traits)))
-        uniqParQ <- sort(unique(c(floor(masterBlock))))
-        uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
-        concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
-
-        for (iii in seq_along(concealnewQ)) {
-            integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <-
-                concealnewQ[iii]
-        }
-        concealnewQMatr <- integersmasterBlock + factorBlock
-
-        Q <- create_q_matrix_int(masterBlock,
-                                 concealnewQMatr,
-                                 ntraits,
-                                 diff.conceal)
-    } else {
-        ntraits <- length(sort(unique(traits)))
-        uniqParQ <- sort(unique(c(masterBlock)))
-        uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
-        concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
-        concealnewQMatr <- masterBlock
-        for (I in seq_along(uniqParQ2)) {
-            uniqParQ2
-            concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
-        }
-
-        Q <- create_q_matrix_int(masterBlock,
-                                 concealnewQMatr,
-                                 ntraits,
-                                 diff.conceal)
-    }
-    uniq_traits <- unique(traits)
-    uniq_traits <- uniq_traits[!is.na(uniq_traits)]
-    if (is.numeric(uniq_traits)) {
-      uniq_traits <- sort(uniq_traits)
-    }
-    
-    all_names <- get_state_names(state_names = uniq_traits,
-                                 num_concealed_states = length(uniq_traits))
-    colnames(Q) <- all_names
-    rownames(Q) <- all_names
-    return(Q)
-}
-
-#' @title Basic Qmatrix
-#' Sets a Q matrix where double transitions are not allowed
-#' 
-#' @inheritParams default_params_doc
-#' 
-#' @return Q matrix that includes both examined and concealed states, it should
-#' be declared as the third element of idparslist.
-#' @description This function expands the Q_matrix, but it does so assuming
-#' that the number of concealed traits is equal to the number of examined
-#' traits, if you have a different number, you should consider looking at
-#' the function [expand_q_matrix()].
-#' @examples
-#' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
-#' # For a three-state trait
-#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
-#' diag(masterBlock) <- NA
-#' masterBlock[1,2] <- 6
-#' masterBlock[1,3] <- 7
-#' masterBlock[2,1] <- 8
-#' masterBlock[2,3] <- 9
-#' masterBlock[3,1] <- 10
-#' masterBlock[3,2] <- 11
-#' myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
-#' # now, it can replace the Q matrix from id_paramPos
-#' num_concealed_states <- 3
-#' param_posit <- id_paramPos(traits,num_concealed_states)
-#' param_posit[[3]] <- myQ
-#' @export
-q_doubletrans_new <- function(traits,
-                              masterBlock,
-                              diff.conceal,
-                              num_concealed_states = NULL) {
+q_doubletrans <- function(traits,
+                          masterBlock, 
+                          diff.conceal,
+                          num_concealed_states = NULL) {
 
   n_obs_traits <- length(sort(unique(traits)))
   if (is.null(num_concealed_states)) num_concealed_states <- n_obs_traits
