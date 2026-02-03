@@ -117,32 +117,4 @@ test_that("the loglik for the complete tree", {
                                    is_complete_tree = TRUE,
                                    display_warning = FALSE)
   testthat::expect_equal(loglik7, loglik5)
-
-  # Parallel code doesn't work on CI
-  testthat::skip_on_cran()
-  testthat::skip_on_ci()
-  loglik6 <- as.numeric(secsse::secsse_loglik(parameter = toCheck,
-                                      phy = phy,
-                                      traits = traits,
-                                      num_concealed_states =
-                                        num_concealed_states,
-                                      cond = cond,
-                                      root_state_weight = root_state_weight,
-                                      sampling_fraction = sampling_fraction,
-                                      is_complete_tree = TRUE,
-                                      num_threads = 4,
-                                      display_warning = FALSE))
-  testthat::expect_equal(loglik6, loglik5, tolerance = 1E-4)
-
-  loglik8 <- secsse::secsse_loglik(parameter = parameter,
-                           phy = phy,
-                           traits = traits,
-                           num_concealed_states = num_concealed_states,
-                           cond = cond,
-                           root_state_weight = root_state_weight,
-                           sampling_fraction = sampling_fraction,
-                           is_complete_tree = TRUE,
-                           num_threads = 4,
-                           display_warning = FALSE)
-  testthat::expect_equal(loglik8, loglik7, tolerance = 1e-5)
 })

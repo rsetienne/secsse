@@ -70,9 +70,7 @@ the names of required observed states can be provided, e.g. c("S", "N").}
 \item{non_extinction}{boolean stating if the tree should be conditioned on
 non-extinction of the crown lineages. Defaults to \code{TRUE}.}
 
-\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
-\code{FALSE}, optimizer output will be shown.}
+\item{verbose}{sets verbose output; default is \code{TRUE}.}
 
 \item{max_tries}{maximum number of simulations to try to obtain a tree.}
 

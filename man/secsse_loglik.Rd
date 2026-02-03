@@ -62,10 +62,10 @@ using a \code{multiPhylo} object, sampling fraction should be list where each
 entry in the list corresponds to the sampling proportion for each tree.}
 
 \item{setting_calculation}{argument used internally to speed up calculation.
-It should be left blank (default : \code{setting_calculation = NULL}).}
+This should be left blank (default : \code{setting_calculation = NULL}).}
 
-\item{see_ancestral_states}{Boolean for whether the ancestral states should
-be shown? Defaults to \code{FALSE}.}
+\item{see_ancestral_states}{Boolean for whether the ancestral states for each
+of the internal nodes should be output. Defaults to \code{FALSE}.}
 
 \item{loglik_penalty}{the size of the penalty for all parameters; default is
 0 (no penalty).}
@@ -84,7 +84,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{method}{integration method used, available are:
+\item{method}{ODE integration method. Choose from:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
@@ -101,7 +101,21 @@ evaluated one more time to retrieve the root state (to avoid having to
 store the root state every ML evaluation).}
 }
 \value{
-The loglikelihood of the data given the parameter.
+A list with the following elements:
+$LL the loglikelihood of the data (phylogeny + tip states) given the
+parameters (speciation, extinction, transition rates).
+If see_ancestral_states = TRUE, then there will be two additional elements:
+$ancestral_states: a matrix with the probabilities of each state at the
+internal nodes
+$states: a matrix with the probabilities E, D (normalized) and S that are used
+in the calculations. The ancestral_states matrix is a submatrix of this matrix.
+This matrix is mostly used for package developers.
+If return_root_state = TRUE, then there will be one additional element:
+$root_state: vector with probabilities of each state at the root. This vector
+is the same as the top row of $ancestral_states
+We have used the shorthand description of "probabilities of each state",
+but technically, the probabilities are the normalized probabilities D of the
+data given each state at the internal nodes.
 }
 \description{
 Likelihood for SecSSE model

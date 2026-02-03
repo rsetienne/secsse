@@ -42,16 +42,16 @@ secsse_sim <- function(lambdas,
   if (is.matrix(lambdas)) {
     # need to be converted
     lambdas <- prepare_full_lambdas(names(mus),
-                                   num_concealed_states = num_concealed_states,
-                                   lambdas)
+                                    num_concealed_states = num_concealed_states,
+                                    lambdas)
   }
-
+  
   if (length(lambdas) != length(mus)) {
     stop("Every state must have a single rate of speciation and extinction")
   }
-
+  
   diag(qs) <- 0
-
+  
   if (is.null(init_state_probs)) {
     num_init_states <- length(mus)
     init_state_probs <- rep(1 / num_init_states, num_init_states)
@@ -73,9 +73,9 @@ secsse_sim <- function(lambdas,
     
     init_state_probs <- init_state_probs / sum(init_state_probs)
   }
-
+  
   if (is.null(seed)) seed <- -1
-
+  
   condition_vec <- vector()
   if (length(conditioning) > 1) {
     condition_vec <- conditioning
@@ -91,57 +91,75 @@ secsse_sim <- function(lambdas,
     condition_vec <- -1 + indices
   } 
   
-  res <- generate_phy(mus,
-                      lambdas,
-                      qs,
-                      crown_age,
-                      max_spec,
-                      max_species_extant,
-                      min_spec,
-                      init_state_probs,
-                      conditioning,
-                      num_concealed_states,
-                      non_extinction,
-                      verbose,
-                      max_tries,
-                      seed,
-                      condition_vec,
-                      tree_size_hist,
-                      start_at_crown,
-                      drop_extinct) 
-  
-  if (res$status == "not enough tries") {
-    return(res)
-  }
-  
-  if (length(res$phy$tip.label) != length(res$obs_traits)) {
-    cat("something went wrong, please report this to the package maintainer")
-  }
-  
-  if (res$status == "success" || res$status == "single_species_tree") {
-    if (sum(sampling_fraction) == length(sampling_fraction) ||
-        is.null(sampling_fraction)) {
-      return(res) # sampling fraction = 1
+  total_tries <- 0
+  while(total_tries < max_tries) {
+    res <- generate_phy(mus,
+                        lambdas,
+                        qs,
+                        crown_age,
+                        max_spec,
+                        max_species_extant,
+                        min_spec,
+                        init_state_probs,
+                        conditioning,
+                        num_concealed_states,
+                        non_extinction,
+                        verbose,
+                        max_tries,
+                        seed,
+                        condition_vec,
+                        tree_size_hist,
+                        start_at_crown,
+                        drop_extinct) 
+    total_tries <- total_tries + res$total_tries
+    if (res$status == "not enough tries") {
+      return(res)
     }
     
-    # if not, we have to subsample
-    all_traits <- names(mus)
-    for (i in 1:length(all_traits)) {
-      all_traits[i] <- substr(all_traits[i], 1, (nchar(all_traits[i]) - 1))
+    if (length(res$phy$tip.label) != length(res$obs_traits)) {
+      message("something went wrong, please report this to the package maintainer")
     }
-    all_traits <- unique(all_traits) # these are now all observed traits
-    tips_to_remove <- c()
-    for (i in seq_along(sampling_fraction)) {
-      trait_tips <- which(res$obs_traits == all_traits[i])
-      to_keep <- stats::rbinom(length(trait_tips), 1, sampling_fraction[i]) # sampling fraction is survival probability
-      trait_tips_for_removal <- trait_tips[to_keep == 0]
-      tips_to_remove <- c(tips_to_remove, trait_tips_for_removal)
-    }
-    # now we need to remove all the tips
-    if (length(tips_to_remove) > 0) {
-      res$obs_traits <- res$obs_traits[-tips_to_remove]
-      res$true_traits <- res$true_traits[-tips_to_remove]
-      res$phy <- ape::drop.tip(res$phy, tips_to_remove)
+    
+    if (res$status == "success" || res$status == "single_species_tree") {
+      if (sum(sampling_fraction) == length(sampling_fraction) ||
+          is.null(sampling_fraction)) {
+        return(res) # sampling fraction = 1
+      }
+      
+      # if not, we have to subsample
+      set.seed(seed)
+      all_traits <- names(mus)
+      for (i in 1:length(all_traits)) {
+        all_traits[i] <- substr(all_traits[i], 1, (nchar(all_traits[i]) - 1))
+      }
+      all_traits <- unique(all_traits) # these are now all observed traits
+      tips_to_remove <- c()
+      for (i in seq_along(sampling_fraction)) {
+        trait_tips <- which(res$obs_traits == all_traits[i])
+        to_keep <- stats::rbinom(length(trait_tips), 1, sampling_fraction[i]) # sampling fraction is survival probability
+        trait_tips_for_removal <- trait_tips[to_keep == 0]
+        tips_to_remove <- c(tips_to_remove, trait_tips_for_removal)
+      }
+      # now we need to remove all the tips
+      if (length(tips_to_remove) > 0) {
+        if (length(tips_to_remove) == length(res$phy$tip.label)) {
+          res$phy <- NULL
+          res$obs_traits <- NULL
+          res$true_traits <- NULL
+        } else {
+          res$obs_traits <- res$obs_traits[-tips_to_remove]
+          res$true_traits <- res$true_traits[-tips_to_remove]
+        
+          res$phy <- ape::drop.tip(res$phy, tips_to_remove)
+        }
+      }
+      
+      if (is.null(res$phy)) {
+        warning("sampling removed all tips, trying again with new seed")
+        seed = sample(1:1e9, 1)
+      } else {
+        return(res)
+      }
     }
   }
   return(res)
@@ -187,17 +205,16 @@ generate_phy <- function(mus,
   if (length(res) < 1) { # this happens upon a throw
     return(list(phy = "ds",
                 traits = 0,
-                status = "error"))
+                status = "error",
+                total_tries = max_tries))
   }
-  
-  
   
   Ltable        <- res$ltable
   
   out_hist <- 0
   if (tree_size_hist == TRUE) out_hist <- res$hist_tree_size
   
-  if (sum(res$tracker) >= max_tries) {
+  if (sum(res$tracker) > max_tries) {
     warning("Couldn't simulate a tree in enough tries,
             try increasing max_tries")
     
@@ -208,7 +225,8 @@ generate_phy <- function(mus,
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
                 size_hist = out_hist,
-                status = "not enough tries"))
+                status = "not enough tries",
+                total_tries = sum(res$tracker)))
   }
   
   if (start_at_crown == FALSE && sum(Ltable[, 4] == -1) == 1) {
@@ -238,7 +256,8 @@ generate_phy <- function(mus,
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
                 size_hist = out_hist,
-                status = "single_species_tree"))
+                status = "single_species_tree",
+                total_tries = sum(res$tracker)))
     
     
   } else if (sum(Ltable[, 4] == -1) < 2) {
@@ -250,7 +269,8 @@ generate_phy <- function(mus,
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
                 size_hist = out_hist,
-                status = "extinction"))
+                status = "extinction",
+                total_tries = sum(res$tracker)))
   }
   
   
@@ -300,7 +320,8 @@ generate_phy <- function(mus,
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
                 size_hist = out_hist,
-                status = "success"))
+                status = "success",
+                total_tries = sum(res$tracker)))
   } else {
     warning("simulation did not meet minimal requirements")
     return(list(phy = "ds",
@@ -310,6 +331,7 @@ generate_phy <- function(mus,
                 conditioning = res$tracker[4],
                 small = res$tracker[6],
                 size_hist = out_hist,
-                status = "requirements not met"))
+                status = "requirements not met",
+                total_tries = sum(res$tracker)))
   }
 }

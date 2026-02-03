@@ -33,7 +33,8 @@
 #' @param cond condition on the existence of a node root: `"maddison_cond"`,
 #'  `"proper_cond"` (default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:
-#'  `"maddison_weights"`, `"proper_weights"` (default) or `"equal_weights"`.
+#'  `"maddison_weights"`, `"proper_weights"` (default), `"equal_weights"'.
+#'  or `"stationary_weights"`
 #'  It can also be specified for the root state: the vector `c(1, 0, 0)` 
 #'  indicates state 1 was the root state. When
 #'  using a `multiPhylo` object, root_state_weight should be list where each
@@ -52,26 +53,24 @@
 #' @param is_complete_tree logical specifying whether or not a tree with all its
 #'  extinct species is provided. If set to `TRUE`, it also assumes that all 
 #'  *all* extinct lineages are present on the tree. Defaults to `FALSE`.
-#' @param verbose sets verbose output; default is `TRUE` when `optimmethod` is
-#'  `"simplex"`. If `optimmethod` is set to `"simplex"`, then even if set to 
-#'  `FALSE`, optimizer output will be shown.
+#' @param verbose sets verbose output; default is `TRUE`.
 #' @param num_threads number of threads to be used. Default is one thread.
 #' @param atol A numeric specifying the absolute tolerance of integration.
 #' @param rtol A numeric specifying the relative tolerance of integration.
-#' @param method integration method used, available are:
+#' @param method ODE integration method. Choose from:
 #'  `"odeint::runge_kutta_cash_karp54"`, `"odeint::runge_kutta_fehlberg78"`,
 #'  `"odeint::runge_kutta_dopri5"`, `"odeint::bulirsch_stoer"` and
 #'  `"odeint::runge_kutta4"`. Default method is: `"odeint::runge_kutta_cash_karp54"`.
 #' @param parameter list where first vector represents lambdas, the second 
 #'  mus and the third transition rates.
 #' @param setting_calculation argument used internally to speed up calculation.
-#'  It should be left blank (default : `setting_calculation = NULL`).
+#'  This should be left blank (default : `setting_calculation = NULL`).
 #' @param loglik_penalty the size of the penalty for all parameters; default is
 #'  0 (no penalty).
 #' @param num_steps number of substeps to show intermediate likelihoods
 #'  along a branch.
-#' @param see_ancestral_states Boolean for whether the ancestral states should 
-#'  be shown? Defaults to `FALSE`.
+#' @param see_ancestral_states Boolean for whether the ancestral states for each
+#'  of the internal nodes should be output. Defaults to `FALSE`.
 #' @param lambdas speciation rates, in the form of a list of matrices.
 #' @param mus extinction rates, in the form of a vector.
 #' @param qs The Q matrix, for example the result of function q_doubletrans, but

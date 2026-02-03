@@ -102,8 +102,6 @@ toCheck[[2]][] <- d
 toCheck[[3]][,] <- userTransRate
 diag(toCheck[[3]]) <- NA
 root_state_weight <- "proper_weights"
-use_fortran <- TRUE
-methode <- "odeint::runge_kutta_cash_karp54"
 cond <- "noCondit"
 
 # the different secsse versions have similar, but not identical 

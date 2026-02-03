@@ -29,7 +29,8 @@ cla_secsse_ml(
   rtol = 1e-07,
   method = "odeint::runge_kutta_cash_karp54",
   use_normalization = TRUE,
-  return_root_state = FALSE
+  return_root_state = FALSE,
+  see_ancestral_states = FALSE
 )
 }
 \arguments{
@@ -99,9 +100,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 along the root edge. This also affects conditioning (as now, conditioning
 no longer needs to assume a speciation event at the start of the tree)}
 
-\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
-\code{FALSE}, optimizer output will be shown.}
+\item{verbose}{sets verbose output; default is \code{TRUE}.}
 
 \item{num_threads}{number of threads to be used. Default is one thread.}
 
@@ -109,7 +108,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{method}{integration method used, available are:
+\item{method}{ODE integration method. Choose from:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
@@ -122,6 +121,9 @@ root, this can be useful to use as the starting point of a simulation. When
 used in ML, after finishing the ML optimization, the found optimum is
 evaluated one more time to retrieve the root state (to avoid having to
 store the root state every ML evaluation).}
+
+\item{see_ancestral_states}{Boolean for whether the ancestral states for each
+of the internal nodes should be output. Defaults to \code{FALSE}.}
 }
 \value{
 Parameters estimated and maximum likelihood

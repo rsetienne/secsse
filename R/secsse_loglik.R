@@ -113,7 +113,6 @@ master_loglik <- function(parameter,
   states <- setting_calculation$states
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
-  
   d <- ncol(states) / 3
   
   # with a complete tree, we need to re-calculate the states every time we
@@ -193,7 +192,8 @@ master_loglik <- function(parameter,
                                      lambdas,
                                      nodeM,
                                      d,
-                                     is_cla = using_cla)
+                                     is_cla = using_cla,
+                                     Q = q_matrix)
   
   if (is_complete_tree) {
     nodeM <- update_complete_tree(phy,
@@ -226,7 +226,14 @@ master_loglik <- function(parameter,
   
   # reset number of threads:
   RcppParallel::setThreadOptions(numThreads = 1)
+
+  if (!see_ancestral_states && !return_root_state) {
+    return(LL)
+  }
   
+  
+  result <- list()
+  result$LL <- LL
   if (see_ancestral_states == TRUE) {
     states <- calcul$states
     num_tips <- ape::Ntip(phy)
@@ -235,18 +242,22 @@ master_loglik <- function(parameter,
       ancestral_states[, (1/3 * ncol(ancestral_states) + 1):(2/3 * ncol(ancestral_states))]
     
     rownames(ancestral_states) <- ances
-    return(list(ancestral_states = ancestral_states, LL = LL, states = states))
+    colnames(ancestral_states) <- names(mus)
+    colnames(states) <- c(paste("E",names(mus), sep = '_'),
+                          paste("D",names(mus), sep = '_'),
+                          paste("S",names(mus), sep = '_'))
+    result$ancestral_states <- ancestral_states
+    result$states = states
   } 
   
   if (return_root_state) {
-    return(list(LL = LL,
-                root_state = get_root_state(calcul$states,
-                                            phy,
-                                            mus,
-                                            d)))
+    root_state <- get_root_state(calcul$states,
+                                 phy,
+                                 mus,
+                                 d)
+    result$root_state <- root_state
   }
-  
-  return(LL)
+  return(result)
 }
 
 #' @title Likelihood for SecSSE model
@@ -254,7 +265,21 @@ master_loglik <- function(parameter,
 #' data
 #' 
 #' @inheritParams default_params_doc
-#' @return The loglikelihood of the data given the parameter.
+#' @return A list with the following elements:
+#' $LL the loglikelihood of the data (phylogeny + tip states) given the
+#' parameters (speciation, extinction, transition rates).
+#' If see_ancestral_states = TRUE, then there will be two additional elements:
+#' $ancestral_states: a matrix with the probabilities of each state at the
+#' internal nodes
+#' $states: a matrix with the probabilities E, D (normalized) and S that are used
+#' in the calculations. The ancestral_states matrix is a submatrix of this matrix.
+#' This matrix is mostly used for package developers.
+#' If return_root_state = TRUE, then there will be one additional element:
+#' $root_state: vector with probabilities of each state at the root. This vector
+#' is the same as the top row of $ancestral_states
+#' We have used the shorthand description of "probabilities of each state",
+#' but technically, the probabilities are the normalized probabilities D of the
+#' data given each state at the internal nodes.
 #' @examples
 #' rm(list = ls(all = TRUE))
 #' library(secsse)
@@ -300,25 +325,26 @@ secsse_loglik <- function(parameter,
                           display_warning = TRUE,
                           use_normalization = TRUE,
                           return_root_state = FALSE) {
-  master_loglik(parameter = parameter,
-                phy = phy,
-                traits = traits,
-                num_concealed_states = num_concealed_states,
-                cond = cond,
-                root_state_weight = root_state_weight,
-                sampling_fraction = sampling_fraction,
-                setting_calculation = setting_calculation,
-                see_ancestral_states = see_ancestral_states,
-                loglik_penalty = loglik_penalty,
-                is_complete_tree = is_complete_tree,
-                take_into_account_root_edge = take_into_account_root_edge,
-                num_threads = num_threads,
-                atol = atol,
-                rtol = rtol,
-                method = method,
-                display_warning = display_warning,
-                use_normalization = use_normalization,
-                return_root_state = return_root_state)
+  ll <- master_loglik(parameter = parameter,
+                      phy = phy,
+                      traits = traits,
+                      num_concealed_states = num_concealed_states,
+                      cond = cond,
+                      root_state_weight = root_state_weight,
+                      sampling_fraction = sampling_fraction,
+                      setting_calculation = setting_calculation,
+                      see_ancestral_states = see_ancestral_states,
+                      loglik_penalty = loglik_penalty,
+                      is_complete_tree = is_complete_tree,
+                      take_into_account_root_edge = take_into_account_root_edge,
+                      num_threads = num_threads,
+                      atol = atol,
+                      rtol = rtol,
+                      method = method,
+                      display_warning = display_warning,
+                      use_normalization = use_normalization,
+                      return_root_state = return_root_state)
+  return(ll)
 }
 
 
@@ -328,7 +354,8 @@ secsse_loglik <- function(parameter,
 #' 
 #' @inheritParams default_params_doc
 #' 
-#' @return The loglikelihood of the data given the parameters
+#' @return A List with property LL: The loglikelihood of the data given the 
+#' parameters, and potentially the root state.
 #' @examples
 #'rm(list=ls(all=TRUE))
 #'library(secsse)

@@ -2,14 +2,10 @@
 - changed the default integration method to "odeint::runge_kutta_cash_karp54",
 although a bit slower, this method is more numerically stable.
 - fixed lack of sorting of numeric traits in the function `q_doubletrans`
-- fixed an error in preparing the state matrices when NAs were present in the 
-traits
-- ML and LL functions now optionally also return the root state, which in turn
-can be used to in `secsse_sim` as a starting point at the root / crown of the
-tree.
-- updated simulations to sample species using a binary search, instead of using
-stochastic acceptance
-
+- fixed an error in preparing the state matrices when NAs were present in the traits
+- ML and LL functions now optionally also return the root state, which in turn can be used to in `secsse_sim` as a starting point at the root / crown of the tree.
+- updated simulations to sample species using a binary search, instead of using stochastic acceptance
+- better documentation of output of ML and LL functions.
 # 3.5.0
 Version 3.5.0 uses a separate calculation for 1 - E, e.g. one minus the local
 extinction rates to avoid numerical aberrations. These are only used in the CLA

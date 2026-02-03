@@ -27,37 +27,9 @@ master_ml <- function(phy,
                       rtol = 1e-7,
                       method = "odeint::runge_kutta_cash_karp54",
                       use_normalization = TRUE,
-                      return_root_state = FALSE) {
-  
-  print_arguments(phy,
-                  traits,
-                  num_concealed_states,
-                  idparslist,
-                  idparsopt,
-                  initparsopt,
-                  idparsfix,
-                  parsfix,
-                  cond,
-                  root_state_weight,
-                  sampling_fraction,
-                  tol,
-                  maxiter,
-                  optimmethod,
-                  num_cycles,
-                  loglik_penalty,
-                  is_complete_tree,
-                  take_into_account_root_edge,
-                  verbose,
-                  num_threads,
-                  atol,
-                  rtol,
-                  method,
-                  use_normalization)
-  
-  
-  
-  
-  
+                      return_root_state = FALSE,
+                      see_ancestral_states = FALSE) {
+
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
     structure_func <- set_and_check_structure_func(idparsfuncdefpar,
@@ -89,7 +61,6 @@ master_ml <- function(phy,
                                             idparslist[[1]])
   }
   
-  see_ancestral_states <- FALSE
   if (!is.null(structure_func)) {
     initparsopt <- c(initparsopt, initfactors)
   }
@@ -107,7 +78,7 @@ master_ml <- function(phy,
                   initparsopt)
   
   optimpars <- c(tol, maxiter, verbose)
-  
+
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
   
   if (!is.list(traits)) {
@@ -130,7 +101,7 @@ master_ml <- function(phy,
                                                  num_modeled_traits,
                                                  traitStates = 
                                                    get_trait_states(idparslist,
-                                                                    num_concealed_states, FALSE))
+                                                                    num_concealed_states, verbose))
     if (length(phy$tip.label) == 1) {
       setting_calculation$states <- setting_calculation$states[-2, ]
       setting_calculation$forTime <- setting_calculation$forTime[-2, ]
@@ -171,7 +142,7 @@ master_ml <- function(phy,
                                                         first_time = FALSE,
                                                         traitStates = 
                                                           get_trait_states(idparslist,
-                                                                           num_concealed_states, FALSE))
+                                                                           num_concealed_states, verbose))
     }
   }
   
@@ -255,12 +226,10 @@ master_ml <- function(phy,
                                               idparsfix,
                                               idparslist,
                                               structure_func)
-      
-      if (!return_root_state) {
-        out2 <- list(MLpars = ml_pars1,
-                     ML = as.numeric(unlist(out$fvalues)),
-                     conv = out$conv)
-      } else {
+      out2 <- list(MLpars = ml_pars1,
+                   ML = as.numeric(unlist(out$fvalues)),
+                   conv = out$conv)
+      if (return_root_state || see_ancestral_states) {
         # we have to recover the root state by re-calculating the LL
         root_res <- master_loglik(parameter = ml_pars1,
                                   phy = phy,
@@ -291,11 +260,13 @@ master_ml <- function(phy,
         if (as.numeric(unlist(out$fvalues)) != root_res$LL) {
           warning("recalculating the root state resulted in a different LL")
         }
-        
-        out2 <- list(MLpars = ml_pars1,
-                     ML = as.numeric(unlist(out$fvalues)),
-                     conv = out$conv,
-                     root_state = root_res$root_state)
+      }
+      if(return_root_state) {
+        out2$root_state <- root_res$root_state
+      }
+      if(see_ancestral_states) {
+        out2$ancestral_states <- root_res$ancestral_states
+        out2$states <- root_res$states
       }
     }
   }
@@ -305,10 +276,26 @@ master_ml <- function(phy,
 #' Maximum likehood estimation for (SecSSE)
 #' 
 #' Maximum likehood estimation under Several examined and concealed
-#' States-dependent Speciation and Extinction (SecSSE)
+#' trait States dependent Speciation and Extinction (SecSSE)
 #' @inheritParams default_params_doc
 #' 
-#' @return Parameter estimated and maximum likelihood
+#' @return A list with the following elements
+#' $MLpars: the maximum likelihood parameter estimates
+#' $ML: the maximum likelihood of the data (phylogeny + tip states) given the
+#' parameters (speciation, extinction, transition rates).
+#' $conv: whether the optimization converged or not
+#' If see_ancestral_states = TRUE, then there will be two additional elements:
+#' $ancestral_states: a matrix with the probabilities of each state at the
+#' internal nodes
+#' $states: a matrix with the probabilities E, D (normalized) and S that are used
+#' in the calculations. The ancestral_states matrix is a submatrix of this matrix.
+#' This matrix is mostly used for package developers.
+#' If return_root_state = TRUE, then there will be one additional element:
+#' $root_state: vector with probabilities of each state at the root. This vector
+#' is the same as the top row of $ancestral_states
+#' We have used the shorthand description of "probabilities of each state",
+#' but technically, the probabilities are the normalized probabilities D of the
+#' data given each state at the internal nodes.
 #' @examples
 #'# Example of how to set the arguments for a ML search.
 #'library(secsse)
@@ -386,7 +373,8 @@ secsse_ml <- function(phy,
                       rtol = 1e-7,
                       method = "odeint::runge_kutta_cash_karp54",
                       use_normalization = TRUE,
-                      return_root_state = FALSE) {
+                      return_root_state = FALSE,
+                      see_ancestral_states = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -413,7 +401,8 @@ secsse_ml <- function(phy,
             rtol = rtol,
             method = method,
             use_normalization = use_normalization,
-            return_root_state = return_root_state)
+            return_root_state = return_root_state,
+            see_ancestral_states = see_ancestral_states)
 }
 
 #' @keywords internal
@@ -475,7 +464,7 @@ secsse_loglik_choosepar <- function(trparsopt,
                             rtol = rtol,
                             display_warning = display_warning,
                             use_normalization = use_normalization,
-                            return_root_state = return_root_state)
+                            return_root_state = FALSE)
     
     if (is.nan(loglik) || is.na(loglik)) {
       warning("There are parameter values used which cause
@@ -576,7 +565,8 @@ cla_secsse_ml <- function(phy,
                           rtol = 1e-7,
                           method = "odeint::runge_kutta_cash_karp54",
                           use_normalization = TRUE,
-                          return_root_state = FALSE) {
+                          return_root_state = FALSE,
+                          see_ancestral_states = FALSE) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -601,5 +591,6 @@ cla_secsse_ml <- function(phy,
             rtol = rtol,
             method = method,
             use_normalization = use_normalization,
-            return_root_state = return_root_state)
+            return_root_state = return_root_state,
+            see_ancestral_states = see_ancestral_states)
 }

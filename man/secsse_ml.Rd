@@ -29,7 +29,8 @@ secsse_ml(
   rtol = 1e-07,
   method = "odeint::runge_kutta_cash_karp54",
   use_normalization = TRUE,
-  return_root_state = FALSE
+  return_root_state = FALSE,
+  see_ancestral_states = FALSE
 )
 }
 \arguments{
@@ -99,9 +100,7 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 along the root edge. This also affects conditioning (as now, conditioning
 no longer needs to assume a speciation event at the start of the tree)}
 
-\item{verbose}{sets verbose output; default is \code{TRUE} when \code{optimmethod} is
-\code{"simplex"}. If \code{optimmethod} is set to \code{"simplex"}, then even if set to
-\code{FALSE}, optimizer output will be shown.}
+\item{verbose}{sets verbose output; default is \code{TRUE}.}
 
 \item{num_threads}{number of threads to be used. Default is one thread.}
 
@@ -109,7 +108,7 @@ no longer needs to assume a speciation event at the start of the tree)}
 
 \item{rtol}{A numeric specifying the relative tolerance of integration.}
 
-\item{method}{integration method used, available are:
+\item{method}{ODE integration method. Choose from:
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
@@ -122,13 +121,32 @@ root, this can be useful to use as the starting point of a simulation. When
 used in ML, after finishing the ML optimization, the found optimum is
 evaluated one more time to retrieve the root state (to avoid having to
 store the root state every ML evaluation).}
+
+\item{see_ancestral_states}{Boolean for whether the ancestral states for each
+of the internal nodes should be output. Defaults to \code{FALSE}.}
 }
 \value{
-Parameter estimated and maximum likelihood
+A list with the following elements
+$MLpars: the maximum likelihood parameter estimates
+$ML: the maximum likelihood of the data (phylogeny + tip states) given the
+parameters (speciation, extinction, transition rates).
+$conv: whether the optimization converged or not
+If see_ancestral_states = TRUE, then there will be two additional elements:
+$ancestral_states: a matrix with the probabilities of each state at the
+internal nodes
+$states: a matrix with the probabilities E, D (normalized) and S that are used
+in the calculations. The ancestral_states matrix is a submatrix of this matrix.
+This matrix is mostly used for package developers.
+If return_root_state = TRUE, then there will be one additional element:
+$root_state: vector with probabilities of each state at the root. This vector
+is the same as the top row of $ancestral_states
+We have used the shorthand description of "probabilities of each state",
+but technically, the probabilities are the normalized probabilities D of the
+data given each state at the internal nodes.
 }
 \description{
 Maximum likehood estimation under Several examined and concealed
-States-dependent Speciation and Extinction (SecSSE)
+trait States dependent Speciation and Extinction (SecSSE)
 }
 \examples{
 # Example of how to set the arguments for a ML search.

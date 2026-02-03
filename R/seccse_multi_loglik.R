@@ -18,7 +18,6 @@ multi_loglik <- function(parameter,
                          display_warning = FALSE,
                          use_normalization = TRUE,
                          return_root_state = FALSE) {
-  
   res <- list()
   root_states <- list()
   for (i in 1:length(phy)) {

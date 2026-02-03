@@ -226,7 +226,13 @@ struct secsse_sim {
              t(0.0),
              verbose(verb) {
     // randomize randomizer
-    rndgen_.seed((seed < 0) ? std::random_device {}() : seed);
+
+    int used_seed = (seed < 0) ? std::random_device {}() : seed;
+
+    rndgen_.seed(used_seed);
+    if (verbose) {
+      Rcpp::Rcout << "used seed: " << used_seed << "\n";
+    }
     init_state = 0;
     track_crowns = {0, 0};
     rates = {0.0, 0.0, 0.0};
@@ -546,13 +552,16 @@ struct secsse_sim {
                               num_traits / num_concealed_states :
                               num_traits;
 
-    std::vector<int> focal_traits;
-    for (size_t i = 0; i < total_num_traits; ++i) focal_traits.push_back(0);
+    std::vector<int> focal_traits(total_num_traits, 0);
 
     for (const auto& i : L) {
-      int trait = static_cast<int>(i.get_trait());
-      if (num_concealed_states > 0) trait = trait % num_concealed_states;
-      focal_traits[trait]++;
+      if (!i.is_dead()) {
+        int trait = static_cast<int>(i.get_trait());
+
+        trait = num_concealed_states > 0 ? trait % num_concealed_states : trait;
+
+        focal_traits[trait]++;
+      }
     }
 
     auto min_val = *std::min_element(focal_traits.begin(),
@@ -606,11 +615,13 @@ struct secsse_sim {
       run_info = done;
     }
 
-    if (conditioning_type == "true_states") {
+    if (conditioning_type == "true_states" ||
+        conditioning_type == "true_traits" ) {
         check_states(num_states, 0);
     }
 
-    if (conditioning_type == "obs_states") {
+    if (conditioning_type == "obs_states" ||
+        conditioning_type == "obs_traits" ) {
         check_states(num_states, num_concealed_states);
     }
 

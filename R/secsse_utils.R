@@ -460,9 +460,10 @@ check_root_state_weight <- function(root_state_weight, traits) {
     } else {
         if (any(root_state_weight == "maddison_weights" |
                 root_state_weight == "equal_weights" |
-                root_state_weight == "proper_weights") == FALSE) {
+                root_state_weight == "proper_weights" | 
+                root_state_weight == "stationary_weights") == FALSE) {
             stop("The root_state_weight must be any of 
-           maddison_weights, equal_weights, or proper_weights.")
+           maddison_weights, equal_weights, proper_weights or stationary_weights.")
         }
     }
 }
@@ -968,7 +969,8 @@ get_weight_states <- function(root_state_weight,
                               lambdas,
                               nodeM,
                               d,
-                              is_cla = FALSE) {
+                              is_cla = FALSE,
+                              Q) {
 
     if (is.numeric(root_state_weight)) {
         weight_states <- rep(root_state_weight / num_concealed_states,
@@ -998,8 +1000,35 @@ get_weight_states <- function(root_state_weight,
         if (root_state_weight == "equal_weights") {
             weight_states <- rep(1 / length(mergeBranch), length(mergeBranch))
         }
+        
+        if (root_state_weight == "stationary_weights") {
+          diag(Q) <- 0
+          diag(Q) <- -rowSums(Q)
+          pi <- pracma::null(t(Q))
+          diff <- 1
+          dimpi2 <- dim(pi)[[2]]
+          if (dimpi2 > 1) {
+            warning('Null space of transition matrix is multidimensional;
+                    the most even dimension is used for weighing the likelihood.')
+          }
+          for(i in 1:dimpi2) {
+            if (pi[which.max(abs(pi[,i])),i] < 0) {
+              pi[,i] <- -pi[,i]
+            }
+            if (any(pi[,i] < 0) && max(abs(pi[which(pi[,i] < 0),i])) > 1E-10) {
+              warning('Substantial negative weights detected.')
+            }
+            pi[which(pi[,i] < 0),i] <- 0
+            pi[,i] <- pi[,i]/sum(pi[,i])
+            diff_new <- abs(max(pi[,i])) - abs(min(pi[,i]))
+            if (diff_new < diff) {
+               diff <- diff_new
+               i_choice <- i
+            }
+          }
+          weight_states <- pi[,i_choice]
+        }
     }
-
     return(weight_states)
 }
 
@@ -1170,7 +1199,7 @@ check_ml_conditions <- function(traits,
 #' @keywords internal
 get_trait_states <- function(idparslist,
                              num_concealed_states,
-                             display_warning = TRUE) {
+                             display_warning = FALSE) {
   trait_names <- names(idparslist[[1]])
   if (is.null(trait_names)) trait_names <- names(idparslist[[2]])
   if (is.null(trait_names)) trait_names <- colnames(idparslist[[3]])
