@@ -58,37 +58,6 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
     return(idparslist)
 }
 
-#' @keywords internal
-create_q_matrix_int <- function(masterBlock,
-                                concealnewQMatr,
-                                ntraits,
-                                diff.conceal) {
-    Q <- NULL
-    for (i in 1:ntraits) {
-        Qrow <- NULL
-        for (ii in 1:ntraits) {
-            entry <- masterBlock[i, ii]
-            if (is.na(entry)) {
-                Qrow <- cbind(Qrow, masterBlock)
-            } else {
-                if (diff.conceal == TRUE) {
-                    entry <- concealnewQMatr[i, ii]
-                }
-
-                outDiagBlock <- matrix(0,
-                                       ncol = ntraits,
-                                       nrow = ntraits,
-                                       byrow = TRUE)
-                diag(outDiagBlock) <- entry
-                Qrow <- cbind(Qrow, outDiagBlock)
-            }
-        }
-        Q <- rbind(Q, Qrow)
-    }
-    return(Q)
-}
-
-
 #' @title Basic Qmatrix
 #' Sets a Q matrix where double transitions are not allowed
 #' 
@@ -1348,52 +1317,4 @@ get_root_state <- function(ancestral_states, phy, mus, d) {
   
   names(root_state) <- names(mus)
   return(root_state)
-}
-
-#' @keywords internal
-print_arguments <- function(phy,
-                            traits,
-                            num_concealed_states,
-                            idparslist,
-                            idparsopt,
-                            initparsopt,
-                            idparsfix,
-                            parsfix,
-                            cond,
-                            root_state_weight,
-                            sampling_fraction,
-                            tol,
-                            maxiter,
-                            optimmethod,
-                            num_cycles,
-                            loglik_penalty,
-                            is_complete_tree,
-                            take_into_account_root_edge,
-                            verbose,
-                            num_threads,
-                            atol,
-                            rtol,
-                            method,
-                            use_normalization) {
-  message("You are running secSSE with the following arguments:")
-  message(paste0(" - Number of concealed states: ", num_concealed_states))
-  message(paste0(" - Number of traits: ", ncol(traits)))
-  message(paste0(" - Number of parameters to optimize: ", length(idparsopt)))
-  message(paste0(" - Number of fixed parameters: ", length(idparsfix)))
-  message(paste0(" - Condition on survival method: ", cond))
-  message(paste0(" - Root state weight method: ", root_state_weight))
-  message(paste0(" - Sampling fraction: ", sampling_fraction))
-  message(paste0(" - Tolerance for optimization: ", tol))
-  message(paste0(" - Maximum iterations for optimization: ", maxiter))
-  message(paste0(" - Optimization method: ", optimmethod))
-  message(paste0(" - Number of cycles for optimization: ", num_cycles))
-  message(paste0(" - Loglikelihood penalty: ", loglik_penalty))
-  message(paste0(" - Is complete tree: ", is_complete_tree))
-  message(paste0(" - Take into account root edge: ", take_into_account_root_edge))
-  message(paste0(" - Verbose level: ", verbose))
-  message(paste0(" - Number of threads: ", num_threads))
-  message(paste0(" - ODE solver method: ", method))
-  message(paste0(" - ODE solver absolute tolerance: ", atol))
-  message(paste0(" - ODE solver relative tolerance: ", rtol))
-  message(paste0(" - ODE solver normalization: ", use_normalization))
 }
