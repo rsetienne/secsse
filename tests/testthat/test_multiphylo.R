@@ -218,6 +218,37 @@ test_that("multi phylo ML", {
   
   testthat::expect_equal(3 * model_R$ML, multi_R$ML)
   testthat::expect_true(all.equal(model_R$MLpars, multi_R$MLpars))
+  
+  # and now we add a single lineage tree:
+  fake_tree <- ape::rphylo(n = 2, birth = 1, death = 0)
+  fake_tree$edge.length <- c(1)
+  fake_tree$node.label <- NULL
+  fake_tree$edge <- as.matrix(fake_tree$edge[-2, ], nrow = 1)
+  fake_tree$tip.label <- fake_tree$tip.label[-2]
+  phylo_list[[4]] <- fake_tree
+  trait_list[[4]] <- 1
+  sf_list[[4]] <- c(1, 1, 1)
+  
+  testthat::expect_message(
+    multi_R <- cla_secsse_ml(
+      phy = phylo_list,
+      traits = trait_list,
+      num_concealed_states = num_concealed_states,
+      idparslist = idparslist,
+      idparsopt = idparsopt,
+      initparsopt = initparsopt,
+      idparsfix = idparsfix,
+      parsfix = parsfix,
+      cond = cond,
+      root_state_weight = root_state_weight,
+      sampling_fraction = sf_list,
+      tol = tol,
+      maxiter = maxiter,
+      optimmethod = optimmethod,
+      num_cycles = 1,
+      verbose = FALSE)
+  )
+  
 })
 
 test_that("multi phylo abuse", {
