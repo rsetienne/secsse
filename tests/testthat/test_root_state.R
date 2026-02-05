@@ -40,7 +40,8 @@ test_that("root state cla LL", {
                             qs = params[[3]],
                             crown_age = 5,
                             num_concealed_states = num_concealed_states,
-                            sampling_fraction = c(1, 1))
+                            sampling_fraction = c(1, 1),
+                            seed = 5)
   
   
   
