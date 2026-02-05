@@ -940,4 +940,30 @@ test_that("test secsse_sim root edge", {
                                  seed = 1)
   testthat::expect_equal(length(sim_tree$phy$tip.label), 1)
   testthat::expect_equal(sim_tree$phy$edge.length[1], crown_age_used)
+  
+  # force failure of simulation of tree
+  # single lineage tree:
+  ext_S <- 10
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  
+  sim_mu_vector_etd   <- secsse::fill_in(idparslist[[2]], used_params)
+  
+  testthat::expect_warning(
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 min_spec = 1,
+                                 init_state_probs = c("SA", "SB"),
+                                 start_at_crown = FALSE,
+                                 seed = 1,
+                                 max_tries = 100),
+  "Couldn't simulate a tree in enough tries,
+            try increasing max_tries"
+  )
+  
+  testthat::expect_equal(sim_tree$status, "not enough tries")
+  testthat::expect_equal(sim_tree$phy, "ds")  
 })  
