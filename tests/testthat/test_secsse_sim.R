@@ -921,5 +921,23 @@ test_that("test secsse_sim root edge", {
   testthat::expect_true(!is.null(sim_tree2$phy$root.edge))
   testthat::expect_equal(unique(sim_tree2$obs_traits), "S")
   testthat::expect_gt(sim_tree2$extinct, sim_tree$extinct)
+  
+  # single lineage tree:
+  spec_S <- 0.01
+  used_params <- c(spec_S, spec_G, ext_S, ext_G, q_SG, q_GS, 0, 0)
+  
+  sim_lambda_list_etd <- secsse::fill_in(idparslist[[1]], used_params)
+  
+  sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list_etd,
+                                 mus = sim_mu_vector_etd,
+                                 qs = sim_q_matrix_etd,
+                                 crown_age = crown_age_used,
+                                 num_concealed_states = 2,
+                                 conditioning = "none",
+                                 min_spec = 1,
+                                 init_state_probs = c("SA", "SB"),
+                                 start_at_crown = FALSE,
+                                 seed = 1)
+  testthat::expect_equal(length(sim_tree$phy$tip.label), 1)
+  testthat::expect_equal(sim_tree$phy$edge.length[1], crown_age_used)
 })  
-      
