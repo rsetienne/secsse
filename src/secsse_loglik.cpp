@@ -16,15 +16,6 @@
 
 namespace secsse {
 
-  // probably the cleanest way to retrieve RcppParallel's concurrency setting
-  // set by RcppParallel::setThreadOptions(numThreads)
-  size_t get_rcpp_num_threads() {
-    auto* nt_env = std::getenv("RCPP_PARALLEL_NUM_THREADS");
-    return (nullptr == nt_env) 
-      ? tbb::task_arena::automatic  // -1
-      : static_cast<size_t>(std::atoi(nt_env));
-  }
-
   template <typename ODE>
   Rcpp::List calc_ll(std::unique_ptr<ODE> od,
                      const Rcpp::IntegerVector& ances,

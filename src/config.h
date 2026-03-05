@@ -8,6 +8,8 @@
 #ifndef SRC_CONFIG_H_
 #define SRC_CONFIG_H_
 
+#include "tbb_stub.h"
+
 // Special case to make use of some steppers that would include
 // boost/get_pointer.hpp
 #ifndef BOOST_NO_AUTO_PTR
