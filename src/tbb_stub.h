@@ -4,6 +4,10 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+// bare minimal tbb-stub header.
+// just enough to to let *this* package pass the 
+// RCPP_PARALLEL_USE_TBB shenanigan on Alpine Linux
+
 #pragma once
 
 #include <cstdlib>
@@ -12,6 +16,8 @@
 
 
 #if RCPP_PARALLEL_USE_TBB == 0
+
+// everything looks so single-threaded here :(
 
 #include <algorithm>
 
@@ -34,7 +40,7 @@ namespace tbb {
 
     global_control(parameter /*p*/, size_t /*value*/) {}
     ~global_control() {};
-    static size_t active_value(parameter param);  // undefined
+    static size_t active_value(parameter /*param*/);  // undefined
   };
 
   
@@ -62,7 +68,14 @@ namespace tbb {
 
 } // namespce tbb
 
-#endif
+
+// function name is lying. 
+inline size_t get_rcpp_num_threads() { 
+  return 1; 
+}
+
+
+#else  // if RCPP_PARLLEL_USE_TBB = 0
 
 
 // probably the cleanest way to retrieve RcppParallel's concurrency setting
@@ -73,3 +86,6 @@ inline size_t get_rcpp_num_threads() {
     ? tbb::task_arena::automatic  // -1
     : static_cast<size_t>(std::atoi(nt_env));
 }
+
+
+#endif
