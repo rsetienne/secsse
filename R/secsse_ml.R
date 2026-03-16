@@ -28,8 +28,9 @@ master_ml <- function(phy,
                       method = "odeint::runge_kutta_cash_karp54",
                       use_normalization = TRUE,
                       return_root_state = FALSE,
-                      see_ancestral_states = FALSE) {
-
+                      see_ancestral_states = FALSE,
+                      max_rate = 1e6) {
+  
   structure_func <- NULL
   if (!is.null(functions_defining_params)) {
     structure_func <- set_and_check_structure_func(idparsfuncdefpar,
@@ -78,7 +79,7 @@ master_ml <- function(phy,
                   initparsopt)
   
   optimpars <- c(tol, maxiter, verbose)
-
+  
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
   
   if (!is.list(traits)) {
@@ -177,7 +178,8 @@ master_ml <- function(phy,
                                         display_warning = FALSE,
                                         verbose = ll_verbose,
                                         use_normalization = use_normalization,
-                                        return_root_state = FALSE)
+                                        return_root_state = FALSE,
+                                        max_rate = max_rate)
   # Function here
   if (verbose) print_init_ll(initloglik = initloglik)
   
@@ -215,7 +217,8 @@ master_ml <- function(phy,
                           display_warning = FALSE,
                           verbose = ll_verbose,
                           use_normalization = use_normalization,
-                          return_root_state = FALSE)
+                          return_root_state = FALSE,
+                          max_rate = max_rate)
     if (out$conv != 0) {
       warning("Optimization has not converged. Try again with different initial values or increase the number of iterations.")
       out2 <- out
@@ -374,7 +377,8 @@ secsse_ml <- function(phy,
                       method = "odeint::runge_kutta_cash_karp54",
                       use_normalization = TRUE,
                       return_root_state = FALSE,
-                      see_ancestral_states = FALSE) {
+                      see_ancestral_states = FALSE,
+                      max_rate = 1e6) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -402,7 +406,8 @@ secsse_ml <- function(phy,
             method = method,
             use_normalization = use_normalization,
             return_root_state = return_root_state,
-            see_ancestral_states = see_ancestral_states)
+            see_ancestral_states = see_ancestral_states,
+            max_rate = max_rate)
 }
 
 #' @keywords internal
@@ -430,9 +435,16 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     display_warning,
                                     verbose,
                                     use_normalization,
-                                    return_root_state) {
+                                    return_root_state,
+                                    max_rate) {
   alltrpars <- c(trparsopt, trparsfix)
-  if (max(alltrpars) > 1 || min(alltrpars) < 0) {
+  
+  # orig param back conversion
+  orig_param <- trparsopt / (1 - trparsopt)
+  if (any(orig_param > max_rate)) {
+    warning("There are parameter values used which are above the maximum rate allowed.")
+    loglik <- -Inf
+  } else if (max(alltrpars) > 1 || min(alltrpars) < 0) {
     loglik <- -Inf
   } else {
     pars1 <- secsse_transform_parameters(trparsopt, trparsfix,
@@ -472,6 +484,7 @@ secsse_loglik_choosepar <- function(trparsopt,
       loglik <- -Inf
     }
   }
+  
   if (verbose) {
     out_print <- c(trparsopt / (1 - trparsopt), loglik)
     message(paste(out_print, collapse = " "))
@@ -566,7 +579,8 @@ cla_secsse_ml <- function(phy,
                           method = "odeint::runge_kutta_cash_karp54",
                           use_normalization = TRUE,
                           return_root_state = FALSE,
-                          see_ancestral_states = FALSE) {
+                          see_ancestral_states = FALSE,
+                          max_rate = 1e6) {
   master_ml(phy = phy,
             traits = traits,
             num_concealed_states = num_concealed_states,
@@ -592,5 +606,6 @@ cla_secsse_ml <- function(phy,
             method = method,
             use_normalization = use_normalization,
             return_root_state = return_root_state,
-            see_ancestral_states = see_ancestral_states)
+            see_ancestral_states = see_ancestral_states,
+            max_rate = max_rate)
 }

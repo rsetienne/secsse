@@ -170,6 +170,11 @@
 #' used in ML, after finishing the ML optimization, the found optimum is 
 #' evaluated one more time to retrieve the root state (to avoid having to 
 #' store the root state every ML evaluation).
+#' @param max_rate upper limit of rates inferred in Maximum Likelihood. 
+#' Sometimes, the ML search might get stuck in an extremely high rate area, 
+#' limiting the maximum rate might then be helpful. Works through setting any 
+#' likelihood exceeding this rate to Infinity, which will be rejected by the 
+#' optimization algorithm and cause the algorithm to move away from this area.
 #' @return Nothing
 #' @keywords internal
 #' @export
@@ -241,6 +246,7 @@ default_params_doc <- function(phy,
                                display_warning,
                                take_into_account_root_edge,
                                use_normalization,
-                               return_root_state) {
+                               return_root_state,
+                               max_rate) {
   # Nothing
 }
