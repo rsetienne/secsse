@@ -396,8 +396,7 @@ check_traits <- function(traits, sampling_fraction) {
 
         if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) ==
             FALSE) {
-            stop(
-                "Check your trait argument; if you have more than one column,
+            stop("Check your trait argument; if you have more than one column,
         make sure all your states are included in the first column."
             )
         }
@@ -1136,7 +1135,7 @@ check_ml_conditions <- function(traits,
                                 idparsfix,
                                 parsfix) {
   if (is.matrix(traits)) {
-    warning("you are setting a model where some species have more
+    warning("You are setting up a model where some species have more
             than one trait state")
   }
   
