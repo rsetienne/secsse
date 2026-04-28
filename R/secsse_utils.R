@@ -840,12 +840,16 @@ build_states <- function(phy,
                          num_unique_traits = NULL,
                          first_time = FALSE,
                          traitStates = NULL) {
+    if (length(phy$tip.label) == 1) {
+      if (length(traits) > 1) {
+        traits <- matrix(traits, nrow = 1, ncol = length(traits))
+      }
+    }
     if (!is.matrix(traits)) {
         traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
     }
-
     if (length(phy$tip.label) != nrow(traits)) {
-     stop("Number of species in the tree must be the same as in the trait file")
+      stop("Number of species in the tree must be the same as in the trait file")
     }
   
     # if there are traits that are not in the observed tree,
