@@ -103,7 +103,7 @@ master_ml <- function(phy,
                                                    get_trait_states(idparslist,
                                                                     num_concealed_states, verbose))
     if (length(phy$tip.label) == 1) { 
-      # will this ever be 1? Because in line 86 we changed phy to having two tips
+      # Rampal: will this ever be 1? Because in line 86 we changed phy to having two tips
       setting_calculation$states <- setting_calculation$states[-2, ]
       setting_calculation$forTime <- setting_calculation$forTime[-2, ]
       phy <- old_phy
@@ -127,7 +127,7 @@ master_ml <- function(phy,
         fake_phy$edge.length[1:2] <- input_phy$edge.length[1]
         input_phy <- fake_phy
         input_traits <- c(input_traits, input_traits)
-        # But doesn't this mean that we now consider a tree with two tips?
+        #Rampal: But doesn't this mean that we now consider a tree with two tips?
       }
 
       setting_calculation[[i]] <- build_initStates_time(phy = input_phy,
