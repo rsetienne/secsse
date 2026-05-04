@@ -13,7 +13,7 @@ cladogenesis"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,10 +163,7 @@ example.</p></dd>
 
 <dt id="arg-root-state-weight">root_state_weight<a class="anchor" aria-label="anchor" href="#arg-root-state-weight"></a></dt>
 <dd><p>the method to weigh the states:
-<code>"maddison_weights"</code>, <code>"proper_weights"</code> (default) or <code>"equal_weights"</code>.
-It can also be specified for the root state: the vector <code>c(1, 0, 0)</code>
-indicates state 1 was the root state. When
-using a <code>multiPhylo</code> object, root_state_weight should be list where each
+<code>"maddison_weights"</code>, <code>"proper_weights"</code> (default), <code>"equal_weights"'. or </code>"stationary_weights"<code>It can also be specified for the root state: the vector</code>c(1, 0, 0)<code> indicates state 1 was the root state. When using a</code>multiPhylo` object, root_state_weight should be list where each
 entry in the list corresponds to the root_state_weight for each tree.</p></dd>
 
 
@@ -500,6 +497,9 @@ store the root state every ML evaluation).</p></dd>
 <span class="r-in"><span><span class="va">optimmethod</span>,</span></span>
 <span class="r-in"><span>num_cycles <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Note: you set some transitions as impossible to happen.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Deduced names and order of used states to be: 0, 1, 2</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> if this is incorrect, consider passing states as matching numeric </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ordering, e.g. 1 for the first state, 2 for the second etc.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 0.0564834411465597 0.0564834411465597 4 -138.291064865705</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating the likelihood for the initial parameters.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The loglikelihood for the initial parameter values is -138.291064865705</span>

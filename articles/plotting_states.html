@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@ a simple tree, with almost trivial traits:</p>
 <span><span class="va">traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">phy</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_states_files/figure-html/starting_conditions-1.png" class="r-plt" width="576"></p>
+<p><img src="plotting_states_files/figure-html/starting_conditions-1.png" class="r-plt" alt="" width="576"></p>
 <p>A typical likelihood calculation would look like (assuming 2 observed
 and 2 hidden traits):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -160,19 +160,20 @@ reconstructed along the nodes:</p>
 three rows indicate the states at the internal nodes (with the last row
 indicating the root, in this case). The columns indicate the four
 extinction and four speciation rates, following the order in params[[1]]
-and params[[2]]. Thus, we have for both, rates 0A, 1A, 0B and 1B. If we
-are interested in the posterior probability of trait 0, we have to
-provide a helper function that sums the probabilities of 0A and 0B,
-e.g.:</p>
+and params[[2]]. Thus, we have for both, rates 0A, 1A, 0B and 1B.
+Furthermore, the last four columns indicate the survival rates, which
+are equal to 1 - extinction. If we are interested in the posterior
+probability of trait 0, we have to provide a helper function that sums
+the probabilities of 0A and 0B, e.g.:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">helper_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="co"># normalized by total sum, just in case.</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="co"># normalized by total sum, just in case.</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We can now use this to plot this probability across the tree. There
 are two options for plotting: using the evaluations along the branches
 as used by the integration method, or evaluating the branch values at a
 specific number of intervals. Using the explicit evaluations is more
-precies, but might be memory heavy. Usually, using 10-100 evaluations
+precise, but might be memory heavy. Usually, using 10-100 evaluations
 per branch provides a very accurate approximation:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
@@ -181,13 +182,10 @@ per branch provides a very accurate approximation:</p>
 <span>                 num_concealed_states <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                 sampling_fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                 prob_func <span class="op">=</span> <span class="va">helper_function</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Deduced names and order of used states to be: 0, 1</span></span>
-<span><span class="co">## if this is incorrect, consider passing states as matching numeric </span></span>
-<span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: Removed 6 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/exact-1.png" class="r-plt" width="576"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p><img src="plotting_states_files/figure-html/exact-1.png" class="r-plt" alt="" width="576"></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
 <span>                 phy <span class="op">=</span> <span class="va">phy</span>,</span>
 <span>                 traits <span class="op">=</span> <span class="va">traits</span>,</span>
@@ -195,13 +193,10 @@ per branch provides a very accurate approximation:</p>
 <span>                 sampling_fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                 num_steps <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>                 prob_func <span class="op">=</span> <span class="va">helper_function</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Deduced names and order of used states to be: 0, 1</span></span>
-<span><span class="co">## if this is incorrect, consider passing states as matching numeric </span></span>
-<span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span>
-<span><span class="co">## Removed 6 rows containing missing values or values outside the scale range</span></span>
+<pre><code><span><span class="co">## Warning: Removed 6 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/exact-2.png" class="r-plt" width="576"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p><img src="plotting_states_files/figure-html/exact-2.png" class="r-plt" alt="" width="576"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">params</span>,</span>
 <span>                 phy <span class="op">=</span> <span class="va">phy</span>,</span>
 <span>                 traits <span class="op">=</span> <span class="va">traits</span>,</span>
@@ -209,12 +204,9 @@ per branch provides a very accurate approximation:</p>
 <span>                 sampling_fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                 num_steps <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>                 prob_func <span class="op">=</span> <span class="va">helper_function</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Deduced names and order of used states to be: 0, 1</span></span>
-<span><span class="co">## if this is incorrect, consider passing states as matching numeric </span></span>
-<span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span>
-<span><span class="co">## Removed 6 rows containing missing values or values outside the scale range</span></span>
+<pre><code><span><span class="co">## Warning: Removed 6 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/exact-3.png" class="r-plt" width="576"></p>
+<p><img src="plotting_states_files/figure-html/exact-3.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level2">
 <h2 id="using-cla-secsse">Using CLA secsse<a class="anchor" aria-label="anchor" href="#using-cla-secsse"></a>
@@ -222,7 +214,7 @@ per branch provides a very accurate approximation:</p>
 <p>For CLA secsse, a similar function is available, which works in the
 same way. Borrowing from the example for cla_secsse_loglik, we first
 prepare our parameters:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">13</span><span class="op">)</span></span>
 <span><span class="va">phylotree</span> <span class="op">&lt;-</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/rtree.html" class="external-link">rcoal</a></span><span class="op">(</span><span class="fl">12</span>, tip.label <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="va">traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
@@ -257,12 +249,12 @@ prepare our parameters:</p>
 states), ordered regularly, e.g.: 0A, 1A, 2A, 0B, 1B, 2B, 0C, 1C, 2C. To
 observe the change in state 0, we formulate a helper function, noticing
 that the first 9 states are the extinction rates:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">helper_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">13</span>, <span class="fl">16</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="co"># normalized by total sum, just in case</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>And then we use these for plotting:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_state_exact.html">plot_state_exact</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameter</span>,</span>
 <span>                         phy <span class="op">=</span> <span class="va">phy</span>,</span>
 <span>                         traits <span class="op">=</span> <span class="va">traits</span>,</span>
@@ -273,12 +265,9 @@ that the first 9 states are the extinction rates:</p>
 <span>                         is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                         prob_func <span class="op">=</span> <span class="va">helper_function</span>,</span>
 <span>                         num_steps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Deduced names and order of used states to be: 0, 1, 2</span></span>
-<span><span class="co">## if this is incorrect, consider passing states as matching numeric </span></span>
-<span><span class="co">##   ordering, e.g. 1 for the first state, 2 for the second etc.</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: Removed 22 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_segment()`).</span></span></code></pre>
-<p><img src="plotting_states_files/figure-html/plot%20cla-1.png" class="r-plt" width="576"></p>
+<p><img src="plotting_states_files/figure-html/plot%20cla-1.png" class="r-plt" alt="" width="576"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

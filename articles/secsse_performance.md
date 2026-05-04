@@ -57,6 +57,7 @@ here we do not actually perform the benchmark, but load the results
 directly from file:
 
 ``` r
+
 load("timing_data.RData")
 
 ggplot(timing_data, aes(x = version, y = time, col = as.factor(num_threads))) +
@@ -82,6 +83,7 @@ because that version did not contain the cla likelihood versions yet.
 ### Testing code standard likelihood
 
 ``` r
+
 set.seed(42)
 out <- DDD::dd_sim(pars = c(0.5, 0.3, 1000), age = 30)
 phy <- out$tes
@@ -156,6 +158,7 @@ if (packageVersion("secsse") < 2.5) {
 ### Testing code Cla likelihood
 
 ``` r
+
 set.seed(42)
 out <- DDD::dd_sim(pars = c(0.5 , 0.3, 1000), age = 30)
 phy <- out$tes

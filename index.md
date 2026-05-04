@@ -6,9 +6,9 @@ status](https://www.r-pkg.org/badges/version/secsse)](https://CRAN.R-project.org
 [![](http://cranlogs.r-pkg.org/badges/secsse)](https://CRAN.R-project.org/package=secsse)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8393098.svg)](https://doi.org/10.5281/zenodo.8393098)
 
-| Branch    | [![GitHub Actions logo](reference/figures/github_actions_logo.png)](https://github.com/features/actions)                                                                                  | [![Codecov logo](reference/figures/Codecov.png)](https://www.codecov.io)                                                                          |
-|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| `master`  | [![R-CMD-check](https://github.com/rsetienne/secsse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rsetienne/secsse/actions/workflows/R-CMD-check.yaml)                | [![codecov.io](https://codecov.io/gh/rsetienne/secsse/branch/master/graph/badge.svg)](https://codecov.io/github/rsetienne/secsse/branch/master)   |
+| Branch | [![GitHub Actions logo](reference/figures/github_actions_logo.png)](https://github.com/features/actions) | [![Codecov logo](reference/figures/Codecov.png)](https://www.codecov.io) |
+|----|----|----|
+| `master` | [![R-CMD-check](https://github.com/rsetienne/secsse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rsetienne/secsse/actions/workflows/R-CMD-check.yaml) | [![codecov.io](https://codecov.io/gh/rsetienne/secsse/branch/master/graph/badge.svg)](https://codecov.io/github/rsetienne/secsse/branch/master) |
 | `develop` | [![R-CMD-check](https://github.com/rsetienne/secsse/actions/workflows/R-CMD-check.yaml/badge.svg?branch=develop)](https://github.com/rsetienne/secsse/actions/workflows/R-CMD-check.yaml) | [![codecov.io](https://codecov.io/gh/rsetienne/secsse/branch/develop/graph/badge.svg)](https://codecov.io/github/rsetienne/secsse/branch/develop) |
 
 ## What is SecSSE?
@@ -33,6 +33,7 @@ version on GitHub.
 From within R, do:
 
 ``` r
+
 install.packages("secsse")
 ```
 
@@ -41,6 +42,7 @@ install.packages("secsse")
 Install secsse from this GitHub repository by running:
 
 ``` r
+
 install.packages("remotes")
 remotes::install_github("rsetienne/secsse")
 ```

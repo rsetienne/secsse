@@ -65,10 +65,10 @@ plot_state_exact(
 - root_state_weight:
 
   the method to weigh the states: `"maddison_weights"`,
-  `"proper_weights"` (default) or `"equal_weights"`. It can also be
-  specified for the root state: the vector `c(1, 0, 0)` indicates state
-  1 was the root state. When using a `multiPhylo` object,
-  root_state_weight should be list where each entry in the list
+  `"proper_weights"` (default),
+  `"equal_weights"'. or `"stationary_weights"`It can also be specified for the root state: the vector`c(1,
+  0, 0)` indicates state 1 was the root state. When using a`multiPhylo\`
+  object, root_state_weight should be list where each entry in the list
   corresponds to the root_state_weight for each tree.
 
 - is_complete_tree:
@@ -161,7 +161,4 @@ out_plot <- plot_state_exact(parameters = params,
                              sampling_fraction = c(1, 1),
                              num_steps = 10,
                              prob_func = helper_function)
-#> Warning: Deduced names and order of used states to be: 0, 1
-#> if this is incorrect, consider passing states as matching numeric 
-#>   ordering, e.g. 1 for the first state, 2 for the second etc.
 ```

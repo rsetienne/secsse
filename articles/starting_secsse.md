@@ -27,6 +27,7 @@ particularly well. The \*.csv file can be loaded into R using the
 read.csv() function. and should look like this:
 
 ``` r
+
 library(secsse)
 data(traits)
 tail(traits)
@@ -54,6 +55,7 @@ read.nexus(). In our example we load a prepared phylogeny named
 “phylo_vignette”:
 
 ``` r
+
 data("phylo_vignette")
 ```
 
@@ -62,6 +64,7 @@ names in the data file, but also that these are in the same order. For
 this purpose, we run the following piece of code prior to any analysis:
 
 ``` r
+
 sorted_traits <- sortingtraits(traits, phylo_vignette)
 ```
 
@@ -71,6 +74,7 @@ are causing issues and if they are in the tree or data file, you can use
 the name.check function in the ‘geiger’(Harmon et al. 2008) package:
 
 ``` r
+
 library(geiger)
 ```
 
@@ -81,6 +85,7 @@ library(geiger)
     ## Loading required package: maps
 
 ``` r
+
 #pick out all elements that do not agree between tree and data
 mismat <- name.check(phylo_vignette, traits)
 #this will call all taxa that are in the tree, but not the data file
@@ -94,6 +99,7 @@ file, it is worth adding them with value `NA` for trait state. You can
 visualise the tip states using the package diversitree:
 
 ``` r
+
 if (requireNamespace("diversitree")) {
   for_plot <- data.frame(trait = traits$trait,
                          row.names = phylo_vignette$tip.label)
@@ -113,7 +119,7 @@ setting parameters and constraints.
 #### Note on assigning ambiguity to taxon trait states
 
 If the user wishes to assign a taxon to multiple trait states, because
-he/she is unsure which state best describes the taxon, he/she can use
+she/he is unsure which state best describes the taxon, she/he can use
 `NA`. `NA` is used when there is no information on possible state at
 all; for example when a state was not measured or a taxon is unavailable
 for inspection. `NA` means a taxon is equally likely to pertain to any
@@ -121,18 +127,19 @@ state. In case the user does have some information, for example if a
 taxon can pertain to multiple states, or if there is uncertainty
 regarding state but one or multiple states can with certainty be
 excluded, secsse offers flexibility to handle ambiguity. In this case,
-the user only needs to supply a trait file, with at least four columns,
-one for the taxon name, and three for trait state. Below, we show an
-example of what the trait info should be like (the column with species’
-names has been removed). If a taxon may pertain to trait state 1 or 3,
-but not to 2, the three columns should have at least the values 1 and a
-3, but never 2 (species in the third row). On the other hand, the
-species in the fifth row can pertain to all states: the first column
-would have a 1, the second a 2, the third a 3 (although if you only have
-this type of ambiguity, it is easier to assign `NA` and use a
-single-column data file).
+the user only needs to supply a trait matrix, with at least N + 1
+columns, one column for the taxon name, and N equal to the number of
+unique states (3 in the example) . Below, we show an example of what the
+trait info should be like (the column with species’ names has been
+removed). If a taxon may pertain to trait state 1 or 3, but not to 2,
+the three columns should have at least the values 1 and a 3, but never 2
+(species in the fourth row). On the other hand, the species in the fifth
+row can pertain to all states: the first column would have a 1, the
+second a 2, the third a 3 (although if you only have this type of
+ambiguity, it is easier to assign `NA` and use a single-column setup).
 
 ``` r
+
 #       traits traits traits
 # [1,]      2      2      2
 # [2,]      1      1      1
@@ -144,17 +151,16 @@ single-column data file).
 ## Setting up an analysis
 
 To perform a Maximum Likelihood analysis, secsse makes use of the
-function `DDD::optimize()`, which in turn, typically, uses the subplex
-package to perform the Maximum Likelihood optimization. In such an
-analysis, we need to specify which parameters we want to optimize, which
-parameters to keep fix, and the initial values per parameter. We do so
-by providing the structure of the input parameters (e.g. in vector,
-matrix or list form), and within this structure we highlight values that
-stay at zero with a 0, and parameters to be inferred with indexes 1, 2,
-… n. The optimizer will then use these indexes to fill in the associated
-parameters and perform the optimization. If this all seems a bit
-unclear, please continue reading and look at the fully set up
-parameterization for the maximum likelihood below to gain more insight.
+function `DDD::optimize()`. In such an analysis, we need to specify
+which parameters we want to optimize, which parameters to keep fix, and
+the initial values per parameter. We do so by providing the structure of
+the input parameters (e.g. in vector, matrix or list form), and within
+this structure we highlight values that stay at zero with a 0, and
+parameters to be inferred with indexes 1, 2, … n. The optimizer will
+then use these indexes to fill in the associated parameters and perform
+the optimization. If this all seems a bit unclear, please continue
+reading and look at the fully set up parameterization for the maximum
+likelihood below to gain more insight.
 
 ### ETD
 
@@ -178,6 +184,7 @@ we can provide secsse with a matrix specifying the potential speciation
 results, and secsse will construct the lambda list accordingly:
 
 ``` r
+
 spec_matrix <- c()
 spec_matrix <- rbind(spec_matrix, c(0, 0, 0, 1))
 spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 2))
@@ -247,6 +254,7 @@ Since we are using the ETD model, here we also expect the extinction
 rates to be different:
 
 ``` r
+
 mu_vec <- secsse::create_mu_vector(state_names = c(0, 1),
                                    num_concealed_states = 2,
                                    model = "ETD",
@@ -279,6 +287,7 @@ suffices to only specify the non-zero transitions. In this case these
 are from state 0 to 1, and vice versa:
 
 ``` r
+
 shift_matrix <- c()
 shift_matrix <- rbind(shift_matrix, c(0, 1, 5))
 shift_matrix <- rbind(shift_matrix, c(1, 0, 6))
@@ -317,6 +326,7 @@ analyses with secsse are that we specify the ids of the rates we want
 optimized, and provide initial values. We can do so as follows:
 
 ``` r
+
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.3, 8)
@@ -340,6 +350,7 @@ traits, but within traits.
 And now we can perform maximum likelihood:
 
 ``` r
+
 idparslist <- list()
 idparslist[[1]] <- lambda_list
 idparslist[[2]] <- mu_vec
@@ -363,6 +374,7 @@ We can now extract several pieces of information from the returned
 answer:
 
 ``` r
+
 ML_ETD <- answ$ML
 ETD_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_ETD
@@ -371,6 +383,7 @@ ML_ETD
     ## [1] -97.34574
 
 ``` r
+
 ETD_par
 ```
 
@@ -378,6 +391,7 @@ ETD_par
     ## [6] 1.016712e-15 5.631846e-05 5.619413e-01
 
 ``` r
+
 spec_rates <- ETD_par[1:2]
 ext_rates <- ETD_par[3:4]
 Q_Examined <- ETD_par[5:6]
@@ -388,18 +402,21 @@ spec_rates
     ## [1] 0.570504 1.003686
 
 ``` r
+
 ext_rates
 ```
 
     ## [1] 0.1712141 0.2626209
 
 ``` r
+
 Q_Examined
 ```
 
     ## [1] 8.318085e-02 1.016712e-15
 
 ``` r
+
 Q_Concealed
 ```
 
@@ -426,6 +443,7 @@ inherits faithfully to the daughter species. However, this time, we set
 the model indicator to “CTD”:
 
 ``` r
+
 spec_matrix <- c()
 spec_matrix <- rbind(spec_matrix, c(0, 0, 0, 1))
 spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 2))
@@ -477,6 +495,7 @@ is now associated with all states with concealed state B.
 For the mu vector, we repeat the same we did for the ETD model:
 
 ``` r
+
 mu_vec <- secsse::create_mu_vector(state_names = c(0, 1),
                                    num_concealed_states = 2,
                                    model = "CTD",
@@ -498,6 +517,7 @@ Setting up the transition matrix is not different from the ETD model,
 the same transitions are possible:
 
 ``` r
+
 shift_matrix <- c()
 shift_matrix <- rbind(shift_matrix, c(0, 1, 5))
 shift_matrix <- rbind(shift_matrix, c(1, 0, 6))
@@ -521,6 +541,7 @@ Now that we have specified our matrices, we can use the same code we
 used for the ETD model to perform our maximum likelihood:
 
 ``` r
+
 idparsopt <- 1:8 # our maximum rate parameter was 8
 idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.3, 8)
@@ -547,6 +568,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
     ## Note: you set some transitions as impossible to happen.
 
 ``` r
+
 ML_CTD <- answ$ML
 CTD_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CTD
@@ -555,6 +577,7 @@ ML_CTD
     ## [1] -99.68055
 
 ``` r
+
 CTD_par
 ```
 
@@ -562,6 +585,7 @@ CTD_par
     ## [6] 2.899761e-16 6.039034e-14 8.699983e-01
 
 ``` r
+
 spec_rates <- CTD_par[1:2]
 ext_rates <- CTD_par[3:4]
 Q_Examined <- CTD_par[5:6]
@@ -572,18 +596,21 @@ spec_rates
     ## [1] 0.6936912 0.7115379
 
 ``` r
+
 ext_rates
 ```
 
     ## [1] 0.0009876522 0.5816323407
 
 ``` r
+
 Q_Examined
 ```
 
     ## [1] 7.875882e-02 2.899761e-16
 
 ``` r
+
 Q_Concealed
 ```
 
@@ -610,6 +637,7 @@ To specify the lambda matrices, this time we choose the same rate
 indicator across both states.
 
 ``` r
+
 spec_matrix <- c()
 spec_matrix <- rbind(spec_matrix, c(0, 0, 0, 1))
 spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 1))
@@ -654,6 +682,7 @@ The mu vector follows closely from this, having a shared extinction rate
 across all states:
 
 ``` r
+
 mu_vec <- secsse::create_mu_vector(state_names = c(0, 1),
                                    num_concealed_states = 2,
                                    model = "CR",
@@ -674,6 +703,7 @@ the same rate. Here, we will choose the more parameter-rich version
 all rates in the transition matrix are the same).
 
 ``` r
+
 shift_matrix <- c()
 shift_matrix <- rbind(shift_matrix, c(0, 1, 3))
 shift_matrix <- rbind(shift_matrix, c(1, 0, 4))
@@ -694,6 +724,7 @@ q_matrix
 #### Maximum Likelihood
 
 ``` r
+
 idparsopt <- 1:6 # our maximum rate parameter was 6
 idparsfix <- c(0) # we want to keep all zeros at zero
 initparsopt <- rep(0.3, 6)
@@ -720,6 +751,7 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
     ## Note: you set some transitions as impossible to happen.
 
 ``` r
+
 ML_CR <- answ$ML
 CR_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CR
@@ -728,6 +760,7 @@ ML_CR
     ## [1] -99.64176
 
 ``` r
+
 CR_par
 ```
 
@@ -735,6 +768,7 @@ CR_par
     ## [6] 1.104975e-01
 
 ``` r
+
 spec_rate <- CR_par[1]
 ext_rate <-  CR_par[2]
 Q_Examined <- CR_par[3:4]
@@ -745,18 +779,21 @@ spec_rate
     ## [1] 0.6923512
 
 ``` r
+
 ext_rate
 ```
 
     ## [1] 1.022085e-14
 
 ``` r
+
 Q_Examined
 ```
 
     ## [1] 7.759612e-02 4.296702e-08
 
 ``` r
+
 Q_Concealed
 ```
 
@@ -773,6 +810,7 @@ the number of parameters of each model and LL is the Log Likelihood, we
 can calculate this as follows:
 
 ``` r
+
 res <- data.frame(ll = c(ML_ETD, ML_CTD, ML_CR),
                   k  = c(8, 8, 6),
                   model = c("ETD", "CTD", "CR"))

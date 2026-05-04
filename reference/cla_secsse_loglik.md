@@ -64,10 +64,10 @@ cla_secsse_loglik(
 - root_state_weight:
 
   the method to weigh the states: `"maddison_weights"`,
-  `"proper_weights"` (default) or `"equal_weights"`. It can also be
-  specified for the root state: the vector `c(1, 0, 0)` indicates state
-  1 was the root state. When using a `multiPhylo` object,
-  root_state_weight should be list where each entry in the list
+  `"proper_weights"` (default),
+  `"equal_weights"'. or `"stationary_weights"`It can also be specified for the root state: the vector`c(1,
+  0, 0)` indicates state 1 was the root state. When using a`multiPhylo\`
+  object, root_state_weight should be list where each entry in the list
   corresponds to the root_state_weight for each tree.
 
 - sampling_fraction:

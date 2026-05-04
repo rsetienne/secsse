@@ -7,6 +7,7 @@ plot your ancestral states alongside your tree. Let us assume we have a
 simple tree, with almost trivial traits:
 
 ``` r
+
 set.seed(5)
 phy <- ape::rphylo(n = 4, birth = 1, death = 0)
 traits <- c(0, 1, 1, 0)
@@ -20,6 +21,7 @@ A typical likelihood calculation would look like (assuming 2 observed
 and 2 hidden traits):
 
 ``` r
+
 params <- secsse::id_paramPos(c(0, 1), 2)
 params[[1]][] <- c(0.2, 0.2, 0.1, 0.1)
 params[[2]][] <- 0.0
@@ -40,6 +42,7 @@ ll <- secsse::secsse_loglik(parameter = params,
     ##   ordering, e.g. 1 for the first state, 2 for the second etc.
 
 ``` r
+
 ll
 ```
 
@@ -78,6 +81,7 @@ observed and 2 hidden traits, we observe the following states
 reconstructed along the nodes:
 
 ``` r
+
 ll$states
 ```
 
@@ -103,13 +107,15 @@ three rows indicate the states at the internal nodes (with the last row
 indicating the root, in this case). The columns indicate the four
 extinction and four speciation rates, following the order in
 params\[\[1\]\] and params\[\[2\]\]. Thus, we have for both, rates 0A,
-1A, 0B and 1B. If we are interested in the posterior probability of
-trait 0, we have to provide a helper function that sums the
-probabilities of 0A and 0B, e.g.:
+1A, 0B and 1B. Furthermore, the last four columns indicate the survival
+rates, which are equal to 1 - extinction. If we are interested in the
+posterior probability of trait 0, we have to provide a helper function
+that sums the probabilities of 0A and 0B, e.g.:
 
 ``` r
+
 helper_function <- function(x) {
-  return(sum(x[c(5, 7)]) / sum(x)) # normalized by total sum, just in case.
+  return(sum(x[c(5, 7)]) / sum(x[1:8])) # normalized by total sum, just in case.
 }
 ```
 
@@ -117,10 +123,11 @@ We can now use this to plot this probability across the tree. There are
 two options for plotting: using the evaluations along the branches as
 used by the integration method, or evaluating the branch values at a
 specific number of intervals. Using the explicit evaluations is more
-precies, but might be memory heavy. Usually, using 10-100 evaluations
+precise, but might be memory heavy. Usually, using 10-100 evaluations
 per branch provides a very accurate approximation:
 
 ``` r
+
 secsse::plot_state_exact(parameters = params,
                  phy = phy,
                  traits = traits,
@@ -129,16 +136,13 @@ secsse::plot_state_exact(parameters = params,
                  prob_func = helper_function)
 ```
 
-    ## Warning: Deduced names and order of used states to be: 0, 1
-    ## if this is incorrect, consider passing states as matching numeric 
-    ##   ordering, e.g. 1 for the first state, 2 for the second etc.
-
     ## Warning: Removed 6 rows containing missing values or values outside the scale range
     ## (`geom_segment()`).
 
 ![](plotting_states_files/figure-html/exact-1.png)
 
 ``` r
+
 secsse::plot_state_exact(parameters = params,
                  phy = phy,
                  traits = traits,
@@ -148,15 +152,13 @@ secsse::plot_state_exact(parameters = params,
                  prob_func = helper_function)
 ```
 
-    ## Warning: Deduced names and order of used states to be: 0, 1
-    ## if this is incorrect, consider passing states as matching numeric 
-    ##   ordering, e.g. 1 for the first state, 2 for the second etc.
-    ## Removed 6 rows containing missing values or values outside the scale range
+    ## Warning: Removed 6 rows containing missing values or values outside the scale range
     ## (`geom_segment()`).
 
 ![](plotting_states_files/figure-html/exact-2.png)
 
 ``` r
+
 secsse::plot_state_exact(parameters = params,
                  phy = phy,
                  traits = traits,
@@ -166,10 +168,7 @@ secsse::plot_state_exact(parameters = params,
                  prob_func = helper_function)
 ```
 
-    ## Warning: Deduced names and order of used states to be: 0, 1
-    ## if this is incorrect, consider passing states as matching numeric 
-    ##   ordering, e.g. 1 for the first state, 2 for the second etc.
-    ## Removed 6 rows containing missing values or values outside the scale range
+    ## Warning: Removed 6 rows containing missing values or values outside the scale range
     ## (`geom_segment()`).
 
 ![](plotting_states_files/figure-html/exact-3.png)
@@ -181,6 +180,7 @@ way. Borrowing from the example for cla_secsse_loglik, we first prepare
 our parameters:
 
 ``` r
+
 set.seed(13)
 phylotree <- ape::rcoal(12, tip.label = 1:12)
 traits <- sample(c(0, 1, 2),
@@ -219,6 +219,7 @@ observe the change in state 0, we formulate a helper function, noticing
 that the first 9 states are the extinction rates:
 
 ``` r
+
 helper_function <- function(x) {
   return(sum(x[c(10, 13, 16)]) / sum(x)) # normalized by total sum, just in case
 }
@@ -227,6 +228,7 @@ helper_function <- function(x) {
 And then we use these for plotting:
 
 ``` r
+
 secsse::plot_state_exact(parameters = parameter,
                          phy = phy,
                          traits = traits,
@@ -238,10 +240,6 @@ secsse::plot_state_exact(parameters = parameter,
                          prob_func = helper_function,
                          num_steps = 10)
 ```
-
-    ## Warning: Deduced names and order of used states to be: 0, 1, 2
-    ## if this is incorrect, consider passing states as matching numeric 
-    ##   ordering, e.g. 1 for the first state, 2 for the second etc.
 
     ## Warning: Removed 22 rows containing missing values or values outside the scale range
     ## (`geom_segment()`).

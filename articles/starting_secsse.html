@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">Thijs
 Janzen</h4>
             
-            <h4 data-toc-skip class="date">2025-11-29</h4>
+            <h4 data-toc-skip class="date">2026-05-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rsetienne/secsse/blob/master/vignettes/starting_secsse.Rmd" class="external-link"><code>vignettes/starting_secsse.Rmd</code></a></small>
       <div class="d-none name"><code>starting_secsse.Rmd</code></div>
@@ -158,14 +158,14 @@ diversitree:</p>
 <span>                        type <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required namespace: diversitree</span></span></code></pre>
-<p><img src="starting_secsse_files/figure-html/plot_tree-1.png" class="r-plt" width="700"></p>
+<p><img src="starting_secsse_files/figure-html/plot_tree-1.png" class="r-plt" alt="" width="700"></p>
 <p>After you are done properly setting up your data, you can proceed to
 setting parameters and constraints.</p>
 <div class="section level4">
 <h4 id="note-on-assigning-ambiguity-to-taxon-trait-states">Note on assigning ambiguity to taxon trait states<a class="anchor" aria-label="anchor" href="#note-on-assigning-ambiguity-to-taxon-trait-states"></a>
 </h4>
 <p>If the user wishes to assign a taxon to multiple trait states,
-because he/she is unsure which state best describes the taxon, he/she
+because she/he is unsure which state best describes the taxon, she/he
 can use <code>NA</code>. <code>NA</code> is used when there is no
 information on possible state at all; for example when a state was not
 measured or a taxon is unavailable for inspection. <code>NA</code> means
@@ -174,15 +174,16 @@ have some information, for example if a taxon can pertain to multiple
 states, or if there is uncertainty regarding state but one or multiple
 states can with certainty be excluded, secsse offers flexibility to
 handle ambiguity. In this case, the user only needs to supply a trait
-file, with at least four columns, one for the taxon name, and three for
-trait state. Below, we show an example of what the trait info should be
-like (the column with species’ names has been removed). If a taxon may
-pertain to trait state 1 or 3, but not to 2, the three columns should
-have at least the values 1 and a 3, but never 2 (species in the third
-row). On the other hand, the species in the fifth row can pertain to all
-states: the first column would have a 1, the second a 2, the third a 3
-(although if you only have this type of ambiguity, it is easier to
-assign <code>NA</code> and use a single-column data file).</p>
+matrix, with at least N + 1 columns, one column for the taxon name, and
+N equal to the number of unique states (3 in the example) . Below, we
+show an example of what the trait info should be like (the column with
+species’ names has been removed). If a taxon may pertain to trait state
+1 or 3, but not to 2, the three columns should have at least the values
+1 and a 3, but never 2 (species in the fourth row). On the other hand,
+the species in the fifth row can pertain to all states: the first column
+would have a 1, the second a 2, the third a 3 (although if you only have
+this type of ambiguity, it is easier to assign <code>NA</code> and use a
+single-column setup).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#       traits traits traits</span></span>
 <span><span class="co"># [1,]      2      2      2</span></span>
@@ -197,18 +198,16 @@ assign <code>NA</code> and use a single-column data file).</p>
 <h2 id="setting-up-an-analysis">Setting up an analysis<a class="anchor" aria-label="anchor" href="#setting-up-an-analysis"></a>
 </h2>
 <p>To perform a Maximum Likelihood analysis, secsse makes use of the
-function <code>DDD::optimize()</code>, which in turn, typically, uses
-the subplex package to perform the Maximum Likelihood optimization. In
-such an analysis, we need to specify which parameters we want to
-optimize, which parameters to keep fix, and the initial values per
-parameter. We do so by providing the structure of the input parameters
-(e.g. in vector, matrix or list form), and within this structure we
-highlight values that stay at zero with a 0, and parameters to be
-inferred with indexes 1, 2, … n. The optimizer will then use these
-indexes to fill in the associated parameters and perform the
-optimization. If this all seems a bit unclear, please continue reading
-and look at the fully set up parameterization for the maximum likelihood
-below to gain more insight.</p>
+function <code>DDD::optimize()</code>. In such an analysis, we need to
+specify which parameters we want to optimize, which parameters to keep
+fix, and the initial values per parameter. We do so by providing the
+structure of the input parameters (e.g. in vector, matrix or list form),
+and within this structure we highlight values that stay at zero with a
+0, and parameters to be inferred with indexes 1, 2, … n. The optimizer
+will then use these indexes to fill in the associated parameters and
+perform the optimization. If this all seems a bit unclear, please
+continue reading and look at the fully set up parameterization for the
+maximum likelihood below to gain more insight.</p>
 <div class="section level3">
 <h3 id="etd">ETD<a class="anchor" aria-label="anchor" href="#etd"></a>
 </h3>

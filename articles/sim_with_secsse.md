@@ -24,6 +24,7 @@ matrix work, we refer to the vignette
 We will here first simulate using the CR model:
 
 ``` r
+
 spec_matrix <- c(0, 0, 0, 1)
 spec_matrix <- rbind(spec_matrix, c(1, 1, 1, 1))
 lambda_list <- secsse::create_lambda_list(state_names = c(0, 1),
@@ -50,6 +51,7 @@ to provide actual starting parameters. secsse has a helping function
 (`fil_in()`) for that as well!
 
 ``` r
+
 speciation_rate <- 0.5
 extinction_rate <- 0.05
 q_ab <- 0.1
@@ -72,6 +74,7 @@ encounters a `2` as rate indicator, it enters the value at position
 ## Simulating
 
 ``` r
+
 sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                mus = sim_mu_vector,
                                qs = sim_q_matrix,
@@ -109,6 +112,7 @@ secsse will try to simulate until all possible combinations of observed
 and concealed states are present at the tips:
 
 ``` r
+
 sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                mus = sim_mu_vector,
                                qs = sim_q_matrix,
@@ -123,6 +127,7 @@ sim_tree$obs_traits
     ## [20] "1" "1" "1"
 
 ``` r
+
 sim_tree$true_traits
 ```
 
@@ -130,6 +135,7 @@ sim_tree$true_traits
     ## [16] "0A" "1A" "1A" "1A" "1A" "1B" "1B"
 
 ``` r
+
 sim_tree <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                mus = sim_mu_vector,
                                qs = sim_q_matrix,
@@ -145,6 +151,7 @@ sim_tree$obs_traits
     ## [39] "0" "1" "0" "0" "1" "1" "0" "0" "0" "0" "0" "1" "1" "1" "1"
 
 ``` r
+
 sim_tree$true_traits
 ```
 

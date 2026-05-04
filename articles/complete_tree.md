@@ -35,6 +35,7 @@ see
 [`vignette("sim_with_secsse", package = "secsse")`](https://rsetienne.github.io/secsse/articles/sim_with_secsse.md).
 
 ``` r
+
 library(secsse)
 
 spec_matrix <- c()
@@ -107,6 +108,7 @@ extant species. However, this time we make sure to set the
 This enables secsse to use the information present in extinct lineages.
 
 ``` r
+
 idparsopt <- 1:4 # our maximum rate parameter was 4 -> We are keeping
 # concealed and examined traits the same for the MLE.
 idparsfix <- c(0) # we want to keep all zeros at zero
@@ -135,6 +137,7 @@ complete_tree_ml_CR <- secsse_ml(phy = sim_tree_complete$phy,
 Now we can see what our results look like.
 
 ``` r
+
 CR_par_complete <- secsse::extract_par_vals(idparslist, complete_tree_ml_CR$MLpars)
 complete_tree_ml_CR
 #> $MLpars
@@ -211,6 +214,7 @@ specification the same.
 
 ``` r
 
+
 sim_tree_reconstructed <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                              mus = sim_mu_vector,
                                              qs = sim_q_matrix,
@@ -237,6 +241,7 @@ if (requireNamespace("diversitree")) {
 
 ``` r
 
+
 reconstructed_tree_ml <- secsse_ml(phy = sim_tree_reconstructed$phy,
                                    traits = sim_tree_reconstructed$obs_traits,
                                    num_concealed_states = 2,
@@ -252,6 +257,7 @@ reconstructed_tree_ml <- secsse_ml(phy = sim_tree_reconstructed$phy,
 ```
 
 ``` r
+
 reconstructed_tree_ml_CR <- reconstructed_tree_ml$ML
 CR_par_reconstructed <- secsse::extract_par_vals(
   idparslist,

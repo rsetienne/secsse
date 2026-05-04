@@ -113,10 +113,10 @@ cla_secsse_ml_func_def_pars(
 - root_state_weight:
 
   the method to weigh the states: `"maddison_weights"`,
-  `"proper_weights"` (default) or `"equal_weights"`. It can also be
-  specified for the root state: the vector `c(1, 0, 0)` indicates state
-  1 was the root state. When using a `multiPhylo` object,
-  root_state_weight should be list where each entry in the list
+  `"proper_weights"` (default),
+  `"equal_weights"'. or `"stationary_weights"`It can also be specified for the root state: the vector`c(1,
+  0, 0)` indicates state 1 was the root state. When using a`multiPhylo\`
+  object, root_state_weight should be list where each entry in the list
   corresponds to the root_state_weight for each tree.
 
 - sampling_fraction:
@@ -451,6 +451,9 @@ maxiter,
 optimmethod,
 num_cycles = 1)
 #> Note: you set some transitions as impossible to happen.
+#> Warning: Deduced names and order of used states to be: 0, 1, 2
+#> if this is incorrect, consider passing states as matching numeric 
+#>   ordering, e.g. 1 for the first state, 2 for the second etc.
 #> 0.0564834411465597 0.0564834411465597 4 -138.291064865705
 #> Calculating the likelihood for the initial parameters.
 #> The loglikelihood for the initial parameter values is -138.291064865705
