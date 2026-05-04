@@ -912,6 +912,26 @@ build_initStates_time <- function(phy,
                                   num_unique_traits = NULL,
                                   first_time = FALSE,
                                   traitStates = NULL) {
+
+    if (length(phy$tip.label) == 1) {
+      fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
+      fake_phy$edge.length[1:2] <- phy$edge.length[1]
+       
+      states <- build_states(fake_phy,
+                             c(traits, traits),
+                             num_concealed_states,
+                             sampling_fraction,
+                             is_complete_tree,
+                             mus,
+                             num_unique_traits,
+                             first_time,
+                             traitStates)
+      phy$node.label <- NULL
+      states <- states[1, ] # only retain entry for one tip
+      forTime <- c(0, phy$edge.length)
+      ances <- NULL # this doesn't exist in a singleton tree
+    } else {
+  
     states <- build_states(phy,
                            traits,
                            num_concealed_states,
@@ -921,12 +941,14 @@ build_initStates_time <- function(phy,
                            num_unique_traits,
                            first_time,
                            traitStates)
-    phy$node.label <- NULL
-    split_times <- sort(event_times(phy), decreasing = FALSE)
-    ances <- as.numeric(names(split_times))
-
-    forTime <- cbind(phy$edge, phy$edge.length)
-
+    
+      phy$node.label <- NULL
+      split_times <- sort(event_times(phy), decreasing = FALSE)
+      ances <- as.numeric(names(split_times))
+      
+      forTime <- cbind(phy$edge, phy$edge.length)
+    }
+    
     return(list(
         states = states,
         ances = ances,

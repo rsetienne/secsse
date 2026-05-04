@@ -39,13 +39,9 @@ secsse_single_branch_loglik <- function(parameter,
   if (is.null(setting_calculation)) {
     
     check_root_state_weight(root_state_weight, traits)
-    
-    # make fake phy
-    fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
-    fake_phy$edge.length[1:2] <- phy$edge.length[1]
-    
-    setting_calculation <- build_initStates_time(fake_phy,
-                                                 c(traits, traits),
+
+    setting_calculation <- secsse:::build_initStates_time(phy,
+                                                 traits,
                                                  num_concealed_states,
                                                  sampling_fraction,
                                                  is_complete_tree,
@@ -55,14 +51,12 @@ secsse_single_branch_loglik <- function(parameter,
   } 
   
   states <- setting_calculation$states
-  states <- states[-2, ]
   forTime <- setting_calculation$forTime
-  forTime <- forTime[-2, ]
-  
-  d <- ncol(states) / 3
+
+  d <- length(states) / 3
   
   if (!is.null(phy$root.edge)) {
-    forTime[3] <- forTime[3] + phy$root.edge
+    forTime[2] <- forTime[2] + phy$root.edge
   }
   
   RcppParallel::setThreadOptions(numThreads = num_threads)
@@ -71,8 +65,8 @@ secsse_single_branch_loglik <- function(parameter,
   if (return_root_state) return_states = TRUE
   
   calcul <- calc_ll_single_branch_cpp(rhs = if (using_cla) "ode_cla" else "ode_standard",
-                                      states = states[1, ],
-                                      forTime = c(0, forTime[3]),
+                                      states = states,
+                                      forTime = forTime,
                                       lambdas = lambdas,
                                       mus = mus,
                                       Q = q_matrix,
