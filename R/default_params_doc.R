@@ -33,7 +33,8 @@
 #' @param cond condition on the existence of a node root: `"maddison_cond"`,
 #'  `"proper_cond"` (default). For details, see vignette.
 #' @param root_state_weight the method to weigh the states:
-#'  `"maddison_weights"`, `"proper_weights"` (default) or `"equal_weights"`.
+#'  `"maddison_weights"`, `"proper_weights"` (default), `"equal_weights"'.
+#'  or `"stationary_weights"`
 #'  It can also be specified for the root state: the vector `c(1, 0, 0)` 
 #'  indicates state 1 was the root state. When
 #'  using a `multiPhylo` object, root_state_weight should be list where each

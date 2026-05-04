@@ -145,9 +145,7 @@ create_q_matrix <- function(state_names,
                             diff.conceal = FALSE) {
 
   total_num_states <- length(state_names)
-  if (total_num_states != num_concealed_states) {
-    stop("number of concealed states has to be equal to the number of observed states")
-  }
+
   trans_matrix <- matrix(0, ncol = total_num_states,
                          nrow = total_num_states)
 
@@ -161,9 +159,10 @@ create_q_matrix <- function(state_names,
 
   diag(trans_matrix) <- NA
 
-  trans_matrix <- secsse::q_doubletrans(traits = state_names,
-                                        masterBlock = trans_matrix,
-                                        diff.conceal = diff.conceal)
+  trans_matrix <- q_doubletrans(traits = state_names,
+                                masterBlock = trans_matrix,
+                                diff.conceal = diff.conceal,
+                                num_concealed_states = num_concealed_states)
   
   all_state_names <- get_state_names(state_names, num_concealed_states)
   colnames(trans_matrix) <- all_state_names
@@ -190,9 +189,9 @@ expand_q_matrix <- function(q_matrix,
   
   traits <- get_state_names(names(q_matrix), num_concealed_states)
   
-  return(secsse::q_doubletrans(traits = traits,
-                               masterBlock = q_matrix,
-                               diff.conceal = diff.conceal))
+  return(q_doubletrans(traits = traits,
+                       masterBlock = q_matrix,
+                       diff.conceal = diff.conceal))
 }
 
 #' Helper function to create a default `shift_matrix` list
@@ -310,36 +309,16 @@ create_mu_vector <- function(state_names,
 
 #' @keywords internal
 replace_matrix <- function(focal_matrix,
-                           params,
-                           is_lambda = FALSE) {
-  if (is_lambda) {
-    entries <- table(focal_matrix)
-    entries <- entries[names(entries) != 0]
-    for (i in seq_len(nrow(focal_matrix))) {
-      for (j in seq_len(ncol(focal_matrix))) {
-        if (focal_matrix[i, j] != 0 && !is.na(focal_matrix[i, j]))  {
-          index <- focal_matrix[i, j]
-          
-          new_val <- params[index]
-          if (index %in% names(entries)) {
-            mult <- 1 / entries[names(entries) == index]
-            new_val <- new_val * mult
-          }
-          
-          focal_matrix[i, j] <- new_val
-        }
-      }
-    }
-  } else {
-    for (i in seq_len(nrow(focal_matrix))) {
-      for (j in seq_len(ncol(focal_matrix))) {
-        if (focal_matrix[i, j] != 0 && !is.na(focal_matrix[i, j]))  {
-          index <- focal_matrix[i, j]
-          focal_matrix[i, j] <- params[index]
-        }
+                           params) {
+  for (i in seq_len(nrow(focal_matrix))) {
+    for (j in seq_len(ncol(focal_matrix))) {
+      if (focal_matrix[i, j] != 0 && !is.na(focal_matrix[i, j]))  {
+        index <- focal_matrix[i, j]
+        focal_matrix[i, j] <- params[index]
       }
     }
   }
+  
   return(focal_matrix)
 }
 
@@ -353,7 +332,7 @@ fill_in <- function(object,
                     params) {
   if (is.list(object)) { # lambda matrix
     for (k in seq_along(object)) {
-      object[[k]] <- replace_matrix(object[[k]], params, is_lambda = FALSE)
+      object[[k]] <- replace_matrix(object[[k]], params)
     }
   } else if (is.matrix(object)) {
     object <- replace_matrix(object, params)

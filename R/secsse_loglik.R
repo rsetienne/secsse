@@ -54,32 +54,32 @@ master_loglik <- function(parameter,
   }
   
   if (length(phy$tip.label) == 1) {
-    return(secsse::secsse_single_branch_loglik(
-                       parameter = parameter,
-                       phy = phy,
-                       traits = traits,
-                       num_concealed_states =
-                         num_concealed_states,
-                       cond = cond,
-                       root_state_weight = 
-                         root_state_weight,
-                       sampling_fraction = 
-                         sampling_fraction,
-                       setting_calculation = 
-                         setting_calculation,
-                       see_ancestral_states = see_ancestral_states,
-                       loglik_penalty = loglik_penalty,
-                       is_complete_tree = 
-                         is_complete_tree,
-                       take_into_account_root_edge = 
-                         take_into_account_root_edge,
-                       num_threads = num_threads,
-                       atol = atol,
-                       rtol = rtol,
-                       method = method,
-                       display_warning = display_warning,
-                       use_normalization = use_normalization,
-                       return_root_state = return_root_state))
+    return(secsse_single_branch_loglik(
+      parameter = parameter,
+      phy = phy,
+      traits = traits,
+      num_concealed_states =
+        num_concealed_states,
+      cond = cond,
+      root_state_weight = 
+        root_state_weight,
+      sampling_fraction = 
+        sampling_fraction,
+      setting_calculation = 
+        setting_calculation,
+      see_ancestral_states = see_ancestral_states,
+      loglik_penalty = loglik_penalty,
+      is_complete_tree = 
+        is_complete_tree,
+      take_into_account_root_edge = 
+        take_into_account_root_edge,
+      num_threads = num_threads,
+      atol = atol,
+      rtol = rtol,
+      method = method,
+      display_warning = display_warning,
+      use_normalization = use_normalization,
+      return_root_state = return_root_state))
   }
   
   lambdas <- parameter[[1]]
@@ -113,7 +113,6 @@ master_loglik <- function(parameter,
   states <- setting_calculation$states
   forTime <- setting_calculation$forTime
   ances <- setting_calculation$ances
-  
   d <- ncol(states) / 3
   
   # with a complete tree, we need to re-calculate the states every time we
@@ -193,7 +192,8 @@ master_loglik <- function(parameter,
                                      lambdas,
                                      nodeM,
                                      d,
-                                     is_cla = using_cla)
+                                     is_cla = using_cla,
+                                     Q = q_matrix)
   
   if (is_complete_tree) {
     nodeM <- update_complete_tree(phy,
@@ -325,25 +325,26 @@ secsse_loglik <- function(parameter,
                           display_warning = TRUE,
                           use_normalization = TRUE,
                           return_root_state = FALSE) {
-  master_loglik(parameter = parameter,
-                phy = phy,
-                traits = traits,
-                num_concealed_states = num_concealed_states,
-                cond = cond,
-                root_state_weight = root_state_weight,
-                sampling_fraction = sampling_fraction,
-                setting_calculation = setting_calculation,
-                see_ancestral_states = see_ancestral_states,
-                loglik_penalty = loglik_penalty,
-                is_complete_tree = is_complete_tree,
-                take_into_account_root_edge = take_into_account_root_edge,
-                num_threads = num_threads,
-                atol = atol,
-                rtol = rtol,
-                method = method,
-                display_warning = display_warning,
-                use_normalization = use_normalization,
-                return_root_state = return_root_state)
+  ll <- master_loglik(parameter = parameter,
+                      phy = phy,
+                      traits = traits,
+                      num_concealed_states = num_concealed_states,
+                      cond = cond,
+                      root_state_weight = root_state_weight,
+                      sampling_fraction = sampling_fraction,
+                      setting_calculation = setting_calculation,
+                      see_ancestral_states = see_ancestral_states,
+                      loglik_penalty = loglik_penalty,
+                      is_complete_tree = is_complete_tree,
+                      take_into_account_root_edge = take_into_account_root_edge,
+                      num_threads = num_threads,
+                      atol = atol,
+                      rtol = rtol,
+                      method = method,
+                      display_warning = display_warning,
+                      use_normalization = use_normalization,
+                      return_root_state = return_root_state)
+  return(ll)
 }
 
 

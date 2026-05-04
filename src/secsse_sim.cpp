@@ -123,6 +123,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
         }
       }
       if (sim.run_info == done) {
+        tracker[ done ]++;
         break;
       } else {
         tracker[ sim.run_info ]++;
@@ -183,7 +184,7 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
   } catch (const char* msg) {
     Rcpp::Rcout << msg << std::endl;
   } catch(...) {
-    ::Rf_error("c++ exception (unknown reason)");
+    Rcpp::stop("c++ exception (unknown reason)");
   }
   return NA_REAL;
 }

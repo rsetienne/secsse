@@ -2,7 +2,7 @@ Package: secsse
 Type: Package
 Title: Several Examined and Concealed States-Dependent Speciation and
  Extinction
-Version: 3.6.0
+Version: 3.6.1
 License: GPL (>= 3) | file LICENSE
 Authors@R: c(
  person(given = "Leonel",
@@ -50,7 +50,8 @@ Imports:
  ggplot2,
  tibble,
  rlang,
- treestats
+ treestats,
+ pracma
 Suggests: 
  diversitree,
  phytools,

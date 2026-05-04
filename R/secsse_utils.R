@@ -58,37 +58,6 @@ id_paramPos <- function(traits, num_concealed_states) { #noLint
     return(idparslist)
 }
 
-#' @keywords internal
-create_q_matrix_int <- function(masterBlock,
-                                concealnewQMatr,
-                                ntraits,
-                                diff.conceal) {
-    Q <- NULL
-    for (i in 1:ntraits) {
-        Qrow <- NULL
-        for (ii in 1:ntraits) {
-            entry <- masterBlock[i, ii]
-            if (is.na(entry)) {
-                Qrow <- cbind(Qrow, masterBlock)
-            } else {
-                if (diff.conceal == TRUE) {
-                    entry <- concealnewQMatr[i, ii]
-                }
-
-                outDiagBlock <- matrix(0,
-                                       ncol = ntraits,
-                                       nrow = ntraits,
-                                       byrow = TRUE)
-                diag(outDiagBlock) <- entry
-                Qrow <- cbind(Qrow, outDiagBlock)
-            }
-        }
-        Q <- rbind(Q, Qrow)
-    }
-    return(Q)
-}
-
-
 #' @title Basic Qmatrix
 #' Sets a Q matrix where double transitions are not allowed
 #' 
@@ -96,88 +65,88 @@ create_q_matrix_int <- function(masterBlock,
 #' 
 #' @return Q matrix that includes both examined and concealed states, it should
 #' be declared as the third element of idparslist.
-#' @description This function expands the Q_matrix, but it does so assuming
-#' that the number of concealed traits is equal to the number of examined
-#' traits, if you have a different number, you should consider looking at
-#' the function [expand_q_matrix()].
+#' @description This function expands the Q_matrix. If the number of concealed
+#' states is not explicitly set by the user, it is assumed to be identical
+#' to the number of observed states.
 #' @examples
-#' traits <- sample(c(0,1,2), 45,replace = TRUE) #get some traits
+#' traits <- sample(c(0, 1, 2), 45, replace = TRUE) # get some traits
 #' # For a three-state trait
-#' masterBlock <- matrix(99,ncol = 3,nrow = 3,byrow = TRUE)
+#' masterBlock <- matrix(99, ncol = 3, nrow = 3, byrow = TRUE)
 #' diag(masterBlock) <- NA
-#' masterBlock[1,2] <- 6
-#' masterBlock[1,3] <- 7
-#' masterBlock[2,1] <- 8
-#' masterBlock[2,3] <- 9
-#' masterBlock[3,1] <- 10
-#' masterBlock[3,2] <- 11
-#' myQ <- q_doubletrans(traits,masterBlock,diff.conceal = FALSE)
+#' masterBlock[1, 2] <- 6
+#' masterBlock[1, 3] <- 7
+#' masterBlock[2, 1] <- 8
+#' masterBlock[2, 3] <- 9
+#' masterBlock[3, 1] <- 10
+#' masterBlock[3, 2] <- 11
+#' myQ <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
 #' # now, it can replace the Q matrix from id_paramPos
 #' num_concealed_states <- 3
 #' param_posit <- id_paramPos(traits,num_concealed_states)
 #' param_posit[[3]] <- myQ
 #' @export
-q_doubletrans <- function(traits, masterBlock, diff.conceal) {
-    if (diff.conceal == TRUE &&
-        all(floor(masterBlock) == masterBlock, na.rm = TRUE) == FALSE) {
-        integersmasterBlock <- floor(masterBlock)
-        factorBlock <- signif(masterBlock - integersmasterBlock, digits = 2)
+q_doubletrans <- function(traits,
+                          masterBlock, 
+                          diff.conceal,
+                          num_concealed_states = NULL) {
 
-        factorstoExpand <- unique(sort(c(factorBlock)))
-        factorstoExpand <- factorstoExpand[factorstoExpand > 0]
-        newshareFac <-
-            (max(factorstoExpand * 10) + 1):(max(factorstoExpand * 10) +
-                                                 length(factorstoExpand))
-        newshareFac <- newshareFac / 10
+  n_obs_traits <- length(sort(unique(traits)))
+  if (is.null(num_concealed_states)) num_concealed_states <- n_obs_traits
+  
+  Q <- matrix(data = 0,
+              nrow = n_obs_traits * num_concealed_states,
+              ncol = n_obs_traits * num_concealed_states)
+  
+  uniq_obs_rates <- sort(unique(c(masterBlock)))
+  uniq_obs_rates <- uniq_obs_rates[!is.na(uniq_obs_rates)]
+  uniq_obs_rates <- uniq_obs_rates[uniq_obs_rates > 0]
+  max_obs_rate <- max(uniq_obs_rates)
+  new_conceal_rates <- 
+    (max_obs_rate + 1):(max_obs_rate + length(uniq_obs_rates))
+  if (diff.conceal == FALSE) {
+    new_conceal_rates <- uniq_obs_rates
+  }
 
-        for (iii in seq_along(newshareFac)) {
-            factorBlock[which(factorBlock == factorstoExpand[iii])] <-
-                newshareFac[iii]
+  for (i in 1:ncol(Q)) {
+    for (j in 1:nrow(Q)) {
+      if (i == j) next
+      
+      obs_trait  <- (c(i, j) - 1) %% n_obs_traits + 1
+      conc_trait <- (c(i, j) - 1) %/% n_obs_traits + 1
+      move_obs   <- abs(diff(obs_trait))
+      move_conc  <- abs(diff(conc_trait))
+      
+      new_rate <- 0
+      
+      if (move_obs > 0 && move_conc == 0) {
+        
+        new_rate <- masterBlock[obs_trait[1], obs_trait[2]]
+        
+      } else if (move_conc > 0 && move_obs == 0) {
+        new_rate <- masterBlock[conc_trait[1], conc_trait[2]]
+        if (new_rate > 0) {
+          conc_index <- which(uniq_obs_rates == new_rate)
+          new_rate   <- new_conceal_rates[conc_index]
         }
-
-        ntraits <- length(sort(unique(traits)))
-        uniqParQ <- sort(unique(c(floor(masterBlock))))
-        uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
-        concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
-
-        for (iii in seq_along(concealnewQ)) {
-            integersmasterBlock[which(integersmasterBlock == uniqParQ2[iii])] <-
-                concealnewQ[iii]
-        }
-        concealnewQMatr <- integersmasterBlock + factorBlock
-
-        Q <- create_q_matrix_int(masterBlock,
-                                 concealnewQMatr,
-                                 ntraits,
-                                 diff.conceal)
-    } else {
-        ntraits <- length(sort(unique(traits)))
-        uniqParQ <- sort(unique(c(masterBlock)))
-        uniqParQ2 <- uniqParQ[which(uniqParQ > 0)]
-        concealnewQ <- (max(uniqParQ2) + 1):(max(uniqParQ2) + length(uniqParQ2))
-        concealnewQMatr <- masterBlock
-        for (I in seq_along(uniqParQ2)) {
-            uniqParQ2
-            concealnewQMatr[concealnewQMatr == uniqParQ2[I]] <- concealnewQ[I]
-        }
-
-        Q <- create_q_matrix_int(masterBlock,
-                                 concealnewQMatr,
-                                 ntraits,
-                                 diff.conceal)
+      }
+      
+      Q[i, j] <- new_rate 
     }
-    uniq_traits <- unique(traits)
-    uniq_traits <- uniq_traits[!is.na(uniq_traits)]
-    if (is.numeric(uniq_traits)) {
-      uniq_traits <- sort(uniq_traits)
-    }
-    
-    all_names <- get_state_names(state_names = uniq_traits,
-                                 num_concealed_states = length(uniq_traits))
-    colnames(Q) <- all_names
-    rownames(Q) <- all_names
-    return(Q)
+  }
+  uniq_traits <- unique(traits)
+  uniq_traits <- uniq_traits[!is.na(uniq_traits)]
+  if (is.numeric(uniq_traits)) {
+    uniq_traits <- sort(uniq_traits)
+  }
+  
+  all_names <- get_state_names(state_names = uniq_traits,
+                               num_concealed_states = num_concealed_states)
+  colnames(Q) <- all_names
+  rownames(Q) <- all_names
+  diag(Q) <- NA
+  return(Q)
 }
+
 
 
 #' @title Data checking and trait sorting
@@ -427,8 +396,7 @@ check_traits <- function(traits, sampling_fraction) {
 
         if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) ==
             FALSE) {
-            stop(
-                "Check your trait argument; if you have more than one column,
+            stop("Check your trait argument; if you have more than one column,
         make sure all your states are included in the first column."
             )
         }
@@ -460,9 +428,10 @@ check_root_state_weight <- function(root_state_weight, traits) {
     } else {
         if (any(root_state_weight == "maddison_weights" |
                 root_state_weight == "equal_weights" |
-                root_state_weight == "proper_weights") == FALSE) {
+                root_state_weight == "proper_weights" | 
+                root_state_weight == "stationary_weights") == FALSE) {
             stop("The root_state_weight must be any of 
-           maddison_weights, equal_weights, or proper_weights.")
+           maddison_weights, equal_weights, proper_weights or stationary_weights.")
         }
     }
 }
@@ -871,12 +840,16 @@ build_states <- function(phy,
                          num_unique_traits = NULL,
                          first_time = FALSE,
                          traitStates = NULL) {
+    if (length(phy$tip.label) == 1) {
+      if (length(traits) > 1) {
+        traits <- matrix(traits, nrow = 1, ncol = length(traits))
+      }
+    }
     if (!is.matrix(traits)) {
         traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
     }
-
     if (length(phy$tip.label) != nrow(traits)) {
-     stop("Number of species in the tree must be the same as in the trait file")
+      stop("Number of species in the tree must be the same as in the trait file")
     }
   
     # if there are traits that are not in the observed tree,
@@ -895,7 +868,7 @@ build_states <- function(phy,
     obs_traits <- unique(traits[, 1])
     obs_traits <- obs_traits[!is.na(obs_traits)]
     if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
-      stop("Tip traits are not in idparslist")
+      warning("Tip traits are not in idparslist")
     }
 
     nb_tip <- ape::Ntip(phy)
@@ -939,6 +912,29 @@ build_initStates_time <- function(phy,
                                   num_unique_traits = NULL,
                                   first_time = FALSE,
                                   traitStates = NULL) {
+
+    if (length(phy$tip.label) == 1) {
+      fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
+      fake_phy$edge.length[1:2] <- phy$edge.length[1]
+      
+      fake_traits <- matrix(data = rep(traits, 2),
+                            nrow = 2)
+      
+      states <- build_states(fake_phy,
+                             fake_traits,
+                             num_concealed_states,
+                             sampling_fraction,
+                             is_complete_tree,
+                             mus,
+                             num_unique_traits,
+                             first_time,
+                             traitStates)
+      phy$node.label <- NULL
+      states <- states[1, ] # only retain entry for one tip
+      forTime <- c(0, phy$edge.length)
+      ances <- NULL # this doesn't exist in a singleton tree
+    } else {
+  
     states <- build_states(phy,
                            traits,
                            num_concealed_states,
@@ -948,12 +944,14 @@ build_initStates_time <- function(phy,
                            num_unique_traits,
                            first_time,
                            traitStates)
-    phy$node.label <- NULL
-    split_times <- sort(event_times(phy), decreasing = FALSE)
-    ances <- as.numeric(names(split_times))
-
-    forTime <- cbind(phy$edge, phy$edge.length)
-
+    
+      phy$node.label <- NULL
+      split_times <- sort(event_times(phy), decreasing = FALSE)
+      ances <- as.numeric(names(split_times))
+      
+      forTime <- cbind(phy$edge, phy$edge.length)
+    }
+    
     return(list(
         states = states,
         ances = ances,
@@ -968,7 +966,8 @@ get_weight_states <- function(root_state_weight,
                               lambdas,
                               nodeM,
                               d,
-                              is_cla = FALSE) {
+                              is_cla = FALSE,
+                              Q) {
 
     if (is.numeric(root_state_weight)) {
         weight_states <- rep(root_state_weight / num_concealed_states,
@@ -998,8 +997,35 @@ get_weight_states <- function(root_state_weight,
         if (root_state_weight == "equal_weights") {
             weight_states <- rep(1 / length(mergeBranch), length(mergeBranch))
         }
+        
+        if (root_state_weight == "stationary_weights") {
+          diag(Q) <- 0
+          diag(Q) <- -rowSums(Q)
+          pi <- pracma::null(t(Q))
+          diff <- 1
+          dimpi2 <- dim(pi)[[2]]
+          if (dimpi2 > 1) {
+            warning('Null space of transition matrix is multidimensional;
+                    the most even dimension is used for weighing the likelihood.')
+          }
+          for(i in 1:dimpi2) {
+            if (pi[which.max(abs(pi[,i])),i] < 0) {
+              pi[,i] <- -pi[,i]
+            }
+            if (any(pi[,i] < 0) && max(abs(pi[which(pi[,i] < 0),i])) > 1E-10) {
+              warning('Substantial negative weights detected.')
+            }
+            pi[which(pi[,i] < 0),i] <- 0
+            pi[,i] <- pi[,i]/sum(pi[,i])
+            diff_new <- abs(max(pi[,i])) - abs(min(pi[,i]))
+            if (diff_new < diff) {
+               diff <- diff_new
+               i_choice <- i
+            }
+          }
+          weight_states <- pi[,i_choice]
+        }
     }
-
     return(weight_states)
 }
 
@@ -1138,7 +1164,7 @@ check_ml_conditions <- function(traits,
                                 idparsfix,
                                 parsfix) {
   if (is.matrix(traits)) {
-    warning("you are setting a model where some species have more
+    warning("You are setting up a model where some species have more
             than one trait state")
   }
   
@@ -1170,7 +1196,7 @@ check_ml_conditions <- function(traits,
 #' @keywords internal
 get_trait_states <- function(idparslist,
                              num_concealed_states,
-                             display_warning = TRUE) {
+                             display_warning = FALSE) {
   trait_names <- names(idparslist[[1]])
   if (is.null(trait_names)) trait_names <- names(idparslist[[2]])
   if (is.null(trait_names)) trait_names <- colnames(idparslist[[3]])
@@ -1319,4 +1345,4 @@ get_root_state <- function(ancestral_states, phy, mus, d) {
   
   names(root_state) <- names(mus)
   return(root_state)
-} 
+}

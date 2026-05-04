@@ -109,10 +109,7 @@ fixed factors, so use a constant within \code{functions_defining_params}.}
 \code{"proper_cond"} (default). For details, see vignette.}
 
 \item{root_state_weight}{the method to weigh the states:
-\code{"maddison_weights"}, \code{"proper_weights"} (default) or \code{"equal_weights"}.
-It can also be specified for the root state: the vector \code{c(1, 0, 0)}
-indicates state 1 was the root state. When
-using a \code{multiPhylo} object, root_state_weight should be list where each
+\code{"maddison_weights"}, \code{"proper_weights"} (default), \verb{"equal_weights"'. or }"stationary_weights"\verb{It can also be specified for the root state: the vector}c(1, 0, 0)\verb{ indicates state 1 was the root state. When using a}multiPhylo` object, root_state_weight should be list where each
 entry in the list corresponds to the root_state_weight for each tree.}
 
 \item{sampling_fraction}{vector that states the sampling proportion per

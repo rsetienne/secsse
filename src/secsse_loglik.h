@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "config.h"
 #include <cassert>
 #include <vector>
 #include <memory>
@@ -16,11 +17,6 @@
 
 namespace secsse {
 
-  // retreives value set by RcppParallel::setThreadOptions(numThreads)
-  // or tbb::task_arena::automatic if missing.
-  size_t get_rcpp_num_threads();
-
-  
   using state_ptr = std::vector<double>*;
 
   // Models of 'integration_node`

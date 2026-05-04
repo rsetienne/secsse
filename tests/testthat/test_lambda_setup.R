@@ -136,7 +136,60 @@ test_that("test q_doubletrans", {
   a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
   a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
   
-  a1 <- unique(as.vector(a1))
-  a2 <- unique(as.vector(a2))
-  testthat::expect_gt(length(a2), length(a1))
+  a1v <- unique(as.vector(a1))
+  a2v <- unique(as.vector(a2))
+  testthat::expect_gt(length(a2v), length(a1v))
+  
+  # test deprecated function
+  testthat::expect_warning(
+  a1_1 <- secsse::expand_q_matrix(masterBlock,
+                                  num_concealed_states = num_concealed_states,
+                                  diff.conceal = FALSE),
+  "This function is deprecated, please use q_doubletrans, piping result
+          to q_doubletrans, this may introduce inaccuracies."
+  )
+  # checking as vector, because expand_q_matrix mangles the trait names
+  testthat::expect_equal(as.vector(a1), as.vector(a1_1))
+  
+  # trigger alternative route, I don't know why this route exists
+  #masterBlock <- matrix(5.1, ncol = 3, nrow = 3, byrow = TRUE)
+  #diag(masterBlock) <- NA
+  #a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  #a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  
+  #a1 <- unique(as.vector(a1))
+  #a2 <- unique(as.vector(a2))
+  #testthat::expect_gt(length(a2), length(a1))
+  
+  traits <- c(2, 0, 1, 0, 2, 0, 1, 2, 2, 0)
+  num_concealed_states <- 3
+  masterBlock <- matrix(5, ncol = 3, nrow = 3, byrow = TRUE)
+  diag(masterBlock) <- NA
+  a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  testthat::expect_equal(max(a1, na.rm = TRUE), 5)
+  testthat::expect_equal(max(a2, na.rm = TRUE), 6)
+  
+  # less trivial example
+  traits <- c(1, 2, 3)
+  masterBlock <- matrix(c(0, 1, 0, 
+                          2, 0, 3, 
+                          0, 4, 0), ncol = 3, nrow = 3, byrow = TRUE)
+  diag(masterBlock) <- NA
+  a1 <- q_doubletrans(traits, masterBlock, diff.conceal = FALSE)
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE)
+  testthat::expect_equal(max(a1, na.rm = TRUE), 4)
+  testthat::expect_equal(max(a2, na.rm = TRUE), 8)
+  
+ 
+  a2 <- q_doubletrans(traits, masterBlock, diff.conceal = TRUE,
+                          num_concealed_states = 2)
+  ref_mat <- matrix(c(0, 1, 0, 5, 0, 0,
+                      2, 0, 3, 0, 5 ,0,
+                      0, 4, 0, 0, 0, 5,
+                      6, 0, 0, 0, 1, 0,
+                      0, 6, 0, 2, 0, 3,
+                      0, 0, 6, 0, 4, 0), nrow = 6, byrow = TRUE)
+  diag(ref_mat) <- NA
+  testthat::expect_equal(as.vector(a2), as.vector(ref_mat))
 })
