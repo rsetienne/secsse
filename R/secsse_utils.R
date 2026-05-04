@@ -916,9 +916,12 @@ build_initStates_time <- function(phy,
     if (length(phy$tip.label) == 1) {
       fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
       fake_phy$edge.length[1:2] <- phy$edge.length[1]
-       
+      
+      fake_traits <- matrix(data = rep(traits, 2),
+                            nrow = 2)
+      
       states <- build_states(fake_phy,
-                             c(traits, traits),
+                             fake_traits,
                              num_concealed_states,
                              sampling_fraction,
                              is_complete_tree,
