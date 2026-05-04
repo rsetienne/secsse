@@ -40,7 +40,7 @@ secsse_single_branch_loglik <- function(parameter,
     
     check_root_state_weight(root_state_weight, traits)
 
-    setting_calculation <- secsse:::build_initStates_time(phy,
+    setting_calculation <- build_initStates_time(phy,
                                                  traits,
                                                  num_concealed_states,
                                                  sampling_fraction,
