@@ -302,7 +302,8 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               idparsfix = idparsfix,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
-                              verbose = FALSE)
+                              verbose = FALSE,
+                              num_threads = 1)
 ```
 
 We can now extract several pieces of information from the returned
@@ -420,7 +421,8 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               idparsfix = idparsfix,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
-                              verbose = FALSE)
+                              verbose = FALSE,
+                              num_threads = 1)
 ML_CTD <- answ$ML
 CTD_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CTD
@@ -523,7 +525,8 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
                               idparsfix = idparsfix,
                               parsfix = initparsfix,
                               sampling_fraction = sampling_fraction,
-                              verbose = FALSE)
+                              verbose = FALSE,
+                              num_threads = 1)
 ML_CR <- answ$ML
 CR_par <- secsse::extract_par_vals(idparslist, answ$MLpars)
 ML_CR
