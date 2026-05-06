@@ -14,6 +14,7 @@ plot_state_exact(
   root_state_weight = "proper_weights",
   is_complete_tree = FALSE,
   method = "odeint::runge_kutta_cash_karp54",
+  num_threads = 1,
   atol = 1e-16,
   rtol = 1e-16,
   num_steps = 100,
@@ -59,6 +60,8 @@ extinct species is provided. If set to \code{TRUE}, it also assumes that all
 \code{"odeint::runge_kutta_cash_karp54"}, \code{"odeint::runge_kutta_fehlberg78"},
 \code{"odeint::runge_kutta_dopri5"}, \code{"odeint::bulirsch_stoer"} and
 \code{"odeint::runge_kutta4"}. Default method is: \code{"odeint::runge_kutta_cash_karp54"}.}
+
+\item{num_threads}{number of threads to be used. Default is one thread.}
 
 \item{atol}{A numeric specifying the absolute tolerance of integration.}
 

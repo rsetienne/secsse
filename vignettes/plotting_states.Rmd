@@ -42,11 +42,12 @@ diag(params[[3]]) <- NA
 
 
 ll <- secsse::secsse_loglik(parameter = params,
-                             phy = phy,
-                             traits = traits,
-                             num_concealed_states = 2,
-                             see_ancestral_states = TRUE,
-                             sampling_fraction = c(1, 1))
+                            phy = phy,
+                            traits = traits,
+                            num_concealed_states = 2,
+                            see_ancestral_states = TRUE,
+                            sampling_fraction = c(1, 1),
+                            num_threads = 1)
 ll
 ```
 
@@ -80,19 +81,21 @@ using 10-100 evaluations per branch provides a very accurate approximation:
 
 ```{r exact}
 secsse::plot_state_exact(parameters = params,
-                 phy = phy,
-                 traits = traits,
-                 num_concealed_states = 2,
-                 sampling_fraction = c(1, 1),
-                 prob_func = helper_function)
+                         phy = phy,
+                         traits = traits,
+                         num_concealed_states = 2,
+                         sampling_fraction = c(1, 1),
+                         prob_func = helper_function,
+                         num_threads = 1)
 
 secsse::plot_state_exact(parameters = params,
-                 phy = phy,
-                 traits = traits,
-                 num_concealed_states = 2,
-                 sampling_fraction = c(1, 1),
-                 num_steps = 10,
-                 prob_func = helper_function)
+                         phy = phy,
+                         traits = traits,
+                         num_concealed_states = 2,
+                         sampling_fraction = c(1, 1),
+                         num_steps = 10,
+                         prob_func = helper_function,
+                         num_threads = 1)
 
 secsse::plot_state_exact(parameters = params,
                  phy = phy,
@@ -100,7 +103,8 @@ secsse::plot_state_exact(parameters = params,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
                  num_steps = 100,
-                 prob_func = helper_function)
+                 prob_func = helper_function,
+                 num_threads = 1)
 ```
 
 # Using CLA secsse
@@ -159,6 +163,7 @@ secsse::plot_state_exact(parameters = parameter,
                          cond = "maddison_cond",
                          root_state_weight = "maddison_weights",
                          is_complete_tree = FALSE,
+                         num_threads = 1,
                          prob_func = helper_function,
                          num_steps = 10)
 ```

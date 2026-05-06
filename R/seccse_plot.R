@@ -141,6 +141,7 @@ plot_state_exact <- function(parameters,
                              root_state_weight = "proper_weights",
                              is_complete_tree = FALSE,
                              method = "odeint::runge_kutta_cash_karp54",
+                             num_threads = 1,
                              atol = 1e-16,
                              rtol = 1e-16,
                              num_steps = 100,
@@ -162,6 +163,7 @@ plot_state_exact <- function(parameters,
                                  is_complete_tree = is_complete_tree,
                                  atol = atol,
                                  rtol = rtol,
+                                 num_threads = num_threads,
                                  method = method)
 
   if (verbose) message("\nconverting collected likelihoods
