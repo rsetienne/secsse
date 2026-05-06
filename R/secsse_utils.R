@@ -396,8 +396,7 @@ check_traits <- function(traits, sampling_fraction) {
 
         if (all(sort(unique(as.vector(traits))) == sort(unique(traits[, 1]))) ==
             FALSE) {
-            stop(
-                "Check your trait argument; if you have more than one column,
+            stop("Check your trait argument; if you have more than one column,
         make sure all your states are included in the first column."
             )
         }
@@ -841,12 +840,16 @@ build_states <- function(phy,
                          num_unique_traits = NULL,
                          first_time = FALSE,
                          traitStates = NULL) {
+    if (length(phy$tip.label) == 1) {
+      if (length(traits) > 1) {
+        traits <- matrix(traits, nrow = 1, ncol = length(traits))
+      }
+    }
     if (!is.matrix(traits)) {
         traits <- matrix(traits, nrow = length(traits), ncol = 1, byrow = FALSE)
     }
-
     if (length(phy$tip.label) != nrow(traits)) {
-     stop("Number of species in the tree must be the same as in the trait file")
+      stop("Number of species in the tree must be the same as in the trait file")
     }
   
     # if there are traits that are not in the observed tree,
@@ -865,7 +868,7 @@ build_states <- function(phy,
     obs_traits <- unique(traits[, 1])
     obs_traits <- obs_traits[!is.na(obs_traits)]
     if (sum(obs_traits %in% traitStates) != length(obs_traits)) {
-      stop("Tip traits are not in idparslist")
+      warning("Tip traits are not in idparslist")
     }
 
     nb_tip <- ape::Ntip(phy)
@@ -909,6 +912,29 @@ build_initStates_time <- function(phy,
                                   num_unique_traits = NULL,
                                   first_time = FALSE,
                                   traitStates = NULL) {
+
+    if (length(phy$tip.label) == 1) {
+      fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
+      fake_phy$edge.length[1:2] <- phy$edge.length[1]
+      
+      fake_traits <- matrix(data = rep(traits, 2),
+                            nrow = 2)
+      
+      states <- build_states(fake_phy,
+                             fake_traits,
+                             num_concealed_states,
+                             sampling_fraction,
+                             is_complete_tree,
+                             mus,
+                             num_unique_traits,
+                             first_time,
+                             traitStates)
+      phy$node.label <- NULL
+      states <- states[1, ] # only retain entry for one tip
+      forTime <- c(0, phy$edge.length)
+      ances <- NULL # this doesn't exist in a singleton tree
+    } else {
+  
     states <- build_states(phy,
                            traits,
                            num_concealed_states,
@@ -918,12 +944,14 @@ build_initStates_time <- function(phy,
                            num_unique_traits,
                            first_time,
                            traitStates)
-    phy$node.label <- NULL
-    split_times <- sort(event_times(phy), decreasing = FALSE)
-    ances <- as.numeric(names(split_times))
-
-    forTime <- cbind(phy$edge, phy$edge.length)
-
+    
+      phy$node.label <- NULL
+      split_times <- sort(event_times(phy), decreasing = FALSE)
+      ances <- as.numeric(names(split_times))
+      
+      forTime <- cbind(phy$edge, phy$edge.length)
+    }
+    
     return(list(
         states = states,
         ances = ances,
@@ -1136,7 +1164,7 @@ check_ml_conditions <- function(traits,
                                 idparsfix,
                                 parsfix) {
   if (is.matrix(traits)) {
-    warning("you are setting a model where some species have more
+    warning("You are setting up a model where some species have more
             than one trait state")
   }
   

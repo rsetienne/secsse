@@ -1,3 +1,8 @@
+# 3.7.0
+- Fixed a major bug when doing Maximum Likelihood including data sets that have 
+singleton trees (e.g. trees with only one tip) has been fixed. All analyses on 
+such a data set being done with a secsse version prior to this are incorrect.
+
 # 3.6.1
 - added support for having a different number of concealed states compared to
 the number of observed states when creating a q_matrix using `q_doubletrans`.

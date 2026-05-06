@@ -83,16 +83,6 @@ master_ml <- function(phy,
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
   
   if (!is.list(traits)) {
-    
-    if (length(phy$tip.label) == 1) {
-      fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
-      fake_phy$edge.length[1:2] <- phy$edge.length[1]
-      old_phy <- phy
-      old_traits <- traits
-      phy <- fake_phy
-      traits <- c(traits, traits)
-    }
-    
     setting_calculation <- build_initStates_time(phy,
                                                  traits,
                                                  num_concealed_states,
@@ -103,16 +93,10 @@ master_ml <- function(phy,
                                                  traitStates = 
                                                    get_trait_states(idparslist,
                                                                     num_concealed_states, verbose))
-    if (length(phy$tip.label) == 1) {
-      setting_calculation$states <- setting_calculation$states[-2, ]
-      setting_calculation$forTime <- setting_calculation$forTime[-2, ]
-      phy <- old_phy
-      traits <- old_traits
-    }
+
   } else {
     setting_calculation <- list()
     for (i in 1:length(phy)) {
-      
       input_phy <- phy[[i]]
       input_traits <- traits[[i]]
       
@@ -121,14 +105,7 @@ master_ml <- function(phy,
       } else {
         input_sampling_fraction <- sampling_fraction
       }
-      
-      if (length(input_phy$tip.label) == 1) {
-        fake_phy <- ape::rphylo(n = 2, birth = 1, death = 0)
-        fake_phy$edge.length[1:2] <- input_phy$edge.length[1]
-        input_phy <- fake_phy
-        input_traits <- c(input_traits, input_traits)
-      }
-      
+  
       setting_calculation[[i]] <- build_initStates_time(phy = input_phy,
                                                         traits = input_traits,
                                                         num_concealed_states =

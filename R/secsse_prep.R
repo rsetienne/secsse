@@ -159,11 +159,10 @@ create_q_matrix <- function(state_names,
 
   diag(trans_matrix) <- NA
 
-  trans_matrix <- 
-    secsse::q_doubletrans(traits = state_names,
-                          masterBlock = trans_matrix,
-                          diff.conceal = diff.conceal,
-                          num_concealed_states = num_concealed_states)
+  trans_matrix <- q_doubletrans(traits = state_names,
+                                masterBlock = trans_matrix,
+                                diff.conceal = diff.conceal,
+                                num_concealed_states = num_concealed_states)
   
   all_state_names <- get_state_names(state_names, num_concealed_states)
   colnames(trans_matrix) <- all_state_names
@@ -190,9 +189,9 @@ expand_q_matrix <- function(q_matrix,
   
   traits <- get_state_names(names(q_matrix), num_concealed_states)
   
-  return(secsse::q_doubletrans(traits = traits,
-                               masterBlock = q_matrix,
-                               diff.conceal = diff.conceal))
+  return(q_doubletrans(traits = traits,
+                       masterBlock = q_matrix,
+                       diff.conceal = diff.conceal))
 }
 
 #' Helper function to create a default `shift_matrix` list
