@@ -46,8 +46,7 @@ ll <- secsse::secsse_loglik(parameter = params,
                             traits = traits,
                             num_concealed_states = 2,
                             see_ancestral_states = TRUE,
-                            sampling_fraction = c(1, 1),
-                            num_threads = 1)
+                            sampling_fraction = c(1, 1))
 ll
 ```
 
@@ -85,8 +84,7 @@ secsse::plot_state_exact(parameters = params,
                  traits = traits,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
-                 prob_func = helper_function,
-                 num_threads = 1)
+                 prob_func = helper_function)
 
 secsse::plot_state_exact(parameters = params,
                  phy = phy,
@@ -94,8 +92,7 @@ secsse::plot_state_exact(parameters = params,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
                  num_steps = 10,
-                 prob_func = helper_function,
-                 num_threads = 1)
+                 prob_func = helper_function)
 
 secsse::plot_state_exact(parameters = params,
                  phy = phy,
@@ -103,8 +100,7 @@ secsse::plot_state_exact(parameters = params,
                  num_concealed_states = 2,
                  sampling_fraction = c(1, 1),
                  num_steps = 100,
-                 prob_func = helper_function,
-                 num_threads = 1)
+                 prob_func = helper_function)
 ```
 
 # Using CLA secsse
@@ -164,7 +160,6 @@ secsse::plot_state_exact(parameters = parameter,
                          root_state_weight = "maddison_weights",
                          is_complete_tree = FALSE,
                          prob_func = helper_function,
-                         num_steps = 10,
-                         num_threads = 1)
+                         num_steps = 10)
 ```
 

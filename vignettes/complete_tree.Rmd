@@ -136,8 +136,7 @@ complete_tree_ml_CR <- secsse_ml(phy = sim_tree_complete$phy,
                                  idparsfix = idparsfix,
                                  parsfix = initparsfix,
                                  sampling_fraction = sampling_fraction,
-                                 verbose = FALSE,
-                                 num_threads = 1)
+                                 verbose = FALSE)
 ```
 
 Now we can see what our results look like.
@@ -196,8 +195,7 @@ reconstructed_tree_ml <- secsse_ml(phy = sim_tree_reconstructed$phy,
                                    parsfix = initparsfix,
                                    sampling_fraction = sampling_fraction,
                                    verbose = FALSE,
-                                   is_complete_tree = FALSE,
-                                   num_threads = 1)
+                                   is_complete_tree = FALSE)
 
 ```
 
