@@ -101,27 +101,28 @@ namespace secsse {
   }
 
 
-  inline inodes_t<terse::inode_t> find_inte_nodes(const std::vector<phy_edge_t>& phy_edge, rvector<const int> ances, std::vector<std::vector<double>>& states) {
+  inline inodes_t<terse::inode_t> find_inte_nodes(const std::vector<phy_edge_t>& phy_edge, rvector<const int> ances, std::vector<std::vector<double>>& states, const int num_threads) {
     auto res = inodes_t<terse::inode_t>{ances.size()};
     auto comp = [](auto& edge, size_t val) { return edge.n < val; };
-    tbb::parallel_for<int>(0, ances.size(), 1, [&](int i) {
-      const auto focal = ances[i];
-      auto& inode = res[i];
-      inode.state = &states[focal - 1];
-      inode.state->clear();   // 'dirty' condition
-      auto it0 = std::lower_bound(std::begin(phy_edge), std::end(phy_edge), focal, comp);
-      auto it1 = std::lower_bound(it0 + 1, std::end(phy_edge), focal, comp);
-      // the next thingy is easy to overlook: the sequence matters for creating 
-      // the 'merged' branch. imposes some pre-condition that is nowere to find :(
-      if (it0->m > it1->m) {
-        std::swap(it0, it1);
-      }
-      inode.desc[0] = { &states[it0->m - 1], it0->time };
-      inode.desc[1] = { &states[it1->m - 1], it1->time };
+    tbb::task_arena(num_threads).execute([&] {
+      tbb::parallel_for<int>(0, ances.size(), 1, [&](int i) {
+        const auto focal = ances[i];
+        auto& inode = res[i];
+        inode.state = &states[focal - 1];
+        inode.state->clear();   // 'dirty' condition
+        auto it0 = std::lower_bound(std::begin(phy_edge), std::end(phy_edge), focal, comp);
+        auto it1 = std::lower_bound(it0 + 1, std::end(phy_edge), focal, comp);
+        // the next thingy is easy to overlook: the sequence matters for creating 
+        // the 'merged' branch. imposes some pre-condition that is nowhere to find :(
+        if (it0->m > it1->m) {
+          std::swap(it0, it1);
+        }
+        inode.desc[0] = { &states[it0->m - 1], it0->time };
+        inode.desc[1] = { &states[it1->m - 1], it1->time };
+      });
     });
     return res;
   }
-
 
   template <typename RaIt>
   inline double normalize_loglik(RaIt first, RaIt last) {
@@ -230,7 +231,8 @@ namespace secsse {
   template <typename INTEGRATOR>
   inline calc_ll_res calc_ll(const INTEGRATOR& integrator,
                              inodes_t<terse::inode_t>& inodes,
-                             std::vector<std::vector<double>>& /* in/out */ states)
+                             std::vector<std::vector<double>>& /* in/out */ states,
+                             int num_threads)
   {
     const auto d = integrator.size();
     auto is_dirty = [](const auto& inode) {
@@ -238,8 +240,10 @@ namespace secsse {
     };
     for (auto first = std::begin(inodes); first != std::end(inodes) ;) {
       auto last = std::partition(first, std::end(inodes), std::not_fn(is_dirty));
-      tbb::parallel_for_each(first, last, [&](auto& inode) {
-        integrator(inode);
+      tbb::task_arena(num_threads).execute([&] {
+        tbb::parallel_for_each(first, last, [&](auto& inode) {
+          integrator(inode);
+        });
       });
       first = last;
     }

@@ -65,7 +65,10 @@ namespace tbb {
     }
   }
         
-
+  class task_arena {
+    task_arena(size_t /*num_threads*/) {});
+    template<typename Func> void execute(const Func& f) { f(); }
+  };
 } // namespce tbb
 
 

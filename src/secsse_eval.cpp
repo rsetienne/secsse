@@ -38,14 +38,15 @@ Rcpp::List eval(std::unique_ptr<ODE> od,
     tstates.emplace_back(states.row(i).begin(), states.row(i).end());
   }
   const auto phy_edge = make_phy_edge_vector(rmatrix<const double>(forTime));
-  auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates);
+  auto inodes = find_inte_nodes(phy_edge, rvector<const int>(ances), tstates, num_threads);
   auto integrator = Integrator<ODE, NORMALIZER>(std::move(od), method, atol, rtol);
-  calc_ll(integrator, inodes, tstates);
+  calc_ll(integrator, inodes, tstates, num_threads);
   
   // integrate over each edge
   auto snodes = inodes_t<storing::inode_t>(std::begin(inodes),
                                            std::end(inodes));
-  tbb::parallel_for_each(std::begin(snodes), std::end(snodes), 
+  tbb::task_arena(num_threads).execute([&] {
+    tbb::parallel_for_each(std::begin(snodes), std::end(snodes), 
                          [&](auto& snode) {
 #ifdef SECSSE_NESTED_PARALLELISM      
                            tbb::parallel_for(0, 2, [&](size_t i) {
@@ -56,6 +57,7 @@ Rcpp::List eval(std::unique_ptr<ODE> od,
                            integrator(snode.desc[1], num_steps);
 #endif      
                          });
+  });
   // convert to Thijs's data layout:
   // rows of [ances, focal, t, [probs]]
   const size_t nrow = 2 * snodes.size() * (num_steps + 1);
