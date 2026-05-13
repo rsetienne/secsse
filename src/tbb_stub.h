@@ -23,11 +23,11 @@
 
 namespace tbb {
 
-  namespace task_arena {
+ // namespace task_arena {
 
-    constexpr size_t automatic = size_t(-1);
+ //   constexpr size_t automatic = size_t(-1);
 
-  } // namespace task_arena
+ // } // namespace task_arena
   
   
   class global_control {
