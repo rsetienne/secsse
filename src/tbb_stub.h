@@ -66,10 +66,11 @@ namespace tbb {
   }
         
   class task_arena {
+  public:
     task_arena(size_t /*num_threads*/) {};
     template<typename Func> void execute(const Func& f) { f(); }
   };
-} // namespce tbb
+} // namespace tbb
 
 
 // function name is lying. 
