@@ -23,11 +23,11 @@
 
 namespace tbb {
 
-  namespace task_arena {
+ // namespace task_arena {
 
-    constexpr size_t automatic = size_t(-1);
+ //   constexpr size_t automatic = size_t(-1);
 
-  } // namespace task_arena
+ // } // namespace task_arena
   
   
   class global_control {
@@ -65,8 +65,13 @@ namespace tbb {
     }
   }
         
-
-} // namespce tbb
+  class task_arena {
+  public:
+    task_arena(size_t /* num_threads */ ) {};
+    template<typename Func> void execute(const Func& f) { f(); }
+    static const size_t automatic = size_t(-1);
+  };
+} // namespace tbb
 
 
 // function name is lying. 
