@@ -370,6 +370,9 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
 
     ## Note: you set some transitions as impossible to happen.
 
+    ## The maximum likelihood is: -97.3457404623158.
+    ## The corresponding parameters are: 0.570504 1.003686 0.1712141 0.2626209 0.08318085 1.016712e-15 5.631846e-05 0.5619413
+
 We can now extract several pieces of information from the returned
 answer:
 
@@ -567,6 +570,9 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
 
     ## Note: you set some transitions as impossible to happen.
 
+    ## The maximum likelihood is: -99.6805458478936.
+    ## The corresponding parameters are: 0.6936912 0.7115379 0.0009876522 0.5816323 0.07875882 2.899761e-16 6.039034e-14 0.8699983
+
 ``` r
 
 ML_CTD <- answ$ML
@@ -749,6 +755,9 @@ answ <- secsse::cla_secsse_ml(phy = phylo_vignette,
 ```
 
     ## Note: you set some transitions as impossible to happen.
+
+    ## The maximum likelihood is: -99.6417589830801.
+    ## The corresponding parameters are: 0.6923512 1.022085e-14 0.07759612 4.296702e-08 0.7491917 0.1104975
 
 ``` r
 

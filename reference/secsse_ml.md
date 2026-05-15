@@ -337,6 +337,8 @@ startingpoint <- DDD::bd_ML(brts = ape::branching.times(phylotree))
 #> 106 15.4959900024837 15.7798135534044 25.2823767246439 contract inside 
 #> 107 15.4958325900067 15.7796667883301 25.2823767251057 contract inside 
 #> Optimization has terminated successfully. 
+#> The maximum likelihood is: 25.2823767251057.
+#> The corresponding parameters are: 15.49583 15.77967
 #> 
 #> Maximum likelihood parameter estimates: lambda0: 15.495833, mu0: 15.779667, lambda1: 0.000000, mu1: 0.000000: 
 #> Maximum loglikelihood: 25.282377
@@ -370,6 +372,8 @@ optimmethod,
 num_cycles = 1,
 verbose = FALSE)
 #> Note: you set some transitions as impossible to happen.
+#> The maximum likelihood is: -16.0891136729296.
+#> The corresponding parameters are: 2.946004 5.138243 6.153466 33.28571
 # model$ML
 # [1] -16.47099
 ```

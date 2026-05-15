@@ -132,6 +132,8 @@ complete_tree_ml_CR <- secsse_ml(phy = sim_tree_complete$phy,
                                  sampling_fraction = sampling_fraction,
                                  verbose = FALSE)
 #> Note: you set some transitions as impossible to happen.
+#> The maximum likelihood is: -118.922570823483.
+#> The corresponding parameters are: 1.204038 0.6272724 0.1110798 0.1179893
 ```
 
 Now we can see what our results look like.
@@ -254,6 +256,8 @@ reconstructed_tree_ml <- secsse_ml(phy = sim_tree_reconstructed$phy,
                                    verbose = FALSE,
                                    is_complete_tree = FALSE)
 #> Note: you set some transitions as impossible to happen.
+#> The maximum likelihood is: -104.796234253476.
+#> The corresponding parameters are: 0.5927429 2.51771e-16 0.0402775 8.885236e-08
 ```
 
 ``` r
@@ -356,7 +360,7 @@ knitr::kable(
 | Transition rate 01 |          0.0402775 |     0.1110798 |                   0.1 |
 | Transition rate 10 |          0.0000001 |     0.1179893 |                   0.1 |
 
-We see that including extinct species results in a better esimation
+We see that including extinct species results in a better estimation
 particularly of the extinction rate. This effect is especially
 noticeable if there are many extinct species present in the tree.
 Additionally, we see that the estimation of the transition rate from

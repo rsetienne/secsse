@@ -365,6 +365,8 @@ startingpoint<-bd_ML(brts = ape::branching.times(phylotree))
 #> 153 0.0564834411465597 1.1641772011865e-15 -104.592829268096 reflect 
 #> 154 0.0564834411465597 1.1641772011865e-15 -104.592829268096 contract outside 
 #> Optimization has terminated successfully. 
+#> The maximum likelihood is: -104.592829268096.
+#> The corresponding parameters are: 0.05648344 1.164177e-15
 #> 
 #> Maximum likelihood parameter estimates: lambda0: 0.056483, mu0: 0.000000, lambda1: 0.000000, mu1: 0.000000: 
 #> Maximum loglikelihood: -104.592829
@@ -437,6 +439,8 @@ maxiter,
 optimmethod,
 num_cycles = 1)
 #> Note: you set some transitions as impossible to happen.
+#> The maximum likelihood is: -136.694315489689.
+#> The corresponding parameters are: 0.05617057 0.02667858 6.3125
 #> Warning: Optimization has not converged. Try again with different initial values or increase the number of iterations.
 print(model$ML)
 #> NULL

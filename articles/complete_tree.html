@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">Pedro Santos
 Neves</h4>
             
-            <h4 data-toc-skip class="date">2026-05-04</h4>
+            <h4 data-toc-skip class="date">2026-05-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rsetienne/secsse/blob/master/vignettes/complete_tree.Rmd" class="external-link"><code>vignettes/complete_tree.Rmd</code></a></small>
       <div class="d-none name"><code>complete_tree.Rmd</code></div>
@@ -195,7 +195,9 @@ enables secsse to use the information present in extinct lineages.</p>
 <span>                                 parsfix <span class="op">=</span> <span class="va">initparsfix</span>,</span>
 <span>                                 sampling_fraction <span class="op">=</span> <span class="va">sampling_fraction</span>,</span>
 <span>                                 verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Note: you set some transitions as impossible to happen.</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: you set some transitions as impossible to happen.</span></span>
+<span><span class="co">#&gt; The maximum likelihood is: -118.922570823483.</span></span>
+<span><span class="co">#&gt; The corresponding parameters are: 1.204038 0.6272724 0.1110798 0.1179893</span></span></code></pre></div>
 <p>Now we can see what our results look like.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">CR_par_complete</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/extract_par_vals.html">extract_par_vals</a></span><span class="op">(</span><span class="va">idparslist</span>, <span class="va">complete_tree_ml_CR</span><span class="op">$</span><span class="va">MLpars</span><span class="op">)</span></span>
@@ -307,7 +309,9 @@ specification the same.</p>
 <span>                                   sampling_fraction <span class="op">=</span> <span class="va">sampling_fraction</span>,</span>
 <span>                                   verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                                   is_complete_tree <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Note: you set some transitions as impossible to happen.</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: you set some transitions as impossible to happen.</span></span>
+<span><span class="co">#&gt; The maximum likelihood is: -104.796234253476.</span></span>
+<span><span class="co">#&gt; The corresponding parameters are: 0.5927429 2.51771e-16 0.0402775 8.885236e-08</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">reconstructed_tree_ml_CR</span> <span class="op">&lt;-</span> <span class="va">reconstructed_tree_ml</span><span class="op">$</span><span class="va">ML</span></span>
 <span><span class="va">CR_par_reconstructed</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/extract_par_vals.html">extract_par_vals</a></span><span class="op">(</span></span>
@@ -438,7 +442,7 @@ specification the same.</p>
 </tr>
 </tbody>
 </table>
-<p>We see that including extinct species results in a better esimation
+<p>We see that including extinct species results in a better estimation
 particularly of the extinction rate. This effect is especially
 noticeable if there are many extinct species present in the tree.
 Additionally, we see that the estimation of the transition rate from

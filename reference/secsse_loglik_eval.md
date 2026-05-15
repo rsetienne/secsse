@@ -293,6 +293,6 @@ secsse_loglik_eval(parameter = params,
 #> [7,]     0     0
 #> 
 #> $duration
-#> [1] 0.000121929
+#> [1] 0.000168784
 #> 
 ```

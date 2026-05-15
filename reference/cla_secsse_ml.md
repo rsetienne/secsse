@@ -324,6 +324,8 @@ startingpoint <- bd_ML(brts = ape::branching.times(phylotree))
 #> 106 15.4959900024837 15.7798135534044 25.2823767246439 contract inside 
 #> 107 15.4958325900067 15.7796667883301 25.2823767251057 contract inside 
 #> Optimization has terminated successfully. 
+#> The maximum likelihood is: 25.2823767251057.
+#> The corresponding parameters are: 15.49583 15.77967
 #> 
 #> Maximum likelihood parameter estimates: lambda0: 15.495833, mu0: 15.779667, lambda1: 0.000000, mu1: 0.000000: 
 #> Maximum loglikelihood: 25.282377
@@ -358,5 +360,7 @@ model <- cla_secsse_ml(
  num_threads = 1,
  verbose = FALSE)
 #> Note: you set some transitions as impossible to happen.
+#> The maximum likelihood is: -89.790084619363.
+#> The corresponding parameters are: 4.627376 14.31114 14.18926
 # [1] -90.9763
 ```

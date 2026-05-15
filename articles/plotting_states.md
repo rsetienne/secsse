@@ -30,11 +30,11 @@ diag(params[[3]]) <- NA
 
 
 ll <- secsse::secsse_loglik(parameter = params,
-                             phy = phy,
-                             traits = traits,
-                             num_concealed_states = 2,
-                             see_ancestral_states = TRUE,
-                             sampling_fraction = c(1, 1))
+                            phy = phy,
+                            traits = traits,
+                            num_concealed_states = 2,
+                            see_ancestral_states = TRUE,
+                            sampling_fraction = c(1, 1))
 ```
 
     ## Warning: Deduced names and order of used states to be: 0, 1

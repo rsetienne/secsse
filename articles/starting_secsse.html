@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">secsse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">Thijs
 Janzen</h4>
             
-            <h4 data-toc-skip class="date">2026-05-04</h4>
+            <h4 data-toc-skip class="date">2026-05-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rsetienne/secsse/blob/master/vignettes/starting_secsse.Rmd" class="external-link"><code>vignettes/starting_secsse.Rmd</code></a></small>
       <div class="d-none name"><code>starting_secsse.Rmd</code></div>
@@ -400,31 +400,33 @@ traits.</p>
 <span>                              sampling_fraction <span class="op">=</span> <span class="va">sampling_fraction</span>,</span>
 <span>                              verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Note: you set some transitions as impossible to happen.</span></span></code></pre>
+<pre><code><span><span class="co">## The maximum likelihood is: -97.3457404623158.</span></span>
+<span><span class="co">## The corresponding parameters are: 0.570504 1.003686 0.1712141 0.2626209 0.08318085 1.016712e-15 5.631846e-05 0.5619413</span></span></code></pre>
 <p>We can now extract several pieces of information from the returned
 answer:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ML_ETD</span> <span class="op">&lt;-</span> <span class="va">answ</span><span class="op">$</span><span class="va">ML</span></span>
 <span><span class="va">ETD_par</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/extract_par_vals.html">extract_par_vals</a></span><span class="op">(</span><span class="va">idparslist</span>, <span class="va">answ</span><span class="op">$</span><span class="va">MLpars</span><span class="op">)</span></span>
 <span><span class="va">ML_ETD</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] -97.34574</span></span></code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ETD_par</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 5.705040e-01 1.003686e+00 1.712141e-01 2.626209e-01 8.318085e-02</span></span>
 <span><span class="co">## [6] 1.016712e-15 5.631846e-05 5.619413e-01</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spec_rates</span> <span class="op">&lt;-</span> <span class="va">ETD_par</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">ext_rates</span> <span class="op">&lt;-</span> <span class="va">ETD_par</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
 <span><span class="va">Q_Examined</span> <span class="op">&lt;-</span> <span class="va">ETD_par</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
 <span><span class="va">Q_Concealed</span> <span class="op">&lt;-</span> <span class="va">ETD_par</span><span class="op">[</span><span class="fl">7</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span></span>
 <span><span class="va">spec_rates</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.570504 1.003686</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ext_rates</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.1712141 0.2626209</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Q_Examined</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 8.318085e-02 1.016712e-15</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Q_Concealed</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 5.631846e-05 5.619413e-01</span></span></code></pre>
 <p>The function <code><a href="../reference/extract_par_vals.html">extract_par_vals()</a></code> goes over the list
@@ -446,7 +448,7 @@ straightforward now that we have gotten the hang of how this works.</p>
 <p>Again, we specify two distinct rates, indicating that the observed
 state inherits faithfully to the daughter species. However, this time,
 we set the model indicator to “CTD”:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spec_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">spec_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">spec_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">spec_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">spec_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -495,7 +497,7 @@ B.</p>
 <h4 id="mu-vector-1">Mu vector<a class="anchor" aria-label="anchor" href="#mu-vector-1"></a>
 </h4>
 <p>For the mu vector, we repeat the same we did for the ETD model:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mu_vec</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/create_mu_vector.html">create_mu_vector</a></span><span class="op">(</span>state_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                                   num_concealed_states <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                                   model <span class="op">=</span> <span class="st">"CTD"</span>,</span>
@@ -513,7 +515,7 @@ concealed state A.</p>
 </h4>
 <p>Setting up the transition matrix is not different from the ETD model,
 the same transitions are possible:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shift_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">shift_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">shift_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">shift_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">shift_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span>
@@ -534,7 +536,7 @@ the same transitions are possible:</p>
 </h4>
 <p>Now that we have specified our matrices, we can use the same code we
 used for the ETD model to perform our maximum likelihood:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">idparsopt</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span> <span class="co"># our maximum rate parameter was 8</span></span>
 <span><span class="va">idparsfix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span> <span class="co"># we want to keep all zeros at zero</span></span>
 <span><span class="va">initparsopt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">8</span><span class="op">)</span></span>
@@ -557,29 +559,31 @@ used for the ETD model to perform our maximum likelihood:</p>
 <span>                              sampling_fraction <span class="op">=</span> <span class="va">sampling_fraction</span>,</span>
 <span>                              verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Note: you set some transitions as impossible to happen.</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## The maximum likelihood is: -99.6805458478936.</span></span>
+<span><span class="co">## The corresponding parameters are: 0.6936912 0.7115379 0.0009876522 0.5816323 0.07875882 2.899761e-16 6.039034e-14 0.8699983</span></span></code></pre>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ML_CTD</span> <span class="op">&lt;-</span> <span class="va">answ</span><span class="op">$</span><span class="va">ML</span></span>
 <span><span class="va">CTD_par</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/extract_par_vals.html">extract_par_vals</a></span><span class="op">(</span><span class="va">idparslist</span>, <span class="va">answ</span><span class="op">$</span><span class="va">MLpars</span><span class="op">)</span></span>
 <span><span class="va">ML_CTD</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] -99.68055</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">CTD_par</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6.936912e-01 7.115379e-01 9.876522e-04 5.816323e-01 7.875882e-02</span></span>
 <span><span class="co">## [6] 2.899761e-16 6.039034e-14 8.699983e-01</span></span></code></pre>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spec_rates</span> <span class="op">&lt;-</span> <span class="va">CTD_par</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">ext_rates</span> <span class="op">&lt;-</span> <span class="va">CTD_par</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
 <span><span class="va">Q_Examined</span> <span class="op">&lt;-</span> <span class="va">CTD_par</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
 <span><span class="va">Q_Concealed</span> <span class="op">&lt;-</span> <span class="va">CTD_par</span><span class="op">[</span><span class="fl">7</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span></span>
 <span><span class="va">spec_rates</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.6936912 0.7115379</span></span></code></pre>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ext_rates</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.0009876522 0.5816323407</span></span></code></pre>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Q_Examined</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 7.875882e-02 2.899761e-16</span></span></code></pre>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Q_Concealed</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6.039034e-14 8.699983e-01</span></span></code></pre>
 <p>Here we now find that state A has a very low speciation rate, in
@@ -603,7 +607,7 @@ a good sanity check.</p>
 </h4>
 <p>To specify the lambda matrices, this time we choose the same rate
 indicator across both states.</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spec_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">spec_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">spec_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">spec_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">spec_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -645,7 +649,7 @@ indicator across both states.</p>
 </h4>
 <p>The mu vector follows closely from this, having a shared extinction
 rate across all states:</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mu_vec</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/create_mu_vector.html">create_mu_vector</a></span><span class="op">(</span>state_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                                   num_concealed_states <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                                   model <span class="op">=</span> <span class="st">"CR"</span>,</span>
@@ -663,7 +667,7 @@ transition matrix (both forward and reverse trait shifts) should share
 the same rate. Here, we will choose the more parameter-rich version
 (Home assignment: try to modify the code to perform an analysis in which
 all rates in the transition matrix are the same).</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shift_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">shift_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">shift_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">shift_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">shift_matrix</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
@@ -682,7 +686,7 @@ all rates in the transition matrix are the same).</p>
 <div class="section level4">
 <h4 id="maximum-likelihood-2">Maximum Likelihood<a class="anchor" aria-label="anchor" href="#maximum-likelihood-2"></a>
 </h4>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">idparsopt</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span> <span class="co"># our maximum rate parameter was 6</span></span>
 <span><span class="va">idparsfix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span> <span class="co"># we want to keep all zeros at zero</span></span>
 <span><span class="va">initparsopt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">6</span><span class="op">)</span></span>
@@ -705,29 +709,31 @@ all rates in the transition matrix are the same).</p>
 <span>                              sampling_fraction <span class="op">=</span> <span class="va">sampling_fraction</span>,</span>
 <span>                              verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Note: you set some transitions as impossible to happen.</span></span></code></pre>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## The maximum likelihood is: -99.6417589830801.</span></span>
+<span><span class="co">## The corresponding parameters are: 0.6923512 1.022085e-14 0.07759612 4.296702e-08 0.7491917 0.1104975</span></span></code></pre>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ML_CR</span> <span class="op">&lt;-</span> <span class="va">answ</span><span class="op">$</span><span class="va">ML</span></span>
 <span><span class="va">CR_par</span> <span class="op">&lt;-</span> <span class="fu">secsse</span><span class="fu">::</span><span class="fu"><a href="../reference/extract_par_vals.html">extract_par_vals</a></span><span class="op">(</span><span class="va">idparslist</span>, <span class="va">answ</span><span class="op">$</span><span class="va">MLpars</span><span class="op">)</span></span>
 <span><span class="va">ML_CR</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] -99.64176</span></span></code></pre>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">CR_par</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6.923512e-01 1.022085e-14 7.759612e-02 4.296702e-08 7.491917e-01</span></span>
 <span><span class="co">## [6] 1.104975e-01</span></span></code></pre>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spec_rate</span> <span class="op">&lt;-</span> <span class="va">CR_par</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">ext_rate</span> <span class="op">&lt;-</span>  <span class="va">CR_par</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">Q_Examined</span> <span class="op">&lt;-</span> <span class="va">CR_par</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
 <span><span class="va">Q_Concealed</span> <span class="op">&lt;-</span> <span class="va">CR_par</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
 <span><span class="va">spec_rate</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.6923512</span></span></code></pre>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ext_rate</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 1.022085e-14</span></span></code></pre>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Q_Examined</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 7.759612e-02 4.296702e-08</span></span></code></pre>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Q_Concealed</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.7491917 0.1104975</span></span></code></pre>
 <p>We now recover a non-zero extinction rate, and much higher transition
@@ -741,7 +747,7 @@ rates for the concealed than for the observed states.</p>
 compare the models using AIC. Remembering that the AIC is 2k - 2LL,
 where k is the number of parameters of each model and LL is the Log
 Likelihood, we can calculate this as follows:</p>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>ll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ML_ETD</span>, <span class="va">ML_CTD</span>, <span class="va">ML_CR</span><span class="op">)</span>,</span>
 <span>                  k  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">6</span><span class="op">)</span>,</span>
 <span>                  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ETD"</span>, <span class="st">"CTD"</span>, <span class="st">"CR"</span><span class="op">)</span><span class="op">)</span></span>
