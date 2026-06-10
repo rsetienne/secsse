@@ -14,7 +14,7 @@ using namespace Rcpp;
 #include "util.h"
 
 #include <RcppParallel.h>
-
+#include <tbb/flow_graph.h>
 
 using state_vec  = std::vector<double>; 
 using state_node = tbb::flow::function_node< state_vec, state_vec>;
@@ -95,9 +95,9 @@ public:
               int n_threads,
               std::string m) :
   od(od_in), ances(ances_in), for_time(for_time_in), states(states_in), num_threads(n_threads), d(od_in.get_d()), method(m) {
-    if (num_threads < 0) {
-      num_threads = tbb::task_scheduler_init::default_num_threads();
-    }
+   // if (num_threads < 0) {
+    //  num_threads = tbb::task_scheduler_init::default_num_threads();
+  //  }
   }
   
   ~threaded_ll() {
@@ -112,9 +112,9 @@ public:
   
   Rcpp::List calc_ll() {
     
-    tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
+   // tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
     
-   // tbb::global_control   gc(tbb::global_control::max_allowed_parallelism, num_threads);
+    tbb::global_control   gc(tbb::global_control::max_allowed_parallelism, num_threads);
     
     int num_tips = ances.size() + 1;
     

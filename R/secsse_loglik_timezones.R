@@ -175,11 +175,13 @@ secsse_loglik_timezones <- function(parameter,
     mergeBranch2 <- mergeBranch2 / (lambdas1 * (1 - nodeM[1:d]) ^ 2)
   }
   
-  
+
   wholeLike <- sum((mergeBranch2) * (weightStates))
+  
+  
   LL <- log(wholeLike) + loglik - penalty(pars = parameter,
                                           loglik_penalty = loglik_penalty)
-  
+
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):nrow(states), ]

@@ -214,9 +214,15 @@ secsse_loglik <- function(parameter,
 
   
   wholeLike <- sum((mergeBranch2) * (weightStates))
+  
+  if (log(wholeLike) > 10) {
+    #cat("HELLO WTF\n")
+    #a <- 5
+  }
+  
   LL <- log(wholeLike) + loglik - penalty(pars = parameter,
                                           loglik_penalty = loglik_penalty)
-  
+  cat(loglik, log(wholeLike), LL, "\n")
   if (see_ancestral_states == TRUE) {
     num_tips <- ape::Ntip(phy)
     ancestral_states <- states[(num_tips + 1):nrow(states), ]

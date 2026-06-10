@@ -75,3 +75,4 @@ test_that("secsse gives the same result as hisse", {
     testthat::expect_equal(y2, z4, tolerance = 1e-4)  # is different LL, diff 0.0118
   }
 })
+

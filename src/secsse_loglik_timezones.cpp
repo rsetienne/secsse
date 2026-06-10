@@ -126,7 +126,6 @@ double calc_ll_timezone_break(const Rcpp::List& params,
                               double absolute_tol,
                               double relative_tol,
                               std::string method) {
-  
   long double loglik = 0.0;
   
   Rcpp::List loc = params[0];
@@ -156,7 +155,7 @@ double calc_ll_timezone_break(const Rcpp::List& params,
       // now we need to integrate the branch.
       // First, we have to find the integrator at the start
       int start_index = get_time_index(start_t, crit_t);
-      int end_index = get_time_index(end_t, crit_t);
+      int end_index   = get_time_index(end_t, crit_t);
       
       if (start_index == end_index) {
         // simple integration, easy peasy:
@@ -195,8 +194,8 @@ double calc_ll_timezone_break(const Rcpp::List& params,
           odeintcpp::integrate(method,
                                std::move(od_ptr), // ode class object
                                y, // state vector
-                               0.0, // t0
-                               t1 - t0, //t1
+                               t0, // t0
+                               t1, //t1
                                (t1 - t0) * 0.1,
                                absolute_tol,
                                relative_tol);
@@ -217,7 +216,6 @@ double calc_ll_timezone_break(const Rcpp::List& params,
     normalize_loglik_node(nodeM, loglik);
     normalize_loglik_node(nodeN, loglik);
     
-    // code correct up till here.
     for (int i = 0; i < d; ++i) {
       mergeBranch[i] = nodeM[i + d] * nodeN[i + d] * ll1[i];
     }
