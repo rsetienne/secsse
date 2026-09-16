@@ -158,8 +158,7 @@ Rcpp::NumericVector ct_condition_cpp(const std::string rhs,
   else if (rhs == "ode_cla") {
     auto ll = Rcpp::as<Rcpp::List>(lambdas);
 
-    return ct_condition(std::make_unique<ode_cla<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol,
-                        use_normalization);
+    return ct_condition(std::make_unique<ode_cla<OdeVariant::ct_condition>>(ll, mus, Q), state, t, method, atol, rtol, use_normalization);
   } 
   else {
     throw std::runtime_error("ct_condition_cpp: unknown rhs");
