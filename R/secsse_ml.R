@@ -71,6 +71,8 @@ master_ml <- function(phy,
   trparsfix <- parsfix / (1 + parsfix)
   trparsfix[which(parsfix == Inf)] <- 1
   
+  trpars_index <- make_trpars_index(idparslist)
+  
   mus <- calc_mus(is_complete_tree,
                   idparslist,
                   idparsfix,
@@ -156,7 +158,8 @@ master_ml <- function(phy,
                                         verbose = ll_verbose,
                                         use_normalization = use_normalization,
                                         return_root_state = FALSE,
-                                        max_rate = max_rate)
+                                        max_rate = max_rate,
+                                        trpars_index = trpars_index)
   # Function here
   if (verbose) print_init_ll(initloglik = initloglik)
   
@@ -195,7 +198,8 @@ master_ml <- function(phy,
                           verbose = ll_verbose,
                           use_normalization = use_normalization,
                           return_root_state = FALSE,
-                          max_rate = max_rate)
+                          max_rate = max_rate,
+                          trpars_index = trpars_index)
     if (out$conv != 0) {
       warning("Optimization has not converged. Try again with different initial values or increase the number of iterations.")
       out2 <- out
@@ -413,7 +417,8 @@ secsse_loglik_choosepar <- function(trparsopt,
                                     verbose,
                                     use_normalization,
                                     return_root_state,
-                                    max_rate) {
+                                    max_rate,
+                                    trpars_index) {
   alltrpars <- c(trparsopt, trparsfix)
   
   # orig param back conversion
@@ -426,7 +431,8 @@ secsse_loglik_choosepar <- function(trparsopt,
   } else {
     pars1 <- secsse_transform_parameters(trparsopt, trparsfix,
                                          idparsopt, idparsfix,
-                                         idparslist, structure_func)
+                                         idparslist, structure_func,
+                                         trpars_index)
     
     loglik <- master_loglik(parameter = pars1,
                             phy = phy,

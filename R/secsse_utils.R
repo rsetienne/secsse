@@ -541,6 +541,87 @@ update_values_transform_cla2 <- function(trpars,
   return(trpars)
 }
 
+## ============================================================
+## 1. Build the index ONCE
+## ============================================================
+
+make_trpars_index <- function(idparslist) {
+  # max_rate
+  max_rate <- max(unlist(idparslist), na.rm = TRUE)
+  
+  idx1 <- lapply(idparslist[[1]], function(x) {
+    lapply(0:max_rate, function(id) which(x == id))
+  })
+  
+  idx2 <- lapply(0:max_rate, function(id) {
+    which(idparslist[[2]] == id)
+  })
+  
+  idx3 <- lapply(0:max_rate, function(id) {
+    which(idparslist[[3]] == id)
+  })
+  
+ out <- list(
+    idx1 = idx1,
+    idx2 = idx2,
+    idx3 = idx3
+  )
+  return(out)
+}
+
+## ============================================================
+## 2. Fast one-pass update function
+## ============================================================
+
+update_values_transform_cla_onepass <- function(trpars, 
+                                                index, 
+                                                idpars, 
+                                                parvals ) { 
+  if (length(idpars) == 0L) { return(trpars) } 
+
+  max_rate <- max(idpars)
+  
+  values <- numeric(max_rate) 
+  present <- logical(max_rate) 
+  for (k in seq_along(idpars)) { 
+    ii <- idpars[k] + 1L 
+    values[ii] <- parvals[k] 
+    present[ii] <- TRUE 
+  } 
+  ids <- which(present) - 1L 
+  ## [[1]] 
+  for (j in seq_along(trpars[[1]])) { 
+    x <- trpars[[1]][[j]]
+    idx <- index$idx1[[j]] # local locations to replace
+    for (id in ids) { 
+      pos <- idx[[id + 1L]] 
+      if (length(pos)) { 
+        x[pos] <- values[id + 1L] 
+      } 
+    }
+    trpars[[1]][[j]] <- x 
+  } 
+  ## [[2]] 
+  x <- trpars[[2]] 
+  for (id in ids) { 
+    pos <- index$idx2[[id + 1L]] 
+    if (length(pos)) { 
+      x[pos] <- values[id + 1L] 
+    } 
+  } 
+  trpars[[2]] <- x 
+  ## [[3]] 
+  x <- trpars[[3]] 
+  for (id in ids) { 
+    pos <- index$idx3[[id + 1L]] 
+    if (length(pos)) { 
+      x[pos] <- values[id + 1L] 
+    } 
+  } 
+  trpars[[3]] <- x 
+  trpars 
+}
+
 
 #' @keywords internal
 transform_params_cla <- function(idparslist,
@@ -550,7 +631,15 @@ transform_params_cla <- function(idparslist,
                                  trparsopt,
                                  structure_func,
                                  idparsfuncdefpar,
-                                 trparfuncdefpar) {
+                                 trparfuncdefpar,
+                                 trpars_index) {
+  
+  trparsopt <- trparsopt[1:length(idparsopt)]
+  trparsfix <- trparsfix[1:length(idparsfix)]
+  if (!is.null(structure_func)) {
+    trparfuncdefpar <- trparfuncdefpar[1:length(idparsfuncdefpar)]
+  }
+  
   trpars1 <- idparslist
   for (j in seq_len(nrow(trpars1[[3]]))) {
     trpars1[[1]][[j]][, ] <- NA
@@ -560,38 +649,33 @@ transform_params_cla <- function(idparslist,
     trpars1[[j]][] <- NA
   }
   
-  if (length(idparsfix) != 0) {
-    trpars1 <- update_values_transform_cla2(trpars1,
-                                            idparslist,
-                                            idparsfix,
-                                            trparsfix)
-  }
+  if (is.null(trpars_index)) stop("no trpars_index found")
+  
+  idpars <- c(
+    idparsfix,
+    idparsopt,
+    if (!is.null(structure_func)) idparsfuncdefpar else NULL
+  )
+  
+  parvals <- c(
+    trparsfix,
+    trparsopt,
+    if (!is.null(structure_func)) trparfuncdefpar else NULL
+  )
+  
+  trpars1 <- update_values_transform_cla_onepass(
+    trpars = trpars1,
+    index = trpars_index,
+    idpars = idpars,
+    parvals = parvals
+  )
+  
 
-  trpars1 <- update_values_transform_cla2(trpars1,
-                                          idparslist,
-                                          idparsopt,
-                                          trparsopt)
-
+  pars1 <- trpars1
+  pars1[[1]] <- lapply( trpars1[[1]], function(x) x / (1 - x) ) 
   
-  ## structure_func part
-  if (!is.null(structure_func)) {
-    trpars1 <- update_values_transform_cla2(trpars1,
-                                            idparslist,
-                                            idparsfuncdefpar,
-                                            trparfuncdefpar)
-  }
-  
-  pre_pars1 <- list()
-  pars1 <- list()
-  
-  for (j in seq_len(nrow(trpars1[[3]]))) {
-    pre_pars1[[j]] <- trpars1[[1]][[j]][, ] / (1 - trpars1[[1]][[j]][, ])
-  }
-  
-  pars1[[1]] <- pre_pars1
-  for (j in 2:3) {
-    pars1[[j]] <- trpars1[[j]] / (1 - trpars1[[j]])
-  }
+  pars1[[2]] <- trpars1[[2]] / (1 - trpars1[[2]]) 
+  pars1[[3]] <- trpars1[[3]] / (1 - trpars1[[3]])
   
   return(pars1)
 }
@@ -655,7 +739,8 @@ secsse_transform_parameters <- function(trparsopt,
                                         idparsopt,
                                         idparsfix,
                                         idparslist,
-                                        structure_func) {
+                                        structure_func,
+                                        trpars_index) {
   if (!is.null(structure_func)) {
     idparsfuncdefpar <- structure_func[[1]]
     functions_defining_params <- structure_func[[2]]
@@ -683,14 +768,17 @@ secsse_transform_parameters <- function(trparsopt,
   
   if (is.list(idparslist[[1]])) {
     # when the ml function is called from cla_secsse
-    pars1 <- transform_params_cla(idparslist,
-                                  idparsfix,
-                                  trparsfix,
-                                  idparsopt,
-                                  trparsopt,
-                                  structure_func,
-                                  idparsfuncdefpar,
-                                  trparfuncdefpar)
+    
+    pars1 <- transform_params_cla(idparslist = idparslist,
+                                 idparsfix = idparsfix,
+                                 trparsfix = trparsfix,
+                                 idparsopt = idparsopt,
+                                 trparsopt = trparsopt,
+                                 structure_func = structure_func,
+                                 idparsfuncdefpar = idparsfuncdefpar,
+                                 trparfuncdefpar = trparfuncdefpar,
+                                 trpars_index = trpars_index)
+
   } else {
     # when non-cla option is called
     pars1 <- transform_params_normal(idparslist,
@@ -785,7 +873,7 @@ update_complete_tree <- function(phy,
                               lambdas,
                               mus,
                               q_matrix,
-                              method,
+                              method, # "odeint::runge_kutta_dopri5",
                               atol,
                               rtol,
                               use_normalization)
