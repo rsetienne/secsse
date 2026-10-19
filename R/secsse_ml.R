@@ -84,6 +84,11 @@ master_ml <- function(phy,
   
   num_modeled_traits <- length(idparslist[[1]]) / num_concealed_states
   
+  # check input
+  check_model_inputs(root_state_weight, sampling_fraction, num_modeled_traits)
+  if (inherits(phy, "phylo")) check_tree(phy, is_complete_tree)
+  else for (p in phy) if (ape::Ntip(p) > 1) check_tree(p, is_complete_tree)
+  
   if (!is.list(traits)) {
     setting_calculation <- build_initStates_time(phy,
                                                  traits,

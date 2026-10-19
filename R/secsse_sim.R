@@ -116,7 +116,11 @@ secsse_sim <- function(lambdas,
       return(res)
     }
     
-    if (length(res$phy$tip.label) != length(res$obs_traits)) {
+    if (!non_extinction && res$status %in% c("extinction", "requirements not met")) {
+      return(res)
+    }
+    if (is.list(res$phy) &&
+        length(res$phy$tip.label) != length(res$obs_traits)) {
       message("something went wrong, please report this to the package maintainer")
     }
     
@@ -127,7 +131,7 @@ secsse_sim <- function(lambdas,
       }
       
       # if not, we have to subsample
-      set.seed(seed)
+      if (seed >= 0) set.seed(seed)
       all_traits <- names(mus)
       for (i in 1:length(all_traits)) {
         all_traits[i] <- substr(all_traits[i], 1, (nchar(all_traits[i]) - 1))

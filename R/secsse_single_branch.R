@@ -38,7 +38,7 @@ secsse_single_branch_loglik <- function(parameter,
   
   if (is.null(setting_calculation)) {
     
-    check_root_state_weight(root_state_weight, traits)
+    check_model_inputs(root_state_weight, sampling_fraction, num_modeled_traits)
 
     setting_calculation <- build_initStates_time(phy,
                                                  traits,
@@ -55,9 +55,11 @@ secsse_single_branch_loglik <- function(parameter,
 
   d <- length(states) / 3
   
-  if (!is.null(phy$root.edge)) {
-    forTime[2] <- forTime[2] + phy$root.edge
-  }
+  has_root_edge <- take_into_account_root_edge &&
+    !is.null(phy$root.edge) && phy$root.edge > 0
+  
+  if (has_root_edge) forTime[2] <- forTime[2] + phy$root.edge
+  if (is_complete_tree) stop("complete trees with a single tip are not supported")
   
   RcppParallel::setThreadOptions(numThreads = num_threads)
   
@@ -80,7 +82,7 @@ secsse_single_branch_loglik <- function(parameter,
   nodeM <- calcul$states
   mergeBranch <- calcul$merge_branch
   
-  S <- nodeM[(2 * d + 1):(3 * d)]
+  S <- if (using_cla) nodeM[(2 * d + 1):(3 * d)] else 1 - nodeM[1:d]
   
   #if (length(nodeM) > 2 * d) nodeM <- nodeM[1:(2 * d)]
   
@@ -97,7 +99,7 @@ secsse_single_branch_loglik <- function(parameter,
                             mergeBranch,
                             weight_states,
                             lambdas,
-                            is_root_edge = TRUE,
+                            is_root_edge = has_root_edge,
                             S)
   wholeLike <- sum((mergeBranch2) * (weight_states))
   

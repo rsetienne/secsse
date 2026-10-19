@@ -900,12 +900,10 @@ create_states <- function(usetraits,
                           ly,
                           mus,
                           nb_tip) {
-  if (anyNA(usetraits)) {
-    nas <- which(is.na(traits))
-    for (iii in seq_along(nas)) {
-      states[nas[iii], ] <- c(1 - rep(sampling_fraction, num_concealed_states),
-                              rep(sampling_fraction, 2 * num_concealed_states))
-    }
+  unknown_tips <- which(rowSums(!is.na(as.matrix(traits))) == 0)
+  for (tip in unknown_tips) {
+    states[tip, ] <- c(1 - rep(sampling_fraction, num_concealed_states),
+                       rep(sampling_fraction, 2 * num_concealed_states))
   }
   
   for (iii in seq_along(traitStates)) {  # Initial state probabilities
@@ -921,10 +919,8 @@ create_states <- function(usetraits,
     extinct_species <- geiger::is.extinct(phy)
     if (!is.null(extinct_species)) {
       for (i in seq_along(extinct_species)) {
-        
-        indices <- c(which(phy$tip.label == extinct_species[i]), (d + 1):ly) 
-        
-        states[indices] <- mus * states[indices]
+        row <- which(phy$tip.label == extinct_species[i])
+        states[row, (d + 1):ly] <- mus * states[row, (d + 1):ly]
       }
     }
     for (iii in 1:nb_tip) {
@@ -1454,4 +1450,48 @@ get_root_state <- function(ancestral_states, phy, mus, d) {
   
   names(root_state) <- names(mus)
   return(root_state)
+}
+
+
+
+#' @keywords internal
+check_model_inputs <- function(root_state_weight,
+                               sampling_fraction,
+                               num_obs_states) {
+# suggested addition by Claude
+  check_one_sf <- function(sf) {
+    if (!is.numeric(sf) || length(sf) != num_obs_states) {
+      stop("sampling_fraction must have one value per observed state (",
+           num_obs_states, "), in the order of the states in idparslist")
+    }
+    if (any(is.na(sf)) || any(sf <= 0 | sf > 1)) {
+      stop("sampling_fraction values must be in (0, 1]")
+    }
+  }
+  check_one_rsw <- function(rsw) {
+    if (is.numeric(rsw)) {
+      if (length(rsw) != num_obs_states) {
+        stop("numeric root_state_weight must have one value per observed state (",
+             num_obs_states, ")")
+      }
+      if (any(is.na(rsw)) || any(rsw < 0) || abs(sum(rsw) - 1) > 1e-8) {
+        stop("root_state_weight must be non-negative and sum to 1")
+      }
+    } else if (!rsw %in% c("maddison_weights", "equal_weights",
+                           "proper_weights", "stationary_weights")) {
+      stop("root_state_weight must be maddison_weights, equal_weights, ",
+           "proper_weights, stationary_weights or a numeric vector")
+    }
+  }
+  if (is.list(sampling_fraction)) lapply(sampling_fraction, check_one_sf)
+  else check_one_sf(sampling_fraction)
+  if (is.list(root_state_weight)) {
+    # multi_loglik treats NA / empty entries as "proper_weights"
+    for (rsw in root_state_weight) {
+      if (length(rsw) > 0 && !anyNA(rsw)) check_one_rsw(rsw)
+    }
+  } else {
+    check_one_rsw(root_state_weight)
+  }
+  invisible(TRUE)
 }
