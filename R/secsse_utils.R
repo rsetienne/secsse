@@ -181,7 +181,6 @@ sortingtraits <- function(trait_info, phy) {
   }
   
   trait_info <- trait_info[match(phy$tip.label, trait_info[, 1]), ]
-  trait_info[, 1] == phy$tip.label
   
   if (ncol(trait_info) == 2) {
     traits <- as.numeric(trait_info[, 2])
@@ -793,13 +792,6 @@ secsse_transform_parameters <- function(trparsopt,
   return(pars1)
 }
 
-condition_root_edge <- function(mergeBranch2,
-                                nodeM) {
-  # note that we don't do maddison conditioning here.
-  
-}
-
-
 #' @keywords internal
 condition <- function(cond,
                       mergeBranch2,
@@ -873,7 +865,7 @@ update_complete_tree <- function(phy,
                               lambdas,
                               mus,
                               q_matrix,
-                              method, # "odeint::runge_kutta_dopri5",
+                              method,
                               atol,
                               rtol,
                               use_normalization)
@@ -930,11 +922,9 @@ create_states <- function(usetraits,
     if (!is.null(extinct_species)) {
       for (i in seq_along(extinct_species)) {
         
-        entry <- mus * states[which(phy$tip.label == extinct_species[i]), 
-                              (d + 1):ly]
+        indices <- c(which(phy$tip.label == extinct_species[i]), (d + 1):ly) 
         
-        states[which(phy$tip.label == extinct_species[i]), (d + 1):ly] <-
-          mus * states[which(phy$tip.label == extinct_species[i]), (d + 1):ly]
+        states[indices] <- mus * states[indices]
       }
     }
     for (iii in 1:nb_tip) {
@@ -1357,8 +1347,8 @@ extract_data <- function(mat) {
       entry <- mat[i, j]
       if (!is.na(entry)) {
         if (entry > 0) {
-          x <- colnames(mat)[i]
-          y <- rownames(mat)[j]
+          x <- rownames(mat)[i]
+          y <- colnames(mat)[j]
           to_plot <- rbind(to_plot, c(x, y, entry))
         }
       }

@@ -232,7 +232,6 @@ generate_phy <- function(mus,
   if (start_at_crown == FALSE && sum(Ltable[, 4] == -1) == 1) {
     # fake phy
     phy <- ape::rphylo(n = 2, birth = 0.2, death = 0)
-    phy$edge.length[-2]
     phy$tip.label <- phy$tip.label[-2]
     phy$edge <- phy$edge[-2, ]
     phy$edge <- matrix(data = phy$edge, nrow = 1) # important!

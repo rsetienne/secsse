@@ -209,7 +209,8 @@ master_ml <- function(phy,
                                               idparsopt,
                                               idparsfix,
                                               idparslist,
-                                              structure_func)
+                                              structure_func,
+                                              trpars_index)
       out2 <- list(MLpars = ml_pars1,
                    ML = as.numeric(unlist(out$fvalues)),
                    conv = out$conv)
