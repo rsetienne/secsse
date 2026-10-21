@@ -1,3 +1,12 @@
+# 3.8.0
+- Fixed a major bug miscalculating the likelihood for complete trees
+- Fixed incorrect likelihood for trees with root edge
+- Fixed incorrect bookkeeping of simulations starting at the root
+- Fixed conditioning of simulations on observed states
+- Patched a mismatch between observed and concealed states when setting up the
+mu vector
+- Removed superfluous code and added additional checks
+
 # 3.7.0
 - Fixed a major bug when doing Maximum Likelihood including data sets that have 
 singleton trees (e.g. trees with only one tip) has been fixed. All analyses on 
