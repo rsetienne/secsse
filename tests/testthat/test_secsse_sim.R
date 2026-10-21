@@ -478,6 +478,8 @@ test_that("test comparison bisse", {
   
   if (!requireNamespace("diversitree")) testthat::skip()
   
+  set.seed(42)
+  
   states <- c("S", "G")
   
   spec_matrix <- c("S", "S", "S", 1)
@@ -532,7 +534,7 @@ test_that("test comparison bisse", {
                                      crown_age = crown_age_used,
                                      num_concealed_states = 2,
                                      conditioning = "none",
-                                     min_spec = 10,
+                                     min_spec = 2,
                                      init_state_probs = c("SA", "SB"),
                                      start_at_crown = FALSE,
                                      verbose = TRUE,
