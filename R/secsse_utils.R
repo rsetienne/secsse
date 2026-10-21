@@ -855,7 +855,7 @@ update_complete_tree <- function(phy,
                                  rtol,
                                  lmb,
                                  use_normalization) {
-  time_inte <- max(abs(ape::branching.times(phy))) # nolint
+  time_inte <- max(ape::node.depth.edgelength(phy)) # nolint
   
   if (is.list(lambdas)) {
     y <- rep(0, lmb)
@@ -868,7 +868,7 @@ update_complete_tree <- function(phy,
                               method,
                               atol,
                               rtol,
-                              use_normalization)
+                              FALSE) # don't normalise for this one
     nodeM <- c(nodeM, y) # nolint
   } else {
     y <- rep(0, 2 * lmb)
@@ -881,7 +881,7 @@ update_complete_tree <- function(phy,
                               method,
                               atol,
                               rtol,
-                              use_normalization)
+                              FALSE) # don't normalise for this one
   }
   return(nodeM)
 }

@@ -89,7 +89,7 @@ sim_tree_complete <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                         qs = sim_q_matrix,
                                         crown_age = 5,
                                         num_concealed_states = 2,
-                                        seed = 40,
+                                        seed = 3,
                                         drop_extinct = FALSE)
 
 if (requireNamespace("diversitree")) {
@@ -137,6 +137,7 @@ complete_tree_ml_CR <- secsse_ml(phy = sim_tree_complete$phy,
                                  parsfix = initparsfix,
                                  sampling_fraction = sampling_fraction,
                                  verbose = FALSE,
+                                 is_complete_tree = TRUE,
                                  num_threads = 1)
 ```
 
@@ -170,7 +171,7 @@ sim_tree_reconstructed <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                              qs = sim_q_matrix,
                                              crown_age = 5,
                                              num_concealed_states = 2,
-                                             seed = 40,
+                                             seed = 3,
                                              drop_extinct = TRUE)
 
 if (requireNamespace("diversitree")) {

@@ -208,7 +208,7 @@ test_that("test secsse_sim init_state_probs and complete tree", {
                                    qs = q_mat_p,
                                    crown_age = 10,
                                    num_concealed_states = 2,
-                                   max_spec = 100,
+                                   max_spec = 101,
                                    min_spec = 100,
                                    max_species_extant = FALSE,
                                    seed = 21,
