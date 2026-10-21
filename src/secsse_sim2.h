@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include <limits>
 #include <array>
 #include <random>
 #include <tuple>
@@ -320,6 +321,12 @@ struct secsse_sim {
           break;
         }
       }
+      
+      if (!crown_start && track_crowns[0] + track_crowns[1] < 1) {
+        // stem mode: whole clade extinct after the crown formed
+        run_info = extinct;
+        break;
+      }
 
       if (max_spec_extant) {
         if (track_crowns[0] + track_crowns[1] >= max_spec) {
@@ -504,6 +511,7 @@ struct secsse_sim {
     double total_rate = rates[shift] +
                         rates[extinction] +
                         rates[speciation];
+    if (total_rate <= 0.0) return std::numeric_limits<double>::infinity();
     std::exponential_distribution<double> exp_dist(total_rate);
     return exp_dist(rndgen_);
   }
