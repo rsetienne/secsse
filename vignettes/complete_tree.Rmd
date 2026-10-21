@@ -257,7 +257,6 @@ care should be exercised with model selection and specification when fitting
 secsse to empirical datasets to make predictions about evolutionary patterns.
 
 ## References
-
 Nee S, May RM, Harvey PH. The reconstructed evolutionary process. Philos Trans 
 R Soc Lond B Biol Sci. 1994 May 28;344(1309):305-11. 
 https://doi.org/10.1098/rstb.1994.0068.
