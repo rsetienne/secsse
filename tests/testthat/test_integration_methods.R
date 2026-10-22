@@ -41,6 +41,8 @@ test_that("loglik for different integrators", {
                                                 root_state_weight = root_state_weight,
                                                 sampling_fraction = sampling_fraction,
                                                 method = integ_method,
+                                                use_normalization = 
+                                                  integ_method != "odeint::runge_kutta_dopri5",
                                                 display_warning = FALSE))
     testthat::expect_equal(loglik1, loglik2, tolerance = 0.01)
   }

@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include <limits>
 #include <array>
 #include <random>
 #include <tuple>
@@ -277,7 +278,7 @@ struct secsse_sim {
         run_info = done;
         return;
       }
-      if (track_crowns[0] + track_crowns[1] < 1) {
+      if (!crown_start  && track_crowns[0] + track_crowns[1] < 1) {
         run_info = extinct;
         return;
       }
@@ -319,6 +320,12 @@ struct secsse_sim {
           run_info = extinct;
           break;
         }
+      }
+      
+      if (!crown_start && track_crowns[0] + track_crowns[1] < 1) {
+        // stem mode: whole clade extinct after the crown formed
+        run_info = extinct;
+        break;
       }
 
       if (max_spec_extant) {
@@ -442,6 +449,9 @@ struct secsse_sim {
     if (num_empty == lambda_distributions.size()) {
       Rcpp::stop("all speciation rates are zero - this makes it impossible to create a crown from a root state, \nplease set one rate to a very low non-zero rate");   // NOLINT.
     }
+    if (lambda_distributions[root_state].indices.empty()) {
+      Rcpp::stop("the root state has zero speciation rate, so no crown can be formed");
+    }
 
     // calculate if the other crown lineage is the same trait:
     auto mother_trait = root_state;
@@ -501,6 +511,7 @@ struct secsse_sim {
     double total_rate = rates[shift] +
                         rates[extinction] +
                         rates[speciation];
+    if (total_rate <= 0.0) return std::numeric_limits<double>::infinity();
     std::exponential_distribution<double> exp_dist(total_rate);
     return exp_dist(rndgen_);
   }
@@ -558,7 +569,7 @@ struct secsse_sim {
       if (!i.is_dead()) {
         int trait = static_cast<int>(i.get_trait());
 
-        trait = num_concealed_states > 0 ? trait % num_concealed_states : trait;
+        trait = num_concealed_states > 0 ? trait % total_num_traits : trait;
 
         focal_traits[trait]++;
       }
@@ -576,23 +587,19 @@ struct secsse_sim {
   }
 
   void check_custom_conditioning(const std::vector<double>& condition_vec,
-                                 int num_concealed_traits) {
+                                 int num_obs_traits) {
     std::map<int, int> histogram;
-
     for (const auto& i : L) {
-      int trait = static_cast<int>(i.get_trait()) % num_concealed_traits;
-        histogram[trait]++;
+      int trait = static_cast<int>(i.get_trait()) % num_obs_traits;
+      histogram[trait]++;
     }
-
     for (const auto& c : condition_vec) {
       if (histogram.find(c) == histogram.end()) {
         run_info = conditioning;
         return;
       }
     }
-
     run_info = done;
-    return;
   }
 
   std::vector<int> get_traits() {
@@ -609,7 +616,7 @@ struct secsse_sim {
                           size_t num_concealed_states,
                           size_t num_states,
                           const std::vector<double>& condition_vec) {
-    if (run_info == extinct) return;
+    if (run_info == extinct || run_info == overshoot) return;
 
     if (conditioning_type == "none") {
       run_info = done;
@@ -627,7 +634,7 @@ struct secsse_sim {
 
     if (conditioning_type == "custom") {
       // do something
-      check_custom_conditioning(condition_vec, num_concealed_states);
+      check_custom_conditioning(condition_vec, num_states / num_concealed_states);
     }
 
     return;

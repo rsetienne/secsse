@@ -1,3 +1,12 @@
+# 3.8.0
+- Fixed a major bug miscalculating the likelihood for complete trees
+- Fixed incorrect likelihood for trees with root edge
+- Fixed incorrect bookkeeping of simulations starting at the root
+- Fixed conditioning of simulations on observed states
+- Patched a mismatch between observed and concealed states when setting up the
+mu vector
+- Removed superfluous code and added additional checks
+
 # 3.7.0
 - Added usage of tbb::task_arena in order to more effectively control the number
 of threads used.

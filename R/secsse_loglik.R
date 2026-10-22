@@ -19,6 +19,11 @@ master_loglik <- function(parameter,
                           use_normalization = TRUE,
                           return_root_state = FALSE) {
   
+  if (use_normalization && grepl("dopri5", method)) {
+    stop("method 'odeint::runge_kutta_dopri5' is not compatible with ",
+         "use_normalization = TRUE; use another method or set it to FALSE")
+  }
+  
   if (is.list(phy)) {
     if (!inherits(phy, "phylo")) {
       if (!inherits(phy, "multiPhylo")) {
@@ -95,6 +100,8 @@ master_loglik <- function(parameter,
                                  num_concealed_states, display_warning)
   
   if (is.null(setting_calculation)) {
+    check_model_inputs(root_state_weight, sampling_fraction, num_modeled_traits)
+
     check_input(traits,
                 phy,
                 sampling_fraction,
@@ -153,7 +160,6 @@ master_loglik <- function(parameter,
   S <- nodeM[(2 * d + 1):(3 * d)]
   
   if (using_cla && !is_complete_tree) {
-    
     if (any(is.na(S))) {
       S <- 1 - E
     } 
@@ -180,10 +186,10 @@ master_loglik <- function(parameter,
       nodeM <- calcul2$states
       
       mergeBranch <- calcul2$merge_branch
+      E <- nodeM[1:d]
+      S <- if (using_cla && !is_complete_tree) nodeM[(2 * d + 1):(3 * d)] else 1 - E
     }
   }
-  
-  
   
   ## At the root
   weight_states <- get_weight_states(root_state_weight,

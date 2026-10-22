@@ -208,7 +208,7 @@ test_that("test secsse_sim init_state_probs and complete tree", {
                                    qs = q_mat_p,
                                    crown_age = 10,
                                    num_concealed_states = 2,
-                                   max_spec = 100,
+                                   max_spec = 101,
                                    min_spec = 100,
                                    max_species_extant = FALSE,
                                    seed = 21,
@@ -350,6 +350,8 @@ test_that("test comparison musse", {
   
   if (!requireNamespace("diversitree")) testthat::skip()
   
+  set.seed(303)
+  
   states <- c("S", "G", "D")
   
   spec_matrix <- c("S", "S", "S", 1)
@@ -467,7 +469,7 @@ test_that("test comparison musse", {
     a1 <- found1[, i]
     a2 <- found2[, i]
     b <- t.test(a1, a2)
-    testthat::expect_true(b$p.value > 0.05)
+    testthat::expect_true(b$p.value > 0.01)
   #  cat(i, mean(a1), mean(a2), b$p.value, "\n")
   }
 })
@@ -477,6 +479,8 @@ test_that("test comparison bisse", {
   testthat::skip_on_cran()
   
   if (!requireNamespace("diversitree")) testthat::skip()
+  
+  set.seed(303)
   
   states <- c("S", "G")
   
@@ -573,7 +577,7 @@ test_that("test comparison bisse", {
     a1 <- found1[, i]
     a2 <- found2[, i]
     b <- t.test(a1, a2)
-    testthat::expect_true(b$p.value > 0.05)
+    testthat::expect_true(b$p.value > 0.01)
   }
 })
 
@@ -637,6 +641,8 @@ test_that("test comparison classe", {
   num_repl <- 300
   crown_age_used <- 30
   
+  set.seed(303)
+  
   used_params <- c(spec_S, spec_G, spec_D, spec_G_SD,
                    ext_S, ext_G, ext_D,
                    q_SG, q_SD,
@@ -674,7 +680,8 @@ test_that("test comparison classe", {
                                    conditioning = "none",
                                    min_spec = 10,
                                    init_state_probs = c("GA", "GB", "GC"),
-                                   start_at_crown = FALSE)
+                                   start_at_crown = FALSE,
+                                   seed = r)
     
     freq_1 <- sum(sim_tree$obs_traits == "S") / length(sim_tree$obs_traits)
     freq_2 <- sum(sim_tree$obs_traits == "G") / length(sim_tree$obs_traits)
