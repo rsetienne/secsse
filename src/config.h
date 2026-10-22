@@ -36,7 +36,7 @@
 #define SECSSE_DEFAULT_EVAL_DTF 0.1
 
 // Uncomment to enable nested parallelism.
-// This feature may improve or may deterioate performance.
+// This feature may improve or may deteriorate performance.
 // Default is disabled.
 //#define SECSSE_NESTED_PARALLELISM
 
