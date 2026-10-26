@@ -1464,8 +1464,8 @@ check_model_inputs <- function(root_state_weight,
       stop("sampling_fraction must have one value per observed state (",
            num_obs_states, "), in the order of the states in idparslist")
     }
-    if (any(is.na(sf)) || any(sf <= 0 | sf > 1)) {
-      stop("sampling_fraction values must be in (0, 1]")
+    if (any(is.na(sf)) || any(sf < 0 | sf > 1)) {
+      stop("sampling_fraction values must be in [0, 1]")
     }
   }
   check_one_rsw <- function(rsw) {
