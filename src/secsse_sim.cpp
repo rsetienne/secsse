@@ -98,7 +98,9 @@ Rcpp::List secsse_sim_cpp(const std::vector<double>& m_R,
                  verbose);
   std::array<double, 6> tracker = {0, 0, 0, 0, 0, 0};
   std::vector<int> tree_size_hist;
-  if (return_tree_size_hist) tree_size_hist = std::vector<int>(max_tries + 1, -1);
+  if (return_tree_size_hist) 
+    tree_size_hist = std::vector<int>(max_tries + 1, -1);
+
   int cnt = 0;
   while (true) {
     sim.run();

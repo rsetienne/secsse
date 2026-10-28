@@ -321,7 +321,7 @@ struct secsse_sim {
           break;
         }
       }
-      
+
       if (!crown_start && track_crowns[0] + track_crowns[1] < 1) {
         // stem mode: whole clade extinct after the crown formed
         run_info = extinct;
@@ -450,7 +450,7 @@ struct secsse_sim {
       Rcpp::stop("all speciation rates are zero - this makes it impossible to create a crown from a root state, \nplease set one rate to a very low non-zero rate");   // NOLINT.
     }
     if (lambda_distributions[root_state].indices.empty()) {
-      Rcpp::stop("the root state has zero speciation rate, so no crown can be formed");
+      Rcpp::stop("the root state has zero speciation rate, so no crown can be formed"); // NOLINT.
     }
 
     // calculate if the other crown lineage is the same trait:
@@ -634,7 +634,8 @@ struct secsse_sim {
 
     if (conditioning_type == "custom") {
       // do something
-      check_custom_conditioning(condition_vec, num_states / num_concealed_states);
+      check_custom_conditioning(condition_vec,
+                                num_states / num_concealed_states);
     }
 
     return;
