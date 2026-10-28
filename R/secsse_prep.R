@@ -167,8 +167,6 @@ create_q_matrix <- function(state_names,
   all_state_names <- get_state_names(state_names, num_concealed_states)
   colnames(trans_matrix) <- all_state_names
   rownames(trans_matrix) <- all_state_names
-  diag(trans_matrix) <- NA
-
   return(trans_matrix)
 }
 
@@ -290,15 +288,18 @@ create_mu_vector <- function(state_names,
 
   if (model == "ETD") {
     for (i in 1:num_obs_states) {
-      indices <- seq(i, length(mus), by = num_concealed_states)
+      # states are ordered 0A, 1A, ..., 0B, 1B, ...: states sharing an
+      # observed trait are num_obs_states apart
+      indices <- seq(i, length(mus), by = num_obs_states)
       mus[indices] <- focal_rate
       focal_rate <- focal_rate + 1
     }
   }
   if (model == "CTD") {
+    # one rate per concealed state, shared by all observed states within it
     mus <- c()
-    for (i in 1:num_obs_states) {
-      mus <- c(mus, rep(focal_rate, num_concealed_states))
+    for (j in 1:num_concealed_states) {
+      mus <- c(mus, rep(focal_rate, num_obs_states))
       focal_rate <- focal_rate + 1
     }
   }

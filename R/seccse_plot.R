@@ -163,8 +163,8 @@ plot_state_exact <- function(parameters,
                                  is_complete_tree = is_complete_tree,
                                  atol = atol,
                                  rtol = rtol,
-                                 method = method,
-                                 num_threads = num_threads)
+                                 num_threads = num_threads,
+                                 method = method)
 
   if (verbose) message("\nconverting collected likelihoods
                        to graph positions:\n")
@@ -278,7 +278,7 @@ collect_node_bars <- function(to_plot,
     }
     y <- sort(y)
 
-    probs <- states[parent, ]
+    probs <- states[parent, 1:(2 * ncol(states) / 3)]   # E and D only, as on branches
     rel_prob <- prob_func(probs)
     node_bars[node_bars_cnt, ] <- c(start_x, y, rel_prob)
     node_bars_cnt <- node_bars_cnt + 1

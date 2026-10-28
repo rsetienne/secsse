@@ -116,7 +116,11 @@ secsse_sim <- function(lambdas,
       return(res)
     }
     
-    if (length(res$phy$tip.label) != length(res$obs_traits)) {
+    if (!non_extinction && res$status %in% c("extinction", "requirements not met")) {
+      return(res)
+    }
+    if (is.list(res$phy) &&
+        length(res$phy$tip.label) != length(res$obs_traits)) {
       message("something went wrong, please report this to the package maintainer")
     }
     
@@ -127,7 +131,7 @@ secsse_sim <- function(lambdas,
       }
       
       # if not, we have to subsample
-      set.seed(seed)
+      if (seed >= 0) set.seed(seed)
       all_traits <- names(mus)
       for (i in 1:length(all_traits)) {
         all_traits[i] <- substr(all_traits[i], 1, (nchar(all_traits[i]) - 1))
@@ -232,7 +236,6 @@ generate_phy <- function(mus,
   if (start_at_crown == FALSE && sum(Ltable[, 4] == -1) == 1) {
     # fake phy
     phy <- ape::rphylo(n = 2, birth = 0.2, death = 0)
-    phy$edge.length[-2]
     phy$tip.label <- phy$tip.label[-2]
     phy$edge <- phy$edge[-2, ]
     phy$edge <- matrix(data = phy$edge, nrow = 1) # important!

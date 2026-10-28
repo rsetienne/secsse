@@ -30,7 +30,8 @@ secsse_ml(
   method = "odeint::runge_kutta_cash_karp54",
   use_normalization = TRUE,
   return_root_state = FALSE,
-  see_ancestral_states = FALSE
+  see_ancestral_states = FALSE,
+  max_rate = 1e+06
 )
 }
 \arguments{
@@ -121,6 +122,12 @@ store the root state every ML evaluation).}
 
 \item{see_ancestral_states}{Boolean for whether the ancestral states for each
 of the internal nodes should be output. Defaults to \code{FALSE}.}
+
+\item{max_rate}{upper limit of rates inferred in Maximum Likelihood.
+Sometimes, the ML search might get stuck in an extremely high rate area,
+limiting the maximum rate might then be helpful. Works through setting any
+likelihood exceeding this rate to Infinity, which will be rejected by the
+optimization algorithm and cause the algorithm to move away from this area.}
 }
 \value{
 A list with the following elements

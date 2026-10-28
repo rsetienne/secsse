@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Rampal S. Etienne \email{r.s.etienne@rug.nl} (\href{https://orcid.org/0000-0003-2142-7612}{ORCID})
   \item Leonel Herrera Alsina \email{leonelhalsina@gmail.com} (\href{https://orcid.org/0000-0003-0474-3592}{ORCID})
   \item Paul van Els \email{paulvanels@gmail.com} (\href{https://orcid.org/0000-0002-9499-8873}{ORCID})
 }

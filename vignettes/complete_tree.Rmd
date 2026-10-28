@@ -89,7 +89,7 @@ sim_tree_complete <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                         qs = sim_q_matrix,
                                         crown_age = 5,
                                         num_concealed_states = 2,
-                                        seed = 40,
+                                        seed = 3,
                                         drop_extinct = FALSE)
 
 if (requireNamespace("diversitree")) {
@@ -136,7 +136,9 @@ complete_tree_ml_CR <- secsse_ml(phy = sim_tree_complete$phy,
                                  idparsfix = idparsfix,
                                  parsfix = initparsfix,
                                  sampling_fraction = sampling_fraction,
-                                 verbose = FALSE)
+                                 verbose = FALSE,
+                                 is_complete_tree = TRUE,
+                                 num_threads = 1)
 ```
 
 Now we can see what our results look like.
@@ -169,7 +171,7 @@ sim_tree_reconstructed <- secsse::secsse_sim(lambdas = sim_lambda_list,
                                              qs = sim_q_matrix,
                                              crown_age = 5,
                                              num_concealed_states = 2,
-                                             seed = 40,
+                                             seed = 3,
                                              drop_extinct = TRUE)
 
 if (requireNamespace("diversitree")) {
@@ -195,7 +197,8 @@ reconstructed_tree_ml <- secsse_ml(phy = sim_tree_reconstructed$phy,
                                    parsfix = initparsfix,
                                    sampling_fraction = sampling_fraction,
                                    verbose = FALSE,
-                                   is_complete_tree = FALSE)
+                                   is_complete_tree = FALSE,
+                                   num_threads = 1)
 
 ```
 
@@ -254,7 +257,6 @@ care should be exercised with model selection and specification when fitting
 secsse to empirical datasets to make predictions about evolutionary patterns.
 
 ## References
-
 Nee S, May RM, Harvey PH. The reconstructed evolutionary process. Philos Trans 
 R Soc Lond B Biol Sci. 1994 May 28;344(1309):305-11. 
 https://doi.org/10.1098/rstb.1994.0068.
